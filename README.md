@@ -63,9 +63,10 @@ Route groups do not alter public URLs. For example,
 - `lib/data/` is mock-only and must not become the production database layer.
 - Authentication identity comes from the server session, never from a client
   supplied user ID.
-- Adult friends-of-friends may discover rides and resort-level activity, but
-  precise meeting points and live locations are visible only to confirmed
-  friends.
+- Adult friends-of-friends may discover rides and resort-level activity.
+  Precise meeting points become visible only to confirmed friends or after the
+  ride host accepts a participation request. Live locations remain limited to
+  confirmed friends.
 - Minor profiles, rides, locations, and direct messages use the narrower
   confirmed-friends audience.
 - Supabase tables exposed through its API require Row Level Security and

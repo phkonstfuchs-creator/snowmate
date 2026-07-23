@@ -53,8 +53,11 @@ All exposed tables need explicit RLS policies and indexes on policy columns.
 Decision recorded on 2026-07-24:
 
 - Adult friends-of-friends may discover ride posts and resort-level presence.
-- Precise meeting points and live locations are visible only to confirmed
-  friends.
+- Precise meeting points are visible to confirmed friends and accepted ride
+  participants. A friend-of-friend must not receive them before the ride host
+  accepts the participation request.
+- Live locations remain visible only to confirmed friends and are not unlocked
+  by ride acceptance.
 - Minor profiles, rides, locations, and direct messages use the narrower
   confirmed-friends audience.
 - Unrelated users do not receive ride or location discovery data.
