@@ -1,4 +1,13 @@
-import { User, RidePost, CarpoolPost, ResortStatus, Badge, LeaderboardEntry, Crew, Conversation } from "./types";
+import {
+  type Badge,
+  type CarpoolPost,
+  type Conversation,
+  type Crew,
+  type LeaderboardEntry,
+  type ResortStatus,
+  type RidePost,
+  type User,
+} from "../types";
 
 export const BADGES: Badge[] = [
   { id: "first_tracks", name: "First Tracks", description: "Rode before 8am on a powder day", rarity: "rare", icon: "sunrise" },
@@ -281,7 +290,7 @@ export const RIDE_POSTS: RidePost[] = [
     meetTime: "09:45",
     meetPoint: "Fulpmes Bahnhof",
     totalSpots: 5,
-    takenSpots: 4,
+    takenSpots: 3,
     joinedUserIds: ["u3", "u4", "u6"],
     caption: "Last spot open! Come along.",
     postedAt: "3 hr ago",
@@ -419,8 +428,8 @@ export const LEADERBOARD_INNSBRUCK: LeaderboardEntry[] = [
   { userId: "u3", rank: 2, days: 31, xp: 3800 },
   { userId: "u6", rank: 3, days: 19, xp: 2900 },
   { userId: "me", rank: 4, days: 23, xp: 2340 },
-  { userId: "u2", rank: 5, days: 11, xp: 1200 },
-  { userId: "u7", rank: 6, days: 14, xp: 1650 },
+  { userId: "u7", rank: 5, days: 14, xp: 1650 },
+  { userId: "u2", rank: 6, days: 11, xp: 1200 },
   { userId: "u4", rank: 7, days: 6, xp: 580 },
 ];
 
@@ -429,9 +438,9 @@ export const LEADERBOARD_SALZBURG: LeaderboardEntry[] = [
   { userId: "u8", rank: 2, days: 28, xp: 4100 },
 ];
 
-export const CREWS = [
-  { id: "cr1", name: "IBK Pow Crew", memberIds: ["me", "u1", "u2", "u3"], city: "innsbruck" as const },
-  { id: "cr2", name: "Park Rats", memberIds: ["me", "u3", "u6", "u7"], city: "innsbruck" as const },
+export const CREWS: Crew[] = [
+  { id: "cr1", name: "IBK Pow Crew", memberIds: ["me", "u1", "u2", "u3"], city: "innsbruck" },
+  { id: "cr2", name: "Park Rats", memberIds: ["me", "u3", "u6", "u7"], city: "innsbruck" },
 ];
 
 export const CONVERSATIONS: Conversation[] = [
@@ -474,7 +483,20 @@ export function getUserById(id: string): User | undefined {
   return MOCK_USERS.find((u) => u.id === id);
 }
 
-export const ME = MOCK_USERS.find((u) => u.id === "me")!;
+export function getUsersByIds(ids: readonly string[]): User[] {
+  return ids.flatMap((id) => {
+    const user = getUserById(id);
+    return user ? [user] : [];
+  });
+}
+
+const currentUser = getUserById("me");
+
+if (!currentUser) {
+  throw new Error("Mock data must include the current user.");
+}
+
+export const ME = currentUser;
 
 export const LEVEL_TITLES: Record<number, string> = {
   1: "Newbie",
@@ -488,4 +510,3 @@ export const LEVEL_TITLES: Record<number, string> = {
   9: "Pro",
   10: "Peak",
 };
-

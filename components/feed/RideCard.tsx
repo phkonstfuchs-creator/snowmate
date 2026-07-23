@@ -10,7 +10,6 @@ interface RideCardProps {
   post: RidePost;
   author: User;
   joinedUsers: User[];
-  currentUserId: string;
   isJoined: boolean;
   onClick: () => void;
   onJoin?: (e: React.MouseEvent) => void;

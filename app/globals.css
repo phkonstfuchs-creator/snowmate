@@ -6,6 +6,10 @@
    no rainbow gradients — tonal gradients only.
    ──────────────────────────────────────────────────────────── */
 :root {
+  --font-display: "Big Shoulders Variable";
+  --font-body: "Hanken Grotesk Variable";
+  --font-mono: "JetBrains Mono Variable";
+
   /* Base neutrals (near-black, layered surfaces) */
   --n-0: #0a0e12; /* canvas */
   --n-1: #10161c; /* surface 1 */

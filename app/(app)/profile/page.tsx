@@ -3,7 +3,8 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
-import { Badge } from "@/lib/types";
+import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import XPBar from "@/components/ui/XPBar";
@@ -17,6 +18,8 @@ const BRAND = "var(--accent-primary)";
 const ORANGE = "var(--accent-warm)";
 
 function PremiumSheet({ onClose }: { onClose: () => void }) {
+  useScrollLock();
+
   const FEATURES = [
     { label: "Satellite map", desc: "Terrain, couloirs & off-piste options live" },
     { label: "Powder alerts", desc: "Push when 15+ cm falls in your area" },
@@ -25,8 +28,8 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
   ];
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Snowmate Premium" style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-5">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -100,7 +103,7 @@ const BADGE_ICON_NAME: Record<string, string> = {
   multi_pass: "map",
 };
 
-const RARITY: Record<string, { bg: string; ink: string; border: string; label: string }> = {
+const RARITY: Record<BadgeRarity, { bg: string; ink: string; border: string; label: string }> = {
   common: { bg: SURFACE, ink: MUTED, border: BORDER, label: "Common" },
   rare: { bg: "var(--accent-primary-subtle)", ink: BRAND, border: "rgba(79,195,240,0.35)", label: "Rare" },
   epic: { bg: "var(--accent-warm-subtle)", ink: "var(--ember-400)", border: "rgba(255,162,60,0.4)", label: "Epic" },
@@ -128,6 +131,13 @@ export default function ProfilePage() {
   const [showPremium, setShowPremium] = useState(false);
   const leaderboard = leaderboardCity === "innsbruck" ? LEADERBOARD_INNSBRUCK : LEADERBOARD_SALZBURG;
   const myRank = leaderboard.find((e) => e.userId === "me");
+  const podiumEntries = [
+    leaderboard[1],
+    leaderboard[0],
+    leaderboard[2],
+  ].filter(
+    (entry): entry is LeaderboardEntry => entry !== undefined,
+  );
 
   return (
     <>
@@ -150,7 +160,7 @@ export default function ProfilePage() {
               <span className="text-white/70 text-sm font-semibold">@{ME.handle}</span>
             </div>
           </div>
-          <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(79,195,240,0.15)" }}>
+          <button aria-label="Open settings" className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(79,195,240,0.15)" }}>
             <Icon name="settings" size={16} color="white" strokeWidth={1.8} />
           </button>
         </div>
@@ -253,7 +263,7 @@ export default function ProfilePage() {
 
         {/* Podium */}
         <div className="flex items-end justify-center gap-2 mb-4 pt-3">
-          {[leaderboard[1], leaderboard[0], leaderboard[2]].filter(Boolean).map((entry) => {
+          {podiumEntries.map((entry) => {
             const user = getUserById(entry.userId);
             if (!user) return null;
             const isFirst = entry.rank === 1;

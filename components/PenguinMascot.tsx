@@ -14,6 +14,7 @@ export default function PenguinMascot({ size = 40, className = "" }: PenguinMasc
       height={size}
       className={className}
       style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }}
+      loading="eager"
       unoptimized
     />
   );

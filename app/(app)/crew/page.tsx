@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { MOCK_USERS, getUserById, CREWS, CONVERSATIONS, ME } from "@/lib/data";
+import {
+  MOCK_USERS,
+  getUserById,
+  getUsersByIds,
+  CREWS,
+  CONVERSATIONS,
+  ME,
+} from "@/lib/data";
 import ConversationThread from "@/components/ConversationThread";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 
@@ -24,8 +31,8 @@ function AddFriendSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Find friends" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -72,10 +79,9 @@ export default function CrewPage() {
   const [tab, setTab] = useState<Tab>("crew");
   const [showAdd, setShowAdd] = useState(false);
   const [pendingActions, setPendingActions] = useState<Record<string, "accepted" | "declined">>({});
-  const [removedFriends, setRemovedFriends] = useState<Set<string>>(new Set());
   const [selectedConvUserId, setSelectedConvUserId] = useState<string | null>(null);
 
-  const myFriends = ME.friendIds.map((id) => getUserById(id)!).filter(Boolean).filter((u) => !removedFriends.has(u.id));
+  const myFriends = getUsersByIds(ME.friendIds);
   const pendingUsers = MOCK_USERS.filter((u) => !ME.friendIds.includes(u.id) && u.id !== "me").slice(0, 3);
   const totalUnread = CONVERSATIONS.reduce((sum, c) => sum + c.messages.filter((m) => m.senderId !== "me" && !m.isRead).length, 0);
   const handlePending = (userId: string, action: "accepted" | "declined") => setPendingActions((prev) => ({ ...prev, [userId]: action }));
@@ -92,6 +98,7 @@ export default function CrewPage() {
           </div>
           <button
             onClick={() => setShowAdd(true)}
+            aria-label="Find friends"
             className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >

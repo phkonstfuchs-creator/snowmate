@@ -18,7 +18,7 @@ export default defineConfig({
       use: {
         ...devices["iPhone 13"],
         browserName: "chromium",
-        channel: "chrome",
+        ...(process.env.CI ? {} : { channel: "chrome" }),
       },
     },
   ],

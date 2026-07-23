@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
 import { RESORT_STATUS, RIDE_POSTS, getUserById, ME } from "@/lib/data";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -20,7 +20,7 @@ const MUTED   = "var(--text-tertiary)";
 const INK     = "var(--text-primary)";
 const BRAND   = "var(--accent-primary)";
 
-const CONDITIONS_LABELS: Record<string, string> = {
+const CONDITIONS_LABELS: Record<ResortStatus["conditions"], string> = {
   fresh: "Fresh", groomed: "Groomed", icy: "Icy", slushy: "Slushy",
 };
 
@@ -30,8 +30,8 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={`${resort.name} details`} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -68,7 +68,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
         {/* Ability bars */}
         <div className="px-5 mt-4">
-          <p className="text-[0.65rem] font-black uppercase tracking-widest mb-2.5" style={{ color: MUTED }}>Who's riding what</p>
+          <p className="text-[0.65rem] font-black uppercase tracking-widest mb-2.5" style={{ color: MUTED }}>Who&apos;s riding what</p>
           {[
             { label: "Chill",     count: resort.chillRiders,    color: "var(--ice-400)",   bg: "var(--accent-primary-subtle)" },
             { label: "Park",      count: resort.parkRiders,     color: "var(--ember-400)", bg: "var(--accent-warm-subtle)" },
@@ -121,8 +121,8 @@ function SatelliteUpsell({ onClose }: { onClose: () => void }) {
   useScrollLock();
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Premium map features" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-5">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -176,7 +176,10 @@ export default function MapPage() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [selectedResort, setSelectedResort] = useState<ResortStatus | null>(null);
 
-  const resorts     = RESORT_STATUS.filter((r) => r.city === city);
+  const resorts = useMemo(
+    () => RESORT_STATUS.filter((resort) => resort.city === city),
+    [city],
+  );
   const sorted      = [...resorts].sort((a, b) => b.ridersNow - a.ridersNow);
   const hotResort   = sorted[0];
   const totalRiders = resorts.reduce((s, r) => s + r.ridersNow, 0);
@@ -193,7 +196,9 @@ export default function MapPage() {
             </p>
           </div>
           <button
-            onClick={() => (ME.isPremium ? undefined : setShowUpsell(true))}
+            onClick={() => {
+              if (!ME.isPremium) setShowUpsell(true);
+            }}
             className="flex items-center gap-1.5 text-xs font-black px-3 py-2 rounded-full active:scale-95 transition-all"
             style={{ background: SURFACE, color: MUTED, border: `1px solid ${BORDER}` }}
           >
@@ -208,6 +213,7 @@ export default function MapPage() {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
+            ariaLabel="Region"
           />
         </div>
       </header>

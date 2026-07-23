@@ -5,7 +5,7 @@ import { User } from "@/lib/types";
 import { BADGES, ME } from "@/lib/data";
 import clsx from "clsx";
 import ConversationThread from "@/components/ConversationThread";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import XPBar from "@/components/ui/XPBar";
@@ -51,8 +51,8 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "env(safe-area-inset-bottom, 24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={`${user.name} profile`} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "env(safe-area-inset-bottom, 24px)" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 z-10" style={{ background: SURFACE }}>
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />

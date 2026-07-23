@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { City, User } from "@/lib/types";
-import { RIDE_POSTS, getUserById, ME } from "@/lib/data";
+import { RIDE_POSTS, getUserById, getUsersByIds, ME } from "@/lib/data";
+import {
+  createRideView,
+  toggleRideMembership,
+} from "@/features/rides/ride-state";
 import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
@@ -30,15 +34,19 @@ export default function FeedPage() {
     .filter(Boolean) as User[];
 
   const handleJoin = (postId: string) => {
-    if (!joinedPostIds.has(postId)) {
+    const post = RIDE_POSTS.find((candidate) => candidate.id === postId);
+    if (!post) return;
+
+    const nextJoinedPostIds = toggleRideMembership(joinedPostIds, post);
+    const didJoin =
+      !joinedPostIds.has(postId) && nextJoinedPostIds.has(postId);
+
+    if (didJoin) {
       setShowXp(true);
       setTimeout(() => setShowXp(false), 1750);
     }
-    setJoinedPostIds((prev) => {
-      const next = new Set(prev);
-      next.has(postId) ? next.delete(postId) : next.add(postId);
-      return next;
-    });
+
+    setJoinedPostIds(nextJoinedPostIds);
   };
 
   return (
@@ -64,6 +72,7 @@ export default function FeedPage() {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
+            ariaLabel="Region"
           />
         </div>
       </header>
@@ -102,21 +111,23 @@ export default function FeedPage() {
       {/* Feed */}
       <div className="px-4 pb-4 space-y-3 stagger">
         {posts.map((post, i) => {
-          const author = getUserById(post.authorId)!;
+          const author = getUserById(post.authorId);
+          if (!author) return null;
+
           const isJoined = joinedPostIds.has(post.id);
-          const allJoined = post.joinedUserIds.map((id) => getUserById(id)!).filter(Boolean);
-          const displayJoined = isJoined ? [...allJoined, ME].filter((u, i, arr) => arr.findIndex(x => x.id === u.id) === i) : allJoined;
-          const displayPost = isJoined
-            ? { ...post, takenSpots: post.takenSpots + 1, joinedUserIds: [...post.joinedUserIds, "me"] }
-            : post;
+          const rideView = createRideView({
+            post,
+            joinedUsers: getUsersByIds(post.joinedUserIds),
+            currentUser: ME,
+            isJoined,
+          });
 
           return (
             <RideCard
               key={post.id}
-              post={displayPost}
+              post={rideView.post}
               author={author}
-              joinedUsers={displayJoined}
-              currentUserId="me"
+              joinedUsers={rideView.joinedUsers}
               isJoined={isJoined}
               index={i}
               onClick={() => setSelectedPostId(post.id)}
@@ -139,6 +150,7 @@ export default function FeedPage() {
       {/* FAB */}
       <button
         onClick={() => setShowPostModal(true)}
+        aria-label="Post a ride"
         className="fixed bottom-[88px] w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40"
         style={{ right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))", background: "var(--ice-500)" }}
       >
@@ -152,19 +164,22 @@ export default function FeedPage() {
 
       {/* Ride Detail Sheet */}
       {selectedPost && (() => {
-        const author = getUserById(selectedPost.authorId)!;
+        const author = getUserById(selectedPost.authorId);
+        if (!author) return null;
+
         const isJoined = joinedPostIds.has(selectedPost.id);
-        const allJoined = selectedPost.joinedUserIds.map((id) => getUserById(id)!).filter(Boolean);
-        const displayJoined = isJoined ? [...allJoined, ME].filter((u, i, arr) => arr.findIndex(x => x.id === u.id) === i) : allJoined;
-        const displayPost = isJoined
-          ? { ...selectedPost, takenSpots: selectedPost.takenSpots + 1, joinedUserIds: [...selectedPost.joinedUserIds, "me"] }
-          : selectedPost;
+        const rideView = createRideView({
+          post: selectedPost,
+          joinedUsers: getUsersByIds(selectedPost.joinedUserIds),
+          currentUser: ME,
+          isJoined,
+        });
+
         return (
           <RideDetailSheet
-            post={displayPost}
+            post={rideView.post}
             author={author}
-            joinedUsers={displayJoined}
-            currentUserId="me"
+            joinedUsers={rideView.joinedUsers}
             isJoined={isJoined}
             onClose={() => setSelectedPostId(null)}
             onJoin={() => { handleJoin(selectedPost.id); }}
@@ -184,7 +199,7 @@ export default function FeedPage() {
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M8 1L2 8.5h5L6 13l6-7.5H7L8 1Z" fill="var(--ice-300)" />
             </svg>
-            <span className="font-mono">+50 XP</span> · You're in!
+            <span className="font-mono">+50 XP</span> · You&apos;re in!
           </div>
         </div>
       )}

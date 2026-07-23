@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 
 const SNOW = "#EAF6FB";
 const FAR  = "#22303A";
@@ -51,7 +51,7 @@ const SCENES = [
     mid:  "M0,180 L0,114 L80,148 L200,144 L326,140 L400,108 L400,180Z",
     near: "M0,180 L0,166 L122,160 L282,158 L400,164 L400,180Z",
   },
-];
+] as const;
 
 // Fixed star positions (sky area, y < 90)
 const STARS: [number, number, number][] = [
@@ -74,9 +74,9 @@ export default function ResortScene({
   style?: React.CSSProperties;
 }) {
   const idx = hash(name) % SCENES.length;
-  const scene = SCENES[idx];
-  // Unique gradient ID per resort to avoid inline-SVG ID collisions
-  const gid = `rsg-${name.replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+  const scene = SCENES[idx] ?? SCENES[0];
+  const instanceId = useId().replaceAll(":", "");
+  const gid = `rsg-${name.replace(/[^a-z0-9]/gi, "").toLowerCase()}-${instanceId}`;
 
   return (
     <svg

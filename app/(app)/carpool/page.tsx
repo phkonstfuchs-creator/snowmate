@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { City } from "@/lib/types";
 import { CARPOOL_POSTS, getUserById } from "@/lib/data";
+import { toggleSetValue } from "@/lib/collections";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
@@ -17,13 +18,13 @@ const MUTED = "var(--text-tertiary)";
 const INK = "var(--text-primary)";
 const BRAND = "var(--accent-primary)";
 
-function OfferModal({ city, onClose }: { city: City; onClose: () => void }) {
+function OfferModal({ onClose }: { onClose: () => void }) {
   useScrollLock();
   const [role, setRole] = useState<"driver" | "rider">("driver");
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Post a carpool" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -34,6 +35,7 @@ function OfferModal({ city, onClose }: { city: City; onClose: () => void }) {
             options={[{ value: "driver", label: "I'm driving" }, { value: "rider", label: "I need a ride" }]}
             value={role}
             onChange={setRole}
+            ariaLabel="Carpool role"
           />
           {[
             { label: "From (departure)", placeholder: "e.g. Innsbruck HBF" },
@@ -71,11 +73,7 @@ export default function CarpoolPage() {
   const riders = posts.filter((p) => p.role === "rider");
 
   const toggle = (id: string) =>
-    setRequestedIds((prev) => {
-      const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
+    setRequestedIds((previousIds) => toggleSetValue(previousIds, id));
 
   return (
     <>
@@ -102,6 +100,7 @@ export default function CarpoolPage() {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
+            ariaLabel="Region"
           />
         </div>
       </header>
@@ -118,7 +117,9 @@ export default function CarpoolPage() {
             </div>
             <div className="space-y-3 stagger">
               {drivers.map((post, i) => {
-                const author = getUserById(post.authorId)!;
+                const author = getUserById(post.authorId);
+                if (!author) return null;
+
                 const isReq = requestedIds.has(post.id);
                 return (
                   <div
@@ -189,7 +190,9 @@ export default function CarpoolPage() {
             </div>
             <div className="space-y-2 stagger">
               {riders.map((post, i) => {
-                const author = getUserById(post.authorId)!;
+                const author = getUserById(post.authorId);
+                if (!author) return null;
+
                 const isOffered = requestedIds.has(post.id + "_offer");
                 return (
                   <div
@@ -240,7 +243,7 @@ export default function CarpoolPage() {
         )}
       </div>
 
-      {showOfferModal && <OfferModal city={city} onClose={() => setShowOfferModal(false)} />}
+      {showOfferModal && <OfferModal onClose={() => setShowOfferModal(false)} />}
     </>
   );
 }

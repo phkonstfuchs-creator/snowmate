@@ -1,3 +1,5 @@
+"use client";
+
 import { InputHTMLAttributes, ReactNode, useId, useState } from "react";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {

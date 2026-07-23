@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
 import Icon from "@/components/ui/Icon";
+import type { AbilityLevel, City } from "@/lib/types";
 
 const D       = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -13,8 +14,7 @@ const MUTED   = "var(--text-tertiary)";
 const INK     = "var(--text-primary)";
 const BRAND   = "var(--accent-primary)";
 
-type City  = "innsbruck" | "salzburg";
-type Style = "chill" | "park" | "off-piste";
+type Style = AbilityLevel;
 
 const STYLE_OPTIONS: { id: Style; label: string; desc: string; color: string; bg: string }[] = [
   { id: "chill",     label: "Chill",      desc: "Groomed runs, sun, good vibes",     color: "var(--ice-400)",   bg: "var(--accent-primary-subtle)" },
@@ -240,7 +240,7 @@ export default function OnboardingPage() {
           <Icon name="chevron-left" size={18} color={MUTED} />
         </button>
         <div>
-          <h2 className="font-display" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>What's your name?</h2>
+          <h2 className="font-display" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>What&apos;s your name?</h2>
           <p className="text-sm font-medium" style={{ color: MUTED }}>Visible to confirmed crew members</p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function OnboardingPage() {
         {/* Avatar preview */}
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: BRAND }}>
-            <span className="font-display text-2xl" style={{ color: "var(--text-on-accent)", fontWeight: 800 }}>{name ? name[0].toUpperCase() : "?"}</span>
+            <span className="font-display text-2xl" style={{ color: "var(--text-on-accent)", fontWeight: 800 }}>{name ? name.charAt(0).toUpperCase() : "?"}</span>
           </div>
         </div>
 

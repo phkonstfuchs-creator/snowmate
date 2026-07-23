@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   createRideView,
-  toggleSetValue,
+  toggleRideMembership,
 } from "@/features/rides/ride-state";
+import { toggleSetValue } from "@/lib/collections";
 import type { RidePost, User } from "@/lib/types";
 
 const currentUser: User = {
@@ -80,5 +81,35 @@ describe("toggleSetValue", () => {
     expect(result).not.toBe(original);
     expect(result.has("ride-1")).toBe(false);
     expect(original.has("ride-1")).toBe(true);
+  });
+
+  it("adds a missing value without changing the source set", () => {
+    const original = new Set<string>();
+    const result = toggleSetValue(original, "ride-1");
+
+    expect(result.has("ride-1")).toBe(true);
+    expect(original.has("ride-1")).toBe(false);
+  });
+});
+
+describe("toggleRideMembership", () => {
+  it("does not join a full ride", () => {
+    const fullRide = {
+      ...ride,
+      totalSpots: 1,
+      takenSpots: 1,
+    };
+
+    const result = toggleRideMembership(new Set(), fullRide);
+
+    expect(result.has(fullRide.id)).toBe(false);
+  });
+
+  it("allows a joined user to leave", () => {
+    const joinedRideIds = new Set([ride.id]);
+
+    const result = toggleRideMembership(joinedRideIds, ride);
+
+    expect(result.has(ride.id)).toBe(false);
   });
 });

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { RidePost, User } from "@/lib/types";
 import UserProfileSheet from "@/components/UserProfileSheet";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
@@ -18,7 +18,6 @@ interface Props {
   post: RidePost;
   author: User;
   joinedUsers: User[];
-  currentUserId: string;
   onClose: () => void;
   onJoin?: () => void;
   isJoined: boolean;
@@ -36,8 +35,8 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} />
-      <div className="sheet-panel" style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
+      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Ride details" style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
@@ -67,7 +66,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} · Lv {author.level} · {post.postedAt}</span>
             </div>
           </button>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
+          <button onClick={onClose} aria-label="Close ride details" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
             <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
           </button>
         </div>

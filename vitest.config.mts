@@ -1,9 +1,11 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
@@ -12,6 +14,7 @@ export default defineConfig({
       provider: "v8",
       include: [
         "features/**/*.ts",
+        "lib/collections.ts",
         "components/ui/SegmentedControl.tsx",
       ],
       thresholds: {

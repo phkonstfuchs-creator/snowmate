@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { AbilityLevel, City } from "@/lib/types";
 import { RESORT_STATUS } from "@/lib/data";
 import Icon from "@/components/ui/Icon";

@@ -1,13 +1,16 @@
+"use client";
+
 interface Option<T extends string> {
   value: T;
   label: string;
 }
 
 interface SegmentedControlProps<T extends string> {
-  options: Option<T>[];
+  options: readonly Option<T>[];
   value: T;
   onChange: (value: T) => void;
   fullWidth?: boolean;
+  ariaLabel?: string;
 }
 
 export default function SegmentedControl<T extends string>({
@@ -15,12 +18,15 @@ export default function SegmentedControl<T extends string>({
   value,
   onChange,
   fullWidth = true,
+  ariaLabel = "Options",
 }: SegmentedControlProps<T>) {
   const activeIndex = Math.max(0, options.findIndex((o) => o.value === value));
 
   return (
     <div
       className="relative flex"
+      role="group"
+      aria-label={ariaLabel}
       style={{
         width: fullWidth ? "100%" : "fit-content",
         padding: 4,
@@ -45,8 +51,10 @@ export default function SegmentedControl<T extends string>({
         const active = opt.value === value;
         return (
           <button
+            type="button"
             key={opt.value}
             onClick={() => onChange(opt.value)}
+            aria-pressed={active}
             className="relative z-10 flex-1 flex items-center justify-center transition-colors"
             style={{
               height: 36,

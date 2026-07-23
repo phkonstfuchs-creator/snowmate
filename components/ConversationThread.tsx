@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/lib/types";
 import { getUserById, CONVERSATIONS } from "@/lib/data";
-import { useScrollLock } from "@/lib/useScrollLock";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 
@@ -69,6 +69,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       >
         <button
           onClick={onClose}
+          aria-label="Close conversation"
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
           style={{ background: "var(--bg-surface-2)" }}
         >
@@ -152,6 +153,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         <button
           onClick={send}
           disabled={!input.trim()}
+          aria-label="Send message"
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40 flex-shrink-0"
           style={{ background: "var(--ice-500)" }}
         >

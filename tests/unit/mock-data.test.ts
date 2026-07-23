@@ -4,6 +4,8 @@ import {
   CARPOOL_POSTS,
   CONVERSATIONS,
   CREWS,
+  LEADERBOARD_INNSBRUCK,
+  LEADERBOARD_SALZBURG,
   MOCK_USERS,
   RIDE_POSTS,
 } from "@/lib/data";
@@ -39,6 +41,33 @@ describe("mock data integrity", () => {
         expected: ride.joinedUserIds.length,
         actual: ride.takenSpots,
       })).filter(({ expected, actual }) => expected !== actual),
+    ).toEqual([]);
+  });
+
+  it("keeps denormalized carpool capacity aligned with rider references", () => {
+    expect(
+      CARPOOL_POSTS.map((post) => ({
+        id: post.id,
+        expected: post.totalSeats - post.riders.length,
+        actual: post.availableSeats,
+      })).filter(({ expected, actual }) => expected !== actual),
+    ).toEqual([]);
+  });
+
+  it.each([
+    ["Innsbruck", LEADERBOARD_INNSBRUCK],
+    ["Salzburg", LEADERBOARD_SALZBURG],
+  ])("keeps the %s leaderboard ranked by XP", (_, leaderboard) => {
+    expect(
+      leaderboard.map((entry, index) => ({
+        rank: entry.rank,
+        expectedRank: index + 1,
+        xp: entry.xp,
+        previousXp: leaderboard[index - 1]?.xp ?? Number.POSITIVE_INFINITY,
+      })).filter(
+        ({ rank, expectedRank, xp, previousXp }) =>
+          rank !== expectedRank || xp > previousXp,
+      ),
     ).toEqual([]);
   });
 });
