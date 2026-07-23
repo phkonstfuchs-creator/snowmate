@@ -48,9 +48,19 @@ phase needs normalized tables for profiles, friendships, crews, rides,
 memberships, carpools, conversations, messages, blocks, reports, and consent.
 All exposed tables need explicit RLS policies and indexes on policy columns.
 
-The unresolved product rule is whether adult ride/location discovery includes
-friends-of-friends or only confirmed friends. Minor visibility and direct
-messaging should default to the narrower confirmed relationship.
+### Visibility decision
+
+Decision recorded on 2026-07-24:
+
+- Adult friends-of-friends may discover ride posts and resort-level presence.
+- Precise meeting points and live locations are visible only to confirmed
+  friends.
+- Minor profiles, rides, locations, and direct messages use the narrower
+  confirmed-friends audience.
+- Unrelated users do not receive ride or location discovery data.
+
+The backend must enforce these audiences in queries and RLS policies rather
+than relying on client-side filtering.
 
 ## Improvements completed
 
@@ -98,8 +108,9 @@ into feature modules; it must not be reduced to keep the percentage green.
 - Conversation selection by conversation ID instead of only user ID
 - Validated server commands for posting, joining, messaging, and onboarding
 
-These require the visibility decision or belong to the backend implementation,
-not to a structural cleanup of the mock prototype.
+These belong to the backend implementation and must enforce the visibility
+decision above; they are not part of the structural cleanup of the mock
+prototype.
 
 ## Residual dependency risk
 

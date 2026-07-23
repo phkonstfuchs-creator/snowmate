@@ -137,7 +137,7 @@ export default function CrewPage() {
             <Icon name="shield-check" size={16} color={BRAND} strokeWidth={1.6} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-black" style={{ color: BRAND }}>Friend-graph model</p>
-              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Rides and location are only visible to confirmed friends. No open matching.</p>
+              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Friends-of-friends can discover rides at resort level. Exact locations stay with confirmed friends.</p>
             </div>
           </div>
 
