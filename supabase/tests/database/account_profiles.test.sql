@@ -92,14 +92,11 @@ select results_eq(
 insert into auth.users (id, email)
 values ('22222222-2222-4222-8222-222222222222', 'rider-two@example.com');
 
-alter table auth.users
-  disable trigger snowmate_create_profile_after_auth_user_insert;
-
 insert into auth.users (id, email)
 values ('33333333-3333-4333-8333-333333333333', 'existing-rider@example.com');
 
-alter table auth.users
-  enable trigger snowmate_create_profile_after_auth_user_insert;
+delete from public.profiles
+where id = '33333333-3333-4333-8333-333333333333';
 
 select results_eq(
   $$select private.backfill_profiles_for_auth_users()$$,
