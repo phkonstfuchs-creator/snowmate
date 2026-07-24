@@ -11,7 +11,7 @@ test("onboarding is outside the authenticated app shell", async ({ page }) => {
   ).toHaveCount(0);
 });
 
-test("a new user can finish onboarding and enter the app shell", async ({
+test("a new user can finish onboarding and continue to account creation", async ({
   page,
 }) => {
   await page.goto("/onboarding");
@@ -20,17 +20,21 @@ test("a new user can finish onboarding and enter the app shell", async ({
   await page.getByRole("button", { name: /Innsbruck/ }).click();
   await page.getByRole("button", { name: /Chill/ }).click();
   await page.getByPlaceholder("Alex Rider").fill("Alex Rider");
-  await page.getByRole("button", { name: "Let's go" }).click();
+  await page.getByRole("button", { name: "Create account" }).click();
 
-  await expect(page).toHaveURL(/\/feed$/);
+  await expect(page).toHaveURL(/\/signup$/);
+  await expect(
+    page.getByRole("heading", { name: "Create your account" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Main navigation" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
 });
 
 test("app responses include the baseline security headers", async ({ page }) => {
   const response = await page.goto("/feed");
 
+  await expect(page).toHaveURL(/\/login$/);
   expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
   expect(response?.headers()["x-frame-options"]).toBe("DENY");
   expect(response?.headers()["referrer-policy"]).toBe(

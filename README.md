@@ -1,8 +1,8 @@
 # Snowmate
 
 Snowmate is a mobile-first coordination app for ski crews around Innsbruck and
-Salzburg. The current repository contains the interactive product prototype and
-the engineering foundation for a later Supabase backend.
+Salzburg. The repository contains the interactive product prototype and the
+first Supabase account foundation.
 
 ## Local development
 
@@ -11,6 +11,7 @@ Requirements:
 - Node.js 24
 - npm 11 or newer
 - Google Chrome for the local Playwright project
+- Docker Desktop for the local Supabase stack and database policy tests
 
 ```bash
 nvm use
@@ -20,6 +21,23 @@ npm run dev
 
 The application is available at `http://localhost:3000`.
 
+The repository is linked to the hosted `snowmate-dev` Supabase project locally.
+That link and `.env.local` are ignored by Git. A fresh checkout needs the three
+browser-safe values documented in `.env.example`; never add a secret or
+service-role key.
+
+For local database work:
+
+```bash
+npx supabase start
+npx supabase db reset
+npm run test:db
+```
+
+`supabase/config.toml` configures the local stack. Hosted Auth settings are
+managed separately in the Supabase Dashboard and do not synchronize from that
+file.
+
 ## Quality gates
 
 ```bash
@@ -27,6 +45,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run test:coverage
+npm run test:db
 npm run test:e2e
 npm run build
 ```
@@ -46,7 +65,11 @@ features/         feature-owned domain logic and, later, feature UI/data access
 hooks/            reusable client-side React hooks
 lib/
   data/           prototype fixtures only
+  supabase/       validated browser/server clients and session refresh
   types.ts        current cross-feature domain types
+supabase/
+  migrations/     reviewed, ordered database changes
+  tests/database/ pgTAP policy and constraint tests
 tests/
   unit/           domain and fixture invariant tests
   e2e/            mobile browser journeys
@@ -81,11 +104,16 @@ Create `.env.local` from the documented names in `.env.example`. Only
 browser-safe Supabase values use the `NEXT_PUBLIC_` prefix. Secret and
 service-role keys must never be committed or exposed to client code.
 
-## Current limitation
+## Current backend boundary
 
-The repository still uses mock data and does not yet provide real
-authentication, persistence, RLS, or server-side authorization. Do not connect
-real profile, chat, minor, or location data until those controls are in place.
+Email/password authentication, SSR cookies, protected product routes, email
+confirmation, logout, and a private RLS-backed profile shell are implemented
+locally. The first migration must still pass the database test suite and be
+explicitly applied to `snowmate-dev`.
+
+Rides, friendships, chats, consent, and location remain mock-only. Do not
+connect real social, minor, or location data until their own normalized schema,
+authorization rules, negative RLS tests, and server DTOs exist.
 
 See [the structural audit](docs/STRUCTURAL_AUDIT.md) for the findings, completed
 work, and backend follow-up.

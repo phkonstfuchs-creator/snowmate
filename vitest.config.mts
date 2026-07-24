@@ -13,8 +13,11 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: [
-        "features/**/*.ts",
+        "features/**/*.{ts,tsx}",
         "lib/collections.ts",
+        "lib/supabase/config.ts",
+        "lib/supabase/proxy.ts",
+        "app/auth/confirm/route.ts",
         "components/ui/SegmentedControl.tsx",
       ],
       thresholds: {

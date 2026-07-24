@@ -121,3 +121,24 @@ The current prototype does not process attacker-supplied CSS or images, reducing
 present exploitability, but the advisories remain open. No forced downgrade,
 pre-release framework, or unsupported dependency override was introduced.
 Recheck when the next stable Next.js patch is available.
+
+## Account foundation follow-up
+
+Status on 2026-07-24:
+
+- Added Supabase SSR clients, validated public environment configuration,
+  session refresh through Next.js 16 `proxy.ts`, and a second authorization
+  check in the authenticated app layout.
+- Replaced the onboarding authentication bypass with real login, signup, email
+  confirmation, and logout flows backed by server-side validation.
+- Added a first migration for private profile shells with explicit grants,
+  forced RLS, owner-only policies, server-controlled minor/account fields, and
+  an `auth.users` trigger that copies no user-controlled metadata.
+- Added unit, component, callback, proxy, mobile E2E, and pgTAP policy tests.
+- The migration is local and has not yet been applied to `snowmate-dev`.
+  Database tests also remain unexecuted until Docker is available locally.
+
+This follow-up secures account identity only. It does not authorize social
+discovery, rides, messages, consent, or location. Those original backend
+blockers remain open and require their own migrations, DTOs, and negative RLS
+tests.

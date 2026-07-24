@@ -49,10 +49,20 @@ export default function OnboardingPage() {
 
   const finish = () => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("sm_done", "1");
+      localStorage.setItem(
+        "sm_onboarding_draft",
+        JSON.stringify({
+          city,
+          style,
+          displayName: name.trim(),
+          handle,
+        }),
+      );
     }
-    router.replace("/feed");
+    router.push("/signup");
   };
+
+  const login = () => router.push("/login");
 
   // ── Step 0: Welcome ─────────────────────────────────────────
   if (step === 0) {
@@ -109,7 +119,7 @@ export default function OnboardingPage() {
               Get started
             </button>
             <button
-              onClick={finish}
+              onClick={login}
               className="w-full py-3 text-sm font-bold"
               style={{ color: MUTED }}
             >
@@ -307,7 +317,7 @@ export default function OnboardingPage() {
           className="w-full py-4 rounded-2xl font-black text-lg active:scale-95 transition-transform disabled:opacity-40"
           style={{ background: BRAND, color: D }}
         >
-          Let&apos;s go
+          Create account
         </button>
         <p className="text-center text-[0.65rem] font-medium" style={{ color: MUTED }}>
           By creating an account you agree to our Terms of Service. Under 18? Parental consent required.

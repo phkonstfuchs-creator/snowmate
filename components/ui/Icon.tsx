@@ -5,7 +5,7 @@ import {
   ShieldCheck, MessageCircle, Heart, Settings, Share2, Wind, ThermometerSnowflake,
   Sparkles, UserPlus, ArrowRight, Compass, Navigation, Route, Clock, Users2,
   BadgeCheck, Lock, ChevronDown, MoreHorizontal, MapPinned, Satellite,
-  Sunrise, Map, Hammer,
+  Sunrise, Map, Hammer, LogOut,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -61,6 +61,7 @@ const REGISTRY: Record<string, ComponentType<LucideProps>> = {
   sunrise: Sunrise,
   map: Map,
   hammer: Hammer,
+  "log-out": LogOut,
 };
 
 interface IconProps extends Omit<LucideProps, "ref"> {

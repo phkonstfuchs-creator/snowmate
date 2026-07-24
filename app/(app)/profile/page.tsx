@@ -8,6 +8,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import XPBar from "@/components/ui/XPBar";
+import { signOutAction } from "@/features/auth/actions";
 
 const D = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -324,6 +325,19 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="px-4 pb-8">
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border text-sm font-bold"
+            style={{ borderColor: BORDER, color: "var(--status-danger)" }}
+          >
+            <Icon name="log-out" size={17} />
+            Log out
+          </button>
+        </form>
       </div>
 
       {showPremium && <PremiumSheet onClose={() => setShowPremium(false)} />}

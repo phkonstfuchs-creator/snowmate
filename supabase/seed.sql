@@ -1,0 +1,1 @@
+-- Account records are created through Supabase Auth, never through seed data.
