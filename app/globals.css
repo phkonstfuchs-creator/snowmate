@@ -410,6 +410,20 @@ body {
   background: var(--paper-2);
 }
 .map-satellite { background: var(--ink-0); }
+
+/* Der helle Kartenlayer ist neutralgrau. Sepia plus leichte
+   Drehung zieht ihn auf den Papierton, damit die Karte wie ein
+   gedruckter Plan wirkt statt wie eine fremde Web-Kachel. */
+.printed-map .leaflet-tile-pane {
+  filter: sepia(0.42) saturate(0.72) hue-rotate(-8deg) brightness(1.02) contrast(0.94);
+}
+.printed-map .leaflet-container { background: var(--paper-2); }
+.printed-map .leaflet-control-attribution {
+  background: rgba(242, 234, 219, 0.82);
+  color: var(--ink-2);
+  font: 500 10px var(--font-body-stack);
+}
+.printed-map .leaflet-control-attribution a { color: var(--rust-ink); }
 .map-pin {
   position: absolute;
   transform: translate(-50%, -100%);
