@@ -4,32 +4,32 @@ const emailSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .max(254, "Email address is too long.")
-  .email("Enter a valid email address.");
+  .max(254, "E-Mail-Adresse ist zu lang.")
+  .email("Gib eine gültige E-Mail-Adresse ein.");
 
 const loginCredentialsSchema = z.object({
   email: emailSchema,
   password: z
     .string()
-    .min(1, "Enter your password.")
-    .max(128, "Password is too long."),
+    .min(1, "Gib dein Passwort ein.")
+    .max(128, "Passwort ist zu lang."),
 });
 
 const signupCredentialsSchema = loginCredentialsSchema
   .extend({
     password: z
       .string()
-      .min(12, "Use at least 12 characters.")
-      .max(128, "Password is too long.")
-      .regex(/[a-z]/, "Add a lowercase letter.")
-      .regex(/[A-Z]/, "Add an uppercase letter.")
-      .regex(/[0-9]/, "Add a number."),
-    confirmPassword: z.string().max(128, "Password is too long."),
+      .min(12, "Verwende mindestens 12 Zeichen.")
+      .max(128, "Passwort ist zu lang.")
+      .regex(/[a-z]/, "Füge einen Kleinbuchstaben hinzu.")
+      .regex(/[A-Z]/, "Füge einen Großbuchstaben hinzu.")
+      .regex(/[0-9]/, "Füge eine Zahl hinzu."),
+    confirmPassword: z.string().max(128, "Passwort ist zu lang."),
   })
   .refine(
     ({ password, confirmPassword }) => password === confirmPassword,
     {
-      message: "Passwords do not match.",
+      message: "Passwörter stimmen nicht überein.",
       path: ["confirmPassword"],
     },
   );

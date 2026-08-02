@@ -121,13 +121,13 @@ test.describe("account lifecycle", () => {
     await expect(page.getByText("Anfrage erhalten")).toBeVisible();
     await expect(
       page.getByText(
-        "If this address can be used, you'll receive a confirmation email shortly.",
+        "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
       ),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Back to login" }).click();
+    await page.getByRole("link", { name: "Zurück zur Anmeldung" }).click();
 
     await page.getByLabel("E-Mail").fill(email);
-    await page.getByLabel("Password").fill(password);
+    await page.getByLabel("Passwort").fill(password);
     await page.getByRole("button", { name: "Anmelden" }).click();
 
     await expect(page).toHaveURL(/\/feed$/);

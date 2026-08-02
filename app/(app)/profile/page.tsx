@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
 import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -28,46 +29,7 @@ function SectionRule({ label, right }: { label: string; right?: React.ReactNode 
 
 function PremiumSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
-
-    function getFocusable(): HTMLElement[] {
-      return Array.from(
-        panel!.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
-      );
-    }
-
-    getFocusable()[0]?.focus();
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.key !== "Tab") return;
-
-      const focusable = getFocusable();
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (!first || !last) return;
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  const panelRef = useDialogFocus<HTMLDivElement>(onClose);
 
   const FEATURES: [string, string][] = [
     ["Satellitenkarte", "Gelände, Rinnen und Off-Piste-Lines live"],
@@ -85,6 +47,7 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label="Snowmate Premium"
+        tabIndex={-1}
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
         <div className="px-5 pt-6 pb-5" style={{ borderBottom: "var(--rule-thin)" }}>
@@ -115,7 +78,7 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
 
         <div className="px-5 pt-5 space-y-3">
           <button
-            className="w-full py-4 font-display text-lg uppercase tracking-tight"
+            className="w-full py-4 font-display text-lg uppercase"
             style={{ background: OCHRE, color: INK, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             2,99 € / Monat
@@ -159,7 +122,7 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
   const tilt = [-7, 5, -3, 8, -5, 4, -8, 6, -4, 7][index % 10];
 
   return (
-    <div className="flex flex-col items-center gap-2 flex-shrink-0" style={{ width: 84 }}>
+    <li className="flex flex-col items-center gap-2 flex-shrink-0" style={{ width: 84 }}>
       <div
         className="flex items-center justify-center rounded-full"
         style={{
@@ -183,13 +146,14 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
         style={{
           fontFamily: "var(--font-mono-stack)",
           fontWeight: 700,
-          letterSpacing: "0.04em",
+          letterSpacing: 0,
           color: earned ? INK : "var(--ink-3)",
         }}
       >
+        <span className="sr-only">{earned ? "Erhalten: " : "Noch gesperrt: "}</span>
         {badge.name}
       </span>
-    </div>
+    </li>
   );
 }
 
@@ -297,7 +261,7 @@ export default function ProfilePage() {
           >
             <Icon name="star" size={20} color={INK} fill={INK} strokeWidth={0} />
             <div className="flex-1">
-              <p className="font-display text-lg uppercase leading-none" style={{ color: INK, letterSpacing: "-0.02em" }}>
+              <p className="font-display text-lg uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>
                 Premium
               </p>
               <p className="text-sm mt-1" style={{ color: "var(--ink-1)" }}>
@@ -321,11 +285,15 @@ export default function ProfilePage() {
             }
           />
         </div>
-        <div className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
+        <ul
+          aria-label="Stempel"
+          className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1 outline-none focus-visible:ring-2 focus-visible:ring-rust"
+          tabIndex={0}
+        >
           {BADGES.map((badge, i) => (
             <Stamp key={badge.id} badge={badge} earned={ME.badges.includes(badge.id)} index={i} />
           ))}
-        </div>
+        </ul>
       </section>
 
       {/* ── Serie ──────────────────────────────────────────── */}

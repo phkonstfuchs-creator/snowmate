@@ -59,7 +59,7 @@ export default function SegmentedControl<T extends string>({
             style={{
               height: 38,
               font: "700 11px var(--font-mono-stack)",
-              letterSpacing: "0.12em",
+              letterSpacing: 0,
               textTransform: "uppercase",
               color: active ? "var(--paper-0)" : "var(--ink-2)",
               transitionDuration: "var(--duration-fast)",

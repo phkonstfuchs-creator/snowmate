@@ -11,6 +11,20 @@ test("onboarding is outside the authenticated app shell", async ({ page }) => {
   ).toHaveCount(0);
 });
 
+test("onboarding actions stay reachable on compact screens", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/onboarding");
+
+  const existingAccountButton = page.getByRole("button", {
+    name: "Ich habe schon einen Account",
+  });
+
+  await existingAccountButton.scrollIntoViewIfNeeded();
+  await expect(existingAccountButton).toBeInViewport({ ratio: 1 });
+});
+
 test("a new user can finish onboarding and continue to account creation", async ({
   page,
 }) => {

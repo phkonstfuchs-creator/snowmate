@@ -6,6 +6,7 @@ import { CARPOOL_POSTS, getUserById } from "@/lib/data";
 import { toggleSetValue } from "@/lib/collections";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -20,15 +21,21 @@ const BRAND = "var(--accent-primary)";
 
 function OfferModal({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const [role, setRole] = useState<"driver" | "rider">("driver");
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <h2 className="font-display px-5 mb-4" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Mitfahrt anbieten</h2>
+        <div className="flex items-center justify-between px-5 mb-4">
+          <h2 className="font-display" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Mitfahrt anbieten</h2>
+          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
+            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+          </button>
+        </div>
 
         <div className="px-5 space-y-3 mb-5">
           <SegmentedControl
@@ -38,13 +45,13 @@ function OfferModal({ onClose }: { onClose: () => void }) {
             ariaLabel="Rolle bei der Mitfahrt"
           />
           {[
-            { label: "From (departure)", placeholder: "e.g. Innsbruck HBF" },
-            { label: "To (resort)", placeholder: "e.g. Stubai Glacier" },
-            { label: "Uhrzeit", placeholder: "08:00" },
-          ].map(({ label, placeholder }) => (
-            <div key={label}>
-              <p className="text-xs font-bold mb-1.5" style={{ color: MUTED }}>{label}</p>
-              <input className="form-input" placeholder={placeholder} />
+            { id: "carpool-from", label: "Abfahrt", placeholder: "z. B. Innsbruck Hbf" },
+            { id: "carpool-to", label: "Zielgebiet", placeholder: "z. B. Stubaier Gletscher" },
+            { id: "carpool-time", label: "Uhrzeit", placeholder: "08:00" },
+          ].map(({ id, label, placeholder }) => (
+            <div key={id}>
+              <label htmlFor={id} className="text-xs font-bold mb-1.5 block" style={{ color: MUTED }}>{label}</label>
+              <input id={id} className="form-input" placeholder={placeholder} />
             </div>
           ))}
         </div>
@@ -55,7 +62,7 @@ function OfferModal({ onClose }: { onClose: () => void }) {
             className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >
-            Post
+            Angebot veröffentlichen
           </button>
         </div>
       </div>
@@ -92,7 +99,7 @@ export default function CarpoolPage() {
             style={{ background: BRAND, color: D }}
           >
             <Icon name="plus" size={14} strokeWidth={2.4} />
-            Post
+            Inserat
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -111,7 +118,7 @@ export default function CarpoolPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--status-success)" }} />
-              <h2 className="font-black text-xs uppercase tracking-widest" style={{ color: "var(--status-success)" }}>
+              <h2 className="font-black text-xs uppercase" style={{ color: "var(--status-success)" }}>
                 Plätze frei · {drivers.length}
               </h2>
             </div>
@@ -184,7 +191,7 @@ export default function CarpoolPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--rust)" }} />
-              <h2 className="font-black text-xs uppercase tracking-widest" style={{ color: "var(--rust)" }}>
+              <h2 className="font-black text-xs uppercase" style={{ color: "var(--rust)" }}>
                 Sucht Mitfahrt · {riders.length}
               </h2>
             </div>

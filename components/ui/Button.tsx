@@ -7,9 +7,9 @@ import { ButtonHTMLAttributes, ReactNode } from "react";
    globals.css (:active verschiebt den Block) — nicht aus JS,
    sonst überschreibt ein Inline-Transform die CSS-Regel. */
 const SIZES = {
-  sm: { h: 36, pad: "0 14px", font: "600 13px var(--font-body-stack)", gap: 6, tracking: "0.01em" },
-  md: { h: 48, pad: "0 20px", font: "600 15px var(--font-body-stack)", gap: 8, tracking: "0.01em" },
-  lg: { h: 56, pad: "0 26px", font: "700 19px var(--font-display-stack)", gap: 10, tracking: "-0.02em" },
+  sm: { h: 36, pad: "0 14px", font: "600 13px var(--font-body-stack)", gap: 6 },
+  md: { h: 48, pad: "0 20px", font: "600 15px var(--font-body-stack)", gap: 8 },
+  lg: { h: 56, pad: "0 26px", font: "700 19px var(--font-display-stack)", gap: 10 },
 };
 
 const VARIANT_CLASS: Record<string, string> = {
@@ -54,7 +54,7 @@ export default function Button({
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,
         textTransform: size === "lg" ? "uppercase" : "none",
-        letterSpacing: s.tracking,
+        letterSpacing: 0,
         transition:
           "transform var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard)",
         ...style,

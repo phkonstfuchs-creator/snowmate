@@ -23,8 +23,8 @@
   /* Tinte — warmes Schwarzbraun, nie #000 */
   --ink-0: #1c1815; /* Volltinte */
   --ink-1: #4a4038; /* Fließtext gedämpft */
-  --ink-2: #776a5d; /* Beschriftung */
-  --ink-3: #a1917f; /* deaktiviert */
+  --ink-2: #62574e; /* Beschriftung */
+  --ink-3: #6f6257; /* deaktiviert */
 
   /* Spotfarben — vier, mehr nicht. Wie im Siebdruck. */
   --rust-ink: #8f3415; /* dunkle Variante für Text auf Ocker/Papier */
@@ -56,7 +56,7 @@
   --text-on-accent: var(--paper-0);
 
   --accent-primary: var(--rust);
-  --accent-primary-hover: var(--rust-light);
+  --accent-primary-hover: var(--rust-ink);
   --accent-primary-active: var(--rust-ink);
   --accent-primary-subtle: rgba(168, 63, 27, 0.1);
 
@@ -105,7 +105,7 @@
   --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", monospace;
   --font-body-stack: var(--font-body), -apple-system, "Segoe UI", sans-serif;
 
-  --text-display-hero: 700 clamp(44px, 13vw, 72px) / 0.88 var(--font-display-stack);
+  --text-display-hero: 700 56px / 0.88 var(--font-display-stack);
   --text-display-lg: 700 40px / 0.9 var(--font-display-stack);
   --text-display-md: 700 28px / 0.95 var(--font-display-stack);
 
@@ -124,8 +124,8 @@
   --text-mono-data-lg: 700 34px / 1 var(--font-mono-stack);
 
   /* Plakat-Typo läuft eng und in Versalien */
-  --tracking-display: -0.02em;
-  --tracking-mono-label: 0.14em;
+  --tracking-display: 0;
+  --tracking-mono-label: 0;
 
   --z-dropdown: 100;
   --z-sticky: 200;
@@ -385,10 +385,14 @@ body {
 .stagger > *:nth-child(8) { animation-delay: 315ms; }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet-overlay, .sheet-panel { animation: none; }
-  .xp-bar-fill { transition: none; }
-  .anim-fade-up, .anim-scale-in { animation: none; }
-  .map-pin { animation: none; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ─── Antippbare Karte — mechanischer Versatz statt Skalierung ── */
@@ -504,7 +508,7 @@ body {
   border: var(--rule-thick) !important;
   box-shadow: var(--shadow-print);
 }
-.sm-btn-primary:hover:not(:disabled) { background: var(--rust-light); }
+.sm-btn-primary:hover:not(:disabled) { background: var(--rust-ink); }
 .sm-btn-primary:active:not(:disabled) {
   transform: translate(3px, 3px);
   box-shadow: none;

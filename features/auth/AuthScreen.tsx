@@ -16,10 +16,13 @@ export default function AuthScreen({
 
   return (
     <main
-      className="paper-grain min-h-dvh"
-      style={{ background: "var(--paper-0)" }}
+      className="min-h-dvh"
+      style={{ background: "var(--ink-0)" }}
     >
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-8">
+      <div
+        className="paper-grain mx-auto flex min-h-dvh w-full max-w-[430px] flex-col px-5 pb-8"
+        style={{ background: "var(--paper-0)" }}
+      >
         <Link
           href="/onboarding"
           aria-label="Zurück zur Startseite"

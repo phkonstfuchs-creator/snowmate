@@ -33,8 +33,8 @@ export default function BottomNav() {
                 <Icon name={tab.icon} size={22} strokeWidth={isActive ? 2.3 : 1.8} />
               </span>
               <span className={clsx(
-                "text-[0.6875rem] leading-none tracking-wide",
-                isActive ? "font-black opacity-100" : "font-bold opacity-60"
+                "text-[0.6875rem] leading-none",
+                isActive ? "font-black" : "font-bold"
               )}>
                 {tab.label}
               </span>

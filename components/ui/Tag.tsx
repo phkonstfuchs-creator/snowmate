@@ -18,7 +18,7 @@ export default function Tag({ level, showIcon = true }: { level: AbilityLevel; s
         borderRadius: 0,
         border: "1px solid currentColor",
         font: "700 11px var(--font-mono)",
-        letterSpacing: "0.04em",
+        letterSpacing: 0,
         textTransform: "uppercase",
       }}
     >

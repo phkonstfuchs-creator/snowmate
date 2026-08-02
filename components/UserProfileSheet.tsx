@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { User } from "@/lib/types";
 import { BADGES, ME } from "@/lib/data";
 import clsx from "clsx";
 import ConversationThread from "@/components/ConversationThread";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -45,17 +46,37 @@ const BADGE_INK: Record<string, string> = {
 export default function UserProfileSheet({ user, onClose, onMessage }: { user: User; onClose: () => void; onMessage?: (userId: string) => void }) {
   useScrollLock();
   const [showThread, setShowThread] = useState(false);
+  const messageButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose, !showThread);
   const isMe = user.id === ME.id;
   const isFriend = ME.friendIds.includes(user.id);
   const earnedBadges = BADGES.filter((b) => user.badges.includes(b.id));
 
+  const closeThread = () => {
+    setShowThread(false);
+    requestAnimationFrame(() => messageButtonRef.current?.focus());
+  };
+
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={`${user.name} profile`} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "env(safe-area-inset-bottom, 24px)" }}>
+      <div
+        ref={dialogRef}
+        className="sheet-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Profil von ${user.name}`}
+        aria-hidden={showThread || undefined}
+        inert={showThread}
+        tabIndex={-1}
+        style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "env(safe-area-inset-bottom, 24px)" }}
+      >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 z-10" style={{ background: SURFACE }}>
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
+          <button type="button" onClick={onClose} aria-label="Profil schließen" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
+            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+          </button>
         </div>
 
         {/* Hero */}
@@ -67,7 +88,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
               </div>
               {user.isPremium && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 flex items-center justify-center" style={{ background: "var(--accent-warm)", borderColor: SURFACE }}>
-                  <Icon name="star" size={9} color="white" fill="white" strokeWidth={0} />
+                  <Icon name="star" size={9} color="var(--ink-0)" fill="var(--ink-0)" strokeWidth={0} />
                 </span>
               )}
             </div>
@@ -82,7 +103,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
                   <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>U18</span>
                 )}
               </div>
-              <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Level {user.level} {user.levelTitle}</p>
+              <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Stufe {user.level} {user.levelTitle}</p>
               {user.bio && <p className="text-sm font-medium mt-1.5 leading-snug" style={{ color: "var(--text-secondary)" }}>{user.bio}</p>}
             </div>
           </div>
@@ -113,9 +134,9 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Stats */}
         <div className="grid grid-cols-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
           {[
-            { label: "Days", value: user.daysThisSeason },
-            { label: "Resorts", value: user.resortsVisited },
-            { label: "Streak", value: `${user.streakWeeks}w` },
+            { label: "Tage", value: user.daysThisSeason },
+            { label: "Gebiete", value: user.resortsVisited },
+            { label: "Serie", value: `${user.streakWeeks} Wo.` },
           ].map(({ label, value }, i) => (
             <div key={label} className="flex flex-col items-center py-4 gap-0.5" style={i < 2 ? { borderRight: `1px solid ${BORDER}` } : {}}>
               <span className="font-mono font-bold text-xl" style={{ color: INK }}>{value}</span>
@@ -127,7 +148,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* XP bar */}
         <div className="px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="mb-2">
-            <span className="text-xs font-black" style={{ color: BRAND }}>Level {user.level} · {user.levelTitle}</span>
+            <span className="text-xs font-black" style={{ color: BRAND }}>Stufe {user.level} · {user.levelTitle}</span>
           </div>
           <XPBar current={user.xp} max={user.xpToNext} />
         </div>
@@ -136,14 +157,14 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {user.favoriteResort && (
           <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <Icon name="mountain" size={14} color={BRAND} strokeWidth={2} />
-            <span className="text-sm font-medium" style={{ color: MUTED }}>Favorite resort: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
+            <span className="text-sm font-medium" style={{ color: MUTED }}>Lieblingsgebiet: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
           </div>
         )}
 
         {/* Badges */}
         {earnedBadges.length > 0 && (
           <div className="px-5 pt-4 pb-5">
-            <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Badges ({earnedBadges.length})</p>
+            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Abzeichen ({earnedBadges.length})</p>
             <div className="flex flex-wrap gap-2">
               {earnedBadges.map((b) => (
                 <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-black"
@@ -159,21 +180,22 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {!isMe && (
           <div className="px-5 pb-4 flex gap-2">
             <button
+              ref={messageButtonRef}
               onClick={() => { if (onMessage) { onMessage(user.id); } else { setShowThread(true); } }}
               className="flex-1 py-3 rounded-2xl font-black text-sm active:scale-95 transition-transform"
               style={{ background: BRAND, color: D }}
             >
-              Message
+              Nachricht
             </button>
             <button className={clsx("flex-1 py-3 rounded-2xl font-black text-sm active:scale-95 transition-transform border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
-              {isFriend ? "In crew" : "Add to crew"}
+              {isFriend ? "Teil der Crew" : "Zur Crew hinzufügen"}
             </button>
           </div>
         )}
       </div>
 
-      {showThread && <ConversationThread userId={user.id} onClose={() => setShowThread(false)} />}
+      {showThread && <ConversationThread userId={user.id} onClose={closeThread} />}
     </>
   );
 }

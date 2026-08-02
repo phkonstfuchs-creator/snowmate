@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
 import { RESORT_STATUS, RIDE_POSTS, getUserById, ME } from "@/lib/data";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
@@ -21,27 +22,36 @@ const INK     = "var(--text-primary)";
 const BRAND   = "var(--accent-primary)";
 
 const CONDITIONS_LABELS: Record<ResortStatus["conditions"], string> = {
-  fresh: "Fresh", groomed: "Groomed", icy: "Icy", slushy: "Slushy",
+  fresh: "Neuschnee", groomed: "Präpariert", icy: "Eisig", slushy: "Sulzig",
 };
+
+type ActiveMapSheet =
+  | { type: "resort"; resort: ResortStatus }
+  | { type: "upsell" }
+  | null;
 
 function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose: () => void }) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const ridesHere = RIDE_POSTS.filter((p) => p.resort === resort.name && p.city === resort.city);
 
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={`${resort.name} details`} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label={`Details zu ${resort.name}`} tabIndex={-1} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
+        <button type="button" onClick={onClose} aria-label="Details schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+          <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+        </button>
 
         {/* Vector scene hero */}
         <div className="mx-5 mt-4 rounded-none overflow-hidden relative" style={{ height: 140 }}>
           <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65) 100%)" }} />
           <div className="absolute bottom-3 left-4">
-            <p className="font-black text-white text-lg tracking-tight drop-shadow">{resort.name}</p>
+            <p className="font-black text-white text-lg drop-shadow">{resort.name}</p>
             <p className="text-white/70 text-xs font-semibold">{resort.altitudeMin}–{resort.altitudeMax} m</p>
           </div>
           <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
@@ -52,9 +62,9 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 px-5 mt-4">
           {[
-            { label: "riding now", val: resort.ridersNow, live: true },
-            { label: "lifts open", val: `${resort.liftsOpen}/${resort.totalLifts}` },
-            { label: CONDITIONS_LABELS[resort.conditions], val: "Snow", cond: resort.conditions },
+            { label: "jetzt unterwegs", val: resort.ridersNow, live: true },
+            { label: "Lifte offen", val: `${resort.liftsOpen}/${resort.totalLifts}` },
+            { label: CONDITIONS_LABELS[resort.conditions], val: "Schnee", cond: resort.conditions },
           ].map(({ label, val, live, cond }) => (
             <div key={label}
               className={clsx("rounded-none p-3 text-center", cond ? `cond-${cond}` : "")}
@@ -68,7 +78,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
         {/* Ability bars */}
         <div className="px-5 mt-4">
-          <p className="text-[0.65rem] font-black uppercase tracking-widest mb-2.5" style={{ color: MUTED }}>Wer fährt was</p>
+          <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>Wer fährt was</p>
           {[
             { label: "Chill",     count: resort.chillRiders,    color: "var(--sky)",   bg: "var(--accent-primary-subtle)" },
             { label: "Park",      count: resort.parkRiders,     color: "var(--rust)", bg: "var(--accent-warm-subtle)" },
@@ -90,7 +100,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         {/* Rides here */}
         {ridesHere.length > 0 && (
           <div className="px-5 mt-4">
-            <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Ausfahrten heute hier</p>
+            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Ausfahrten heute hier</p>
             {ridesHere.map((ride) => {
               const a = getUserById(ride.authorId);
               if (!a) return null;
@@ -99,7 +109,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
                   <Avatar id={a.id} initials={a.avatar} size={32} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-black" style={{ color: INK }}>{a.name}</p>
-                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {ride.totalSpots - ride.takenSpots} open</p>
+                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {ride.totalSpots - ride.takenSpots} frei</p>
                   </div>
                   <span className={clsx("text-[0.65rem] font-black px-2 py-0.5 rounded-full flex-shrink-0",
                     ride.abilityLevel === "chill" && "badge-chill",
@@ -119,29 +129,33 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
 function SatellitUpsell({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Premium map features" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Premium-Kartenfunktionen" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-5">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
+        <button type="button" onClick={onClose} aria-label="Dialog schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+          <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+        </button>
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "var(--accent-warm)" }}>
-            <Icon name="star" size={28} color="white" fill="white" strokeWidth={0} />
+            <Icon name="star" size={28} color="var(--ink-0)" fill="var(--ink-0)" strokeWidth={0} />
           </div>
         </div>
         <div className="px-5 text-center mb-5">
           <h2 className="font-display" style={{ color: INK, fontSize: 22, fontWeight: 800 }}>Premium freischalten</h2>
           <p className="text-sm font-medium leading-relaxed mt-1" style={{ color: MUTED }}>
-            Satellit map, powder alerts and advanced stats.
+            Satellitenkarte, Powder-Alarm und erweiterte Statistiken.
           </p>
         </div>
         <div className="px-5 space-y-2 mb-5">
           {[
-            "Satellit map · terrain & couloirs live",
-            "Powder alerts · 15+ cm push notification",
-            "Advanced stats · heatmap + vertical",
+            "Satellitenkarte · Gelände und Rinnen live",
+            "Powder-Alarm · Push-Mitteilung ab 15 cm",
+            "Erweiterte Statistiken · Heatmap und Höhenmeter",
           ].map((t) => {
             const [label, desc] = t.split(" · ");
             return (
@@ -159,11 +173,11 @@ function SatellitUpsell({ onClose }: { onClose: () => void }) {
         </div>
         <div className="px-5 space-y-2">
           <button className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
-            style={{ background: "var(--accent-warm)", color: "var(--text-on-accent)" }}>
-            Start for € 2.99 / month
+            style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>
+            Für 2,99 € pro Monat starten
           </button>
           <button onClick={onClose} className="w-full py-3 text-sm font-bold" style={{ color: MUTED }}>
-            Not now
+            Jetzt nicht
           </button>
         </div>
       </div>
@@ -173,8 +187,7 @@ function SatellitUpsell({ onClose }: { onClose: () => void }) {
 
 export default function MapPage() {
   const [city, setCity] = useState<City>("innsbruck");
-  const [showUpsell, setShowUpsell] = useState(false);
-  const [selectedResort, setSelectedResort] = useState<ResortStatus | null>(null);
+  const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
 
   const resorts = useMemo(
     () => RESORT_STATUS.filter((resort) => resort.city === city),
@@ -197,7 +210,7 @@ export default function MapPage() {
           </div>
           <button
             onClick={() => {
-              if (!ME.isPremium) setShowUpsell(true);
+              if (!ME.isPremium) setActiveSheet({ type: "upsell" });
             }}
             className="flex items-center gap-1.5 text-xs font-black px-3 py-2 rounded-full active:scale-95 transition-all"
             style={{ background: SURFACE, color: MUTED, border: `1px solid ${BORDER}` }}
@@ -205,7 +218,7 @@ export default function MapPage() {
             <Icon name="satellite" size={13} strokeWidth={1.5} />
             Satellit
             <span className="text-[0.55rem] font-black px-1 py-0.5 rounded-full"
-              style={{ background: "var(--accent-warm)", color: "var(--text-on-accent)" }}>PRO</span>
+              style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>PRO</span>
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -220,7 +233,11 @@ export default function MapPage() {
 
       {/* Real Leaflet map */}
       <div style={{ height: 280, position: "relative", overflow: "hidden" }}>
-        <LeafletMap city={city} resorts={resorts} onSelect={setSelectedResort} />
+        <LeafletMap
+          city={city}
+          resorts={resorts}
+          onSelect={(resort) => setActiveSheet({ type: "resort", resort })}
+        />
       </div>
 
       {/* Brennpunkt strip */}
@@ -228,7 +245,7 @@ export default function MapPage() {
         <button
           className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] active:scale-[0.98] transition-transform overflow-hidden"
           style={{ background: BRAND }}
-          onClick={() => setSelectedResort(hotResort)}
+          onClick={() => setActiveSheet({ type: "resort", resort: hotResort })}
         >
           <div className="w-14 h-14 rounded-none overflow-hidden flex-shrink-0">
             <ResortScene name={hotResort.name} className="w-full h-full" />
@@ -248,14 +265,14 @@ export default function MapPage() {
 
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
-        <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Alle Gebiete</p>
+        <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Alle Gebiete</p>
         <div className="space-y-2 stagger">
           {sorted.map((resort, i) => (
             <button
               key={resort.name}
               className="card-tap w-full flex items-center gap-3 p-0 rounded-none overflow-hidden anim-fade-up text-left"
               style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
-              onClick={() => setSelectedResort(resort)}
+              onClick={() => setActiveSheet({ type: "resort", resort })}
             >
               <div className="w-14 h-14 overflow-hidden flex-shrink-0">
                 <ResortScene name={resort.name} className="w-full h-full" />
@@ -284,8 +301,15 @@ export default function MapPage() {
         </div>
       </div>
 
-      {selectedResort && <ResortDetailSheet resort={selectedResort} onClose={() => setSelectedResort(null)} />}
-      {showUpsell && <SatellitUpsell onClose={() => setShowUpsell(false)} />}
+      {activeSheet?.type === "resort" && (
+        <ResortDetailSheet
+          resort={activeSheet.resort}
+          onClose={() => setActiveSheet(null)}
+        />
+      )}
+      {activeSheet?.type === "upsell" && (
+        <SatellitUpsell onClose={() => setActiveSheet(null)} />
+      )}
     </>
   );
 }

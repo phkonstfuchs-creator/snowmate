@@ -26,7 +26,7 @@ export default function Badge({ tone = "neutral", icon, children }: BadgeProps) 
         background: t.bg,
         color: t.fg,
         font: "700 11px var(--font-mono-stack)",
-        letterSpacing: "0.06em",
+        letterSpacing: 0,
         textTransform: "uppercase",
       }}
     >

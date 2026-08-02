@@ -117,7 +117,7 @@ export default function OnboardingPage() {
   };
 
   const shell =
-    "fixed inset-0 flex flex-col paper-grain";
+    "fixed inset-0 flex flex-col overflow-y-auto overscroll-contain paper-grain";
   const shellStyle: React.CSSProperties = {
     background: PAPER,
     zIndex: 800,
@@ -178,7 +178,7 @@ export default function OnboardingPage() {
                 color: PAPER,
                 border: "var(--rule-thick)",
                 boxShadow: "var(--shadow-print)",
-                letterSpacing: "-0.02em",
+                letterSpacing: 0,
               }}
             >
               Los geht&rsquo;s
@@ -234,7 +234,7 @@ export default function OnboardingPage() {
                   style={{ background: PAPER, borderTop: "var(--rule-thick)" }}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-display text-xl uppercase leading-none" style={{ color: INK, letterSpacing: "-0.02em" }}>
+                    <p className="font-display text-xl uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>
                       {label}
                     </p>
                     {selected && <Icon name="check" size={18} color={RUST} strokeWidth={2.6} />}
@@ -297,7 +297,7 @@ export default function OnboardingPage() {
                     className="font-display text-xl uppercase leading-none"
                     style={{
                       color: selected ? (opt.id === "park" ? INK : PAPER) : INK,
-                      letterSpacing: "-0.02em",
+                      letterSpacing: 0,
                     }}
                   >
                     {opt.label}
@@ -430,7 +430,7 @@ export default function OnboardingPage() {
             color: PAPER,
             border: "var(--rule-thick)",
             boxShadow: "var(--shadow-print)",
-            letterSpacing: "-0.02em",
+            letterSpacing: 0,
           }}
         >
           Account erstellen

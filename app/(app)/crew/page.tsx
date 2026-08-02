@@ -11,6 +11,7 @@ import {
   ME,
 } from "@/lib/data";
 import ConversationThread from "@/components/ConversationThread";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -26,17 +27,23 @@ type Tab = "crew" | "squads" | "pending" | "chats";
 
 function AddFriendSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const [requested, setRequested] = useState<Set<string>>(new Set());
   const suggestions = MOCK_USERS.filter((u) => !ME.friendIds.includes(u.id) && u.id !== "me").slice(0, 3);
 
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Freunde finden" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Freunde finden" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <h2 className="font-black text-lg px-5 mb-1" style={{ color: INK }}>Freunde finden</h2>
+        <div className="flex items-center justify-between px-5 mb-1">
+          <h2 className="font-black text-lg" style={{ color: INK }}>Freunde finden</h2>
+          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
+            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+          </button>
+        </div>
         <p className="text-xs font-bold px-5 mb-4" style={{ color: MUTED }}>Leute, die deine Freunde kennen</p>
 
         <div className="px-5 space-y-2 mb-5">
@@ -119,7 +126,7 @@ export default function CrewPage() {
               >
                 {TAB_LABELS[t]}
                 {badge > 0 && (
-                  <span className="absolute -top-0.5 right-[15%] w-4 h-4 rounded-full text-white text-[0.6rem] font-black flex items-center justify-center font-mono" style={{ background: "var(--accent-warm)" }}>
+                  <span className="absolute -top-0.5 right-[15%] w-4 h-4 rounded-full text-[0.6rem] font-black flex items-center justify-center font-mono" style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>
                     {badge}
                   </span>
                 )}
@@ -233,7 +240,7 @@ export default function CrewPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-black text-sm" style={{ color: INK }}>{user.name}</span>
                     </div>
-                    <span className="text-xs font-bold" style={{ color: MUTED }}>@{user.handle} · Level {user.level}</span>
+                    <span className="text-xs font-bold" style={{ color: MUTED }}>@{user.handle} · Stufe {user.level}</span>
                     <p className="text-xs font-medium mt-1.5" style={{ color: MUTED }}>{user.daysThisSeason} Tage this season · {user.resortsVisited} resorts</p>
                     {user.isMinor && (
                       <span className="inline-flex items-center gap-1 text-[0.65rem] font-black px-2 py-0.5 rounded-full mt-1.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>Unter 18</span>
@@ -292,7 +299,7 @@ export default function CrewPage() {
                     <div className="relative flex-shrink-0">
                       <Avatar id={other.id} initials={other.avatar} size={46} />
                       {unread > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full text-white text-[0.6rem] font-black flex items-center justify-center font-mono" style={{ background: "var(--accent-warm)" }}>
+                        <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full text-[0.6rem] font-black flex items-center justify-center font-mono" style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>
                           {unread}
                         </span>
                       )}
@@ -305,7 +312,7 @@ export default function CrewPage() {
                       </div>
                       <p className={clsx("text-xs truncate", unread > 0 ? "font-bold" : "font-medium")} style={{ color: MUTED }}>
                         {conv.contextType === "ride" && <span className="font-black" style={{ color: BRAND }}>Ausfahrt · </span>}
-                        {lastMsg ? (lastMsg.senderId === "me" ? "You: " : "") + lastMsg.text : "No messages yet"}
+                        {lastMsg ? (lastMsg.senderId === "me" ? "Du: " : "") + lastMsg.text : "Noch keine Nachrichten"}
                       </p>
                     </div>
 

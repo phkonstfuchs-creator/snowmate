@@ -53,7 +53,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
         style={{ background: "var(--paper-0)", borderBottom: "1px solid var(--border-hairline)" }}
       >
         <Icon name="mountain" size={13} color="var(--ink-0)" strokeWidth={2.2} />
-        <span className="font-display text-base uppercase" style={{ color: "var(--ink-0)", letterSpacing: "-0.02em" }}>
+        <span className="font-display text-base uppercase" style={{ color: "var(--ink-0)", letterSpacing: 0 }}>
           {post.resort}
         </span>
       </div>
