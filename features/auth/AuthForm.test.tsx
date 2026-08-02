@@ -108,4 +108,51 @@ describe("AuthForm", () => {
       screen.getByRole("button", { name: "Signing in..." }),
     ).toBeDisabled();
   });
+
+  it("moves focus to the first invalid field after a field-error response", () => {
+    mocks.useActionState.mockReturnValue([
+      initialAuthActionState,
+      vi.fn(),
+      false,
+    ]);
+    const { rerender } = render(<AuthForm mode="login" />);
+
+    mocks.useActionState.mockReturnValue([
+      {
+        status: "error",
+        message: "Check the highlighted fields.",
+        email: "invalid",
+        fieldErrors: { email: ["Enter a valid email address."] },
+      },
+      vi.fn(),
+      false,
+    ]);
+    rerender(<AuthForm mode="login" />);
+
+    expect(screen.getByLabelText("Email")).toHaveFocus();
+  });
+
+  it("moves focus to the error summary when no field is invalid", () => {
+    mocks.useActionState.mockReturnValue([
+      initialAuthActionState,
+      vi.fn(),
+      false,
+    ]);
+    const { rerender } = render(<AuthForm mode="login" />);
+
+    mocks.useActionState.mockReturnValue([
+      {
+        status: "error",
+        message: "Email or password is incorrect.",
+        email: "person@example.com",
+      },
+      vi.fn(),
+      false,
+    ]);
+    rerender(<AuthForm mode="login" />);
+
+    expect(
+      screen.getByText("Email or password is incorrect."),
+    ).toHaveFocus();
+  });
 });

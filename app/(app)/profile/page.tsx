@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
 import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
@@ -20,6 +20,46 @@ const ORANGE = "var(--accent-warm)";
 
 function PremiumSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    function getFocusable(): HTMLElement[] {
+      return Array.from(
+        panel!.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+    }
+
+    getFocusable()[0]?.focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const focusable = getFocusable();
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const FEATURES = [
     { label: "Satellite map", desc: "Terrain, couloirs & off-piste options live" },
@@ -30,7 +70,7 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Snowmate Premium" style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div ref={panelRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Snowmate Premium" style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-5">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
@@ -251,10 +291,12 @@ export default function ProfilePage() {
       <div className="px-4 pt-5 pb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-black text-[0.9375rem]" style={{ color: INK }}>Top this season</h2>
-          <div className="flex rounded-lg overflow-hidden" style={{ background: "var(--bg-surface-2)" }}>
+          <div className="flex rounded-lg overflow-hidden" role="group" aria-label="Leaderboard region" style={{ background: "var(--bg-surface-2)" }}>
             {(["innsbruck", "salzburg"] as const).map((c) => (
               <button key={c} onClick={() => setLeaderboardCity(c)}
-                className="text-xs font-black px-3 py-1.5 transition-all"
+                aria-pressed={leaderboardCity === c}
+                aria-label={c === "innsbruck" ? "Innsbruck" : "Salzburg"}
+                className="text-xs font-black px-3.5 py-2 transition-all"
                 style={leaderboardCity === c ? { background: BRAND, color: D } : { color: MUTED }}>
                 {c === "innsbruck" ? "IBK" : "SBG"}
               </button>

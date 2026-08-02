@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PenguinMascot from "@/components/PenguinMascot";
+import Icon from "@/components/ui/Icon";
 import AuthForm from "./AuthForm";
 
 interface AuthScreenProps {
@@ -22,7 +23,7 @@ export default function AuthScreen({
         <Link
           href="/onboarding"
           aria-label="Back to onboarding"
-          className="flex w-fit items-center gap-2"
+          className="-my-2.5 flex w-fit items-center gap-2 py-2.5"
         >
           <PenguinMascot size={30} />
           <span
@@ -61,17 +62,28 @@ export default function AuthScreen({
           </div>
 
           {confirmationFailed ? (
-            <p
+            <div
               role="alert"
-              className="mb-5 rounded-lg border px-4 py-3 text-sm font-semibold"
+              className="mb-5 flex items-start gap-3 rounded-lg border px-4 py-3"
               style={{
-                color: "var(--status-danger)",
                 borderColor: "var(--status-danger)",
                 background: "var(--bg-surface-1)",
               }}
             >
-              That confirmation link is invalid or expired.
-            </p>
+              <Icon
+                name="alert-circle"
+                size={18}
+                color="var(--status-danger)"
+                className="mt-0.5 flex-shrink-0"
+              />
+              <p
+                className="text-sm font-semibold leading-relaxed"
+                style={{ color: "var(--status-danger)" }}
+              >
+                That confirmation link is invalid or expired. Log in below,
+                or sign up again to request a new one.
+              </p>
+            </div>
           ) : null}
 
           <AuthForm mode={mode} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
@@ -24,10 +24,19 @@ const STYLE_OPTIONS: { id: Style; label: string; desc: string; color: string; bg
 
 function ProgressBar({ step, total }: { step: number; total: number }) {
   return (
-    <div className="flex gap-1.5 px-6 pt-5">
+    <div
+      className="flex gap-1.5 px-6 pt-5"
+      role="progressbar"
+      aria-label="Onboarding progress"
+      aria-valuenow={step}
+      aria-valuemin={0}
+      aria-valuemax={total}
+      aria-valuetext={`Step ${step} of ${total}`}
+    >
       {Array.from({ length: total }, (_, i) => (
         <div
           key={i}
+          aria-hidden="true"
           className="flex-1 rounded-full transition-all duration-300"
           style={{ height: 3, background: i < step ? BRAND : "var(--border-subtle)" }}
         />
@@ -43,6 +52,17 @@ export default function OnboardingPage() {
   const [style, setStyle] = useState<Style | null>(null);
   const [name, setName]   = useState("");
   const [handle, setHandle] = useState("");
+
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    headingRef.current?.focus();
+  }, [step]);
 
   const next = () => setStep((s) => s + 1);
   const back = () => setStep((s) => s - 1);
@@ -84,7 +104,7 @@ export default function OnboardingPage() {
           {/* Hero content */}
           <div className="flex-1 flex flex-col justify-center">
             <div className="mb-6">
-              <h1 className="font-display leading-[0.95] text-white mb-3" style={{ fontSize: "clamp(2.6rem, 12vw, 3.6rem)", fontWeight: 800, letterSpacing: "var(--tracking-display)" }}>
+              <h1 ref={headingRef} tabIndex={-1} className="font-display leading-[0.95] text-white mb-3 outline-none" style={{ fontSize: "clamp(2.6rem, 12vw, 3.6rem)", fontWeight: 800, letterSpacing: "var(--tracking-display)" }}>
                 Find your<br />crew. Today.
               </h1>
               <p className="font-semibold" style={{ color: "var(--text-secondary)", fontSize: "1.0625rem" }}>
@@ -138,11 +158,11 @@ export default function OnboardingPage() {
         <ProgressBar step={1} total={3} />
 
         <div className="flex items-center gap-3 px-6 pt-4 pb-2">
-          <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
+          <button onClick={back} aria-label="Go back" className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
             <Icon name="chevron-left" size={18} color={MUTED} />
           </button>
           <div>
-            <h2 className="font-display" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>Where do you ride?</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="font-display outline-none" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>Where do you ride?</h2>
             <p className="text-sm font-medium" style={{ color: MUTED }}>Your region in the feed &amp; on the map</p>
           </div>
         </div>
@@ -156,6 +176,8 @@ export default function OnboardingPage() {
               <button
                 key={c}
                 onClick={() => { setCity(c); setTimeout(() => setStep(2), 200); }}
+                aria-pressed={selected}
+                aria-label={`${label} — ${subtitle}`}
                 className="relative rounded-3xl overflow-hidden text-left active:scale-98 transition-transform"
                 style={{
                   height: 140,
@@ -193,11 +215,11 @@ export default function OnboardingPage() {
         <ProgressBar step={2} total={3} />
 
         <div className="flex items-center gap-3 px-6 pt-4 pb-2">
-          <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
+          <button onClick={back} aria-label="Go back" className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
             <Icon name="chevron-left" size={18} color={MUTED} />
           </button>
           <div>
-            <h2 className="font-display" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>How do you ride?</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="font-display outline-none" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>How do you ride?</h2>
             <p className="text-sm font-medium" style={{ color: MUTED }}>Shapes your feed &amp; your crew</p>
           </div>
         </div>
@@ -210,6 +232,7 @@ export default function OnboardingPage() {
               <button
                 key={opt.id}
                 onClick={() => { setStyle(opt.id); setTimeout(() => setStep(3), 200); }}
+                aria-pressed={selected}
                 className="flex items-center gap-4 p-4 rounded-2xl text-left active:scale-98 transition-transform"
                 style={{
                   background: selected ? opt.bg : SURFACE,
@@ -246,18 +269,18 @@ export default function OnboardingPage() {
       <ProgressBar step={3} total={3} />
 
       <div className="flex items-center gap-3 px-6 pt-4 pb-2">
-        <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
+        <button onClick={back} aria-label="Go back" className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: SURFACE }}>
           <Icon name="chevron-left" size={18} color={MUTED} />
         </button>
         <div>
-          <h2 className="font-display" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>What&apos;s your name?</h2>
+          <h2 ref={headingRef} tabIndex={-1} className="font-display outline-none" style={{ color: INK, fontSize: 26, fontWeight: 800 }}>What&apos;s your name?</h2>
           <p className="text-sm font-medium" style={{ color: MUTED }}>Visible to confirmed crew members</p>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col justify-center px-6">
         {/* Avatar preview */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6" aria-hidden="true">
           <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: BRAND }}>
             <span className="font-display text-2xl" style={{ color: "var(--text-on-accent)", fontWeight: 800 }}>{name ? name.charAt(0).toUpperCase() : "?"}</span>
           </div>
@@ -265,10 +288,12 @@ export default function OnboardingPage() {
 
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: MUTED }}>Name</p>
+            <label htmlFor="onboarding-name" className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: MUTED }}>Name</label>
             <input
+              id="onboarding-name"
               className="form-input"
               placeholder="Alex Rider"
+              autoComplete="name"
               value={name}
               onChange={(e) => {
                 const v = e.target.value;
@@ -278,13 +303,15 @@ export default function OnboardingPage() {
             />
           </div>
           <div>
-            <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: MUTED }}>Handle</p>
+            <label htmlFor="onboarding-handle" className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: MUTED }}>Handle</label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold" style={{ color: MUTED }}>@</span>
+              <span aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold" style={{ color: MUTED }}>@</span>
               <input
+                id="onboarding-handle"
                 className="form-input"
                 style={{ paddingLeft: "1.8rem" }}
                 placeholder="alex_rider"
+                autoComplete="off"
                 value={handle}
                 onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20))}
               />
