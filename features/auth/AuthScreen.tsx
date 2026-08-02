@@ -16,72 +16,77 @@ export default function AuthScreen({
 
   return (
     <main
-      className="min-h-dvh px-6 py-8"
-      style={{ background: "var(--bg-canvas)" }}
+      className="paper-grain min-h-dvh"
+      style={{ background: "var(--paper-0)" }}
     >
-      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md flex-col">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-8">
         <Link
           href="/onboarding"
-          aria-label="Back to onboarding"
-          className="-my-2.5 flex w-fit items-center gap-2 py-2.5"
+          aria-label="Zurück zur Startseite"
+          className="-my-2 flex w-fit items-center gap-2 py-2 pt-6"
         >
-          <PenguinMascot size={30} />
-          <span
-            className="font-display text-lg font-extrabold"
-            style={{ color: "var(--text-primary)" }}
-          >
+          <PenguinMascot size={26} />
+          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
             Snowmate
           </span>
         </Link>
 
-        <div className="flex flex-1 flex-col justify-center py-10">
-          <div className="mb-8">
-            <p
-              className="mb-2 text-xs font-black uppercase"
-              style={{
-                color: "var(--accent-primary)",
-                letterSpacing: 0,
-              }}
-            >
-              {isSignup ? "Join the crew" : "Welcome back"}
-            </p>
-            <h1
-              className="font-display text-4xl font-extrabold"
-              style={{ color: "var(--text-primary)", letterSpacing: 0 }}
-            >
-              {isSignup ? "Create your account" : "Log in"}
-            </h1>
-            <p
-              className="mt-3 text-base leading-relaxed"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {isSignup
-                ? "Your profile details come next. First, secure your account."
-                : "Pick up where your crew left off."}
-            </p>
-          </div>
+        <div className="flex flex-1 flex-col justify-center py-8">
+          <p className="text-mono-label" style={{ color: "var(--rust)" }}>
+            {isSignup ? "Werde Teil der Crew" : "Willkommen zurück"}
+          </p>
+          <h1
+            className="text-display-lg mt-3"
+            style={{ color: "var(--ink-0)" }}
+          >
+            {/* Leerzeichen vor dem Umbruch, sonst liest der Screenreader
+                "Accounterstellen" als einen Namen */}
+            {isSignup ? (
+              <>
+                Account{" "}
+                <br />
+                erstellen
+              </>
+            ) : (
+              "Anmelden"
+            )}
+          </h1>
+          <p
+            className="mt-3 text-base leading-relaxed"
+            style={{ color: "var(--ink-1)" }}
+          >
+            {isSignup
+              ? "Zuerst dein Zugang. Die Profildaten kommen gleich danach."
+              : "Mach dort weiter, wo deine Crew aufgehört hat."}
+          </p>
+
+          <div
+            className="mt-6 mb-6"
+            style={{ borderTop: "var(--rule-thin)" }}
+            aria-hidden="true"
+          />
 
           {confirmationFailed ? (
             <div
               role="alert"
-              className="mb-5 flex items-start gap-3 rounded-lg border px-4 py-3"
+              className="mb-6 flex items-start gap-3 px-4 py-3"
               style={{
-                borderColor: "var(--status-danger)",
-                background: "var(--bg-surface-1)",
+                border: "1px solid var(--crimson)",
+                background: "var(--paper-1)",
               }}
             >
               <Icon
                 name="alert-circle"
                 size={18}
-                color="var(--status-danger)"
+                color="var(--crimson)"
                 className="mt-0.5 flex-shrink-0"
               />
               <p
-                className="text-sm font-semibold leading-relaxed"
-                style={{ color: "var(--status-danger)" }}
+                className="text-sm leading-relaxed"
+                style={{ color: "var(--crimson)" }}
               >
-                That confirmation link is invalid or expired. Log in below,
-                or sign up again to request a new one.
+                Dieser Bestätigungslink ist ungültig oder abgelaufen. Melde dich
+                unten an oder registriere dich erneut.
               </p>
             </div>
           ) : null}

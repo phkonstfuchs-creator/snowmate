@@ -43,25 +43,26 @@ export default function AuthForm({ mode }: AuthFormProps) {
     return (
       <div aria-live="polite" className="space-y-5">
         <div
-          className="flex items-start gap-3 rounded-lg border px-4 py-4"
+          className="flex items-start gap-3 px-4 py-4"
           style={{
-            background: "var(--accent-primary-subtle)",
-            borderColor: "rgba(79,195,240,0.35)",
+            background: "var(--paper-1)",
+            border: "var(--rule-thick)",
+            boxShadow: "var(--shadow-print)",
           }}
         >
           <Icon
             name="mail-check"
             size={20}
-            color="var(--accent-primary)"
+            color="var(--rust)"
             className="mt-0.5 flex-shrink-0"
           />
           <div>
-            <p className="font-bold" style={{ color: "var(--text-primary)" }}>
-              Request received
+            <p className="text-mono-label" style={{ color: "var(--ink-0)" }}>
+              Anfrage erhalten
             </p>
             <p
-              className="mt-1 text-sm leading-relaxed"
-              style={{ color: "var(--text-secondary)" }}
+              className="mt-1.5 text-sm leading-relaxed"
+              style={{ color: "var(--ink-1)" }}
             >
               {state.message}
             </p>
@@ -69,10 +70,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
         <Link
           href="/login"
-          className="block text-center text-sm font-bold"
-          style={{ color: "var(--accent-primary)" }}
+          className="block text-center text-sm font-semibold underline"
+          style={{ color: "var(--ink-1)" }}
         >
-          Back to login
+          Zurück zur Anmeldung
         </Link>
       </div>
     );
@@ -82,7 +83,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
     <form action={formAction} className="space-y-4" noValidate>
       <Input
         ref={emailRef}
-        label="Email"
+        label="E-Mail"
         name="email"
         type="email"
         autoComplete="email"
@@ -94,13 +95,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
       />
       <Input
         ref={passwordRef}
-        label="Password"
+        label="Passwort"
         name="password"
         type="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
         helper={
           isSignup
-            ? "12+ characters with uppercase, lowercase and a number"
+            ? "Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben und einer Zahl"
             : undefined
         }
         error={state.fieldErrors?.password?.[0]}
@@ -110,7 +111,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {isSignup ? (
         <Input
           ref={confirmPasswordRef}
-          label="Confirm password"
+          label="Passwort bestätigen"
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
@@ -126,39 +127,38 @@ export default function AuthForm({ mode }: AuthFormProps) {
           role="alert"
           tabIndex={-1}
           className="text-sm font-semibold outline-none"
-          style={{ color: "var(--status-danger)" }}
+          style={{ color: "var(--crimson)" }}
         >
           {state.message}
         </p>
       ) : null}
 
-      <Button
-        type="submit"
-        size="lg"
-        fullWidth
-        disabled={isPending}
-        aria-busy={isPending}
-      >
-        {isPending
-          ? isSignup
-            ? "Creating account..."
-            : "Signing in..."
-          : isSignup
-            ? "Create account"
-            : "Log in"}
-      </Button>
+      <div className="pt-1">
+        <Button
+          type="submit"
+          size="lg"
+          fullWidth
+          disabled={isPending}
+          aria-busy={isPending}
+        >
+          {isPending
+            ? isSignup
+              ? "Wird erstellt…"
+              : "Wird angemeldet…"
+            : isSignup
+              ? "Account erstellen"
+              : "Anmelden"}
+        </Button>
+      </div>
 
-      <p
-        className="text-center text-sm"
-        style={{ color: "var(--text-tertiary)" }}
-      >
-        {isSignup ? "Already have an account?" : "New to Snowmate?"}{" "}
+      <p className="text-center text-sm" style={{ color: "var(--ink-2)" }}>
+        {isSignup ? "Schon dabei?" : "Noch keinen Account?"}{" "}
         <Link
           href={isSignup ? "/login" : "/signup"}
-          className="font-bold"
-          style={{ color: "var(--accent-primary)" }}
+          className="font-semibold underline"
+          style={{ color: "var(--rust)" }}
         >
-          {isSignup ? "Log in" : "Create one"}
+          {isSignup ? "Anmelden" : "Registrieren"}
         </Link>
       </p>
     </form>

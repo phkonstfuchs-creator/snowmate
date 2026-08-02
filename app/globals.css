@@ -118,7 +118,8 @@
   --text-body-sm: 400 13px / 1.5 var(--font-body-stack);
   --text-caption: 500 13px / 1.4 var(--font-body-stack);
 
-  --text-mono-label: 700 11px / 1.3 var(--font-mono-stack);
+  /* Zeilenhöhe großzügig, sonst beschneiden Versal-Umlaute (Ä/Ö/Ü) */
+  --text-mono-label: 700 11px / 1.5 var(--font-mono-stack);
   --text-mono-data: 700 20px / 1.1 var(--font-mono-stack);
   --text-mono-data-lg: 700 34px / 1 var(--font-mono-stack);
 
@@ -246,9 +247,11 @@ body {
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-/* ─── Papier-Textur — feines Korn, wie echter Druckbogen ─────── */
-.paper-grain {
-  position: relative;
+/* ─── Papier-Textur — feines Korn, wie echter Druckbogen ───────
+   Liegt in @layer components, damit Tailwind-Utilities wie
+   `fixed` die Positionierung weiterhin überschreiben können. */
+@layer components {
+  .paper-grain { position: relative; }
 }
 .paper-grain::after {
   content: '';

@@ -32,26 +32,26 @@ describe("AuthForm", () => {
   it("renders the compact login fields", () => {
     render(<AuthForm mode="login" />);
 
-    expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Password")).toHaveAttribute(
+    expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
+    expect(screen.getByLabelText("Passwort")).toHaveAttribute(
       "autocomplete",
       "current-password",
     );
-    expect(screen.queryByLabelText("Confirm password")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Log in" })).toBeEnabled();
+    expect(screen.queryByLabelText("Passwort bestätigen")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Anmelden" })).toBeEnabled();
   });
 
   it("renders strong-password guidance for signup", () => {
     render(<AuthForm mode="signup" />);
 
-    expect(screen.getByLabelText("Confirm password")).toBeInTheDocument();
+    expect(screen.getByLabelText("Passwort bestätigen")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "12+ characters with uppercase, lowercase and a number",
+        "Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben und einer Zahl",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Create account" }),
+      screen.getByRole("button", { name: "Account erstellen" }),
     ).toBeEnabled();
   });
 
@@ -91,8 +91,8 @@ describe("AuthForm", () => {
 
     render(<AuthForm mode="signup" />);
 
-    expect(screen.getByText("Request received")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
+    expect(screen.getByText("Anfrage erhalten")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Passwort")).not.toBeInTheDocument();
   });
 
   it("disables submission while authentication is pending", () => {
@@ -105,7 +105,7 @@ describe("AuthForm", () => {
     render(<AuthForm mode="login" />);
 
     expect(
-      screen.getByRole("button", { name: "Signing in..." }),
+      screen.getByRole("button", { name: "Wird angemeldet…" }),
     ).toBeDisabled();
   });
 
@@ -129,7 +129,7 @@ describe("AuthForm", () => {
     ]);
     rerender(<AuthForm mode="login" />);
 
-    expect(screen.getByLabelText("Email")).toHaveFocus();
+    expect(screen.getByLabelText("E-Mail")).toHaveFocus();
   });
 
   it("moves focus to the error summary when no field is invalid", () => {

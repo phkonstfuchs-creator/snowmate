@@ -32,9 +32,9 @@ export default function Input({
   const inputType = isPassword && revealed ? "text" : type;
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
+    <div className="flex w-full flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-caption" style={{ font: "var(--text-caption)", color: "var(--text-secondary)" }}>
+        <label htmlFor={id} className="text-mono-label" style={{ color: "var(--ink-0)" }}>
           {label}
         </label>
       )}
@@ -42,12 +42,12 @@ export default function Input({
         className="flex items-center gap-2.5"
         style={{
           height: 52,
-          padding: "0 8px 0 16px",
-          borderRadius: "var(--radius-md)",
-          background: "var(--bg-surface-3)",
-          border: `1px solid ${error ? "var(--status-danger)" : focused ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+          padding: "0 4px 0 14px",
+          borderRadius: 0,
+          background: "var(--paper-0)",
+          border: `1px solid ${error ? "var(--crimson)" : "var(--ink-0)"}`,
           boxShadow: focused && !error ? "var(--glow-focus)" : "none",
-          transition: `border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard)`,
+          transition: "box-shadow var(--duration-fast) var(--ease-standard)",
           opacity: disabled ? 0.5 : 1,
         }}
       >
@@ -61,8 +61,8 @@ export default function Input({
           onBlur={() => setFocused(false)}
           aria-invalid={error ? true : undefined}
           aria-describedby={helper || error ? messageId : undefined}
-          className={`flex-1 bg-transparent outline-none border-none ${className ?? ""}`}
-          style={{ font: "var(--text-body)", color: "var(--text-primary)" }}
+          className={`min-w-0 flex-1 border-none bg-transparent outline-none ${className ?? ""}`}
+          style={{ font: "var(--text-body)", color: "var(--ink-0)" }}
           {...rest}
         />
         {isPassword ? (
@@ -70,13 +70,12 @@ export default function Input({
             type="button"
             onClick={() => setRevealed((v) => !v)}
             disabled={disabled}
-            aria-label={revealed ? "Hide password" : "Show password"}
+            aria-label={revealed ? "Passwort verbergen" : "Passwort anzeigen"}
             aria-pressed={revealed}
-            className="flex-shrink-0 flex items-center justify-center"
+            className="flex flex-shrink-0 items-center justify-center self-stretch"
             style={{
-              alignSelf: "stretch",
               minWidth: 44,
-              color: "var(--text-tertiary)",
+              color: "var(--ink-2)",
               cursor: disabled ? "not-allowed" : "pointer",
             }}
           >
@@ -88,7 +87,8 @@ export default function Input({
         <span
           id={messageId}
           role={error ? "alert" : undefined}
-          style={{ font: "var(--text-body-sm)", color: error ? "var(--status-danger)" : "var(--text-tertiary)" }}
+          className="text-sm"
+          style={{ color: error ? "var(--crimson)" : "var(--ink-2)" }}
         >
           {error || helper}
         </span>
