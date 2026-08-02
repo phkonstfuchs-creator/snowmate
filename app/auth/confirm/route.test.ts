@@ -4,20 +4,78 @@ import { GET } from "./route";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
+  getSupabasePublicConfig: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: mocks.createClient,
 }));
 
+vi.mock("@/lib/supabase/config", () => ({
+  getSupabasePublicConfig: mocks.getSupabasePublicConfig,
+}));
+
 const verifyOtp = vi.fn();
+const exchangeCodeForSession = vi.fn();
 
 describe("GET /auth/confirm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.createClient.mockResolvedValue({
-      auth: { verifyOtp },
+      auth: { exchangeCodeForSession, verifyOtp },
     });
+    mocks.getSupabasePublicConfig.mockReturnValue({
+      siteUrl: "http://localhost:3000",
+    });
+  });
+
+  it("exchanges the PKCE code from the hosted confirmation email", async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      new NextRequest(
+        "http://localhost:3000/auth/confirm?code=authorization-code",
+      ),
+    );
+
+    expect(exchangeCodeForSession).toHaveBeenCalledWith(
+      "authorization-code",
+    );
+    expect(verifyOtp).not.toHaveBeenCalled();
+    expect(response.headers.get("location")).toBe(
+      "http://localhost:3000/feed",
+    );
+    expect(response.headers.get("cache-control")).toContain("no-store");
+  });
+
+  it("keeps invalid PKCE codes outside the app", async () => {
+    exchangeCodeForSession.mockResolvedValue({
+      error: { code: "flow_state_expired" },
+    });
+
+    const response = await GET(
+      new NextRequest(
+        "http://localhost:3000/auth/confirm?code=expired-code",
+      ),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "http://localhost:3000/login?confirmation=failed",
+    );
+  });
+
+  it("redirects only to the configured application origin", async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      new NextRequest(
+        "https://attacker.example/auth/confirm?code=authorization-code",
+      ),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "http://localhost:3000/feed",
+    );
   });
 
   it("rejects token types outside the signup flow", async () => {
