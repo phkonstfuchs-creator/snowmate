@@ -63,7 +63,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         style={{
           paddingTop: "max(44px, env(safe-area-inset-top, 16px) + 16px)",
           paddingBottom: "12px",
-          background: "rgba(10,14,18,0.95)",
+          background: "var(--paper-0)",
           borderBottom: "1px solid var(--border-subtle)",
         }}
       >
@@ -81,7 +81,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
           <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
             @{other.handle}
             {existing?.contextType === "ride" && (
-              <span style={{ color: "var(--ice-400)" }}> · via Ride</span>
+              <span style={{ color: "var(--sky)" }}> · via Ride</span>
             )}
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-3 space-y-3">
         {existing?.contextType === "ride" && messages.length > 0 && (
           <div className="flex justify-center mb-1">
-            <span className="text-[0.62rem] px-3 py-1 rounded-full font-medium" style={{ background: "var(--accent-primary-subtle)", color: "var(--ice-300)" }}>
+            <span className="text-[0.62rem] px-3 py-1 rounded-full font-medium" style={{ background: "var(--accent-primary-subtle)", color: "var(--sky)" }}>
               Ride context
             </span>
           </div>
@@ -155,7 +155,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
           disabled={!input.trim()}
           aria-label="Send message"
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40 flex-shrink-0"
-          style={{ background: "var(--ice-500)" }}
+          style={{ background: "var(--sky)" }}
         >
           <Icon name="arrow-right" size={16} color="white" strokeWidth={2} />
         </button>

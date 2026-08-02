@@ -30,14 +30,14 @@ const BADGE_BG: Record<string, string> = {
   multi_pass: "var(--accent-primary-subtle)",
 };
 const BADGE_INK: Record<string, string> = {
-  first_tracks: "var(--ember-400)",
+  first_tracks: "var(--rust)",
   storm_chaser: BRAND,
   local_legend: BRAND,
   crew_builder: BRAND,
   powder_hound: BRAND,
-  season_warrior: "var(--ember-400)",
+  season_warrior: "var(--rust)",
   night_rider: "var(--text-secondary)",
-  dawn_patrol: "var(--ember-400)",
+  dawn_patrol: "var(--rust)",
   carpool_king: "var(--status-success)",
   multi_pass: BRAND,
 };
@@ -79,7 +79,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
                   <Icon name="badge-check" size={16} color={BRAND} fill={BRAND} strokeWidth={1.5} />
                 )}
                 {user.isMinor && (
-                  <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--ember-400)" }}>U18</span>
+                  <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>U18</span>
                 )}
               </div>
               <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Level {user.level} {user.levelTitle}</p>
@@ -101,7 +101,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
               {user.snapchat && (
                 <a href={`https://snapchat.com/add/${user.snapchat}`} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
-                  style={{ background: "var(--accent-warm-subtle)", color: "var(--ember-300)", border: "1px solid rgba(255,162,60,0.3)" }}
+                  style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)", border: "1px solid var(--rust-ink)" }}
                   onClick={(e) => e.stopPropagation()}>
                   {user.snapchat}
                 </a>

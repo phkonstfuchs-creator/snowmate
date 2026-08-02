@@ -47,7 +47,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal aria-label="Post a ride">
+      <div className="sheet-panel" role="dialog" aria-modal aria-label="Ausfahrt posten">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
@@ -56,21 +56,21 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
           {step === 2 ? (
-            <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--ice-400)" }}>
+            <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
               Back
             </button>
           ) : (
-            <button onClick={onClose} className="text-sm font-semibold" style={{ color: "var(--ice-400)" }}>
+            <button onClick={onClose} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
               Cancel
             </button>
           )}
-          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Post a ride</span>
+          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Ausfahrt posten</span>
           {step === 1 ? (
             <button
               onClick={() => resort && setStep(2)}
               disabled={!resort}
               className="text-sm font-semibold"
-              style={{ color: resort ? "var(--ice-400)" : "var(--text-disabled)" }}
+              style={{ color: resort ? "var(--sky)" : "var(--text-disabled)" }}
             >
               Next
             </button>
@@ -79,7 +79,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               onClick={handleSubmit}
               disabled={!meetPoint}
               className="text-sm font-bold"
-              style={{ color: meetPoint ? "var(--ice-400)" : "var(--text-disabled)" }}
+              style={{ color: meetPoint ? "var(--sky)" : "var(--text-disabled)" }}
             >
               Post
             </button>
@@ -98,7 +98,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                 onChange={(e) => setResort(e.target.value)}
                 className="form-input"
               >
-                <option value="">Choose a resort...</option>
+                <option value="">Gebiet wählen …</option>
                 {resorts.map((r) => (
                   <option key={r} value={r}>{r}</option>
                 ))}
@@ -112,7 +112,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               <div className="grid grid-cols-3 gap-2">
                 {ABILITY_OPTIONS.map((opt) => {
                   const active = abilityLevel === opt.value;
-                  const accent = opt.value === "chill" ? "var(--ice-400)" : opt.value === "park" ? "var(--ember-400)" : "#FF9C9C";
+                  const accent = opt.value === "chill" ? "var(--sky)" : opt.value === "park" ? "var(--rust)" : "#FF9C9C";
                   const bg = opt.value === "chill" ? "var(--accent-primary-subtle)" : opt.value === "park" ? "var(--accent-warm-subtle)" : "rgba(255,107,107,0.14)";
                   return (
                     <button
@@ -190,10 +190,10 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             {/* Summary pill */}
             <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
-              <Icon name="mountain" size={16} color="var(--ice-400)" strokeWidth={2} />
+              <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>
-                <span className="text-xs ml-2 font-mono" style={{ color: "var(--ice-300)" }}>{meetTime} · {totalSpots} spots</span>
+                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{meetTime} · {totalSpots} spots</span>
               </div>
             </div>
           </div>

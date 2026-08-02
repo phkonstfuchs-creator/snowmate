@@ -29,21 +29,21 @@ export default function SegmentedControl<T extends string>({
       aria-label={ariaLabel}
       style={{
         width: fullWidth ? "100%" : "fit-content",
-        padding: 4,
-        borderRadius: "var(--radius-md)",
-        background: "var(--bg-surface-3)",
-        border: "1px solid var(--border-subtle)",
+        padding: 0,
+        borderRadius: 0,
+        background: "var(--paper-0)",
+        border: "var(--rule-thin)",
       }}
     >
       <div
         className="absolute"
         style={{
-          top: 4,
-          bottom: 4,
-          left: `calc(${activeIndex} * (100% / ${options.length}) + 4px)`,
-          width: `calc(100% / ${options.length} - 8px)`,
-          borderRadius: "var(--radius-sm)",
-          background: "var(--accent-primary)",
+          top: 0,
+          bottom: 0,
+          left: `calc(${activeIndex} * (100% / ${options.length}))`,
+          width: `calc(100% / ${options.length})`,
+          borderRadius: 0,
+          background: "var(--ink-0)",
           transition: `left var(--duration-base) var(--ease-standard)`,
         }}
       />
@@ -57,9 +57,11 @@ export default function SegmentedControl<T extends string>({
             aria-pressed={active}
             className="relative z-10 flex-1 flex items-center justify-center transition-colors"
             style={{
-              height: 36,
-              font: "600 13px var(--font-body)",
-              color: active ? "var(--text-on-accent)" : "var(--text-tertiary)",
+              height: 38,
+              font: "700 11px var(--font-mono-stack)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: active ? "var(--paper-0)" : "var(--ink-2)",
               transitionDuration: "var(--duration-fast)",
             }}
           >

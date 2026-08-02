@@ -32,33 +32,33 @@ function AddFriendSheet({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Find friends" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Freunde finden" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <h2 className="font-black text-lg px-5 mb-1" style={{ color: INK }}>Find friends</h2>
-        <p className="text-xs font-bold px-5 mb-4" style={{ color: MUTED }}>People your friends know</p>
+        <h2 className="font-black text-lg px-5 mb-1" style={{ color: INK }}>Freunde finden</h2>
+        <p className="text-xs font-bold px-5 mb-4" style={{ color: MUTED }}>Leute, die deine Freunde kennen</p>
 
         <div className="px-5 space-y-2 mb-5">
           {suggestions.map((u) => {
             const isReq = requested.has(u.id);
             return (
-              <div key={u.id} className="flex items-center gap-3 p-3 rounded-2xl" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
+              <div key={u.id} className="flex items-center gap-3 p-3 rounded-none" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
                 <Avatar id={u.id} initials={u.avatar} size={40} verified={u.accountType === "verified"} />
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-sm" style={{ color: INK }}>{u.name}</p>
-                  <p className="text-xs font-bold" style={{ color: MUTED }}>@{u.handle} · Lvl {u.level}</p>
+                  <p className="text-xs font-bold" style={{ color: MUTED }}>@{u.handle} · Stufe {u.level}</p>
                 </div>
                 <button
                   onClick={() => setRequested((prev) => new Set(prev).add(u.id))}
                   disabled={isReq}
-                  className="text-xs font-black px-3.5 py-2 rounded-full active:scale-90 transition-all"
+                  className="text-mono-label px-3 py-2 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
                   style={isReq
                     ? { background: "var(--accent-primary-subtle)", color: BRAND }
                     : { background: BRAND, color: D }
                   }
                 >
-                  {isReq ? "Sent" : "Add"}
+                  {isReq ? "Gesendet" : "Anfragen"}
                 </button>
               </div>
             );
@@ -66,8 +66,8 @@ function AddFriendSheet({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="px-5">
-          <button className="w-full py-3.5 rounded-2xl font-black text-sm active:scale-95 transition-transform" style={{ border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }}>
-            Share invite link · +200 XP
+          <button className="w-full py-3.5 rounded-none font-black text-sm active:scale-95 transition-transform" style={{ border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }}>
+            Einladungslink teilen · +200 XP
           </button>
         </div>
       </div>
@@ -86,19 +86,19 @@ export default function CrewPage() {
   const totalUnread = CONVERSATIONS.reduce((sum, c) => sum + c.messages.filter((m) => m.senderId !== "me" && !m.isRead).length, 0);
   const handlePending = (userId: string, action: "accepted" | "declined") => setPendingActions((prev) => ({ ...prev, [userId]: action }));
 
-  const TAB_LABELS: Record<Tab, string> = { crew: "Crew", squads: "Squads", pending: "Requests", chats: "Chats" };
+  const TAB_LABELS: Record<Tab, string> = { crew: "Crew", squads: "Squads", pending: "Anfragen", chats: "Chats" };
 
   return (
     <>
-      <header className="sticky top-0 z-50" style={{ background: "rgba(10,14,18,0.96)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${BORDER}` }}>
+      <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
             <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Crew</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} friends · {CREWS.length} squads</p>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} Freunde · {CREWS.length} Squads</p>
           </div>
           <button
             onClick={() => setShowAdd(true)}
-            aria-label="Find friends"
+            aria-label="Freunde finden"
             className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >
@@ -133,28 +133,28 @@ export default function CrewPage() {
       {/* Crew tab */}
       {tab === "crew" && (
         <div className="px-4 pt-4 pb-6">
-          <div className="flex items-start gap-3 rounded-xl px-4 py-3 mb-4" style={{ background: "var(--accent-primary-subtle)", border: "1px solid rgba(79,195,240,0.25)" }}>
+          <div className="flex items-start gap-3 rounded-none px-4 py-3 mb-4" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
             <Icon name="shield-check" size={16} color={BRAND} strokeWidth={1.6} className="flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-black" style={{ color: BRAND }}>Friend-graph model</p>
-              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Friends-of-friends can discover rides at resort level. Exact location unlocks after acceptance.</p>
+              <p className="text-xs font-black" style={{ color: BRAND }}>So funktioniert Sichtbarkeit</p>
+              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Freunde von Freunden sehen Ausfahrten auf Gebietsebene. Der genaue Treffpunkt wird erst nach der Zusage sichtbar.</p>
             </div>
           </div>
 
           <div className="space-y-2">
             {myFriends.map((friend) => (
-              <div key={friend.id} className="flex items-center gap-3 p-3 rounded-2xl" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
+              <div key={friend.id} className="flex items-center gap-3 p-3 rounded-none" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
                 <Avatar id={friend.id} initials={friend.avatar} size={42} verified={friend.accountType === "verified"} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm" style={{ color: INK }}>{friend.name}</span>
                     <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>
-                      Lvl {friend.level}
+                      Stufe {friend.level}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-xs font-bold" style={{ color: MUTED }}>@{friend.handle}</span>
-                    <span className="text-xs font-bold" style={{ color: MUTED }}>{friend.daysThisSeason} days</span>
+                    <span className="text-xs font-bold" style={{ color: MUTED }}>{friend.daysThisSeason} Tage</span>
                   </div>
                 </div>
                 <button
@@ -168,16 +168,16 @@ export default function CrewPage() {
             ))}
           </div>
 
-          <div className="mt-5 rounded-2xl p-5 flex flex-col items-center gap-3 text-center" style={{ border: `2px dashed ${BORDER}` }}>
+          <div className="mt-5 rounded-none p-5 flex flex-col items-center gap-3 text-center" style={{ border: `2px dashed ${BORDER}` }}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--accent-primary-subtle)" }}>
               <Icon name="user-plus" size={18} color={BRAND} strokeWidth={2} />
             </div>
             <div>
-              <p className="font-black text-sm" style={{ color: INK }}>Invite friends</p>
-              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>Earn 200 XP per friend you invite</p>
+              <p className="font-black text-sm" style={{ color: INK }}>Freunde einladen</p>
+              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>200 XP für jede Person, die du einlädst</p>
             </div>
             <button className="text-sm font-black px-5 py-2 rounded-full active:scale-95 transition-transform" style={{ background: BRAND, color: D }}>
-              Share link
+              Link teilen
             </button>
           </div>
         </div>
@@ -189,13 +189,13 @@ export default function CrewPage() {
           {CREWS.map((crew) => {
             const members = crew.memberIds.map((id) => getUserById(id)!).filter(Boolean);
             return (
-              <div key={crew.id} className="rounded-2xl p-4" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
+              <div key={crew.id} className="rounded-none p-4" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="font-black text-[0.9375rem]" style={{ color: INK }}>{crew.name}</p>
                     <p className="text-xs font-bold" style={{ color: MUTED }}>{members.length} members · {crew.city === "innsbruck" ? "Innsbruck" : "Salzburg"}</p>
                   </div>
-                  <button className="text-xs font-black px-3 py-1.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>Plan a ride</button>
+                  <button className="text-xs font-black px-3 py-1.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>Ausfahrt planen</button>
                 </div>
                 <div className="flex -space-x-2">
                   {members.map((m) => (
@@ -207,7 +207,7 @@ export default function CrewPage() {
               </div>
             );
           })}
-          <button className="w-full rounded-2xl p-4 flex items-center justify-center gap-2 text-sm font-black" style={{ border: `2px dashed ${BORDER}`, color: BRAND }}>
+          <button className="w-full rounded-none p-4 flex items-center justify-center gap-2 text-sm font-black" style={{ border: `2px dashed ${BORDER}`, color: BRAND }}>
             <Icon name="plus" size={14} strokeWidth={2.2} />
             Create new squad
           </button>
@@ -220,7 +220,7 @@ export default function CrewPage() {
           {pendingUsers.map((user) => {
             const action = pendingActions[user.id];
             return (
-              <div key={user.id} className="rounded-2xl p-4"
+              <div key={user.id} className="rounded-none p-4"
                 style={{
                   border: `1px solid ${action === "accepted" ? "rgba(74,222,154,0.4)" : BORDER}`,
                   background: action === "accepted" ? "rgba(74,222,154,0.1)" : action === "declined" ? "var(--bg-canvas)" : SURFACE,
@@ -234,23 +234,23 @@ export default function CrewPage() {
                       <span className="font-black text-sm" style={{ color: INK }}>{user.name}</span>
                     </div>
                     <span className="text-xs font-bold" style={{ color: MUTED }}>@{user.handle} · Level {user.level}</span>
-                    <p className="text-xs font-medium mt-1.5" style={{ color: MUTED }}>{user.daysThisSeason} days this season · {user.resortsVisited} resorts</p>
+                    <p className="text-xs font-medium mt-1.5" style={{ color: MUTED }}>{user.daysThisSeason} Tage this season · {user.resortsVisited} resorts</p>
                     {user.isMinor && (
-                      <span className="inline-flex items-center gap-1 text-[0.65rem] font-black px-2 py-0.5 rounded-full mt-1.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--ember-400)" }}>Under 18</span>
+                      <span className="inline-flex items-center gap-1 text-[0.65rem] font-black px-2 py-0.5 rounded-full mt-1.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>Unter 18</span>
                     )}
                     {action ? (
                       <p className="text-xs font-black mt-3" style={{ color: action === "accepted" ? "var(--status-success)" : MUTED }}>
-                        {action === "accepted" ? "Friend confirmed" : "Request declined"}
+                        {action === "accepted" ? "Freund bestätigt" : "Anfrage abgelehnt"}
                       </p>
                     ) : (
                       <div className="flex gap-2 mt-3">
                         <button onClick={() => handlePending(user.id, "declined")}
-                          className="flex-1 py-2 rounded-xl text-sm font-black active:scale-95 transition-transform"
+                          className="flex-1 py-2 rounded-none text-sm font-black active:scale-95 transition-transform"
                           style={{ border: `1.5px solid ${BORDER}`, color: MUTED }}>
                           Decline
                         </button>
                         <button onClick={() => handlePending(user.id, "accepted")}
-                          className="flex-1 py-2 rounded-xl text-sm font-black active:scale-95 transition-transform"
+                          className="flex-1 py-2 rounded-none text-sm font-black active:scale-95 transition-transform"
                           style={{ background: BRAND, color: D }}>
                           Confirm
                         </button>
@@ -273,8 +273,8 @@ export default function CrewPage() {
                 <Icon name="message-circle" size={28} color={BRAND} strokeWidth={1.8} />
               </div>
               <div>
-                <p className="font-black" style={{ color: INK }}>No chats yet</p>
-                <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Message someone from a ride post!</p>
+                <p className="font-black" style={{ color: INK }}>Noch keine Chats</p>
+                <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Schreib jemanden aus einer Ausfahrt an.</p>
               </div>
             </div>
           ) : (
@@ -304,7 +304,7 @@ export default function CrewPage() {
                         <span className="text-[0.6rem] flex-shrink-0 ml-2" style={{ color: MUTED }}>{lastMsg?.sentAt}</span>
                       </div>
                       <p className={clsx("text-xs truncate", unread > 0 ? "font-bold" : "font-medium")} style={{ color: MUTED }}>
-                        {conv.contextType === "ride" && <span className="font-black" style={{ color: BRAND }}>Ride · </span>}
+                        {conv.contextType === "ride" && <span className="font-black" style={{ color: BRAND }}>Ausfahrt · </span>}
                         {lastMsg ? (lastMsg.senderId === "me" ? "You: " : "") + lastMsg.text : "No messages yet"}
                       </p>
                     </div>

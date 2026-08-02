@@ -84,7 +84,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               </span>
             )}
             {author.snapchat && (
-              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--ember-300)", border: `1px solid rgba(255,162,60,0.3)` }}>
+              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)", border: `1px solid var(--rust-ink)` }}>
                 {author.snapchat}
               </span>
             )}
@@ -100,7 +100,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
             </div>
             <div className="px-4 py-3">
               <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Open spots</p>
-              <p className="font-black text-sm font-mono" style={{ color: isFull ? MUTED : openSpots === 1 ? "var(--ember-400)" : BRAND }}>
+              <p className="font-black text-sm font-mono" style={{ color: isFull ? MUTED : openSpots === 1 ? "var(--rust)" : BRAND }}>
                 {isFull ? "Full" : `${openSpots} open`}
               </p>
             </div>

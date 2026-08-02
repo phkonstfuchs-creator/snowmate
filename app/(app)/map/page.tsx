@@ -37,7 +37,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         </div>
 
         {/* Vector scene hero */}
-        <div className="mx-5 mt-4 rounded-2xl overflow-hidden relative" style={{ height: 140 }}>
+        <div className="mx-5 mt-4 rounded-none overflow-hidden relative" style={{ height: 140 }}>
           <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65) 100%)" }} />
           <div className="absolute bottom-3 left-4">
@@ -45,7 +45,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
             <p className="text-white/70 text-xs font-semibold">{resort.altitudeMin}–{resort.altitudeMax} m</p>
           </div>
           <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
-            <span className="text-xs font-black text-white">{resort.snowDepth} cm snow</span>
+            <span className="text-xs font-black text-white">{resort.snowDepth} cm Schnee</span>
           </div>
         </div>
 
@@ -57,7 +57,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
             { label: CONDITIONS_LABELS[resort.conditions], val: "Snow", cond: resort.conditions },
           ].map(({ label, val, live, cond }) => (
             <div key={label}
-              className={clsx("rounded-2xl p-3 text-center", cond ? `cond-${cond}` : "")}
+              className={clsx("rounded-none p-3 text-center", cond ? `cond-${cond}` : "")}
               style={cond ? {} : { background: SURFACE, border: `1px solid ${BORDER}` }}>
               {live && <div className="flex justify-center mb-1"><span className="pulse-dot" style={{ width: 6, height: 6 }} /></div>}
               <p className="font-black text-lg" style={{ color: cond ? undefined : INK }}>{val}</p>
@@ -68,10 +68,10 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
         {/* Ability bars */}
         <div className="px-5 mt-4">
-          <p className="text-[0.65rem] font-black uppercase tracking-widest mb-2.5" style={{ color: MUTED }}>Who&apos;s riding what</p>
+          <p className="text-[0.65rem] font-black uppercase tracking-widest mb-2.5" style={{ color: MUTED }}>Wer fährt was</p>
           {[
-            { label: "Chill",     count: resort.chillRiders,    color: "var(--ice-400)",   bg: "var(--accent-primary-subtle)" },
-            { label: "Park",      count: resort.parkRiders,     color: "var(--ember-400)", bg: "var(--accent-warm-subtle)" },
+            { label: "Chill",     count: resort.chillRiders,    color: "var(--sky)",   bg: "var(--accent-primary-subtle)" },
+            { label: "Park",      count: resort.parkRiders,     color: "var(--rust)", bg: "var(--accent-warm-subtle)" },
             { label: "Off-Piste", count: resort.offPisteRiders, color: "#FF9C9C",          bg: "rgba(255,107,107,0.14)" },
           ].map(({ label, count, color, bg }) => {
             const pct = resort.ridersNow > 0 ? Math.round((count / resort.ridersNow) * 100) : 0;
@@ -90,7 +90,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         {/* Rides here */}
         {ridesHere.length > 0 && (
           <div className="px-5 mt-4">
-            <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Rides here today</p>
+            <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Ausfahrten heute hier</p>
             {ridesHere.map((ride) => {
               const a = getUserById(ride.authorId);
               if (!a) return null;
@@ -117,7 +117,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
   );
 }
 
-function SatelliteUpsell({ onClose }: { onClose: () => void }) {
+function SatellitUpsell({ onClose }: { onClose: () => void }) {
   useScrollLock();
   return (
     <>
@@ -132,20 +132,20 @@ function SatelliteUpsell({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div className="px-5 text-center mb-5">
-          <h2 className="font-display" style={{ color: INK, fontSize: 22, fontWeight: 800 }}>Unlock Premium</h2>
+          <h2 className="font-display" style={{ color: INK, fontSize: 22, fontWeight: 800 }}>Premium freischalten</h2>
           <p className="text-sm font-medium leading-relaxed mt-1" style={{ color: MUTED }}>
-            Satellite map, powder alerts and advanced stats.
+            Satellit map, powder alerts and advanced stats.
           </p>
         </div>
         <div className="px-5 space-y-2 mb-5">
           {[
-            "Satellite map · terrain & couloirs live",
+            "Satellit map · terrain & couloirs live",
             "Powder alerts · 15+ cm push notification",
             "Advanced stats · heatmap + vertical",
           ].map((t) => {
             const [label, desc] = t.split(" · ");
             return (
-              <div key={label} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+              <div key={label} className="flex items-start gap-3 p-3 rounded-none" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
                 <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: BRAND }}>
                   <Icon name="check" size={12} color={D} strokeWidth={2.2} />
                 </div>
@@ -158,7 +158,7 @@ function SatelliteUpsell({ onClose }: { onClose: () => void }) {
           })}
         </div>
         <div className="px-5 space-y-2">
-          <button className="w-full py-4 rounded-2xl font-black text-base active:scale-95 transition-transform"
+          <button className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
             style={{ background: "var(--accent-warm)", color: "var(--text-on-accent)" }}>
             Start for € 2.99 / month
           </button>
@@ -187,12 +187,12 @@ export default function MapPage() {
   return (
     <>
       <header className="sticky top-0 z-50"
-        style={{ background: "rgba(10,14,18,0.96)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${BORDER}` }}>
+        style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Map</h1>
+            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Karte</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-              {totalRiders} riders live · {resorts.length} resorts
+              {totalRiders} fahren gerade · {resorts.length} Gebiete
             </p>
           </div>
           <button
@@ -203,7 +203,7 @@ export default function MapPage() {
             style={{ background: SURFACE, color: MUTED, border: `1px solid ${BORDER}` }}
           >
             <Icon name="satellite" size={13} strokeWidth={1.5} />
-            Satellite
+            Satellit
             <span className="text-[0.55rem] font-black px-1 py-0.5 rounded-full"
               style={{ background: "var(--accent-warm)", color: "var(--text-on-accent)" }}>PRO</span>
           </button>
@@ -223,24 +223,24 @@ export default function MapPage() {
         <LeafletMap city={city} resorts={resorts} onSelect={setSelectedResort} />
       </div>
 
-      {/* Hotspot strip */}
+      {/* Brennpunkt strip */}
       {hotResort && (
         <button
-          className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-2xl w-[calc(100%-2rem)] active:scale-[0.98] transition-transform overflow-hidden"
+          className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] active:scale-[0.98] transition-transform overflow-hidden"
           style={{ background: BRAND }}
           onClick={() => setSelectedResort(hotResort)}
         >
-          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+          <div className="w-14 h-14 rounded-none overflow-hidden flex-shrink-0">
             <ResortScene name={hotResort.name} className="w-full h-full" />
           </div>
           <div className="flex-1 text-left">
             <p className="font-black text-sm" style={{ color: "var(--text-on-accent)" }}>{hotResort.name}</p>
             <p className="text-xs font-semibold" style={{ color: "rgba(4,20,28,0.72)" }}>
-              {hotResort.ridersNow} riders live · {hotResort.snowDepth} cm snow
+              {hotResort.ridersNow} fahren gerade · {hotResort.snowDepth} cm Schnee
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs font-black" style={{ color: "rgba(4,20,28,0.65)" }}>Hotspot</span>
+            <span className="text-xs font-black" style={{ color: "rgba(4,20,28,0.65)" }}>Brennpunkt</span>
             <Icon name="chevron-right" size={14} color="var(--text-on-accent)" strokeWidth={2} />
           </div>
         </button>
@@ -248,12 +248,12 @@ export default function MapPage() {
 
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
-        <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>All resorts</p>
+        <p className="text-[0.65rem] font-black uppercase tracking-widest mb-3" style={{ color: MUTED }}>Alle Gebiete</p>
         <div className="space-y-2 stagger">
           {sorted.map((resort, i) => (
             <button
               key={resort.name}
-              className="card-tap w-full flex items-center gap-3 p-0 rounded-2xl overflow-hidden anim-fade-up text-left"
+              className="card-tap w-full flex items-center gap-3 p-0 rounded-none overflow-hidden anim-fade-up text-left"
               style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
               onClick={() => setSelectedResort(resort)}
             >
@@ -269,11 +269,11 @@ export default function MapPage() {
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="pulse-dot" style={{ width: 5, height: 5 }} />
-                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.ridersNow} riders</span>
+                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.ridersNow} fahren</span>
                   <span style={{ color: BORDER }}>·</span>
                   <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.snowDepth} cm</span>
                   <span style={{ color: BORDER }}>·</span>
-                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.liftsOpen}/{resort.totalLifts} lifts</span>
+                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.liftsOpen}/{resort.totalLifts} Lifte</span>
                 </div>
               </div>
               <div className="pr-3">
@@ -285,7 +285,7 @@ export default function MapPage() {
       </div>
 
       {selectedResort && <ResortDetailSheet resort={selectedResort} onClose={() => setSelectedResort(null)} />}
-      {showUpsell && <SatelliteUpsell onClose={() => setShowUpsell(false)} />}
+      {showUpsell && <SatellitUpsell onClose={() => setShowUpsell(false)} />}
     </>
   );
 }

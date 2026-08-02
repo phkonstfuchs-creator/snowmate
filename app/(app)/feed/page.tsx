@@ -52,19 +52,19 @@ export default function FeedPage() {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-50" style={{ background: "rgba(10,14,18,0.96)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border-subtle)" }}>
+      <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
-            <PenguinMascot size={30} />
-            <span className="font-display text-white" style={{ fontSize: 21, fontWeight: 800 }}>Snowmate</span>
+            <PenguinMascot size={28} />
+            <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Snowmate</span>
           </div>
           <button
             onClick={() => setShowPostModal(true)}
-            className="flex items-center gap-1.5 text-sm font-black px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform"
-            style={{ background: "var(--accent-primary)", color: "var(--text-on-accent)" }}
+            className="card-tap text-mono-label flex items-center gap-1.5 px-3 py-2"
+            style={{ background: "var(--rust)", color: "var(--paper-0)", border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
-            <Icon name="plus" size={14} strokeWidth={2.4} />
-            Post
+            <Icon name="plus" size={13} strokeWidth={2.6} />
+            Posten
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -101,11 +101,11 @@ export default function FeedPage() {
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <div className="flex items-center gap-2">
           <span className="pulse-dot" />
-          <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
-            <span className="font-mono font-bold">{ridersToday}</span> out today
+          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
+            {ridersToday} heute unterwegs
           </span>
         </div>
-        <span className="text-xs font-bold" style={{ color: "var(--text-disabled)" }}>Tue, Jan 8</span>
+        <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>Di, 8. Jan</span>
       </div>
 
       {/* Feed */}
@@ -140,8 +140,8 @@ export default function FeedPage() {
           <div className="flex flex-col items-center gap-4 py-16 text-center">
             <PenguinMascot size={72} />
             <div>
-              <p className="font-bold" style={{ color: "var(--text-primary)" }}>No rides yet today</p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>Be the first — post your ride!</p>
+              <p className="font-bold" style={{ color: "var(--text-primary)" }}>Heute noch keine Ausfahrt</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>Sei die Erste oder der Erste — poste deine Line.</p>
             </div>
           </div>
         )}
@@ -150,11 +150,16 @@ export default function FeedPage() {
       {/* FAB */}
       <button
         onClick={() => setShowPostModal(true)}
-        aria-label="Post a ride"
-        className="fixed bottom-[88px] w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40"
-        style={{ right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))", background: "var(--ice-500)" }}
+        aria-label="Ausfahrt posten"
+        className="card-tap fixed bottom-[96px] z-40 flex h-14 w-14 items-center justify-center"
+        style={{
+          right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))",
+          background: "var(--rust)",
+          border: "var(--rule-thick)",
+          boxShadow: "var(--shadow-print)",
+        }}
       >
-        <Icon name="plus" size={22} color="white" strokeWidth={2.5} />
+        <Icon name="plus" size={22} color="var(--paper-0)" strokeWidth={2.5} />
       </button>
 
       {/* Post Modal */}
@@ -195,11 +200,14 @@ export default function FeedPage() {
       {/* XP toast */}
       {showXp && (
         <div className="fixed bottom-[150px] left-1/2 -translate-x-1/2 z-[450] pointer-events-none">
-          <div className="xp-toast flex items-center gap-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg" style={{ background: "var(--bg-surface-2)" }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M8 1L2 8.5h5L6 13l6-7.5H7L8 1Z" fill="var(--ice-300)" />
+          <div
+            className="xp-toast text-mono-label flex items-center gap-2 px-4 py-2.5"
+            style={{ background: "var(--ink-0)", color: "var(--paper-0)", boxShadow: "var(--shadow-print)" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M8 1L2 8.5h5L6 13l6-7.5H7L8 1Z" fill="var(--ochre)" />
             </svg>
-            <span className="font-mono">+50 XP</span> · You&apos;re in!
+            +50 XP · Du bist dabei
           </div>
         </div>
       )}
