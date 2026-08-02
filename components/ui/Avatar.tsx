@@ -1,4 +1,6 @@
-const AVATAR_COLORS = ["#2CA3D6", "#FF7A1A", "#4ADE9A", "#1D7FAE", "#E85D04", "#7FDCFA"];
+/* Spotfarben des Bogens — jede ist gegen Papier und gegen weiße
+   Initialen geprüft, damit Avatare nie aus der Palette fallen. */
+const AVATAR_COLORS = ["#a83f1b", "#2a5647", "#3e6e8e", "#8f3415", "#3b7561", "#2f5570"];
 
 export function avatarColor(id: string) {
   return AVATAR_COLORS[id.charCodeAt(id.length - 1) % AVATAR_COLORS.length];
