@@ -4,10 +4,10 @@ test("onboarding is outside the authenticated app shell", async ({ page }) => {
   await page.goto("/onboarding");
 
   await expect(
-    page.getByRole("heading", { name: "Find your crew. Today." }),
+    page.getByRole("heading", { name: "Finde deine Crew" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("navigation", { name: "Main navigation" }),
+    page.getByRole("navigation", { name: "Hauptnavigation" }),
   ).toHaveCount(0);
 });
 
@@ -16,18 +16,18 @@ test("a new user can finish onboarding and continue to account creation", async 
 }) => {
   await page.goto("/onboarding");
 
-  await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Los geht\u2019s" }).click();
   await page.getByRole("button", { name: /Innsbruck/ }).click();
   await page.getByRole("button", { name: /Chill/ }).click();
   await page.getByPlaceholder("Alex Rider").fill("Alex Rider");
-  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByRole("button", { name: "Account erstellen" }).click();
 
   await expect(page).toHaveURL(/\/signup$/);
   await expect(
-    page.getByRole("heading", { name: "Create your account" }),
+    page.getByRole("heading", { name: "Account erstellen" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("navigation", { name: "Main navigation" }),
+    page.getByRole("navigation", { name: "Hauptnavigation" }),
   ).toHaveCount(0);
 });
 

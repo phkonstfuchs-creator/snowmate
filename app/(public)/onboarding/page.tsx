@@ -142,8 +142,14 @@ export default function OnboardingPage() {
 
         <div className="flex flex-1 flex-col px-4 pt-6">
           <p className="text-mono-label" style={{ color: RUST }}>Saison 25/26 · Tirol &amp; Salzburg</p>
+          {/* Leerzeichen vor jedem Umbruch, sonst liest der Screenreader
+              "FindedeineCrew" als ein Wort */}
           <h1 className="text-display-hero mt-3" style={{ color: INK }}>
-            Finde<br />deine<br />Crew
+            Finde{" "}
+            <br />
+            deine{" "}
+            <br />
+            Crew
           </h1>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>

@@ -226,9 +226,14 @@ export default function ProfilePage() {
           </button>
         </div>
 
+        {/* Leerzeichen zwischen den Zeilen, sonst ergibt der
+            Blockumbruch den Namen "FelixGruber" fuer Screenreader */}
         <h1 className="text-display-hero relative mt-2" style={{ color: INK }}>
-          {ME.name.split(" ").map((word) => (
-            <span key={word} className="block">{word}</span>
+          {ME.name.split(" ").map((word, i) => (
+            <span key={word} className="block">
+              {i > 0 ? " " : null}
+              {word}
+            </span>
           ))}
         </h1>
 
