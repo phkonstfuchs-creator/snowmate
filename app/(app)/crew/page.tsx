@@ -12,6 +12,7 @@ import {
 } from "@/lib/data";
 import ConversationThread from "@/components/ConversationThread";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -27,20 +28,21 @@ type Tab = "crew" | "squads" | "pending" | "chats";
 
 function AddFriendSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [requested, setRequested] = useState<Set<string>>(new Set());
   const suggestions = MOCK_USERS.filter((u) => !ME.friendIds.includes(u.id) && u.id !== "me").slice(0, 3);
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Freunde finden" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Freunde finden" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
         <div className="flex items-center justify-between px-5 mb-1">
           <h2 className="font-black text-lg" style={{ color: INK }}>Freunde finden</h2>
-          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>

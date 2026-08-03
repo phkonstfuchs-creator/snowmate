@@ -10,16 +10,16 @@ import {
 } from "../types";
 
 export const BADGES: Badge[] = [
-  { id: "first_tracks", name: "First Tracks", description: "Rode before 8am on a powder day", rarity: "rare", icon: "sunrise" },
-  { id: "storm_chaser", name: "Storm Chaser", description: "Posted a ride during a snowstorm", rarity: "epic", icon: "snowflake" },
-  { id: "local_legend", name: "Local Legend", description: "10+ rides at the same resort", rarity: "rare", icon: "mountain" },
-  { id: "crew_builder", name: "Crew Builder", description: "Invited 5+ friends to Snowmate", rarity: "common", icon: "users" },
-  { id: "powder_hound", name: "Powder Hound", description: "20+ powder days logged", rarity: "epic", icon: "wind" },
-  { id: "season_warrior", name: "Season Warrior", description: "30+ days in one season", rarity: "epic", icon: "trophy" },
-  { id: "night_rider", name: "Night Rider", description: "5+ après sessions with crew", rarity: "common", icon: "moon" },
-  { id: "dawn_patrol", name: "Dawn Patrol", description: "10+ rides before 9am", rarity: "rare", icon: "alarm" },
-  { id: "carpool_king", name: "Carpool King", description: "Offered 10+ rides to resorts", rarity: "common", icon: "car" },
-  { id: "multi_pass", name: "Multi-Pass", description: "Rode 5+ different resorts", rarity: "common", icon: "map" },
+  { id: "first_tracks", name: "First Tracks", description: "Vor 8 Uhr an einem Powder-Tag gefahren", rarity: "rare", icon: "sunrise" },
+  { id: "storm_chaser", name: "Storm Chaser", description: "Ausfahrt während eines Schneesturms gepostet", rarity: "epic", icon: "snowflake" },
+  { id: "local_legend", name: "Local Legend", description: "10+ Ausfahrten im selben Gebiet", rarity: "rare", icon: "mountain" },
+  { id: "crew_builder", name: "Crew Builder", description: "5+ Freunde zu Snowmate eingeladen", rarity: "common", icon: "users" },
+  { id: "powder_hound", name: "Powder Hound", description: "20+ Powder-Tage gesammelt", rarity: "epic", icon: "wind" },
+  { id: "season_warrior", name: "Season Warrior", description: "30+ Tage in einer Saison", rarity: "epic", icon: "trophy" },
+  { id: "night_rider", name: "Night Rider", description: "5+ Après-Sessions mit der Crew", rarity: "common", icon: "moon" },
+  { id: "dawn_patrol", name: "Dawn Patrol", description: "10+ Ausfahrten vor 9 Uhr", rarity: "rare", icon: "alarm" },
+  { id: "carpool_king", name: "Carpool King", description: "10+ Mitfahrten angeboten", rarity: "common", icon: "car" },
+  { id: "multi_pass", name: "Multi-Pass", description: "5+ verschiedene Gebiete gefahren", rarity: "common", icon: "map" },
 ];
 
 export const MOCK_USERS: User[] = [
@@ -247,7 +247,7 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 4,
     takenSpots: 2,
     joinedUserIds: ["u2", "u3"],
-    caption: "Powder day! Glacier is untouched. Who's in? Let's head out early — carpool from Innsbruck HBF possible.",
+    caption: "Powder-Tag! Der Gletscher ist unverspurt. Wer ist dabei? Wir starten früh — Mitfahrt ab Innsbruck HBF möglich.",
     postedAt: "23 min ago",
   },
   {
@@ -262,8 +262,8 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 6,
     takenSpots: 3,
     joinedUserIds: ["u6", "u7", "u4"],
-    caption: "Park session at Nordkette, doing rails. Intermediate+ only. Bring a helmet.",
-    postedAt: "1 hr ago",
+    caption: "Park-Session an der Nordkette, Rails stehen an. Ab mittlerem Niveau. Helm mitbringen.",
+    postedAt: "vor 1 Std.",
   },
   {
     id: "r3",
@@ -277,7 +277,7 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 8,
     takenSpots: 5,
     joinedUserIds: ["u2", "u4", "u7", "u8", "u5"],
-    caption: "Chill day, blue runs only. Bring your beginners along. I've got space in the van.",
+    caption: "Chilliger Tag, nur blaue Pisten. Bringt gern Anfänger mit. Im Bus ist noch Platz.",
     postedAt: "2 hr ago",
   },
   {
@@ -292,7 +292,7 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 5,
     takenSpots: 3,
     joinedUserIds: ["u3", "u4", "u6"],
-    caption: "Last spot open! Come along.",
+    caption: "Letzter Platz frei! Komm mit.",
     postedAt: "3 hr ago",
   },
   {
@@ -307,7 +307,7 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 3,
     takenSpots: 1,
     joinedUserIds: ["u8"],
-    caption: "Early start, deep snow on Kohlmais. I know the area blind — happy to guide.",
+    caption: "Früher Start, tiefer Schnee am Kohlmais. Ich kenne das Gebiet blind und führe gern.",
     postedAt: "45 min ago",
   },
   {
@@ -322,8 +322,8 @@ export const RIDE_POSTS: RidePost[] = [
     totalSpots: 4,
     takenSpots: 2,
     joinedUserIds: ["u5", "u6"],
-    caption: "Afternoon park session at the Nachtslalom area. Sick kicker setup today.",
-    postedAt: "1 hr ago",
+    caption: "Nachmittags Park-Session beim Nachtslalom. Das Kicker-Setup ist heute richtig gut.",
+    postedAt: "vor 1 Std.",
   },
 ];
 
@@ -339,8 +339,8 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     totalSeats: 3,
     availableSeats: 2,
     riders: ["u2"],
-    note: "Got room for two more, luggage no problem.",
-    postedAt: "1 hr ago",
+    note: "Habe noch zwei Plätze frei, Gepäck kein Problem.",
+    postedAt: "vor 1 Std.",
   },
   {
     id: "c2",
@@ -353,7 +353,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     totalSeats: 1,
     availableSeats: 1,
     riders: [],
-    note: "Looking for a ride, I'll chip in for gas.",
+    note: "Suche eine Mitfahrt, Spritgeld gebe ich dazu.",
     postedAt: "2 hr ago",
   },
   {
@@ -367,7 +367,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     totalSeats: 4,
     availableSeats: 3,
     riders: ["u6"],
-    note: "Leaving after breakfast, easy 5 min drive.",
+    note: "Fahre nach dem Frühstück los, sind nur 5 Minuten.",
     postedAt: "3 hr ago",
   },
   {
@@ -381,7 +381,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     totalSeats: 4,
     availableSeats: 2,
     riders: ["u8", "u7"],
-    note: "Early start, be on time please. Heading back around 16:00.",
+    note: "Früher Start, bitte pünktlich sein. Rückfahrt gegen 16:00.",
     postedAt: "30 min ago",
   },
   {
@@ -395,7 +395,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     totalSeats: 1,
     availableSeats: 1,
     riders: [],
-    note: "Looking for a ride to the glacier, I'm punctual.",
+    note: "Suche Mitfahrt zum Gletscher, bin pünktlich.",
     postedAt: "4 hr ago",
   },
 ];
@@ -449,11 +449,11 @@ export const CONVERSATIONS: Conversation[] = [
     participantIds: ["me", "u1"],
     contextType: "direct",
     messages: [
-      { id: "m1", senderId: "u1", text: "Hey! Stubai tomorrow morning? Forecast says the glacier got 30cm fresh.", sentAt: "Yesterday 21:14", isRead: true },
-      { id: "m2", senderId: "me", text: "For sure! What time do you want to head out?", sentAt: "Yesterday 21:20", isRead: true },
-      { id: "m3", senderId: "u1", text: "8am from HBF? I'll drive.", sentAt: "Yesterday 21:22", isRead: true },
-      { id: "m4", senderId: "me", text: "Perfect, I'm in!", sentAt: "Yesterday 21:25", isRead: true },
-      { id: "m5", senderId: "u1", text: "Skis waxed yet?", sentAt: "1 hr ago", isRead: false },
+      { id: "m1", senderId: "u1", text: "Hey! Morgen früh Stubai? Laut Vorhersage liegen am Gletscher 30 cm frisch.", sentAt: "Gestern 21:14", isRead: true },
+      { id: "m2", senderId: "me", text: "Auf jeden Fall! Wann willst du los?", sentAt: "Gestern 21:20", isRead: true },
+      { id: "m3", senderId: "u1", text: "8 Uhr ab HBF? Ich fahre.", sentAt: "Gestern 21:22", isRead: true },
+      { id: "m4", senderId: "me", text: "Perfekt, ich bin dabei!", sentAt: "Gestern 21:25", isRead: true },
+      { id: "m5", senderId: "u1", text: "Ski schon gewachst?", sentAt: "vor 1 Std.", isRead: false },
     ],
   },
   {
@@ -462,9 +462,9 @@ export const CONVERSATIONS: Conversation[] = [
     contextType: "ride",
     contextId: "r2",
     messages: [
-      { id: "m6", senderId: "u3", text: "You coming to Nordkette today? Park session.", sentAt: "Today 09:12", isRead: true },
-      { id: "m7", senderId: "me", text: "Which features are open?", sentAt: "Today 09:15", isRead: true },
-      { id: "m8", senderId: "u3", text: "All of them! Rails, kicker, box. Great conditions.", sentAt: "Today 09:17", isRead: false },
+      { id: "m6", senderId: "u3", text: "Kommst du heute zur Nordkette? Park-Session.", sentAt: "Heute 09:12", isRead: true },
+      { id: "m7", senderId: "me", text: "Welche Obstacles sind offen?", sentAt: "Heute 09:15", isRead: true },
+      { id: "m8", senderId: "u3", text: "Alle! Rails, Kicker, Box. Top Bedingungen.", sentAt: "Heute 09:17", isRead: false },
     ],
   },
   {
@@ -472,9 +472,9 @@ export const CONVERSATIONS: Conversation[] = [
     participantIds: ["me", "u2"],
     contextType: "direct",
     messages: [
-      { id: "m9", senderId: "u2", text: "Bro Schlick was lit yesterday", sentAt: "Yesterday 17:44", isRead: true },
-      { id: "m10", senderId: "me", text: "Yeah man the slopes were insane. When again?", sentAt: "Yesterday 17:50", isRead: true },
-      { id: "m11", senderId: "u2", text: "Saturday?", sentAt: "Yesterday 17:51", isRead: true },
+      { id: "m9", senderId: "u2", text: "Alter, Schlick war gestern brutal gut", sentAt: "Gestern 17:44", isRead: true },
+      { id: "m10", senderId: "me", text: "Ja Wahnsinn, die Hänge waren irre. Wann wieder?", sentAt: "Gestern 17:50", isRead: true },
+      { id: "m11", senderId: "u2", text: "Samstag?", sentAt: "Gestern 17:51", isRead: true },
     ],
   },
 ];

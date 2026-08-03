@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
 import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -29,7 +30,8 @@ function SectionRule({ label, right }: { label: string; right?: React.ReactNode 
 
 function PremiumSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
-  const panelRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
   const FEATURES: [string, string][] = [
     ["Satellitenkarte", "Gelände, Rinnen und Off-Piste-Lines live"],
@@ -40,10 +42,11 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
       <div
         ref={panelRef}
         className="sheet-panel paper-grain"
+        data-state={state}
         role="dialog"
         aria-modal="true"
         aria-label="Snowmate Premium"
@@ -86,7 +89,7 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
           <p className="text-center text-mono-label" style={{ color: INK_2 }}>
             Monatlich kündbar · Keine Mindestlaufzeit
           </p>
-          <button onClick={onClose} className="w-full py-2.5 text-sm font-semibold underline" style={{ color: INK_2 }}>
+          <button onClick={dismiss} className="w-full py-2.5 text-sm font-semibold underline" style={{ color: INK_2 }}>
             Jetzt nicht
           </button>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { AbilityLevel, City } from "@/lib/types";
 import { RESORT_STATUS } from "@/lib/data";
@@ -30,7 +31,8 @@ const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = 
 
 export default function PostRideModal({ city, onClose, onPost }: PostRideModalProps) {
   useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [step, setStep] = useState<1 | 2>(1);
   const [resort, setResort] = useState("");
   const [abilityLevel, setAbilityLevel] = useState<AbilityLevel>("chill");
@@ -43,13 +45,13 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
   const handleSubmit = () => {
     onPost({ resort, abilityLevel, meetTime, meetPoint, totalSpots, caption });
-    onClose();
+    dismiss();
   };
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal aria-label="Ausfahrt posten" tabIndex={-1}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Ausfahrt posten" tabIndex={-1}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
@@ -62,7 +64,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               Zurück
             </button>
           ) : (
-            <button onClick={onClose} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
+            <button onClick={dismiss} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
               Abbrechen
             </button>
           )}
@@ -122,7 +124,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                       key={opt.value}
                       onClick={() => setAbilityLevel(opt.value)}
                       aria-pressed={active}
-                      className="flex flex-col items-center gap-1 px-3 py-3 rounded-xl border-2 transition-all duration-150"
+                      className="flex flex-col items-center gap-1 px-3 py-3 border-2 transition-colors duration-100"
                       style={{ borderColor: active ? accent : "var(--border-subtle)", background: active ? bg : "var(--bg-surface-2)" }}
                     >
                       <span className="text-sm font-bold" style={{ color: active ? accent : "var(--text-primary)" }}>{opt.label}</span>
@@ -197,7 +199,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
             </div>
 
             {/* Summary pill */}
-            <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
+            <div className="rounded-none px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
               <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>

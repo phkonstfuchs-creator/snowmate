@@ -6,6 +6,7 @@ import { BADGES, ME } from "@/lib/data";
 import clsx from "clsx";
 import ConversationThread from "@/components/ConversationThread";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -47,7 +48,8 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
   useScrollLock();
   const [showThread, setShowThread] = useState(false);
   const messageButtonRef = useRef<HTMLButtonElement>(null);
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose, !showThread);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss, !showThread);
   const isMe = user.id === ME.id;
   const isFriend = ME.friendIds.includes(user.id);
   const earnedBadges = BADGES.filter((b) => user.badges.includes(b.id));
@@ -59,7 +61,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
       <div
         ref={dialogRef}
         className="sheet-panel"
@@ -74,7 +76,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 z-10" style={{ background: SURFACE }}>
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-          <button type="button" onClick={onClose} aria-label="Profil schließen" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label="Profil schließen" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -83,7 +85,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         <div className="px-5 pt-4 pb-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-black text-xl flex-shrink-0" style={{ background: avatarColor(user.id) }}>
+              <div className="w-16 h-16 rounded-none flex items-center justify-center text-white font-black text-xl flex-shrink-0" style={{ background: avatarColor(user.id) }}>
                 {user.avatar}
               </div>
               {user.isPremium && (
@@ -182,12 +184,12 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             <button
               ref={messageButtonRef}
               onClick={() => { if (onMessage) { onMessage(user.id); } else { setShowThread(true); } }}
-              className="flex-1 py-3 rounded-2xl font-black text-sm active:scale-95 transition-transform"
+              className="flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform"
               style={{ background: BRAND, color: D }}
             >
               Nachricht
             </button>
-            <button className={clsx("flex-1 py-3 rounded-2xl font-black text-sm active:scale-95 transition-transform border-2")}
+            <button className={clsx("flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
               {isFriend ? "Teil der Crew" : "Zur Crew hinzufügen"}
             </button>

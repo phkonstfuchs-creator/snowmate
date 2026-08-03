@@ -90,12 +90,21 @@
   --shadow-sheet: 0 -2px 0 var(--ink-0);
   --glow-focus: 0 0 0 3px rgba(168, 63, 27, 0.3);
 
-  /* Bewegung — Druck bewegt sich nicht weich. Kurz und trocken. */
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-bounce: cubic-bezier(0.2, 0, 0, 1);
+  /* Bewegung — Druck bewegt sich nicht weich. Kurz und trocken.
+     Zwei echte Kurven statt einer: Eintretendes und Austretendes
+     laeuft ease-out (startet sofort, fuehlt sich reaktionsschnell
+     an), Bewegung auf dem Schirm ease-in-out. Die alte Kurve
+     (0.2, 0, 0, 1) startete flach — also ease-in — und liess jede
+     Interaktion traeger wirken, als sie war. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-standard: var(--ease-out);
+
   --duration-fast: 100ms;
   --duration-base: 180ms;
   --duration-slow: 300ms;
+  /* Nur fuer seltene Belohnungsmomente (XP-Einblendung). Alles,
+     was oft passiert, bleibt unter 300ms. */
   --duration-celebrate: 700ms;
 
   /* Typografie — drei Stimmen.
@@ -173,6 +182,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
+}
+
+/* ─── Tastaturfokus ──────────────────────────────────────────
+   Vorher gab es gar keinen: Tastaturnutzer bekamen den blauen
+   Browser-Default, der auf Papier wie ein Fremdkoerper wirkt.
+   Jetzt eine harte Passermarke in Volltinte — sichtbar, aber im
+   Duktus des Drucks. :focus-visible statt :focus, damit der
+   Rahmen bei Mausklick nicht aufblitzt. */
+:focus-visible {
+  outline: 2px solid var(--ink-0);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+/* Auf farbigen Flaechen (Rost, Tanne) wuerde Tinte untergehen */
+.sm-btn-primary:focus-visible,
+.sm-btn-warm:focus-visible,
+.city-toggle-btn.active:focus-visible {
+  outline-color: var(--paper-0);
+  outline-offset: -5px;
 }
 
 /* ─── App-Rahmen ─────────────────────────────────────────────── */
@@ -329,9 +357,14 @@ body {
   inset: 0;
   background: var(--bg-overlay);
   z-index: var(--z-modal-backdrop);
-  animation: fade-in 0.18s ease;
+  animation: fade-in 0.18s var(--ease-out);
   touch-action: none;
   overflow: hidden;
+}
+/* Ausblenden schneller als Einblenden: beim Oeffnen schaut man
+   hin, beim Schliessen ist die Entscheidung schon gefallen. */
+.sheet-overlay[data-state="closing"] {
+  animation: fade-out 0.16s var(--ease-out) forwards;
 }
 .sheet-panel {
   position: fixed;
@@ -346,11 +379,19 @@ body {
   box-shadow: var(--shadow-sheet);
   z-index: var(--z-modal);
   padding-bottom: env(safe-area-inset-bottom, 16px);
-  animation: slide-up 0.26s var(--ease-standard);
+  animation: slide-up 0.26s var(--ease-out);
   overscroll-behavior: contain;
+}
+.sheet-panel[data-state="closing"] {
+  animation: slide-down 0.16s var(--ease-out) forwards;
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes slide-down {
+  from { transform: translateX(-50%) translateY(0); }
+  to { transform: translateX(-50%) translateY(100%); }
+}
 @keyframes slide-up {
   from { transform: translateX(-50%) translateY(100%); }
   to { transform: translateX(-50%) translateY(0); }
@@ -508,7 +549,6 @@ body {
   border: var(--rule-thick) !important;
   box-shadow: var(--shadow-print);
 }
-.sm-btn-primary:hover:not(:disabled) { background: var(--rust-ink); }
 .sm-btn-primary:active:not(:disabled) {
   transform: translate(3px, 3px);
   box-shadow: none;
@@ -520,14 +560,12 @@ body {
   border: var(--rule-thick) !important;
   box-shadow: var(--shadow-print);
 }
-.sm-btn-secondary:hover:not(:disabled) { background: var(--paper-1); }
 .sm-btn-secondary:active:not(:disabled) {
   transform: translate(3px, 3px);
   box-shadow: none;
 }
 
 .sm-btn-ghost { background: transparent; color: var(--ink-1); }
-.sm-btn-ghost:hover:not(:disabled) { color: var(--ink-0); background: var(--paper-1); }
 
 .sm-btn-warm {
   background: var(--ochre);
@@ -535,10 +573,19 @@ body {
   border: var(--rule-thick) !important;
   box-shadow: var(--shadow-print);
 }
-.sm-btn-warm:hover:not(:disabled) { background: #e3a63f; }
 .sm-btn-warm:active:not(:disabled) {
   transform: translate(3px, 3px);
   box-shadow: none;
+}
+
+/* Hover nur auf echten Zeigergeraeten. Ohne diesen Schutz loest
+   ein Fingertipp den Hover-Zustand aus und laesst ihn danach
+   haengen — auf einer Mobile-First-App der Normalfall. */
+@media (hover: hover) and (pointer: fine) {
+  .sm-btn-primary:hover:not(:disabled) { background: var(--rust-ink); }
+  .sm-btn-secondary:hover:not(:disabled) { background: var(--paper-1); }
+  .sm-btn-ghost:hover:not(:disabled) { color: var(--ink-0); background: var(--paper-1); }
+  .sm-btn-warm:hover:not(:disabled) { background: #e3a63f; }
 }
 
 /* ─── Umschalter — Reiter auf einem Register ────────────────── */

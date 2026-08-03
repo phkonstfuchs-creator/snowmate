@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RidePost, User } from "@/lib/types";
 import UserProfileSheet from "@/components/UserProfileSheet";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
@@ -27,7 +28,8 @@ interface Props {
 export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined }: Props) {
   useScrollLock();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose, selectedUser === null);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss, selectedUser === null);
   const openSpots = post.totalSpots - post.takenSpots;
   const isFull = openSpots <= 0;
 
@@ -37,15 +39,15 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Ausfahrtsdetails" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Ausfahrtsdetails" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
 
         {/* Resort scene hero */}
-        <div className="mx-5 mt-4 rounded-2xl overflow-hidden relative" style={{ height: 130 }}>
+        <div className="mx-5 mt-4 rounded-none overflow-hidden relative" style={{ height: 130 }}>
           <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)" }} />
           <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
@@ -68,7 +70,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} · Lv {author.level} · {post.postedAt}</span>
             </div>
           </button>
-          <button onClick={onClose} aria-label="Ausfahrtsdetails schließen" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
+          <button onClick={dismiss} aria-label="Ausfahrtsdetails schließen" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
             <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -94,7 +96,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         )}
 
         {/* Details grid */}
-        <div className="mx-5 my-4 rounded-2xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
+        <div className="mx-5 my-4 rounded-none overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
           <div className="grid grid-cols-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <div className="px-4 py-3" style={{ borderRight: `1px solid ${BORDER}` }}>
               <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Uhrzeit</p>
@@ -152,7 +154,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           <button
             onClick={onJoin}
             disabled={isFull && !isJoined}
-            className="w-full py-4 rounded-2xl font-black text-base transition-all duration-150 active:scale-95"
+            className="w-full py-4 font-black text-base transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
             style={isJoined
               ? { background: "var(--accent-primary-subtle)", color: BRAND }
               : isFull

@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
 import { RESORT_STATUS, RIDE_POSTS, getUserById, ME } from "@/lib/data";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
@@ -32,17 +33,18 @@ type ActiveMapSheet =
 
 function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose: () => void }) {
   useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const ridesHere = RIDE_POSTS.filter((p) => p.resort === resort.name && p.city === resort.city);
 
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label={`Details zu ${resort.name}`} tabIndex={-1} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label={`Details zu ${resort.name}`} tabIndex={-1} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <button type="button" onClick={onClose} aria-label="Details schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+        <button type="button" onClick={dismiss} aria-label="Details schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
           <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
         </button>
 
@@ -129,15 +131,16 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
 
 function SatellitUpsell({ onClose }: { onClose: () => void }) {
   useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Premium-Kartenfunktionen" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Premium-Kartenfunktionen" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3 mb-5">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <button type="button" onClick={onClose} aria-label="Dialog schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+        <button type="button" onClick={dismiss} aria-label="Dialog schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
           <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
         </button>
         <div className="flex justify-center mb-4">
@@ -176,7 +179,7 @@ function SatellitUpsell({ onClose }: { onClose: () => void }) {
             style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>
             Für 2,99 € pro Monat starten
           </button>
-          <button onClick={onClose} className="w-full py-3 text-sm font-bold" style={{ color: MUTED }}>
+          <button onClick={dismiss} className="w-full py-3 text-sm font-bold" style={{ color: MUTED }}>
             Jetzt nicht
           </button>
         </div>
@@ -212,7 +215,7 @@ export default function MapPage() {
             onClick={() => {
               if (!ME.isPremium) setActiveSheet({ type: "upsell" });
             }}
-            className="flex items-center gap-1.5 text-xs font-black px-3 py-2 rounded-full active:scale-95 transition-all"
+            className="flex items-center gap-1.5 text-xs font-black px-3 py-2 transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
             style={{ background: SURFACE, color: MUTED, border: `1px solid ${BORDER}` }}
           >
             <Icon name="satellite" size={13} strokeWidth={1.5} />

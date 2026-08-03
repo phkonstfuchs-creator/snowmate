@@ -7,6 +7,7 @@ import { toggleSetValue } from "@/lib/collections";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -21,18 +22,19 @@ const BRAND = "var(--accent-primary)";
 
 function OfferModal({ onClose }: { onClose: () => void }) {
   useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [role, setRole] = useState<"driver" | "rider">("driver");
   return (
     <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
         <div className="flex items-center justify-between px-5 mb-4">
           <h2 className="font-display" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Mitfahrt anbieten</h2>
-          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -58,7 +60,7 @@ function OfferModal({ onClose }: { onClose: () => void }) {
 
         <div className="px-5">
           <button
-            onClick={onClose}
+            onClick={dismiss}
             className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >
@@ -168,7 +170,7 @@ export default function CarpoolPage() {
                       <button
                         onClick={() => toggle(post.id)}
                         disabled={post.availableSeats === 0 && !isReq}
-                        className="w-full py-2.5 rounded-none text-sm font-black active:scale-95 transition-all"
+                        className="w-full py-2.5 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
                         style={isReq
                           ? { background: "var(--accent-primary-subtle)", color: BRAND }
                           : post.availableSeats === 0
@@ -222,7 +224,7 @@ export default function CarpoolPage() {
                         {post.note && <p className="text-xs mt-1.5 font-medium" style={{ color: MUTED }}>{post.note}</p>}
                         <button
                           onClick={() => toggle(post.id + "_offer")}
-                          className="mt-3 w-full py-2 rounded-none text-sm font-black active:scale-95 transition-all"
+                          className="mt-3 w-full py-2 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
                           style={isOffered
                             ? { background: "var(--accent-primary-subtle)", color: BRAND }
                             : { border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }
