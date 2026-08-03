@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+env:
+  NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+  NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -27,10 +32,10 @@ jobs:
       - run: npm run test:coverage
       - run: npm run build
 
-  e2e:
+  integration:
     needs: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -40,5 +45,46 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npx supabase start
+      - run: npx supabase db reset
+      - run: npm run test:db
+      - name: Configure the app for local Supabase
+        shell: bash
+        run: |
+          api_url=""
+          publishable_key=""
+          anon_key=""
+          mailpit_url=""
+
+          while IFS='=' read -r key raw_value; do
+            value="${raw_value%$'\r'}"
+            value="${value#\"}"
+            value="${value%\"}"
+
+            case "$key" in
+              API_URL) api_url="$value" ;;
+              PUBLISHABLE_KEY) publishable_key="$value" ;;
+              ANON_KEY) anon_key="$value" ;;
+              INBUCKET_URL|MAILPIT_URL) mailpit_url="$value" ;;
+            esac
+          done < <(npx supabase status -o env)
+
+          public_key="${publishable_key:-$anon_key}"
+
+          if [[ -z "$api_url" || -z "$public_key" || -z "$mailpit_url" ]]; then
+            echo "Supabase status did not return the required local values." >&2
+            exit 1
+          fi
+
+          {
+            printf 'NEXT_PUBLIC_SUPABASE_URL=%s\n' "$api_url"
+            printf 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$public_key"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://localhost:3000"
+            printf 'MAILPIT_URL=%s\n' "$mailpit_url"
+            printf 'LOCAL_SUPABASE_E2E=%s\n' "1"
+          } >> "$GITHUB_ENV"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - if: always()
+        continue-on-error: true
+        run: npx supabase stop --no-backup

@@ -94,7 +94,7 @@ export default function LeafletMap({
     if (!mapRef.current) {
       leaflet
         .tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+          "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
           {
             attribution:
               '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -147,7 +147,7 @@ export default function LeafletMap({
         role="alert"
         style={{ color: "var(--text-tertiary)" }}
       >
-        Map could not be loaded.
+        Die Karte konnte nicht geladen werden.
       </div>
     );
   }
@@ -155,7 +155,8 @@ export default function LeafletMap({
   return (
     <div
       ref={containerRef}
-      aria-label={`${city} resort map`}
+      aria-label={`Karte der Skigebiete in ${city === "innsbruck" ? "Innsbruck" : "Salzburg"}`}
+      className="printed-map"
       style={{ width: "100%", height: "100%", minHeight: 260 }}
     />
   );

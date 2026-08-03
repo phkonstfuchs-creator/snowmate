@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 
 const TONES = {
-  neutral: { bg: "var(--bg-surface-3)", fg: "var(--text-secondary)" },
-  ice: { bg: "var(--accent-primary-subtle)", fg: "var(--ice-300)" },
-  warm: { bg: "var(--accent-warm-subtle)", fg: "var(--ember-300)" },
-  danger: { bg: "rgba(255,107,107,0.14)", fg: "var(--status-danger)" },
+  neutral: { bg: "var(--paper-2)", fg: "var(--ink-1)" },
+  ice: { bg: "transparent", fg: "var(--sky)" },
+  warm: { bg: "var(--accent-warm-subtle)", fg: "var(--rust-ink)" },
+  danger: { bg: "transparent", fg: "var(--crimson)" },
 } as const;
 
 interface BadgeProps {
@@ -21,11 +21,13 @@ export default function Badge({ tone = "neutral", icon, children }: BadgeProps) 
       style={{
         height: 26,
         padding: "0 10px",
-        borderRadius: "var(--radius-pill)",
+        borderRadius: 0,
+        border: "1px solid currentColor",
         background: t.bg,
         color: t.fg,
-        font: "600 12px var(--font-body)",
-        letterSpacing: "0.01em",
+        font: "700 11px var(--font-mono-stack)",
+        letterSpacing: 0,
+        textTransform: "uppercase",
       }}
     >
       {icon}

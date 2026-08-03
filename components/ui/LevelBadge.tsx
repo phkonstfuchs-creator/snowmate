@@ -3,8 +3,8 @@ import { ReactNode } from "react";
 const TIERS = {
   bronze: { fg: "#C9866B", ring: "rgba(201,134,107,0.35)" },
   silver: { fg: "#B9C4CC", ring: "rgba(185,196,204,0.35)" },
-  gold: { fg: "var(--ember-400)", ring: "rgba(255,162,60,0.4)" },
-  ice: { fg: "var(--ice-300)", ring: "rgba(127,220,250,0.4)" },
+  gold: { fg: "var(--rust)", ring: "var(--rust-ink)" },
+  ice: { fg: "var(--sky)", ring: "rgba(127,220,250,0.4)" },
 };
 
 interface LevelBadgeProps {

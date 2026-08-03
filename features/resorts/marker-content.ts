@@ -8,17 +8,17 @@ export function createMarkerContent(
   const marker = document.createElement("div");
   marker.style.width = `${size}px`;
   marker.style.height = `${size}px`;
-  marker.style.background = isHot ? "#4FC3F0" : "#202A34";
-  marker.style.borderRadius = "50%";
+  marker.style.background = isHot ? "#a83f1b" : "#1c1815";
+  marker.style.borderRadius = "0";
   marker.style.display = "flex";
   marker.style.flexDirection = "column";
   marker.style.alignItems = "center";
   marker.style.justifyContent = "center";
-  marker.style.border = "2px solid rgba(255,255,255,0.18)";
+  marker.style.border = "2px solid #1c1815";
   marker.style.cursor = "pointer";
 
   if (isHot) {
-    marker.style.boxShadow = "0 0 0 3px rgba(79,195,240,0.35)";
+    marker.style.boxShadow = "3px 3px 0 rgba(28,24,21,0.45)";
   }
 
   const riderCount = document.createElement("span");
@@ -26,7 +26,7 @@ export function createMarkerContent(
   riderCount.style.fontFamily = "var(--font-mono)";
   riderCount.style.fontSize = `${size < 42 ? 11 : 14}px`;
   riderCount.style.fontWeight = "700";
-  riderCount.style.color = isHot ? "#0A0E12" : "#F5F9FB";
+  riderCount.style.color = "#f2eadb";
   riderCount.style.lineHeight = "1";
   marker.append(riderCount);
 
@@ -34,7 +34,7 @@ export function createMarkerContent(
     const resortName = document.createElement("span");
     resortName.textContent = resort.name.split(" ")[0] ?? resort.name;
     resortName.style.fontSize = "7px";
-    resortName.style.color = isHot ? "rgba(10,14,18,0.75)" : "#8A97A3";
+    resortName.style.color = "rgba(242,234,219,0.8)";
     resortName.style.whiteSpace = "nowrap";
     resortName.style.overflow = "hidden";
     resortName.style.maxWidth = `${size - 8}px`;

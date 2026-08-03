@@ -1,5 +1,10 @@
 import Image from "next/image";
 
+/* Die Marke bleibt der Original-Pinguin — nur auf die
+   Siebdruck-Spotfarben reduziert (public/logo-print.png, erzeugt
+   aus public/logo.png). Mütze rostrot, Schnabel und Zunge ocker,
+   Schnee auf Papierton, Himmel im Blau der Palette. */
+
 interface PenguinMascotProps {
   size?: number;
   className?: string;
@@ -8,8 +13,8 @@ interface PenguinMascotProps {
 export default function PenguinMascot({ size = 40, className = "" }: PenguinMascotProps) {
   return (
     <Image
-      src="/logo.png"
-      alt="Snowmate logo"
+      src="/logo-print.png"
+      alt="Snowmate"
       width={size}
       height={size}
       className={className}

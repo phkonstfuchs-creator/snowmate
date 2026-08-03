@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { AbilityLevel, City } from "@/lib/types";
 import { RESORT_STATUS } from "@/lib/data";
@@ -22,13 +23,14 @@ interface PostData {
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
-  { value: "chill", label: "Chill", desc: "Blue runs, easy pace" },
-  { value: "park", label: "Park", desc: "Features, jumps, rails" },
-  { value: "off-piste", label: "Off-Piste", desc: "Powder, backcountry, technical" },
+  { value: "chill", label: "Chill", desc: "Blaue Pisten, entspanntes Tempo" },
+  { value: "park", label: "Park", desc: "Kicker, Sprünge, Rails" },
+  { value: "off-piste", label: "Off-Piste", desc: "Powder, Gelände, technisch" },
 ];
 
 export default function PostRideModal({ city, onClose, onPost }: PostRideModalProps) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const [step, setStep] = useState<1 | 2>(1);
   const [resort, setResort] = useState("");
   const [abilityLevel, setAbilityLevel] = useState<AbilityLevel>("chill");
@@ -47,7 +49,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal aria-label="Post a ride">
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal aria-label="Ausfahrt posten" tabIndex={-1}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
@@ -56,32 +58,32 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
           {step === 2 ? (
-            <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--ice-400)" }}>
-              Back
+            <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
+              Zurück
             </button>
           ) : (
-            <button onClick={onClose} className="text-sm font-semibold" style={{ color: "var(--ice-400)" }}>
-              Cancel
+            <button onClick={onClose} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
+              Abbrechen
             </button>
           )}
-          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Post a ride</span>
+          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Ausfahrt posten</span>
           {step === 1 ? (
             <button
               onClick={() => resort && setStep(2)}
               disabled={!resort}
               className="text-sm font-semibold"
-              style={{ color: resort ? "var(--ice-400)" : "var(--text-disabled)" }}
+              style={{ color: resort ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Next
+              Weiter
             </button>
           ) : (
             <button
               onClick={handleSubmit}
               disabled={!meetPoint}
               className="text-sm font-bold"
-              style={{ color: meetPoint ? "var(--ice-400)" : "var(--text-disabled)" }}
+              style={{ color: meetPoint ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Post
+              Veröffentlichen
             </button>
           )}
         </div>
@@ -90,15 +92,16 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
         {step === 1 && (
           <div className="px-5 pt-5 pb-6 space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Resort
+              <label htmlFor="post-ride-resort" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Skigebiet
               </label>
               <select
+                id="post-ride-resort"
                 value={resort}
                 onChange={(e) => setResort(e.target.value)}
                 className="form-input"
               >
-                <option value="">Choose a resort...</option>
+                <option value="">Gebiet wählen …</option>
                 {resorts.map((r) => (
                   <option key={r} value={r}>{r}</option>
                 ))}
@@ -106,18 +109,19 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Level
-              </label>
-              <div className="grid grid-cols-3 gap-2">
+              <p id="post-ride-level-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Fahrstil
+              </p>
+              <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="post-ride-level-label">
                 {ABILITY_OPTIONS.map((opt) => {
                   const active = abilityLevel === opt.value;
-                  const accent = opt.value === "chill" ? "var(--ice-400)" : opt.value === "park" ? "var(--ember-400)" : "#FF9C9C";
+                  const accent = opt.value === "chill" ? "var(--sky)" : opt.value === "park" ? "var(--rust)" : "#FF9C9C";
                   const bg = opt.value === "chill" ? "var(--accent-primary-subtle)" : opt.value === "park" ? "var(--accent-warm-subtle)" : "rgba(255,107,107,0.14)";
                   return (
                     <button
                       key={opt.value}
                       onClick={() => setAbilityLevel(opt.value)}
+                      aria-pressed={active}
                       className="flex flex-col items-center gap-1 px-3 py-3 rounded-xl border-2 transition-all duration-150"
                       style={{ borderColor: active ? accent : "var(--border-subtle)", background: active ? bg : "var(--bg-surface-2)" }}
                     >
@@ -136,10 +140,11 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
           <div className="px-5 pt-5 pb-6 space-y-4">
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Time
+                <label htmlFor="post-ride-time" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                  Uhrzeit
                 </label>
                 <input
+                  id="post-ride-time"
                   type="time"
                   value={meetTime}
                   onChange={(e) => setMeetTime(e.target.value)}
@@ -147,10 +152,11 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                 />
               </div>
               <div className="w-24">
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Spots
+                <label htmlFor="post-ride-spots" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                  Plätze
                 </label>
                 <select
+                  id="post-ride-spots"
                   value={totalSpots}
                   onChange={(e) => setTotalSpots(Number(e.target.value))}
                   className="form-input"
@@ -163,12 +169,13 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Meeting point
+              <label htmlFor="post-ride-meeting-point" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Treffpunkt
               </label>
               <input
+                id="post-ride-meeting-point"
                 type="text"
-                placeholder="e.g. base station, parking lot..."
+                placeholder="z. B. Talstation oder Parkplatz"
                 value={meetPoint}
                 onChange={(e) => setMeetPoint(e.target.value)}
                 className="form-input"
@@ -176,11 +183,12 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Note (optional)
+              <label htmlFor="post-ride-caption" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Notiz (optional)
               </label>
               <textarea
-                placeholder="What's the plan?"
+                id="post-ride-caption"
+                placeholder="Was ist der Plan?"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 rows={3}
@@ -190,10 +198,10 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             {/* Summary pill */}
             <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
-              <Icon name="mountain" size={16} color="var(--ice-400)" strokeWidth={2} />
+              <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>
-                <span className="text-xs ml-2 font-mono" style={{ color: "var(--ice-300)" }}>{meetTime} · {totalSpots} spots</span>
+                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{meetTime} · {totalSpots} Plätze</span>
               </div>
             </div>
           </div>

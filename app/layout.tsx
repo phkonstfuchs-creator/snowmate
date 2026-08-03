@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/big-shoulders";
+import "@fontsource-variable/jost";
 import "@fontsource-variable/hanken-grotesk";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource/space-mono/400.css";
+import "@fontsource/space-mono/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Snowmate",
-  description: "Find your crew, today.",
+  description: "Finde deine Crew. Heute.",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Snowmate" },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0A0E12",
+  themeColor: "#F2EADB",
 };
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="de"
       data-scroll-behavior="smooth"
     >
       <body>{children}</body>

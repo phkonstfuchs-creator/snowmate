@@ -6,10 +6,12 @@ import { CARPOOL_POSTS, getUserById } from "@/lib/data";
 import { toggleSetValue } from "@/lib/collections";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
 
 const D = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -20,31 +22,37 @@ const BRAND = "var(--accent-primary)";
 
 function OfferModal({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const [role, setRole] = useState<"driver" | "rider">("driver");
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div className="sheet-panel" role="dialog" aria-modal="true" aria-label="Post a carpool" style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
+      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <h2 className="font-display px-5 mb-4" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Post a carpool</h2>
+        <div className="flex items-center justify-between px-5 mb-4">
+          <h2 className="font-display" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Mitfahrt anbieten</h2>
+          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
+            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
+          </button>
+        </div>
 
         <div className="px-5 space-y-3 mb-5">
           <SegmentedControl
-            options={[{ value: "driver", label: "I'm driving" }, { value: "rider", label: "I need a ride" }]}
+            options={[{ value: "driver", label: "Ich fahre" }, { value: "rider", label: "Ich suche Platz" }]}
             value={role}
             onChange={setRole}
-            ariaLabel="Carpool role"
+            ariaLabel="Rolle bei der Mitfahrt"
           />
           {[
-            { label: "From (departure)", placeholder: "e.g. Innsbruck HBF" },
-            { label: "To (resort)", placeholder: "e.g. Stubai Glacier" },
-            { label: "Time", placeholder: "08:00" },
-          ].map(({ label, placeholder }) => (
-            <div key={label}>
-              <p className="text-xs font-bold mb-1.5" style={{ color: MUTED }}>{label}</p>
-              <input className="form-input" placeholder={placeholder} />
+            { id: "carpool-from", label: "Abfahrt", placeholder: "z. B. Innsbruck Hbf" },
+            { id: "carpool-to", label: "Zielgebiet", placeholder: "z. B. Stubaier Gletscher" },
+            { id: "carpool-time", label: "Uhrzeit", placeholder: "08:00" },
+          ].map(({ id, label, placeholder }) => (
+            <div key={id}>
+              <label htmlFor={id} className="text-xs font-bold mb-1.5 block" style={{ color: MUTED }}>{label}</label>
+              <input id={id} className="form-input" placeholder={placeholder} />
             </div>
           ))}
         </div>
@@ -52,10 +60,10 @@ function OfferModal({ onClose }: { onClose: () => void }) {
         <div className="px-5">
           <button
             onClick={onClose}
-            className="w-full py-4 rounded-2xl font-black text-base active:scale-95 transition-transform"
+            className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >
-            Post
+            Angebot veröffentlichen
           </button>
         </div>
       </div>
@@ -64,7 +72,8 @@ function OfferModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function CarpoolPage() {
-  const [city, setCity] = useState<City>("innsbruck");
+  const currentProfile = useCurrentProfile();
+  const [city, setCity] = useState<City>(currentProfile.city);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
 
@@ -79,12 +88,12 @@ export default function CarpoolPage() {
     <>
       <header
         className="sticky top-0 z-50"
-        style={{ background: "rgba(10,14,18,0.96)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${BORDER}` }}
+        style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Carpool</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>Ride along or give a lift</p>
+            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Mitfahrt</h1>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>Mitfahren oder jemanden mitnehmen</p>
           </div>
           <button
             onClick={() => setShowOfferModal(true)}
@@ -92,7 +101,7 @@ export default function CarpoolPage() {
             style={{ background: BRAND, color: D }}
           >
             <Icon name="plus" size={14} strokeWidth={2.4} />
-            Post
+            Inserat
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -111,8 +120,8 @@ export default function CarpoolPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--status-success)" }} />
-              <h2 className="font-black text-xs uppercase tracking-widest" style={{ color: "var(--status-success)" }}>
-                Seats open · {drivers.length}
+              <h2 className="font-black text-xs uppercase" style={{ color: "var(--status-success)" }}>
+                Plätze frei · {drivers.length}
               </h2>
             </div>
             <div className="space-y-3 stagger">
@@ -124,7 +133,7 @@ export default function CarpoolPage() {
                 return (
                   <div
                     key={post.id}
-                    className="rounded-2xl overflow-hidden anim-fade-up"
+                    className="rounded-none overflow-hidden anim-fade-up"
                     style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
                   >
                     {/* Mini resort scene strip */}
@@ -161,7 +170,7 @@ export default function CarpoolPage() {
                       <button
                         onClick={() => toggle(post.id)}
                         disabled={post.availableSeats === 0 && !isReq}
-                        className="w-full py-2.5 rounded-xl text-sm font-black active:scale-95 transition-all"
+                        className="w-full py-2.5 rounded-none text-sm font-black active:scale-95 transition-all"
                         style={isReq
                           ? { background: "var(--accent-primary-subtle)", color: BRAND }
                           : post.availableSeats === 0
@@ -169,7 +178,7 @@ export default function CarpoolPage() {
                           : { background: BRAND, color: D }
                         }
                       >
-                        {isReq ? "Requested" : "Request seat"}
+                        {isReq ? "Angefragt" : "Platz anfragen"}
                       </button>
                     </div>
                   </div>
@@ -183,9 +192,9 @@ export default function CarpoolPage() {
         {riders.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--ember-400)" }} />
-              <h2 className="font-black text-xs uppercase tracking-widest" style={{ color: "var(--ember-400)" }}>
-                Looking for a ride · {riders.length}
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--rust)" }} />
+              <h2 className="font-black text-xs uppercase" style={{ color: "var(--rust)" }}>
+                Sucht Mitfahrt · {riders.length}
               </h2>
             </div>
             <div className="space-y-2 stagger">
@@ -197,7 +206,7 @@ export default function CarpoolPage() {
                 return (
                   <div
                     key={post.id}
-                    className="rounded-2xl p-4 anim-fade-up"
+                    className="rounded-none p-4 anim-fade-up"
                     style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
                   >
                     <div className="flex items-start gap-3">
@@ -205,8 +214,8 @@ export default function CarpoolPage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--ember-400)" }}>
-                            Needs a ride
+                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>
+                            Sucht Platz
                           </span>
                         </div>
                         <p className="text-xs font-semibold mt-1" style={{ color: MUTED }}>
@@ -215,13 +224,13 @@ export default function CarpoolPage() {
                         {post.note && <p className="text-xs mt-1.5 font-medium" style={{ color: MUTED }}>{post.note}</p>}
                         <button
                           onClick={() => toggle(post.id + "_offer")}
-                          className="mt-3 w-full py-2 rounded-xl text-sm font-black active:scale-95 transition-all"
+                          className="mt-3 w-full py-2 rounded-none text-sm font-black active:scale-95 transition-all"
                           style={isOffered
                             ? { background: "var(--accent-primary-subtle)", color: BRAND }
                             : { border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }
                           }
                         >
-                          {isOffered ? "Offered" : "Offer a ride"}
+                          {isOffered ? "Angeboten" : "Fahrt anbieten"}
                         </button>
                       </div>
                     </div>
@@ -236,8 +245,8 @@ export default function CarpoolPage() {
           <div className="flex flex-col items-center gap-4 py-16 text-center">
             <PenguinMascot size={64} />
             <div>
-              <p className="font-black text-lg" style={{ color: INK }}>No carpool posts</p>
-              <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Offer a ride or ask for a seat.</p>
+              <p className="font-black text-lg" style={{ color: INK }}>Noch keine Mitfahrten</p>
+              <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Biete eine Fahrt an oder frag nach einem Platz.</p>
             </div>
           </div>
         )}

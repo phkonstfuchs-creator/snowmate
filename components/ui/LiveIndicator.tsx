@@ -3,7 +3,7 @@ export default function LiveIndicator({ label = "LIVE", size = "md" }: { label?:
   return (
     <span className="inline-flex items-center gap-1.5">
       <span className="pulse-dot" style={{ width: dot, height: dot }} />
-      <span className="text-mono-label" style={{ color: "var(--ice-300)" }}>{label}</span>
+      <span className="text-mono-label" style={{ color: "var(--sky)" }}>{label}</span>
     </span>
   );
 }

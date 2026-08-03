@@ -1,8 +1,8 @@
 function flameColor(units: number) {
-  if (units >= 30) return "var(--ember-600)";
-  if (units >= 10) return "var(--ember-500)";
-  if (units >= 5) return "var(--ember-400)";
-  return "var(--ice-400)";
+  if (units >= 30) return "var(--rust-ink)";
+  if (units >= 10) return "var(--rust)";
+  if (units >= 5) return "var(--rust)";
+  return "var(--sky)";
 }
 
 interface StreakCounterProps {

@@ -6,18 +6,18 @@ import clsx from "clsx";
 import Icon from "@/components/ui/Icon";
 
 const TABS = [
-  { href: "/feed", label: "Today", icon: "flame" },
-  { href: "/map", label: "Map", icon: "map-pinned" },
-  { href: "/carpool", label: "Carpool", icon: "car" },
+  { href: "/feed", label: "Heute", icon: "flame" },
+  { href: "/map", label: "Karte", icon: "map-pinned" },
+  { href: "/carpool", label: "Mitfahrt", icon: "car" },
   { href: "/crew", label: "Crew", icon: "users" },
-  { href: "/profile", label: "Profile", icon: "user" },
+  { href: "/profile", label: "Profil", icon: "user" },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="bottom-nav" aria-label="Main navigation">
+    <nav className="bottom-nav" aria-label="Hauptnavigation">
       <div className="flex items-stretch">
         {TABS.map((tab) => {
           const isActive = pathname.startsWith(tab.href);
@@ -26,22 +26,22 @@ export default function BottomNav() {
               key={tab.href}
               href={tab.href}
               className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-3 min-h-[56px] transition-colors duration-150"
-              style={{ color: isActive ? "var(--accent-primary)" : "var(--text-tertiary)" }}
+              style={{ color: isActive ? "var(--rust)" : "var(--ink-2)" }}
               aria-current={isActive ? "page" : undefined}
             >
               <span className="transition-transform duration-150" style={{ transform: isActive ? "translateY(-1px)" : "none" }}>
                 <Icon name={tab.icon} size={22} strokeWidth={isActive ? 2.3 : 1.8} />
               </span>
               <span className={clsx(
-                "text-[0.6875rem] leading-none tracking-wide",
-                isActive ? "font-black opacity-100" : "font-bold opacity-60"
+                "text-[0.6875rem] leading-none",
+                isActive ? "font-black" : "font-bold"
               )}>
                 {tab.label}
               </span>
               {isActive && (
                 <span
-                  className="absolute bottom-0 w-5 h-0.5 rounded-full"
-                  style={{ bottom: "env(safe-area-inset-bottom, 4px)", background: "var(--accent-primary)" }}
+                  className="absolute inset-x-0 top-0"
+                  style={{ height: 3, background: "var(--rust)" }}
                 />
               )}
             </Link>
