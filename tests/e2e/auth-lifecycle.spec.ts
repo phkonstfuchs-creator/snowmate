@@ -141,7 +141,7 @@ test.describe("account lifecycle", () => {
     await page.getByRole("link", { name: "Zurück zur Anmeldung" }).click();
 
     await page.getByLabel("E-Mail").fill(email);
-    await page.getByLabel("Passwort").fill(password);
+    await page.getByLabel("Passwort", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Anmelden" }).click();
 
     await expect(page).toHaveURL(/\/feed$/);
