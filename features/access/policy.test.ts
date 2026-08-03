@@ -12,6 +12,7 @@ import {
 const adult: AccessContext = {
   viewerId: "viewer",
   ownerId: "owner",
+  viewerIsMinor: false,
   ownerIsMinor: false,
   relationship: "unrelated",
   isBlocked: false,
@@ -83,6 +84,18 @@ describe("Snowmate visibility policy", () => {
     expect(canViewExactRideDetails(friend)).toBe(true);
     expect(canViewLiveLocation(friend)).toBe(true);
     expect(canDirectMessage(friend)).toBe(true);
+  });
+
+  it("does not let a minor viewer use adult friend-of-friend discovery", () => {
+    const context: AccessContext = {
+      ...adult,
+      viewerIsMinor: true,
+      relationship: "friend-of-friend",
+    };
+
+    expect(canDiscoverProfile(context)).toBe(false);
+    expect(canDiscoverRide(context, "friends-of-friends")).toBe(false);
+    expect(canViewResortPresence(context, "friends-of-friends")).toBe(false);
   });
 
   it("lets owners access their own records", () => {
