@@ -10,6 +10,7 @@ export type DiscoveryAudience = "friends" | "friends-of-friends";
 export interface AccessContext {
   viewerId: string;
   ownerId: string;
+  viewerIsMinor: boolean;
   ownerIsMinor: boolean;
   relationship: Relationship;
   isBlocked: boolean;
@@ -32,7 +33,9 @@ export function canDiscoverProfile(context: AccessContext): boolean {
   if (isSelf(context) || isConfirmedFriend(context)) return true;
 
   return (
-    !context.ownerIsMinor && context.relationship === "friend-of-friend"
+    !context.viewerIsMinor &&
+    !context.ownerIsMinor &&
+    context.relationship === "friend-of-friend"
   );
 }
 
@@ -44,6 +47,7 @@ export function canDiscoverRide(
   if (isSelf(context) || isConfirmedFriend(context)) return true;
 
   return (
+    !context.viewerIsMinor &&
     !context.ownerIsMinor &&
     audience === "friends-of-friends" &&
     context.relationship === "friend-of-friend"
@@ -62,6 +66,7 @@ export function canViewExactRideDetails(context: AccessContext): boolean {
   if (isSelf(context) || isConfirmedFriend(context)) return true;
 
   return (
+    !context.viewerIsMinor &&
     !context.ownerIsMinor &&
     context.relationship === "accepted-ride-participant"
   );
