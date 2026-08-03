@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef } from "react";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
+import { PROFILE_DRAFT_KEY } from "@/features/profile/draft-storage";
 import { initialAuthActionState } from "./action-state";
 import { signInAction, signUpAction } from "./actions";
 
@@ -24,6 +25,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const errorSummaryRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (mode === "login") {
+      window.sessionStorage.removeItem(PROFILE_DRAFT_KEY);
+      window.localStorage.removeItem(PROFILE_DRAFT_KEY);
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (state.status !== "error" || isPending) return;

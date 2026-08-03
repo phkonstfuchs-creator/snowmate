@@ -115,7 +115,7 @@ prototype.
 
 ## Residual dependency risk
 
-At audit time, `next@16.2.11` is the latest stable release. npm still reports
+As of 2026-08-03, `next@16.2.12` is the latest stable release. npm still reports
 high advisories for Next's pinned `postcss@8.4.31` and optional `sharp@0.34.5`.
 The current prototype does not process attacker-supplied CSS or images, reducing
 present exploitability, but the advisories remain open. No forced downgrade,
@@ -124,7 +124,7 @@ Recheck when the next stable Next.js patch is available.
 
 ## Account foundation follow-up
 
-Status on 2026-07-24:
+Status updated on 2026-08-03:
 
 - Added Supabase SSR clients, validated public environment configuration,
   session refresh through Next.js 16 `proxy.ts`, and a second authorization
@@ -135,10 +135,21 @@ Status on 2026-07-24:
   forced RLS, owner-only policies, server-controlled minor/account fields, and
   an `auth.users` trigger that copies no user-controlled metadata.
 - Added unit, component, callback, proxy, mobile E2E, and pgTAP policy tests.
-- The migration is local and has not yet been applied to `snowmate-dev`.
-  Database tests also remain unexecuted until Docker is available locally.
+- The private profile-shell migration is applied to `snowmate-dev`.
+- Added a protected `/complete-profile` route, server-side profile gate,
+  explicit minimal DTO, shared Zod validation, and real name/handle rendering
+  throughout the prototype-backed app views. Browser onboarding data is only a
+  tab-scoped, untrusted prefill and is removed on completion, login, or logout.
+- Added an additive profile-completion migration with stricter identity
+  constraints, authenticated-only RPC execution, RLS-preserving own-row
+  updates, and pgTAP attack cases. This second migration is applied to
+  `snowmate-dev`; local and remote migration histories match, and the linked
+  database linter reports no schema errors.
+- Unit, component, type, lint, build, and mobile E2E checks pass. The database
+  tests remain unexecuted until the local Supabase PostgreSQL stack is
+  available.
 
-This follow-up secures account identity only. It does not authorize social
-discovery, rides, messages, consent, or location. Those original backend
-blockers remain open and require their own migrations, DTOs, and negative RLS
-tests.
+This follow-up secures account identity and profile completion only. It does not
+authorize social discovery, rides, messages, consent, or location. Those
+original backend blockers remain open and require their own migrations, DTOs,
+and negative RLS tests.

@@ -6,6 +6,7 @@ import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
 import Icon from "@/components/ui/Icon";
 import type { AbilityLevel, City } from "@/lib/types";
+import { PROFILE_DRAFT_KEY } from "@/features/profile/draft-storage";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -108,8 +109,9 @@ export default function OnboardingPage() {
 
   const finish = () => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "sm_onboarding_draft",
+      localStorage.removeItem(PROFILE_DRAFT_KEY);
+      sessionStorage.setItem(
+        PROFILE_DRAFT_KEY,
         JSON.stringify({ city, style, displayName: name.trim(), handle }),
       );
     }

@@ -59,9 +59,10 @@ server and browser.
 ```text
 app/
   (public)/       public flows without the authenticated app shell
+  (account)/      authenticated setup without product navigation
   (app)/          product routes sharing navigation and app layout
 components/       reusable UI and cross-feature presentation components
-features/         feature-owned domain logic and, later, feature UI/data access
+features/         feature-owned domain logic, UI, validation, and server access
 hooks/            reusable client-side React hooks
 lib/
   data/           prototype fixtures only
@@ -107,9 +108,12 @@ service-role keys must never be committed or exposed to client code.
 ## Current backend boundary
 
 Email/password authentication, SSR cookies, protected product routes, email
-confirmation, logout, and a private RLS-backed profile shell are implemented
-locally. The first migration must still pass the database test suite and be
-explicitly applied to `snowmate-dev`.
+confirmation, logout, and the private RLS-backed profile shell are implemented;
+the account-profile foundation is applied to `snowmate-dev`. The protected
+profile-completion flow, explicit server DTO, real profile identity in the UI,
+and its additive RPC/constraint migration are implemented and applied to the
+hosted project. Local pgTAP verification still requires the local Supabase
+PostgreSQL stack through Docker Desktop.
 
 Rides, friendships, chats, consent, and location remain mock-only. Do not
 connect real social, minor, or location data until their own normalized schema,

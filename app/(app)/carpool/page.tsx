@@ -11,6 +11,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
 
 const D = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -71,7 +72,8 @@ function OfferModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function CarpoolPage() {
-  const [city, setCity] = useState<City>("innsbruck");
+  const currentProfile = useCurrentProfile();
+  const [city, setCity] = useState<City>(currentProfile.city);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
 

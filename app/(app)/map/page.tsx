@@ -11,6 +11,7 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
 
@@ -186,7 +187,8 @@ function SatellitUpsell({ onClose }: { onClose: () => void }) {
 }
 
 export default function MapPage() {
-  const [city, setCity] = useState<City>("innsbruck");
+  const currentProfile = useCurrentProfile();
+  const [city, setCity] = useState<City>(currentProfile.city);
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
 
   const resorts = useMemo(

@@ -15,9 +15,13 @@ import UserProfileSheet from "@/components/UserProfileSheet";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
+import { createPrototypeCurrentUser } from "@/features/profile/prototype-user";
 
 export default function FeedPage() {
-  const [city, setCity] = useState<City>("innsbruck");
+  const currentProfile = useCurrentProfile();
+  const currentUser = createPrototypeCurrentUser(currentProfile, ME);
+  const [city, setCity] = useState<City>(currentProfile.city);
   const [showPostModal, setShowPostModal] = useState(false);
   const [joinedPostIds, setJoinedPostIds] = useState<Set<string>>(new Set());
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -118,7 +122,7 @@ export default function FeedPage() {
           const rideView = createRideView({
             post,
             joinedUsers: getUsersByIds(post.joinedUserIds),
-            currentUser: ME,
+            currentUser,
             isJoined,
           });
 
@@ -176,7 +180,7 @@ export default function FeedPage() {
         const rideView = createRideView({
           post: selectedPost,
           joinedUsers: getUsersByIds(selectedPost.joinedUserIds),
-          currentUser: ME,
+          currentUser,
           isJoined,
         });
 

@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getAuthRedirect } from "./route-access";
 
 describe("getAuthRedirect", () => {
-  it.each(["/feed", "/profile", "/map", "/crew", "/carpool"])(
+  it.each([
+    "/feed",
+    "/profile",
+    "/map",
+    "/crew",
+    "/carpool",
+    "/complete-profile",
+  ])(
     "protects %s from signed-out visitors",
     (pathname) => {
       expect(getAuthRedirect(pathname, false)).toBe("/login");

@@ -72,7 +72,7 @@ test.describe("account lifecycle", () => {
     "Requires the local Supabase stack used by CI.",
   );
 
-  test("signs up, confirms, signs out and signs back in", async ({
+  test("signs up, completes a profile, signs out and signs back in", async ({
     page,
     request,
     context,
@@ -85,6 +85,7 @@ test.describe("account lifecycle", () => {
 
     const email = `snowmate-e2e-${crypto.randomUUID()}@example.com`;
     const password = "Snowmate2026Pass";
+    const handle = `e2e_${crypto.randomUUID().slice(0, 8)}`;
 
     await page.goto("/signup");
     await page.getByLabel("E-Mail").fill(email);
@@ -102,10 +103,23 @@ test.describe("account lifecycle", () => {
     );
 
     await page.goto(confirmationLink);
+    await expect(page).toHaveURL(/\/complete-profile$/);
+
+    await page.goto(new URL("/feed", page.url()).toString());
+    await expect(page).toHaveURL(/\/complete-profile$/);
+
+    await page.getByLabel("Name").fill("E2E Rider");
+    await page.getByLabel("Handle").fill(handle);
+    await page.getByRole("button", { name: "Innsbruck" }).click();
+    await page.getByRole("button", { name: /Chill/ }).click();
+    await page.getByRole("button", { name: "Profil abschließen" }).click();
+
     await expect(page).toHaveURL(/\/feed$/);
     await expect(page.getByText("Snowmate").first()).toBeVisible();
 
     await page.goto(new URL("/profile", page.url()).toString());
+    await expect(page.getByRole("heading", { name: "E2E Rider" })).toBeVisible();
+    await expect(page.getByText(`@${handle}`)).toBeVisible();
     await page.getByRole("button", { name: "Abmelden" }).click();
     await expect(page).toHaveURL(/\/login$/);
 

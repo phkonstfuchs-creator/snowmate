@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { initialAuthActionState } from "./action-state";
 import AuthForm from "./AuthForm";
+import { PROFILE_DRAFT_KEY } from "@/features/profile/draft-storage";
 
 const mocks = vi.hoisted(() => ({
   useActionState: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock("./actions", () => ({
 
 describe("AuthForm", () => {
   beforeEach(() => {
+    sessionStorage.clear();
     mocks.useActionState.mockReturnValue([
       initialAuthActionState,
       vi.fn(),
@@ -39,6 +41,22 @@ describe("AuthForm", () => {
     );
     expect(screen.queryByLabelText("Passwort bestätigen")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Anmelden" })).toBeEnabled();
+  });
+
+  it("clears a previous account draft on the existing-account login path", () => {
+    sessionStorage.setItem(PROFILE_DRAFT_KEY, "previous account");
+
+    render(<AuthForm mode="login" />);
+
+    expect(sessionStorage.getItem(PROFILE_DRAFT_KEY)).toBeNull();
+  });
+
+  it("keeps the public onboarding draft through signup", () => {
+    sessionStorage.setItem(PROFILE_DRAFT_KEY, "new account");
+
+    render(<AuthForm mode="signup" />);
+
+    expect(sessionStorage.getItem(PROFILE_DRAFT_KEY)).toBe("new account");
   });
 
   it("renders strong-password guidance for signup", () => {

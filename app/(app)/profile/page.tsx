@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
-import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
+import type { Badge, BadgeRarity, City, LeaderboardEntry } from "@/lib/types";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import { signOutAction } from "@/features/auth/actions";
+import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
+import { profileInitials } from "@/features/profile/prototype-user";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -158,7 +160,8 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
 }
 
 export default function ProfilePage() {
-  const [leaderboardCity, setLeaderboardCity] = useState<"innsbruck" | "salzburg">("innsbruck");
+  const currentProfile = useCurrentProfile();
+  const [leaderboardCity, setLeaderboardCity] = useState<City>(currentProfile.city);
   const [showPremium, setShowPremium] = useState(false);
   const leaderboard = leaderboardCity === "innsbruck" ? LEADERBOARD_INNSBRUCK : LEADERBOARD_SALZBURG;
   const myRank = leaderboard.find((e) => e.userId === "me");
@@ -193,8 +196,8 @@ export default function ProfilePage() {
         {/* Leerzeichen zwischen den Zeilen, sonst ergibt der
             Blockumbruch den Namen "FelixGruber" fuer Screenreader */}
         <h1 className="text-display-hero relative mt-2" style={{ color: INK }}>
-          {ME.name.split(" ").map((word, i) => (
-            <span key={word} className="block">
+          {currentProfile.displayName.split(/\s+/).map((word, i) => (
+            <span key={`${word}-${i}`} className="block">
               {i > 0 ? " " : null}
               {word}
             </span>
@@ -204,15 +207,15 @@ export default function ProfilePage() {
         <div className="relative mt-4 flex items-center gap-3">
           <div
             className="avatar-initials"
-            style={{ width: 46, height: 46, background: avatarBg("me"), color: PAPER, fontSize: 17 }}
+            style={{ width: 46, height: 46, background: avatarBg(currentProfile.handle), color: PAPER, fontSize: 17 }}
           >
-            {ME.avatar}
+            {profileInitials(currentProfile.displayName)}
           </div>
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
               Stufe {ME.level} · {ME.levelTitle}
             </p>
-            <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{ME.handle}</p>
+            <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{currentProfile.handle}</p>
           </div>
         </div>
       </header>
