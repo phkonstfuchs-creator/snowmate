@@ -156,7 +156,7 @@ function SatellitUpsell({ onClose }: { onClose: () => void }) {
         </div>
         <div className="px-5 space-y-2 mb-5">
           {[
-            "Satellitenkarte · Gelände und Rinnen live",
+            "Satellitenansicht · Luftbilder statt Illustration",
             "Powder-Alarm · Push-Mitteilung ab 15 cm",
             "Erweiterte Statistiken · Heatmap und Höhenmeter",
           ].map((t) => {

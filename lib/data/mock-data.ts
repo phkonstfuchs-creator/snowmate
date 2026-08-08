@@ -248,7 +248,7 @@ export const RIDE_POSTS: RidePost[] = [
     takenSpots: 2,
     joinedUserIds: ["u2", "u3"],
     caption: "Powder-Tag! Der Gletscher ist unverspurt. Wer ist dabei? Wir starten früh — Mitfahrt ab Innsbruck HBF möglich.",
-    postedAt: "23 min ago",
+    postedAt: "vor 23 Min.",
   },
   {
     id: "r2",
@@ -278,7 +278,7 @@ export const RIDE_POSTS: RidePost[] = [
     takenSpots: 5,
     joinedUserIds: ["u2", "u4", "u7", "u8", "u5"],
     caption: "Chilliger Tag, nur blaue Pisten. Bringt gern Anfänger mit. Im Bus ist noch Platz.",
-    postedAt: "2 hr ago",
+    postedAt: "vor 2 Std.",
   },
   {
     id: "r4",
@@ -293,7 +293,7 @@ export const RIDE_POSTS: RidePost[] = [
     takenSpots: 3,
     joinedUserIds: ["u3", "u4", "u6"],
     caption: "Letzter Platz frei! Komm mit.",
-    postedAt: "3 hr ago",
+    postedAt: "vor 3 Std.",
   },
   {
     id: "r5",
@@ -308,7 +308,7 @@ export const RIDE_POSTS: RidePost[] = [
     takenSpots: 1,
     joinedUserIds: ["u8"],
     caption: "Früher Start, tiefer Schnee am Kohlmais. Ich kenne das Gebiet blind und führe gern.",
-    postedAt: "45 min ago",
+    postedAt: "vor 45 Min.",
   },
   {
     id: "r6",
@@ -348,13 +348,13 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     role: "rider",
     resort: "Axamer Lizum",
     city: "innsbruck",
-    departurePoint: "Anywhere, Innsbruck city center",
+    departurePoint: "Egal wo, Innsbruck Zentrum",
     departureTime: "09:00",
     totalSeats: 1,
     availableSeats: 1,
     riders: [],
     note: "Suche eine Mitfahrt, Spritgeld gebe ich dazu.",
-    postedAt: "2 hr ago",
+    postedAt: "vor 2 Std.",
   },
   {
     id: "c3",
@@ -368,7 +368,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     availableSeats: 3,
     riders: ["u6"],
     note: "Fahre nach dem Frühstück los, sind nur 5 Minuten.",
-    postedAt: "3 hr ago",
+    postedAt: "vor 3 Std.",
   },
   {
     id: "c4",
@@ -382,7 +382,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     availableSeats: 2,
     riders: ["u8", "u7"],
     note: "Früher Start, bitte pünktlich sein. Rückfahrt gegen 16:00.",
-    postedAt: "30 min ago",
+    postedAt: "vor 30 Min.",
   },
   {
     id: "c5",
@@ -396,7 +396,7 @@ export const CARPOOL_POSTS: CarpoolPost[] = [
     availableSeats: 1,
     riders: [],
     note: "Suche Mitfahrt zum Gletscher, bin pünktlich.",
-    postedAt: "4 hr ago",
+    postedAt: "vor 4 Std.",
   },
 ];
 

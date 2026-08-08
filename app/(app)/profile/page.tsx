@@ -34,7 +34,7 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
   const FEATURES: [string, string][] = [
-    ["Satellitenkarte", "Gelände, Rinnen und Off-Piste-Lines live"],
+    ["Satellitenansicht", "Echte Luftbilder statt illustrierter Karte"],
     ["Powder-Alarm", "Push, sobald 15+ cm in deiner Region fallen"],
     ["Erweiterte Zahlen", "Heatmaps, Höhenmeter, Saisonvergleich"],
     ["Premium-Stempel", "Goldener Stempel auf Profil und im Feed"],
