@@ -14,6 +14,26 @@ export const metadata: Metadata = {
 };
 
 const REPO = "https://github.com/phkonstfuchs-creator/snowmate";
+/* TODO: echte Profil-URL eintragen, sobald sie vorliegt */
+const LINKEDIN = "https://www.linkedin.com/in/philipp-fuchs";
+
+/* Jahr + Sache, damit die Liste ohne Fließtext lesbar bleibt */
+const EXPERIENCE: [string, string][] = [
+  [
+    "2026",
+    "Silicon Valley Technology and Management Program at San José State University",
+  ],
+  [
+    "2026",
+    "Korea Tech & AI Founders Program — German segment in Saarbrücken, Korea segment in autumn",
+  ],
+  [
+    "2025",
+    "ODDO BHF Future Pioneers: built an AI-native multi-agent equity research MVP with an international team and presented it to the bank's senior management in Paris",
+  ],
+  ["2025", "Techstars Startup Weekend — 2nd place"],
+  ["2024", "Techstars Startup Weekend — runner-up"],
+];
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -114,7 +134,7 @@ export default function Home() {
             Read the code
           </a>
           <span className="text-sm" style={{ color: INK_2 }}>
-            Built by Philipp Fuchs, 16, Saarbrücken
+            Built by Philipp Fuchs, 17, Saarbrücken
           </span>
         </div>
 
@@ -146,17 +166,23 @@ export default function Home() {
           ))}
         </div>
         <p className="mt-6 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          Snowmate is explicitly not a tracking app like Strava and not a
-          location app like Snapchat Map. It is the coordination layer of the
-          mountain, and it is crew-first.
+          Snowmate is not a tracking app like Strava, not a location map like
+          Snapchat, and not another social feed engineered to hold your
+          attention. The big platforms are built to keep you scrolling.
+          Snowmate is built to get you off your phone and onto the mountain
+          with the right people. It is the coordination layer of the day, and
+          it is crew-first.
         </p>
 
         {/* ── Produkt ──────────────────────────────────────── */}
         <Rule label="The product" num="02" />
         <p className="mb-8 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
-          Screens are in German because the users are — students and seasonal
-          workers around Innsbruck and Salzburg. Riding vocabulary stays
-          English, because that is how they actually speak.
+          The screens are in German because the users are — students and
+          seasonal workers around Innsbruck and Salzburg. Riding vocabulary
+          stays English, because that is how they actually speak. An English
+          version is planned for the first region outside the German-speaking
+          Alps — that means pulling the strings out of the components into a
+          translation layer first, which has not happened yet.
         </p>
 
         <div className="grid gap-10 sm:grid-cols-2">
@@ -269,24 +295,56 @@ export default function Home() {
           style={{ background: PAPER_1, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
         >
           <p className="max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            I am Philipp Fuchs, 16, based in Saarbrücken. I run a small
-            production studio for video, motion and web work with a business
-            partner, and Snowmate is the product I am building on the side.
+            I am Philipp Fuchs, 17, from Saarbrücken, Germany. I am still in
+            school — Gymnasium am Schloss, Abitur expected 2027, majoring in
+            History and English, currently averaging 1.4 on the German scale
+            where 1.0 is the top mark.
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            I build with heavy AI pairing and I would rather say so than have
-            you find it in the commit history. What I own is the product
-            thinking, the architecture rules, the design direction and every
-            call about what does not get shipped. The commits are public —
-            judge the decisions.
+            Alongside that I run a registered sole proprietorship for web
+            design, video editing and motion design. I filed it as a minor.
+            Snowmate is the product I build on the side.
           </p>
-          <a
-            href={REPO}
-            className="text-mono-label mt-5 inline-block underline"
-            style={{ color: RUST }}
-          >
-            github.com/phkonstfuchs-creator/snowmate
-          </a>
+
+          <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
+            {EXPERIENCE.map(([year, what], i) => (
+              <div
+                key={what}
+                className="flex flex-wrap items-baseline gap-x-3 py-2.5"
+                style={{ borderBottom: i < EXPERIENCE.length - 1 ? "1px solid var(--border-hairline)" : "none" }}
+              >
+                <span className="text-mono-label flex-shrink-0" style={{ color: RUST, minWidth: 52 }}>
+                  {year}
+                </span>
+                <span className="flex-1 text-sm leading-relaxed" style={{ color: INK_1 }}>
+                  {what}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
+            Snowmate is not my first attempt at this. PeakBuddy was an earlier
+            ski-app concept I worked through at the Bocconi entrepreneurship
+            lab, and FixItNow was a tradesperson-matching platform I dropped
+            once I understood the marketplace problem. Snowmate is the first
+            one I have taken far enough to hand someone a link.
+          </p>
+          <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
+            I build with heavy AI pairing. What I own is the product thinking,
+            the architecture rules, the design direction and every call about
+            what does not get shipped. The commits are public — judge the
+            decisions.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+            <a href={REPO} className="text-mono-label underline" style={{ color: RUST }}>
+              GitHub
+            </a>
+            <a href={LINKEDIN} className="text-mono-label underline" style={{ color: RUST }}>
+              LinkedIn
+            </a>
+          </div>
         </div>
 
         <p className="mt-14 text-mono-label" style={{ color: INK_2 }}>
