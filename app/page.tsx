@@ -14,25 +14,27 @@ export const metadata: Metadata = {
 };
 
 const REPO = "https://github.com/phkonstfuchs-creator/snowmate";
-/* TODO: echte Profil-URL eintragen, sobald sie vorliegt */
-const LINKEDIN = "https://www.linkedin.com/in/philipp-fuchs";
+const LINKEDIN = "https://www.linkedin.com/in/philipp-k-fuchs";
 
-/* Jahr + Sache, damit die Liste ohne Fließtext lesbar bleibt */
+/* Jahr + Sache. Konkret statt blumig — die Fakten tragen sich
+   selbst, Adjektive wuerden sie nur verwaessern. */
 const EXPERIENCE: [string, string][] = [
   [
     "2026",
-    "Silicon Valley Technology and Management Program at San José State University",
+    "Silicon Valley Technology and Management Program at San José State University — in the Bay Area, at the source.",
   ],
   [
     "2026",
-    "Korea Tech & AI Founders Program — German segment in Saarbrücken, Korea segment in autumn",
+    "Korea Tech & AI Founders Program — a cross-border founder track. German cohort in Saarbrücken, Korean cohort this autumn.",
   ],
   [
     "2025",
-    "ODDO BHF Future Pioneers: built an AI-native multi-agent equity research MVP with an international team and presented it to the bank's senior management in Paris",
+    "ODDO BHF Future Pioneers — built an AI-native multi-agent equity research MVP with an international team and pitched it to the bank's senior management in Paris.",
   ],
-  ["2025", "Techstars Startup Weekend — 2nd place"],
-  ["2024", "Techstars Startup Weekend — runner-up"],
+  [
+    "2024–25",
+    "Techstars Startup Weekend — on the podium twice: 2nd place in 2025, runner-up in 2024.",
+  ],
 ];
 
 const PAPER = "var(--paper-0)";
@@ -179,10 +181,11 @@ export default function Home() {
         <p className="mb-8 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
           The screens are in German because the users are — students and
           seasonal workers around Innsbruck and Salzburg. Riding vocabulary
-          stays English, because that is how they actually speak. An English
-          version is planned for the first region outside the German-speaking
-          Alps — that means pulling the strings out of the components into a
-          translation layer first, which has not happened yet.
+          stays English, because that is how they actually speak. The app and
+          these screenshots go English as soon as Snowmate leaves the
+          German-speaking Alps — that means pulling the strings out of the
+          components into a translation layer first, which has not happened
+          yet.
         </p>
 
         <div className="grid gap-10 sm:grid-cols-2">
@@ -302,8 +305,9 @@ export default function Home() {
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
             Alongside that I run a registered sole proprietorship for web
-            design, video editing and motion design. I filed it as a minor.
-            Snowmate is the product I build on the side.
+            design, video editing and motion design — I filed it before I was
+            old enough to sign the paperwork on my own. Snowmate is the
+            product I build on the side.
           </p>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
