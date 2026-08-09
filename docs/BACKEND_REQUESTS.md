@@ -150,7 +150,7 @@ of that exists. Before any of it is built, the following need decisions:
 
 - Payment provider and whether Snowmate ever holds funds. Handling other
   people's money changes the regulatory picture substantially, and the
-  operator is a minor running a sole proprietorship
+  operator is a minor running a registered business
 - Refunds and cancellations for trips, which is the actual hard part
 - Whether the trip organiser is a Snowmate account or a separate role
 

@@ -25,15 +25,15 @@ const EXPERIENCE: [string, string][] = [
     "Silicon Valley Technology and Management Program at San José State University, in the Bay Area.",
   ],
   [
-    "2026",
-    "Korea Tech & AI Founders Program, a cross-border founder track. German cohort in Saarbrücken, Korean cohort this autumn.",
+    "Aug 2026 – Sep 2026",
+    "Korea Tech & AI Founders Program, a cross-border founder track. German cohort in Saarbrücken, Korean cohort in Korea.",
   ],
   [
     "Jul 2026",
     "Bocconi Summer School, Entrepreneurship Lab in Milan.",
   ],
   [
-    "2025",
+    "Nov 2025 – Jan 2026",
     "ODDO BHF Future Pioneers. Built an AI-native multi-agent equity research MVP with an international team and pitched it to the bank's senior management in Paris.",
   ],
   [
@@ -346,46 +346,9 @@ export default function Home() {
           handled properly. That is also why a percentage of a trip beats a
           subscription: it scales with something that is already moving.
         </p>
-        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
-          To be clear about the status: only the Season Pass exists as a
-          feature today, and nothing is being charged. There is no payment
-          integration, no revenue and no paying user. The transaction flows
-          above are planned for the coming season, not built. The pricing is a
-          hypothesis, not a result.
-        </p>
-
-        {/* ── Position ─────────────────────────────────────── */}
-        <Rule label="Why I am not shipping faster" num="05" />
-        <p className="max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          The users are 16 to 25, so a share of them are minors, and the app
-          handles meeting points. That combination is the reason the social
-          features still run on fixtures instead of a live database.
-        </p>
-        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          The rule I set for myself is written into the repository: no real
-          social, minor or location data gets connected before its own schema,
-          authorization rules, negative RLS tests and server DTOs exist. I
-          would rather show an honest prototype than a live app that leaks a
-          15-year-old&rsquo;s location.
-        </p>
-        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          The same reasoning killed a feature I had already designed and
-          removed from the code: a map view advertising off-piste lines.
-          Steering teenagers into avalanche terrain is not a feature worth
-          selling, it is a liability. It is gone, not hidden behind a flag.
-        </p>
-        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          Public events cut against that instinct, because they open a ride to
-          strangers instead of the friend graph. So they carry the narrower
-          rule: minors cannot host one, and the exact meeting point stays
-          hidden until you have joined. Everyone sees the resort, nobody sees
-          the car park. That rule is written as tested logic in the frontend
-          and filed as a server-side requirement, because a client-side filter
-          is a display choice, not protection.
-        </p>
 
         {/* ── Craft ────────────────────────────────────────── */}
-        <Rule label="How it is built" num="06" />
+        <Rule label="How it is built" num="05" />
         <div className="grid gap-5 sm:grid-cols-2">
           {[
             ["Stack", "Next.js App Router, TypeScript, Tailwind, Supabase with server-side sessions."],
@@ -405,7 +368,7 @@ export default function Home() {
         </div>
 
         {/* ── Founder note ────────────────────────────────── */}
-        <Rule label="Who is building this" num="07" />
+        <Rule label="Who is building this" num="06" />
         <div
           className="px-5 py-5"
           style={{ background: PAPER_1, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
@@ -416,7 +379,7 @@ export default function Home() {
             averaging 1.4 on the German scale where 1.0 is the top mark.
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            Alongside that I run a registered sole proprietorship for web
+            Alongside that I run a registered business for web
             design, video editing and motion design. I filed it before I was
             old enough to sign the paperwork on my own. Snowmate is the
             product I build on the side.
