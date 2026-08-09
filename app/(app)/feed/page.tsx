@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
 import { RIDE_POSTS, getUserById, getUsersByIds, ME } from "@/lib/data";
 import {
@@ -17,6 +19,7 @@ import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
 
 export default function FeedPage() {
+  const basePath = useBasePath();
   const [city, setCity] = useState<City>("innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
   const [joinedPostIds, setJoinedPostIds] = useState<Set<string>>(new Set());
@@ -136,13 +139,31 @@ export default function FeedPage() {
           );
         })}
 
+        {/* Ein leerer Feed heisst meistens: noch keine Freunde da.
+            Genau dann ist der Weg zu den offenen Events die Antwort,
+            nicht die Aufforderung, selbst etwas zu posten. */}
         {posts.length === 0 && (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
+          <div className="flex flex-col items-center gap-4 py-14 text-center">
             <PenguinMascot size={72} />
             <div>
               <p className="font-bold" style={{ color: "var(--text-primary)" }}>Heute noch keine Ausfahrt</p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>Sei die Erste oder der Erste — poste deine Line.</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
+                Hier stehen Ausfahrten deiner Crew. Offene Events findest du
+                bei Events, dafür brauchst du niemanden zu kennen.
+              </p>
             </div>
+            <Link
+              href={`${basePath}/events`}
+              className="card-tap font-display px-5 py-3 text-base uppercase"
+              style={{
+                background: "var(--rust)",
+                color: "var(--paper-0)",
+                border: "var(--rule-thick)",
+                boxShadow: "var(--shadow-print)",
+              }}
+            >
+              Offene Events ansehen
+            </Link>
           </div>
         )}
       </div>

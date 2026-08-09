@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
-import { RESORT_STATUS, RIDE_POSTS, getUserById, ME } from "@/lib/data";
+import { RESORT_STATUS, RIDE_POSTS, getUserById } from "@/lib/data";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -15,7 +15,6 @@ import Icon from "@/components/ui/Icon";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
 
-const D       = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
 const BORDER  = "var(--border-subtle)";
 const MUTED   = "var(--text-tertiary)";
@@ -26,10 +25,7 @@ const CONDITIONS_LABELS: Record<ResortStatus["conditions"], string> = {
   fresh: "Neuschnee", groomed: "Präpariert", icy: "Eisig", slushy: "Sulzig",
 };
 
-type ActiveMapSheet =
-  | { type: "resort"; resort: ResortStatus }
-  | { type: "upsell" }
-  | null;
+type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | null;
 
 function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose: () => void }) {
   useScrollLock();
@@ -129,65 +125,6 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
   );
 }
 
-function SatellitUpsell({ onClose }: { onClose: () => void }) {
-  useScrollLock();
-  const { state, dismiss } = useSheetDismiss(onClose);
-  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
-  return (
-    <>
-      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Premium-Kartenfunktionen" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
-        <div className="flex justify-center pt-3 mb-5">
-          <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-        </div>
-        <button type="button" onClick={dismiss} aria-label="Dialog schließen" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
-          <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
-        </button>
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "var(--accent-warm)" }}>
-            <Icon name="star" size={28} color="var(--ink-0)" fill="var(--ink-0)" strokeWidth={0} />
-          </div>
-        </div>
-        <div className="px-5 text-center mb-5">
-          <h2 className="font-display" style={{ color: INK, fontSize: 22, fontWeight: 800 }}>Premium freischalten</h2>
-          <p className="text-sm font-medium leading-relaxed mt-1" style={{ color: MUTED }}>
-            Satellitenkarte, Powder-Alarm und erweiterte Statistiken.
-          </p>
-        </div>
-        <div className="px-5 space-y-2 mb-5">
-          {[
-            "Satellitenansicht · Luftbilder statt Illustration",
-            "Powder-Alarm · Push-Mitteilung ab 15 cm",
-            "Erweiterte Statistiken · Heatmap und Höhenmeter",
-          ].map((t) => {
-            const [label, desc] = t.split(" · ");
-            return (
-              <div key={label} className="flex items-start gap-3 p-3 rounded-none" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: BRAND }}>
-                  <Icon name="check" size={12} color={D} strokeWidth={2.2} />
-                </div>
-                <div>
-                  <p className="font-black text-sm" style={{ color: INK }}>{label}</p>
-                  <p className="text-xs font-medium" style={{ color: MUTED }}>{desc}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="px-5 space-y-2">
-          <button className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
-            style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>
-            Für 2,99 € pro Monat starten
-          </button>
-          <button onClick={dismiss} className="w-full py-3 text-sm font-bold" style={{ color: MUTED }}>
-            Jetzt nicht
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
 export default function MapPage() {
   const [city, setCity] = useState<City>("innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
@@ -199,6 +136,7 @@ export default function MapPage() {
   const sorted      = [...resorts].sort((a, b) => b.ridersNow - a.ridersNow);
   const hotResort   = sorted[0];
   const totalRiders = resorts.reduce((s, r) => s + r.ridersNow, 0);
+  const deepestSnow = [...resorts].sort((a, b) => b.snowDepth - a.snowDepth)[0];
 
   return (
     <>
@@ -211,18 +149,14 @@ export default function MapPage() {
               {totalRiders} fahren gerade · {resorts.length} Gebiete
             </p>
           </div>
-          <button
-            onClick={() => {
-              if (!ME.isPremium) setActiveSheet({ type: "upsell" });
-            }}
-            className="flex items-center gap-1.5 text-xs font-black px-3 py-2 transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
-            style={{ background: SURFACE, color: MUTED, border: `1px solid ${BORDER}` }}
-          >
-            <Icon name="satellite" size={13} strokeWidth={1.5} />
-            Satellit
-            <span className="text-[0.55rem] font-black px-1 py-0.5 rounded-full"
-              style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>PRO</span>
-          </button>
+          <div className="text-right">
+            <p className="text-mono-data" style={{ color: INK }}>
+              {deepestSnow?.snowDepth ?? 0} cm
+            </p>
+            <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>
+              tiefster Schnee
+            </p>
+          </div>
         </div>
         <div className="px-4 pb-3">
           <SegmentedControl
@@ -255,12 +189,12 @@ export default function MapPage() {
           </div>
           <div className="flex-1 text-left">
             <p className="font-black text-sm" style={{ color: "var(--text-on-accent)" }}>{hotResort.name}</p>
-            <p className="text-xs font-semibold" style={{ color: "rgba(4,20,28,0.72)" }}>
+            <p className="text-xs font-semibold" style={{ color: "var(--paper-0)" }}>
               {hotResort.ridersNow} fahren gerade · {hotResort.snowDepth} cm Schnee
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs font-black" style={{ color: "rgba(4,20,28,0.65)" }}>Brennpunkt</span>
+            <span className="text-xs font-black" style={{ color: "var(--paper-0)" }}>Brennpunkt</span>
             <Icon name="chevron-right" size={14} color="var(--text-on-accent)" strokeWidth={2} />
           </div>
         </button>
@@ -290,9 +224,9 @@ export default function MapPage() {
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="pulse-dot" style={{ width: 5, height: 5 }} />
                   <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.ridersNow} fahren</span>
-                  <span style={{ color: BORDER }}>·</span>
+                  <span style={{ color: "var(--ink-3)" }}>·</span>
                   <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.snowDepth} cm</span>
-                  <span style={{ color: BORDER }}>·</span>
+                  <span style={{ color: "var(--ink-3)" }}>·</span>
                   <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.liftsOpen}/{resort.totalLifts} Lifte</span>
                 </div>
               </div>
@@ -309,9 +243,6 @@ export default function MapPage() {
           resort={activeSheet.resort}
           onClose={() => setActiveSheet(null)}
         />
-      )}
-      {activeSheet?.type === "upsell" && (
-        <SatellitUpsell onClose={() => setActiveSheet(null)} />
       )}
     </>
   );

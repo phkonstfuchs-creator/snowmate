@@ -36,6 +36,10 @@
 
   --ochre: #d9962b; /* Belohnung — NUR Fläche, Tinte darauf */
   --sky: #3e6e8e; /* Live / Info */
+  /* Auf getoenten Flaechen reicht --sky nicht: gegen den
+     Park-Hintergrund kommt es nur auf 3,76:1. Dunkle Variante wie
+     bei --rust-ink, damit 11px fett die 4,5:1 halten (5,35:1). */
+  --sky-ink: #2f5670;
   --crimson: #8e2420; /* Fehler */
 
   /* Semantische Zuordnung */
@@ -327,11 +331,11 @@ body {
 
 /* ─── Fahrstil-Marken ────────────────────────────────────────── */
 .badge-chill    { background: var(--accent-warm-subtle); color: var(--rust-ink); }
-.badge-park     { background: rgba(62, 110, 142, 0.16); color: var(--sky); }
+.badge-park     { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
 .badge-offpiste { background: rgba(42, 86, 71, 0.16); color: var(--pine); }
 
 /* ─── Schneelage-Marken ──────────────────────────────────────── */
-.cond-fresh   { background: rgba(62, 110, 142, 0.16); color: var(--sky); }
+.cond-fresh   { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
 .cond-groomed { background: var(--paper-2); color: var(--ink-1); }
 .cond-icy     { background: var(--paper-2); color: var(--ink-2); }
 .cond-slushy  { background: var(--accent-warm-subtle); color: var(--rust-ink); }
@@ -454,8 +458,6 @@ body {
   overflow: hidden;
   background: var(--paper-2);
 }
-.map-satellite { background: var(--ink-0); }
-
 /* Der helle Kartenlayer ist neutralgrau. Sepia plus leichte
    Drehung zieht ihn auf den Papierton, damit die Karte wie ein
    gedruckter Plan wirkt statt wie eine fremde Web-Kachel. */

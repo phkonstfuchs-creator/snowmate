@@ -96,7 +96,13 @@ sichtbar."* Das ist heute reine Behauptung im UI.
 durchgesetzt werden, nicht im Client gefiltert — sonst steht der genaue
 Treffpunkt trotzdem in der API-Antwort.
 
-**Behelf heute:** keiner, die Fixtures enthalten immer alle Felder.
+**Behelf heute:** `features/rides/visibility.ts` bildet die Regel als
+getestete Funktion ab und liefert `meetPoint: null`, solange keine
+Zusage vorliegt. Das ist Darstellung, keine Durchsetzung — die Fixtures
+enthalten weiterhin alle Felder.
+
+Siehe Punkt 5: Bei öffentlichen Events wiegt dieselbe Lücke schwerer,
+weil dort auch Fremde lesen.
 
 ---
 
@@ -116,6 +122,65 @@ seiner Sicht ein Fehler.
 
 **Gebraucht:** Eine Profiltabelle plus Server-Action, um den Entwurf
 nach bestätigter Anmeldung zu übernehmen.
+
+---
+
+## 5. Öffentliche Events brauchen serverseitige Sichtbarkeit
+
+**Status:** OFFEN — **höchste Priorität von allen Punkten hier**
+**Betrifft:** Schema für `rides`, RLS-Regeln, Lese-DTO
+
+Mit dem Screen *Events* (`/events`) gibt es erstmals Inhalte, die
+**ohne Freundschaft** sichtbar sind. Damit fällt die bisherige
+Schutzannahme weg: Bis jetzt war jede Leserin und jeder Leser
+mindestens Freundesfreund. Bei einem öffentlichen Event liest die
+ganze Welt mit.
+
+### Gebrauchtes Feld
+
+```
+rides.visibility  enum('friends','public')  not null  default 'friends'
+```
+
+`default 'friends'` ist Absicht: Wer das Feld vergisst, bekommt die
+engere Sichtbarkeit, nicht die weitere.
+
+### Durchzusetzende Regeln
+
+| # | Regel | Warum |
+|---|---|---|
+| 1 | `meet_point` wird **nicht ausgeliefert**, solange die abfragende Person nicht zugesagt hat | Ein Client-Filter reicht nicht: Der Treffpunkt stünde trotzdem in der API-Antwort und wäre über die Netzwerkkonsole lesbar |
+| 2 | Bei `visibility = 'public'` unterbricht auch Freundschaft die Sperre **nicht** — nur die Zusage zählt | Sonst wäre die Zusage bei Events wirkungslos |
+| 3 | `visibility = 'public'` ist verboten, wenn die gastgebende Person minderjährig ist | Minderjährige dürfen nicht an Fremde ausspielen. Als **Check Constraint oder Trigger**, nicht nur als Policy |
+| 4 | Beitritt wird serverseitig gegen `total_spots` geprüft | Sonst überbucht ein paralleler Request das Event |
+| 5 | Ein Event einer minderjährigen Person taucht in der öffentlichen Liste nicht auf, selbst wenn das Flag falsch gesetzt wurde | Zweite Verteidigungslinie, falls Regel 3 umgangen wurde |
+
+### Vorschlag für den Lesevertrag
+
+Zwei getrennte Ansichten statt eines Feldes, das mal gefüllt ist und
+mal nicht:
+
+- `rides_public` — ohne `meet_point`, für die Liste
+- `rides_joined` — mit `meet_point`, nur für zugesagte Teilnehmende
+
+Damit kann das Feld gar nicht erst versehentlich mitgeliefert werden.
+
+**Warum das der wichtigste Punkt ist:** Alle anderen Lücken hier
+betreffen Bequemlichkeit oder Sprache. Diese betrifft den genauen
+Aufenthaltsort einer möglicherweise minderjährigen Person gegenüber
+Fremden.
+
+**Behelf heute:** `features/rides/visibility.ts` mit
+`toVisibleRide`, `canPostPublicRide` und `isDiscoverablePublicRide`,
+abgedeckt durch `features/rides/visibility.test.ts`. Die Funktion
+entfernt `meetPoint` per Destructuring aus dem Objekt, statt es nur
+auszublenden — im Prototyp verlässlich, gegen einen echten Server
+wertlos. Zusätzlich ist der Öffentlich-Schalter in
+`PostRideModal` für Minderjährige gesperrt, was sich clientseitig
+trivial umgehen lässt.
+
+**Nicht verhandelbar:** Bevor echte Nutzerdaten an `/events` hängen,
+müssen Regel 1 bis 3 als negative pgTAP-Tests vorliegen.
 
 ---
 

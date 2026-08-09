@@ -4,6 +4,8 @@ const protectedRouteRoots = [
   "/map",
   "/crew",
   "/carpool",
+  "/events",
+  "/people",
 ] as const;
 
 const signedOutOnlyRoutes = new Set(["/login", "/signup"]);

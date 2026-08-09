@@ -7,7 +7,9 @@ import {
   LEADERBOARD_INNSBRUCK,
   LEADERBOARD_SALZBURG,
   MOCK_USERS,
+  PUBLIC_EVENTS,
   RIDE_POSTS,
+  getUserById,
 } from "@/lib/data";
 
 const userIds = new Set(MOCK_USERS.map((user) => user.id));
@@ -16,7 +18,7 @@ describe("mock data integrity", () => {
   it("keeps every user reference resolvable", () => {
     const references = [
       ...MOCK_USERS.flatMap((user) => user.friendIds),
-      ...RIDE_POSTS.flatMap((ride) => [
+      ...[...RIDE_POSTS, ...PUBLIC_EVENTS].flatMap((ride) => [
         ride.authorId,
         ...ride.joinedUserIds,
       ]),
@@ -41,6 +43,41 @@ describe("mock data integrity", () => {
         expected: ride.joinedUserIds.length,
         actual: ride.takenSpots,
       })).filter(({ expected, actual }) => expected !== actual),
+    ).toEqual([]);
+  });
+
+  it("marks every friends-feed ride as friends-only", () => {
+    expect(
+      RIDE_POSTS.filter((ride) => ride.visibility !== "friends").map((r) => r.id),
+    ).toEqual([]);
+  });
+
+  /* Bei grossen Events ist joinedUserIds nur der sichtbare Ausschnitt
+     der Teilnehmenden, nicht die vollstaendige Liste. Deshalb gilt
+     hier eine Spanne statt der Gleichheit wie im Freundes-Feed. */
+  it("keeps public event capacity within bounds", () => {
+    expect(
+      PUBLIC_EVENTS.filter(
+        (event) =>
+          event.joinedUserIds.length > event.takenSpots ||
+          event.takenSpots > event.totalSpots,
+      ).map((event) => event.id),
+    ).toEqual([]);
+  });
+
+  it("never lets a minor host a public event", () => {
+    expect(
+      PUBLIC_EVENTS.filter((event) => getUserById(event.authorId)?.isMinor).map(
+        (event) => event.id,
+      ),
+    ).toEqual([]);
+  });
+
+  it("gives every public event a title and a meeting point to withhold", () => {
+    expect(
+      PUBLIC_EVENTS.filter((event) => !event.title || !event.meetPoint).map(
+        (event) => event.id,
+      ),
     ).toEqual([]);
   });
 

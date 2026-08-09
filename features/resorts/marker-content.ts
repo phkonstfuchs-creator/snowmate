@@ -34,7 +34,7 @@ export function createMarkerContent(
     const resortName = document.createElement("span");
     resortName.textContent = resort.name.split(" ")[0] ?? resort.name;
     resortName.style.fontSize = "7px";
-    resortName.style.color = "rgba(242,234,219,0.8)";
+    resortName.style.color = "var(--paper-0)";
     resortName.style.whiteSpace = "nowrap";
     resortName.style.overflow = "hidden";
     resortName.style.maxWidth = `${size - 8}px`;

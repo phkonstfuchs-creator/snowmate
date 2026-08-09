@@ -41,6 +41,7 @@ const ride: RidePost = {
   joinedUserIds: ["friend"],
   caption: "",
   postedAt: "now",
+  visibility: "friends",
 };
 
 describe("createRideView", () => {

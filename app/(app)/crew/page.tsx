@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useBasePath } from "@/hooks/useBasePath";
 import clsx from "clsx";
 import {
-  MOCK_USERS,
   getUserById,
   getUsersByIds,
   CREWS,
@@ -11,9 +12,6 @@ import {
   ME,
 } from "@/lib/data";
 import ConversationThread from "@/components/ConversationThread";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { useSheetDismiss } from "@/hooks/useSheetDismiss";
-import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 
@@ -24,78 +22,17 @@ const MUTED = "var(--text-tertiary)";
 const INK = "var(--text-primary)";
 const BRAND = "var(--accent-primary)";
 
-type Tab = "crew" | "squads" | "pending" | "chats";
-
-function AddFriendSheet({ onClose }: { onClose: () => void }) {
-  useScrollLock();
-  const { state, dismiss } = useSheetDismiss(onClose);
-  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
-  const [requested, setRequested] = useState<Set<string>>(new Set());
-  const suggestions = MOCK_USERS.filter((u) => !ME.friendIds.includes(u.id) && u.id !== "me").slice(0, 3);
-
-  return (
-    <>
-      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Freunde finden" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
-        <div className="flex justify-center pt-3 mb-4">
-          <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-        </div>
-        <div className="flex items-center justify-between px-5 mb-1">
-          <h2 className="font-black text-lg" style={{ color: INK }}>Freunde finden</h2>
-          <button type="button" onClick={dismiss} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
-            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
-          </button>
-        </div>
-        <p className="text-xs font-bold px-5 mb-4" style={{ color: MUTED }}>Leute, die deine Freunde kennen</p>
-
-        <div className="px-5 space-y-2 mb-5">
-          {suggestions.map((u) => {
-            const isReq = requested.has(u.id);
-            return (
-              <div key={u.id} className="flex items-center gap-3 p-3 rounded-none" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
-                <Avatar id={u.id} initials={u.avatar} size={40} verified={u.accountType === "verified"} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-sm" style={{ color: INK }}>{u.name}</p>
-                  <p className="text-xs font-bold" style={{ color: MUTED }}>@{u.handle} · Stufe {u.level}</p>
-                </div>
-                <button
-                  onClick={() => setRequested((prev) => new Set(prev).add(u.id))}
-                  disabled={isReq}
-                  className="text-mono-label px-3 py-2 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
-                  style={isReq
-                    ? { background: "var(--accent-primary-subtle)", color: BRAND }
-                    : { background: BRAND, color: D }
-                  }
-                >
-                  {isReq ? "Gesendet" : "Anfragen"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="px-5">
-          <button className="w-full py-3.5 rounded-none font-black text-sm active:scale-95 transition-transform" style={{ border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }}>
-            Einladungslink teilen · +200 XP
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
+type Tab = "crew" | "squads" | "chats";
 
 export default function CrewPage() {
+  const basePath = useBasePath();
   const [tab, setTab] = useState<Tab>("crew");
-  const [showAdd, setShowAdd] = useState(false);
-  const [pendingActions, setPendingActions] = useState<Record<string, "accepted" | "declined">>({});
   const [selectedConvUserId, setSelectedConvUserId] = useState<string | null>(null);
 
   const myFriends = getUsersByIds(ME.friendIds);
-  const pendingUsers = MOCK_USERS.filter((u) => !ME.friendIds.includes(u.id) && u.id !== "me").slice(0, 3);
   const totalUnread = CONVERSATIONS.reduce((sum, c) => sum + c.messages.filter((m) => m.senderId !== "me" && !m.isRead).length, 0);
-  const handlePending = (userId: string, action: "accepted" | "declined") => setPendingActions((prev) => ({ ...prev, [userId]: action }));
 
-  const TAB_LABELS: Record<Tab, string> = { crew: "Crew", squads: "Squads", pending: "Anfragen", chats: "Chats" };
+  const TAB_LABELS: Record<Tab, string> = { crew: "Crew", squads: "Squads", chats: "Chats" };
 
   return (
     <>
@@ -105,21 +42,19 @@ export default function CrewPage() {
             <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Crew</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} Freunde · {CREWS.length} Squads</p>
           </div>
-          <button
-            onClick={() => setShowAdd(true)}
-            aria-label="Freunde finden"
-            className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+          <Link
+            href={`${basePath}/people`}
+            aria-label="Leute finden"
+            className="card-tap flex h-11 w-11 items-center justify-center"
             style={{ background: BRAND, color: D }}
           >
-            <Icon name="plus" size={16} strokeWidth={2.4} />
-          </button>
+            <Icon name="user-plus" size={17} strokeWidth={2.2} />
+          </Link>
         </div>
 
         <div className="flex px-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
-          {(["crew", "squads", "pending", "chats"] as const).map((t) => {
-            const badge = t === "pending"
-              ? pendingUsers.filter((u) => !pendingActions[u.id]).length
-              : t === "chats" ? totalUnread : 0;
+          {(["crew", "squads", "chats"] as const).map((t) => {
+            const badge = t === "chats" ? totalUnread : 0;
             const isActive = tab === t;
             return (
               <button key={t} onClick={() => setTab(t)}
@@ -157,7 +92,7 @@ export default function CrewPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm" style={{ color: INK }}>{friend.name}</span>
-                    <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>
+                    <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: "var(--rust-ink)" }}>
                       Stufe {friend.level}
                     </span>
                   </div>
@@ -177,18 +112,20 @@ export default function CrewPage() {
             ))}
           </div>
 
-          <div className="mt-5 rounded-none p-5 flex flex-col items-center gap-3 text-center" style={{ border: `2px dashed ${BORDER}` }}>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--accent-primary-subtle)" }}>
+          <Link
+            href={`${basePath}/people`}
+            className="card-tap mt-5 flex items-center gap-3 p-4"
+            style={{ border: `2px dashed ${BORDER}` }}
+          >
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent-primary-subtle)" }}>
               <Icon name="user-plus" size={18} color={BRAND} strokeWidth={2} />
             </div>
-            <div>
-              <p className="font-black text-sm" style={{ color: INK }}>Freunde einladen</p>
-              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>200 XP für jede Person, die du einlädst</p>
+            <div className="flex-1">
+              <p className="font-black text-sm" style={{ color: INK }}>Leute finden</p>
+              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>Suchen, anfragen und offene Anfragen beantworten</p>
             </div>
-            <button className="text-sm font-black px-5 py-2 rounded-full active:scale-95 transition-transform" style={{ background: BRAND, color: D }}>
-              Link teilen
-            </button>
-          </div>
+            <Icon name="chevron-right" size={16} color={MUTED} strokeWidth={2} />
+          </Link>
         </div>
       )}
 
@@ -220,56 +157,6 @@ export default function CrewPage() {
             <Icon name="plus" size={14} strokeWidth={2.2} />
             Create new squad
           </button>
-        </div>
-      )}
-
-      {/* Pending tab */}
-      {tab === "pending" && (
-        <div className="px-4 pt-4 pb-6 space-y-3">
-          {pendingUsers.map((user) => {
-            const action = pendingActions[user.id];
-            return (
-              <div key={user.id} className="rounded-none p-4"
-                style={{
-                  border: `1px solid ${action === "accepted" ? "rgba(74,222,154,0.4)" : BORDER}`,
-                  background: action === "accepted" ? "rgba(74,222,154,0.1)" : action === "declined" ? "var(--bg-canvas)" : SURFACE,
-                  opacity: action === "declined" ? 0.5 : 1,
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar id={user.id} initials={user.avatar} size={42} verified={user.accountType === "verified"} />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-sm" style={{ color: INK }}>{user.name}</span>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: MUTED }}>@{user.handle} · Stufe {user.level}</span>
-                    <p className="text-xs font-medium mt-1.5" style={{ color: MUTED }}>{user.daysThisSeason} Tage this season · {user.resortsVisited} resorts</p>
-                    {user.isMinor && (
-                      <span className="inline-flex items-center gap-1 text-[0.65rem] font-black px-2 py-0.5 rounded-full mt-1.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>Unter 18</span>
-                    )}
-                    {action ? (
-                      <p className="text-xs font-black mt-3" style={{ color: action === "accepted" ? "var(--status-success)" : MUTED }}>
-                        {action === "accepted" ? "Freund bestätigt" : "Anfrage abgelehnt"}
-                      </p>
-                    ) : (
-                      <div className="flex gap-2 mt-3">
-                        <button onClick={() => handlePending(user.id, "declined")}
-                          className="flex-1 py-2 rounded-none text-sm font-black active:scale-95 transition-transform"
-                          style={{ border: `1.5px solid ${BORDER}`, color: MUTED }}>
-                          Decline
-                        </button>
-                        <button onClick={() => handlePending(user.id, "accepted")}
-                          className="flex-1 py-2 rounded-none text-sm font-black active:scale-95 transition-transform"
-                          style={{ background: BRAND, color: D }}>
-                          Confirm
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
       )}
 
@@ -328,7 +215,6 @@ export default function CrewPage() {
       )}
 
       {selectedConvUserId && <ConversationThread userId={selectedConvUserId} onClose={() => setSelectedConvUserId(null)} />}
-      {showAdd && <AddFriendSheet onClose={() => setShowAdd(false)} />}
     </>
   );
 }

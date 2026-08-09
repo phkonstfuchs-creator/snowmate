@@ -28,16 +28,15 @@ function SectionRule({ label, right }: { label: string; right?: React.ReactNode 
   );
 }
 
-function PremiumSheet({ onClose }: { onClose: () => void }) {
+function SeasonPassSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
   const FEATURES: [string, string][] = [
-    ["Satellitenansicht", "Echte Luftbilder statt illustrierter Karte"],
     ["Powder-Alarm", "Push, sobald 15+ cm in deiner Region fallen"],
-    ["Erweiterte Zahlen", "Heatmaps, Höhenmeter, Saisonvergleich"],
-    ["Premium-Stempel", "Goldener Stempel auf Profil und im Feed"],
+    ["Saisonvergleich", "Deine Zahlen gegen die letzte Saison und die Region"],
+    ["Saisonstempel", "Stempel auf dem Profil für die ganze Saison"],
   ];
 
   return (
@@ -49,15 +48,16 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
         data-state={state}
         role="dialog"
         aria-modal="true"
-        aria-label="Snowmate Premium"
+        aria-label="Snowmate Season Pass"
         tabIndex={-1}
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
         <div className="px-5 pt-6 pb-5" style={{ borderBottom: "var(--rule-thin)" }}>
-          <p className="text-mono-label mb-2" style={{ color: RUST }}>Ausgabe 01 · Saison 25/26</p>
-          <h2 className="text-display-md" style={{ color: INK }}>Snowmate<br />Premium</h2>
+          <p className="text-mono-label mb-2" style={{ color: RUST }}>Dezember bis April · Saison 25/26</p>
+          <h2 className="text-display-md" style={{ color: INK }}>Season{" "}<br />Pass</h2>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
-            Für alle, die früher aufstehen und länger bleiben als der Rest.
+            Einmal für die ganze Saison. Kein Abo, keine Verlängerung.
+            Alles zum Verabreden bleibt kostenlos.
           </p>
         </div>
 
@@ -84,10 +84,10 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
             className="w-full py-4 font-display text-lg uppercase"
             style={{ background: OCHRE, color: INK, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
-            2,99 € / Monat
+            14,99 € einmalig
           </button>
           <p className="text-center text-mono-label" style={{ color: INK_2 }}>
-            Monatlich kündbar · Keine Mindestlaufzeit
+            Gilt bis Ende April · Keine Verlängerung
           </p>
           <button onClick={dismiss} className="w-full py-2.5 text-sm font-semibold underline" style={{ color: INK_2 }}>
             Jetzt nicht
@@ -162,7 +162,7 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
 
 export default function ProfilePage() {
   const [leaderboardCity, setLeaderboardCity] = useState<"innsbruck" | "salzburg">("innsbruck");
-  const [showPremium, setShowPremium] = useState(false);
+  const [showSeasonPass, setShowSeasonPass] = useState(false);
   const leaderboard = leaderboardCity === "innsbruck" ? LEADERBOARD_INNSBRUCK : LEADERBOARD_SALZBURG;
   const myRank = leaderboard.find((e) => e.userId === "me");
   const pct = Math.min(100, Math.round((ME.xp / ME.xpToNext) * 100));
@@ -258,17 +258,19 @@ export default function ProfilePage() {
       {!ME.isPremium && (
         <section className="px-4 pt-5">
           <button
-            onClick={() => setShowPremium(true)}
+            onClick={() => setShowSeasonPass(true)}
             className="card-tap flex w-full items-center gap-3 px-4 py-3.5 text-left"
             style={{ background: OCHRE, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="star" size={20} color={INK} fill={INK} strokeWidth={0} />
             <div className="flex-1">
               <p className="font-display text-lg uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>
-                Premium
+                Season Pass
               </p>
-              <p className="text-sm mt-1" style={{ color: "var(--ink-1)" }}>
-                Satellitenkarte, Powder-Alarm &amp; mehr
+              {/* Volltinte, nicht ink-1: auf Ocker kommt ink-1 nur auf
+                  4,01:1 und verfehlt AA. */}
+              <p className="text-sm mt-1" style={{ color: INK }}>
+                Powder-Alarm und Saisonzahlen · 14,99 € einmalig
               </p>
             </div>
             <Icon name="chevron-right" size={18} color={INK} strokeWidth={2} />
@@ -443,7 +445,7 @@ export default function ProfilePage() {
         </form>
       </div>
 
-      {showPremium && <PremiumSheet onClose={() => setShowPremium(false)} />}
+      {showSeasonPass && <SeasonPassSheet onClose={() => setShowSeasonPass(false)} />}
     </div>
   );
 }

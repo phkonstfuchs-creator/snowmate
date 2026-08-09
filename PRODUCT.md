@@ -19,7 +19,22 @@ Snowmate is the social coordination layer of the mountain: "who's riding today, 
 
 Success = a young skier in Innsbruck opens the app on a Saturday morning, sees who's riding, posts a ride or joins one, finds a carpool seat, and is on the mountain with the right people — without sending a single WhatsApp message.
 
-Safety by design: no open 1:1 stranger matching for minors. The product is built on a friend-graph model where discovery happens within your crew and friends-of-friends, never broadcast to strangers.
+Safety by design: no open 1:1 stranger matching for minors. The product is built on a friend-graph model where discovery happens within your crew and friends-of-friends.
+
+The one deliberate exception is **public events**: group rides a host opens to everyone, because a new arrival with an empty friend graph otherwise has nowhere to start. They are group-shaped, never 1:1, and they carry a stricter rule than the friend feed — a minor can never host one, the resort is public but the exact meeting point unlocks only on joining, and friendship alone does not unlock it. Every ride is friends-only unless the host explicitly opens it.
+
+## Business Model
+
+Coordination is free and stays free — feed, map, carpool board, crew, public events. Charging for coordination breaks the product, because a tool half your crew cannot use is worth nothing.
+
+Revenue comes from transactions that already happen today, handled badly:
+
+1. **University ski club trips (main driver)** — clubs run semester trips for 50–300 people on Excel, WhatsApp and private bank transfers. Snowmate handles signup, seat allocation, payment, participant lists and cancellations. **3% of the volume handled.** A 150-person trip at 300 € is 45,000 € currently moving through one overloaded organiser.
+2. **Carpool transaction fee** — **0.99 € per matched ride**, charged to the passenger, never the driver: offering a seat must stay free or the board empties. It also fixes the trust problem, since a paid seat means fewer no-shows.
+3. **Regional partners (season 2 onward)** — ski areas, rental shops and huts pay for visibility to people going there tomorrow. Delivered as an offer inside the feed tied to a specific ride, never as a banner.
+4. **Season Pass** — **14.99 € once per season** (December–April) for powder alerts and extended stats. A minor line, not the core model, and never presented as the main one.
+
+Status: only the Season Pass exists as a feature. The transaction flows are planned for the coming season and nothing is charged today — no payment integration, no revenue, no paying user.
 
 ## Brand Personality
 
@@ -43,7 +58,7 @@ Voice: direct, crew-native, zero corporate-speak. The interface talks like a fri
 1. **Crew first, individual second.** Every screen's primary subject is a group, not a solo user. Feed shows rides, not user profiles. The social graph is the product.
 2. **Real-time feel, not static.** Even with mock data, the interface should feel alive — recent timestamps, "riding now" indicators, count badges. The app is a live pulse of the mountain, not a bulletin board.
 3. **Safety is invisible architecture.** The friend-graph model should feel natural and social, never like a restriction. Users shouldn't see a wall — they should see their crew. Safety lives in the data model, not in warning labels.
-4. **Earned, not bought.** Gamification is tied to real social and coordination actions (posting, joining, inviting) — never to fitness metrics or premium tiers. XP and badges feel like recognition from the community, not a loyalty points scheme.
+4. **Earned, not bought.** Gamification is tied to real social and coordination actions (posting, joining, inviting) — never to fitness metrics or paid tiers. XP and badges feel like recognition from the community, not a loyalty points scheme. This is why coordination is not monetized: paying must never buy standing.
 5. **Mobile is the only screen that matters.** Design at 390px first. Every interaction — posting a ride, claiming a carpool seat, viewing the crew — must be one-thumb operable. Desktop is a nice-to-have, not a design constraint.
 
 ## Accessibility & Inclusion

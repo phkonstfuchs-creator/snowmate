@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
-import { AbilityLevel, City } from "@/lib/types";
-import { RESORT_STATUS } from "@/lib/data";
+import { AbilityLevel, City, RideVisibility } from "@/lib/types";
+import { RESORT_STATUS, ME } from "@/lib/data";
+import { canPostPublicRide } from "@/features/rides/visibility";
 import Icon from "@/components/ui/Icon";
 
 interface PostRideModalProps {
@@ -21,6 +22,7 @@ interface PostData {
   meetPoint: string;
   totalSpots: number;
   caption: string;
+  visibility: RideVisibility;
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
@@ -40,11 +42,24 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   const [meetPoint, setMeetPoint] = useState("");
   const [totalSpots, setTotalSpots] = useState(4);
   const [caption, setCaption] = useState("");
+  const [visibility, setVisibility] = useState<RideVisibility>("friends");
 
   const resorts = RESORT_STATUS.filter((r) => r.city === city).map((r) => r.name);
+  /* Minderjaehrige koennen nicht oeffentlich posten. Der Schalter
+     ist dann gesperrt statt versteckt, sonst wirkt das Fehlen wie
+     ein Fehler statt wie eine Regel. */
+  const mayGoPublic = canPostPublicRide(ME);
 
   const handleSubmit = () => {
-    onPost({ resort, abilityLevel, meetTime, meetPoint, totalSpots, caption });
+    onPost({
+      resort,
+      abilityLevel,
+      meetTime,
+      meetPoint,
+      totalSpots,
+      caption,
+      visibility: mayGoPublic ? visibility : "friends",
+    });
     dismiss();
   };
 
@@ -196,6 +211,58 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                 rows={3}
                 className="form-input resize-none"
               />
+            </div>
+
+            <div>
+              <p id="post-ride-visibility-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Wer sieht das
+              </p>
+              <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="post-ride-visibility-label">
+                {([
+                  { value: "friends", label: "Freunde", desc: "Freunde und deren Freunde" },
+                  { value: "public", label: "Öffentlich", desc: "Alle, auch ohne Freundschaft" },
+                ] as const).map((opt) => {
+                  const active = visibility === opt.value;
+                  const locked = opt.value === "public" && !mayGoPublic;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => !locked && setVisibility(opt.value)}
+                      aria-pressed={active}
+                      disabled={locked}
+                      className="flex flex-col items-start gap-1 px-3 py-3 border-2 text-left transition-colors duration-100"
+                      style={{
+                        borderColor: active ? "var(--rust)" : "var(--border-subtle)",
+                        background: active ? "var(--accent-warm-subtle)" : "var(--bg-surface-2)",
+                        opacity: locked ? 0.55 : 1,
+                        cursor: locked ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Icon
+                          name={opt.value === "public" ? "globe" : "users"}
+                          size={13}
+                          color={active ? "var(--rust)" : "var(--text-tertiary)"}
+                          strokeWidth={2}
+                        />
+                        <span className="text-sm font-bold" style={{ color: active ? "var(--rust)" : "var(--text-primary)" }}>
+                          {opt.label}
+                        </span>
+                        {locked && <Icon name="lock" size={11} color="var(--text-tertiary)" strokeWidth={2} />}
+                      </span>
+                      <span className="text-[0.65rem] leading-tight" style={{ color: "var(--text-tertiary)" }}>
+                        {locked ? "Erst ab 18 möglich" : opt.desc}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {visibility === "public" && mayGoPublic && (
+                <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
+                  Gebiet und Uhrzeit sieht jeder. Der genaue Treffpunkt wird
+                  erst nach der Zusage sichtbar.
+                </p>
+              )}
             </div>
 
             {/* Summary pill */}

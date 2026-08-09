@@ -214,7 +214,7 @@ export default function CarpoolPage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>
+                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)" }}>
                             Sucht Platz
                           </span>
                         </div>

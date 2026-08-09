@@ -65,9 +65,11 @@ function Rule({ label, num }: { label: string; num: string }) {
 
 const SCREENS: [string, string, string][] = [
   ["feed", "Feed", "Who is riding today, where, and how many spots are left."],
+  ["events", "Public events", "Open rides anyone can join without knowing a single person yet. The resort is public, the meeting point unlocks on joining."],
   ["map", "Map", "All resorts in the region, with riders split by riding style, not just a headcount."],
   ["carpool", "Carpool", "Two-sided board: drivers offer seats, riders ask for one."],
-  ["crew", "Crew", "Friends, requests and chats that are attached to a ride or a carpool."],
+  ["crew", "Crew", "Friends, squads and chats that are attached to a ride or a carpool."],
+  ["people", "Add people", "Search by name or handle, send a request, answer the ones you got. Minors are flagged, because that changes what accepting them means."],
   ["profile", "Profile", "Season record: days, resorts, streak, stamps and a regional ranking."],
 ];
 
@@ -76,8 +78,9 @@ const SCREENS: [string, string, string][] = [
 const STATUS: [string, "live" | "mock" | "next" | "later", string][] = [
   ["Sign-up, e-mail confirmation, sign-in, sign-out", "live", "Supabase, server-side sessions, protected routes"],
   ["Row Level Security on the profile shell", "live", "with negative policy tests (pgTAP)"],
-  ["Feed, Map, Carpool, Crew, Profile", "mock", "rendered from a local fixture file, no database behind them"],
-  ["Meeting-point visibility rule", "mock", "promised in the UI, not enforced on the server yet"],
+  ["Feed, Events, Map, Carpool, Crew, Profile", "mock", "rendered from a local fixture file, no database behind them"],
+  ["Meeting-point visibility rule", "mock", "tested logic in the frontend, not enforced on the server yet"],
+  ["Payments for trips and carpool seats", "next", "the revenue model above: designed, not built, nothing is charged"],
   ["Onboarding answers (region, style, name)", "mock", "written to browser storage and never read back"],
   ["Rides, crews and chats on a real schema", "next", "needs tables, RLS and negative tests first"],
   ["Snow depth and fresh-snow alerts", "next", "Open-Meteo covers this: verified, free, no key"],
@@ -86,10 +89,30 @@ const STATUS: [string, "live" | "mock" | "next" | "later", string][] = [
 ];
 
 /* Preis und Begruendung getrennt, damit die Zahlen nicht in
-   Fliesstext verschwinden */
-const PRICING: [string, string, string][] = [
-  ["Free", "Feed, carpool board, crew, chats", "Everything needed to actually meet up. This part stays free, because a coordination tool is worthless if half your crew is behind a paywall."],
-  ["Premium", "2.99 € per month", "Aerial map view, fresh-snow alerts, deeper season stats, a premium stamp on your profile."],
+   Fliesstext verschwinden. Reihenfolge = Gewicht: die Skiclub-
+   Fahrten sind der Treiber, der Season Pass eine Randnotiz. */
+const REVENUE: { line: string; price: string; body: string; lead?: boolean }[] = [
+  {
+    line: "University ski club trips",
+    price: "3% of the volume handled",
+    lead: true,
+    body: "Clubs run semester trips for 50 to 300 people on Excel, a WhatsApp group and private bank transfers. Snowmate handles signup, seat allocation, payment, the participant list and cancellations. A trip with 150 people at 300 € is 45,000 € moving through one organiser who is currently doing it by hand.",
+  },
+  {
+    line: "Carpool fee",
+    price: "0.99 € per matched ride",
+    body: "Charged to the passenger, never to the driver, because the whole board collapses if offering a seat costs you something. It also fixes the trust problem: the seat is paid for, so people stop not showing up.",
+  },
+  {
+    line: "Regional partners",
+    price: "season 2 onward",
+    body: "Ski areas, rental shops and huts pay to reach people who are going there tomorrow. Delivered as an offer inside the feed attached to a specific ride, not as a banner.",
+  },
+  {
+    line: "Season Pass",
+    price: "14.99 € once per season",
+    body: "December to April. Powder alerts and extended stats. A small line, not the model.",
+  },
 ];
 
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
@@ -275,28 +298,38 @@ export default function Home() {
 
         {/* ── Geschäftsmodell ──────────────────────────────── */}
         <Rule label="Business model" num="04" />
-        <div style={{ borderTop: "var(--rule-thin)" }}>
-          {PRICING.map(([tier, price, body]) => (
+        <p className="max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
+          Coordination stays free. All of it: feed, map, carpool board, crew,
+          public events. A coordination tool is worthless if half your crew is
+          behind a paywall, so charging for it would break the product before
+          it earned anything. The money comes from transactions that already
+          happen today, badly.
+        </p>
+        <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
+          {REVENUE.map(({ line, price, body, lead }) => (
             <div
-              key={tier}
+              key={line}
               className="py-4"
               style={{ borderBottom: "1px solid var(--border-hairline)" }}
             >
-              <div className="flex flex-wrap items-baseline gap-x-3">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span
                   className="text-mono-label px-2 py-0.5"
                   style={{
-                    background: tier === "Premium" ? "var(--ochre)" : "var(--paper-2)",
+                    background: lead ? "var(--ochre)" : "var(--paper-2)",
                     color: INK,
-                    minWidth: 88,
-                    textAlign: "center",
                   }}
                 >
-                  {tier}
-                </span>
-                <span className="text-[0.9375rem] font-semibold" style={{ color: INK }}>
                   {price}
                 </span>
+                <span className="text-[0.9375rem] font-semibold" style={{ color: INK }}>
+                  {line}
+                </span>
+                {lead && (
+                  <span className="text-mono-label" style={{ color: RUST }}>
+                    main driver
+                  </span>
+                )}
               </div>
               <p className="mt-2 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
                 {body}
@@ -305,16 +338,17 @@ export default function Home() {
           ))}
         </div>
         <p className="mt-5 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          The maths is deliberately unromantic. There are roughly 13 ski areas
-          on one pass around Innsbruck alone, and the people I am building for
-          already pay for a season pass, so the willingness to pay for the
-          mountain exists. At 2.99 € a month, this only works on volume within
-          a region, which is why the plan is to win one valley properly before
-          touching a second.
+          The logic is that these people already spend money on the mountain.
+          They buy a season pass, they split fuel in a group chat, they wire
+          280 € to a club treasurer. None of that needs to be created, only
+          handled properly. That is also why a percentage of a trip beats a
+          subscription: it scales with something that is already moving.
         </p>
         <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
-          To be clear about the status: nobody is paying yet. There is no
-          payment integration, no revenue and no paying user. The pricing is a
+          To be clear about the status: only the Season Pass exists as a
+          feature today, and nothing is being charged. There is no payment
+          integration, no revenue and no paying user. The transaction flows
+          above are planned for the coming season, not built. The pricing is a
           hypothesis, not a result.
         </p>
 
@@ -333,10 +367,19 @@ export default function Home() {
           15-year-old&rsquo;s location.
         </p>
         <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          The same reasoning killed a feature I had already designed: a
-          satellite map advertising couloirs and off-piste lines. Steering
-          teenagers into avalanche terrain is not a premium feature, it is a
-          liability. It is gone.
+          The same reasoning killed a feature I had already designed and
+          removed from the code: a map view advertising off-piste lines.
+          Steering teenagers into avalanche terrain is not a feature worth
+          selling, it is a liability. It is gone, not hidden behind a flag.
+        </p>
+        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
+          Public events cut against that instinct, because they open a ride to
+          strangers instead of the friend graph. So they carry the narrower
+          rule: minors cannot host one, and the exact meeting point stays
+          hidden until you have joined. Everyone sees the resort, nobody sees
+          the car park. That rule is written as tested logic in the frontend
+          and filed as a server-side requirement, because a client-side filter
+          is a display choice, not protection.
         </p>
 
         {/* ── Handwerk ─────────────────────────────────────── */}

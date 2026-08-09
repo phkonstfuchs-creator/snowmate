@@ -2,10 +2,24 @@ import { describe, expect, it } from "vitest";
 import { getAuthRedirect } from "./route-access";
 
 describe("getAuthRedirect", () => {
-  it.each(["/feed", "/profile", "/map", "/crew", "/carpool"])(
-    "protects %s from signed-out visitors",
+  it.each([
+    "/feed",
+    "/profile",
+    "/map",
+    "/crew",
+    "/carpool",
+    "/events",
+    "/people",
+  ])("protects %s from signed-out visitors", (pathname) => {
+    expect(getAuthRedirect(pathname, false)).toBe("/login");
+  });
+
+  /* Der klickbare Prototyp liegt bewusst ausserhalb der Anmeldung
+     und darf davon nicht eingefangen werden. */
+  it.each(["/demo", "/demo/events", "/demo/people"])(
+    "keeps the prototype route %s public",
     (pathname) => {
-      expect(getAuthRedirect(pathname, false)).toBe("/login");
+      expect(getAuthRedirect(pathname, false)).toBeNull();
     },
   );
 

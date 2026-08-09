@@ -91,6 +91,12 @@ Route groups do not alter public URLs. For example,
   friends or after the ride host accepts a participation request.
 - Minor profiles, rides, locations, and direct messages use the narrower
   confirmed-friends audience.
+- Rides carry a `visibility` of `friends` or `public`. A public event is
+  discoverable without any friendship, so it applies the stricter rule:
+  friendship alone never reveals the meeting point, only joining does, and a
+  minor can never host one. `features/rides/visibility.ts` holds this as
+  tested logic; enforcing it server-side is the top item in
+  [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md).
 - Supabase tables exposed through its API require Row Level Security and
   negative policy tests before real user data is connected.
 - User input is validated at the server boundary and backed by database
@@ -111,9 +117,12 @@ confirmation, logout, and a private RLS-backed profile shell are implemented
 locally. The first migration must still pass the database test suite and be
 explicitly applied to `snowmate-dev`.
 
-Rides, friendships, chats, consent, and location remain mock-only. Do not
-connect real social, minor, or location data until their own normalized schema,
-authorization rules, negative RLS tests, and server DTOs exist.
+Rides, public events, friendships, chats, consent, and location remain
+mock-only. Do not connect real social, minor, or location data until their own
+normalized schema, authorization rules, negative RLS tests, and server DTOs
+exist. Public events raise that bar rather than lowering it: they are the first
+surface readable by strangers, so their visibility rules need negative pgTAP
+tests before any real ride is attached.
 
 See [the structural audit](docs/STRUCTURAL_AUDIT.md) for the findings, completed
 work, and backend follow-up.
