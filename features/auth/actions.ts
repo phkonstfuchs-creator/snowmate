@@ -20,7 +20,7 @@ function invalidState(
 ): AuthActionState {
   return {
     status: "error",
-    message: "Bitte prüfe die markierten Felder.",
+    message: "Check the highlighted fields.",
     email,
     fieldErrors,
   };
@@ -30,7 +30,7 @@ function confirmationPendingState(email: string): AuthActionState {
   return {
     status: "success",
     message:
-      "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
+      "If this address can be used, you will receive a confirmation email shortly.",
     email,
   };
 }
@@ -65,14 +65,14 @@ export async function signInAction(
     if (error) {
       return {
         status: "error",
-        message: "E-Mail-Adresse oder Passwort ist falsch.",
+        message: "Email or password is incorrect.",
         email: validation.data.email,
       };
     }
   } catch {
     return {
       status: "error",
-      message: "Die Anmeldung ist vorübergehend nicht verfügbar. Versuche es gleich noch einmal.",
+      message: "Sign in is temporarily unavailable. Try again shortly.",
       email: validation.data.email,
     };
   }
@@ -115,7 +115,7 @@ export async function signUpAction(
       return {
         status: "error",
         message:
-          "Der Account konnte nicht erstellt werden. Prüfe deine Angaben und versuche es erneut.",
+          "We could not create the account. Check the details and try again.",
         email: validation.data.email,
       };
     }
@@ -126,7 +126,7 @@ export async function signUpAction(
   } catch {
     return {
       status: "error",
-      message: "Die Registrierung ist vorübergehend nicht verfügbar. Versuche es gleich noch einmal.",
+      message: "Sign up is temporarily unavailable. Try again shortly.",
       email: validation.data.email,
     };
   }

@@ -22,10 +22,10 @@ const RUST = "var(--rust)";
 const PINE = "var(--pine)";
 const OCHRE = "var(--ochre)";
 
-/* Der Treffpunkt-Riegel. Sichtbar verschlossen statt einfach
-   weggelassen: Wer nicht beigetreten ist, soll verstehen, dass da
-   etwas ist und warum es fehlt. Weglassen wuerde wie ein Fehler
-   wirken, ein Schloss erklaert die Regel. */
+/* The meeting-point lock. Visibly closed rather than simply left
+   out: someone who has not joined should understand that something
+   is there and why it is missing. Omitting it would read as a bug,
+   a lock explains the rule. */
 function MeetingPoint({ value, locked }: { value: string | null; locked: boolean }) {
   if (!locked && value) {
     return (
@@ -43,7 +43,7 @@ function MeetingPoint({ value, locked }: { value: string | null; locked: boolean
     >
       <Icon name="lock" size={14} color={INK_2} strokeWidth={1.9} className="mt-0.5 flex-shrink-0" />
       <p className="text-sm leading-snug" style={{ color: INK_2 }}>
-        Genauer Treffpunkt wird nach der Zusage sichtbar.
+        Exact meeting point becomes visible once you join.
       </p>
     </div>
   );
@@ -97,7 +97,7 @@ function EventDetailSheet({
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Event schließen"
+          aria-label="Close event"
           className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center"
         >
           <Icon name="x" size={18} color={INK_2} strokeWidth={2} />
@@ -109,7 +109,7 @@ function EventDetailSheet({
             className="text-mono-label absolute left-0 top-0 px-2 py-1"
             style={{ background: OCHRE, color: INK }}
           >
-            Öffentlich
+            Public
           </span>
         </div>
 
@@ -120,8 +120,8 @@ function EventDetailSheet({
           <h2 className="text-display-md mt-1.5" style={{ color: INK }}>
             {post.title ?? post.resort}
           </h2>
-          {/* Gebiet nur, wenn der Titel es nicht ohnehin nennt —
-              sonst steht "Axamer Lizum" zweimal untereinander. */}
+          {/* Resort only when the title does not already name it,
+              otherwise "Axamer Lizum" appears twice in a row. */}
           {!(post.title ?? "").toLowerCase().includes(post.resort.toLowerCase()) && (
             <p className="mt-1 text-sm" style={{ color: INK_2 }}>
               {post.resort}
@@ -134,7 +134,7 @@ function EventDetailSheet({
           <div className="min-w-0 flex-1">
             <p className="text-[0.9375rem] font-semibold" style={{ color: INK }}>{author.name}</p>
             <p className="text-sm" style={{ color: INK_2 }}>
-              Gastgeber · Stufe {author.level}
+              Host · Level {author.level}
             </p>
           </div>
           <Tag level={post.abilityLevel} />
@@ -147,21 +147,21 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-4">
-          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Treffpunkt</p>
+          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Meeting point</p>
           <MeetingPoint value={view.meetPoint} locked={view.meetPointLocked} />
         </div>
 
         <div className="mx-5 mt-4 grid grid-cols-2" style={{ border: "var(--rule-thin)" }}>
           <div className="px-4 py-3" style={{ borderRight: "1px solid var(--border-hairline)" }}>
-            <p className="text-mono-label" style={{ color: INK_2 }}>Angemeldet</p>
+            <p className="text-mono-label" style={{ color: INK_2 }}>Signed up</p>
             <p className="text-mono-data mt-0.5" style={{ color: INK }}>
               {taken}/{post.totalSpots}
             </p>
           </div>
           <div className="px-4 py-3">
-            <p className="text-mono-label" style={{ color: INK_2 }}>Frei</p>
+            <p className="text-mono-label" style={{ color: INK_2 }}>Open</p>
             <p className="text-mono-data mt-0.5" style={{ color: isFull ? INK_2 : PINE }}>
-              {isFull ? "voll" : openSpots}
+              {isFull ? "full" : openSpots}
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ function EventDetailSheet({
         {joinedUsers.length > 0 && (
           <div className="px-5 pt-4">
             <p className="text-mono-label mb-2" style={{ color: INK_2 }}>
-              Unter anderem dabei
+              Among those going
             </p>
             <div className="flex flex-wrap gap-2">
               {joinedUsers.map((user) => (
@@ -199,7 +199,7 @@ function EventDetailSheet({
                   : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }
             }
           >
-            {isJoined ? "Zusage zurückziehen" : isFull ? "Event ist voll" : "Zusagen"}
+            {isJoined ? "Leave event" : isFull ? "Event is full" : "Join event"}
           </button>
         </div>
       </div>
@@ -249,7 +249,7 @@ function EventCard({
             className="text-mono-label absolute right-0 top-0 px-2 py-1"
             style={{ background: PINE, color: "var(--paper-0)" }}
           >
-            Zugesagt
+            Joined
           </span>
         )}
       </div>
@@ -262,8 +262,8 @@ function EventCard({
           <Tag level={post.abilityLevel} />
         </div>
 
-        {/* Das Gebiet ist die oeffentliche Information schlechthin —
-            es bleibt auf der Karte, ausser der Titel nennt es schon. */}
+        {/* The resort is the public information here — it stays on
+            the card unless the title already carries it. */}
         <p className="mt-1 text-sm" style={{ color: INK_2 }}>
           {(post.title ?? "").toLowerCase().includes(post.resort.toLowerCase())
             ? `${post.meetTime} · ${author.name}`
@@ -275,7 +275,7 @@ function EventCard({
             <div style={{ width: `${filled}%`, height: "100%", background: isFull ? INK_2 : RUST }} />
           </div>
           <span className="text-mono-label flex-shrink-0" style={{ color: isFull ? INK_2 : INK }}>
-            {isFull ? "voll" : `${openSpots} frei`}
+            {isFull ? "full" : `${openSpots} open`}
           </span>
         </div>
       </div>
@@ -288,9 +288,9 @@ export default function EventsScreen() {
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
   const [openEventId, setOpenEventId] = useState<string | null>(null);
 
-  /* Die Filterung laeuft ueber isDiscoverablePublicRide, nicht ueber
-     einen simplen visibility-Vergleich: so faellt auch eine falsch
-     markierte Ausfahrt einer minderjaehrigen Person heraus. */
+  /* Filtering runs through isDiscoverablePublicRide rather than a
+     plain visibility comparison, so a wrongly flagged ride hosted by
+     a minor drops out too. */
   const events = useMemo(
     () =>
       PUBLIC_EVENTS.filter((event) => {
@@ -298,9 +298,9 @@ export default function EventsScreen() {
         const author = getUserById(event.authorId);
         return author ? isDiscoverablePublicRide(event, author) : false;
       })
-        /* Volle Events nach hinten. Dieser Screen ist der Einstieg
-           fuer Leute ohne Kontakte — oben muss stehen, wo man noch
-           mitkann, nicht wo man zu spaet ist. */
+        /* Full events go last. This screen is the entry point for
+           people without contacts, so the top must show where you can
+           still join, not where you are too late. */
         .sort(
           (a, b) =>
             Number(a.takenSpots >= a.totalSpots) -
@@ -326,7 +326,7 @@ export default function EventsScreen() {
             Events
           </h1>
           <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
-            {events.length} offene Events · {openSeats} Plätze frei
+            {events.length} open events · {openSeats} spots left
           </p>
         </div>
         <div className="px-4 pb-3">
@@ -339,19 +339,19 @@ export default function EventsScreen() {
         </div>
       </header>
 
-      {/* Erklaert die Sichtbarkeitsregel dort, wo sie greift.
-          Fremde lesen hier mit, also gehoert die Regel auf den
-          Screen und nicht in eine Hilfeseite. */}
+      {/* States the visibility rule where it applies. Strangers read
+          along here, so the rule belongs on the screen rather than in
+          a help page. */}
       <div
         className="mx-4 mt-4 flex items-start gap-3 px-4 py-3"
         style={{ background: PAPER_1, border: "var(--rule-thin)" }}
       >
         <Icon name="globe" size={16} color={PINE} strokeWidth={1.7} className="mt-0.5 flex-shrink-0" />
         <div>
-          <p className="text-mono-label" style={{ color: INK }}>Für alle offen</p>
+          <p className="text-mono-label" style={{ color: INK }}>Open to everyone</p>
           <p className="mt-1 text-sm leading-snug" style={{ color: INK_1 }}>
-            Du brauchst hier niemanden zu kennen. Das Gebiet sieht jeder, den
-            genauen Treffpunkt erst, wer zugesagt hat.
+            You do not need to know anyone here. Everyone sees the resort,
+            only those who joined see the exact meeting point.
           </p>
         </div>
       </div>
@@ -377,10 +377,10 @@ export default function EventsScreen() {
             <Icon name="calendar-days" size={30} color={INK_2} strokeWidth={1.5} />
             <div>
               <p className="font-semibold" style={{ color: INK }}>
-                Hier ist gerade nichts offen
+                Nothing open here right now
               </p>
               <p className="mt-1 text-sm" style={{ color: INK_2 }}>
-                In der anderen Region laufen vielleicht welche.
+                There may be some in the other region.
               </p>
             </div>
           </div>

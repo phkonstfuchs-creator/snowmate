@@ -2,15 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Sheets fuhren bisher herein und verschwanden beim Schliessen
-   schlagartig — genau der harte Sprung, den Bewegung eigentlich
-   abfangen soll. Der Hook haelt das Sheet so lange montiert, bis
-   die Ausblendung gelaufen ist, und meldet den Zustand als
-   data-state an das Panel.
+/* Sheets used to slide in and then vanish instantly on close —
+   exactly the hard cut that motion is supposed to absorb. This hook
+   keeps the sheet mounted until the exit has run and reports the
+   state to the panel as data-state.
 
-   Das Ausblenden ist bewusst kuerzer als das Einblenden: beim
-   Oeffnen schaut man hin, beim Schliessen ist die Entscheidung
-   schon gefallen und jede Verzoegerung fuehlt sich zaeh an. */
+   The exit is deliberately shorter than the entrance: opening is
+   what you watch, while on closing the decision is already made and
+   any delay feels sluggish. */
 const EXIT_MS = 160;
 
 export function useSheetDismiss(onClose: () => void) {
@@ -23,10 +22,10 @@ export function useSheetDismiss(onClose: () => void) {
   }, [onClose]);
 
   const dismiss = useCallback(() => {
-    /* Mehrfaches Antippen darf den Timer nicht neu starten */
+    /* Repeated taps must not restart the timer */
     if (timerRef.current) return;
 
-    /* Wer weniger Bewegung will, bekommt keine Warteschleife */
+    /* Anyone asking for less motion gets no waiting period */
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;

@@ -1,5 +1,6 @@
-/* Spotfarben des Bogens — jede ist gegen Papier und gegen weiße
-   Initialen geprüft, damit Avatare nie aus der Palette fallen. */
+/* Spot colours of the sheet — each is checked against paper and
+   against white initials, so avatars never fall out of the
+   palette. */
 const AVATAR_COLORS = ["#a83f1b", "#2a5647", "#3e6e8e", "#8f3415", "#3b7561", "#2f5570"];
 
 export function avatarColor(id: string) {

@@ -1,38 +1,35 @@
 import type { RidePost, User, VisibleRide } from "@/lib/types";
 
-/* Gestufte Sichtbarkeit fuer Ausfahrten.
+/* Tiered visibility for rides.
  *
- * Die Regel lautet ueberall gleich: das Gebiet sieht jeder, den
- * genauen Treffpunkt erst, wer zugesagt hat. Bei oeffentlichen
- * Events wiegt das schwerer, weil dort auch Fremde mitlesen.
+ * The rule is the same everywhere: everyone sees the resort, only
+ * those who joined see the exact meeting point. For public events
+ * this weighs more, because strangers are reading along too.
  *
- * ACHTUNG: Das hier ist Darstellung, keine Durchsetzung. Solange
- * der Server den Treffpunkt mitliefert, steht er trotzdem in der
- * API-Antwort. Die serverseitige Regel ist in
- * docs/BACKEND_REQUESTS.md als Punkt 5 angefordert.
+ * WARNING: this is presentation, not enforcement. As long as the
+ * server ships the meeting point, it sits in the API response
+ * regardless. The server-side rule is filed as item 5 in
+ * docs/BACKEND_REQUESTS.md.
  */
 
 interface ViewerContext {
   viewer: User;
-  /* Autoren-Objekt, damit die Minderjaehrigen-Regel ohne einen
-     zweiten Lookup auskommt */
+  /* The author object, so the minor rule needs no second lookup */
   author: User;
   isJoined: boolean;
   friendIds: readonly string[];
 }
 
-/* Minderjaehrige duerfen nicht oeffentlich an Fremde ausspielen.
-   Das ist dieselbe Regel wie im README: Profile, Ausfahrten,
-   Standorte und Nachrichten Minderjaehriger laufen ueber das
-   engere Publikum "bestaetigte Freunde". */
+/* Minors must not broadcast to strangers. Same rule as in the
+   README: profiles, rides, locations and messages of minors use the
+   narrower "confirmed friends" audience. */
 export function canPostPublicRide(user: Pick<User, "isMinor">): boolean {
   return !user.isMinor;
 }
 
-/* Eine oeffentliche Ausfahrt einer minderjaehrigen Person ist ein
-   Datenfehler, kein gueltiger Zustand. Wir zeigen sie in der
-   oeffentlichen Liste nicht an, statt uns auf die Eingabe zu
-   verlassen. */
+/* A public ride hosted by a minor is a data error, not a valid
+   state. We keep it out of the public list rather than trusting
+   the input. */
 export function isDiscoverablePublicRide(
   post: Pick<RidePost, "visibility">,
   author: Pick<User, "isMinor">,
@@ -49,8 +46,8 @@ export function canSeeMeetingPoint({
   if (viewer.id === author.id) return true;
   if (isJoined) return true;
 
-  /* Bei "friends" traegt schon die Freundschaft; bei "public"
-     nicht, sonst waere die Zusage wirkungslos. */
+  /* For "friends" the friendship alone carries it; for "public" it
+     does not, otherwise joining would mean nothing. */
   return friendIds.includes(author.id);
 }
 

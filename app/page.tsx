@@ -3,10 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import PenguinMascot from "@/components/PenguinMascot";
 
-/* Öffentliche Startseite. Bewusst eine ehrliche Fallstudie statt
-   einer Marketingseite: Sie führt nirgends in den Login, weil
-   hinter dem Login noch Beispieldaten liegen. Die App selbst
-   bleibt unter /onboarding erreichbar. */
+/* Public landing page. Deliberately an honest case study rather
+   than a marketing page: it never leads into the login, because
+   there is only sample data behind it. The app itself stays
+   reachable at /onboarding. */
 
 export const metadata: Metadata = {
   title: "Snowmate: coordinating ski days in Innsbruck and Salzburg",
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 const REPO = "https://github.com/phkonstfuchs-creator/snowmate";
 const LINKEDIN = "https://www.linkedin.com/in/philipp-k-fuchs";
 
-/* Jahr + Sache. Konkret statt blumig — die Fakten tragen sich
-   selbst, Adjektive wuerden sie nur verwaessern. */
+/* Year plus fact. Concrete rather than flowery — the facts carry
+   themselves, adjectives would only dilute them. */
 const EXPERIENCE: [string, string][] = [
   [
     "Aug 2026",
@@ -73,8 +73,7 @@ const SCREENS: [string, string, string][] = [
   ["profile", "Profile", "Season record: days, resorts, streak, stamps and a regional ranking."],
 ];
 
-/* Zeilen bewusst als Daten, damit Status und Begründung nicht
-   auseinanderlaufen koennen */
+/* Rows kept as data so status and reasoning cannot drift apart */
 const STATUS: [string, "live" | "mock" | "next" | "later", string][] = [
   ["Sign-up, e-mail confirmation, sign-in, sign-out", "live", "Supabase, server-side sessions, protected routes"],
   ["Row Level Security on the profile shell", "live", "with negative policy tests (pgTAP)"],
@@ -88,9 +87,9 @@ const STATUS: [string, "live" | "mock" | "next" | "later", string][] = [
   ["Vertical metres, heatmaps", "later", "needs a native app, because iOS suspends background JS in a PWA"],
 ];
 
-/* Preis und Begruendung getrennt, damit die Zahlen nicht in
-   Fliesstext verschwinden. Reihenfolge = Gewicht: die Skiclub-
-   Fahrten sind der Treiber, der Season Pass eine Randnotiz. */
+/* Price and reasoning kept apart so the numbers do not disappear
+   into prose. Order equals weight: the ski club trips are the
+   driver, the Season Pass is a footnote. */
 const REVENUE: { line: string; price: string; body: string; lead?: boolean }[] = [
   {
     line: "University ski club trips",
@@ -126,7 +125,7 @@ export default function Home() {
   return (
     <main className="paper-grain min-h-dvh" style={{ background: PAPER }}>
       <div className="mx-auto w-full max-w-[720px] px-5 pb-20">
-        {/* ── Kopf ─────────────────────────────────────────── */}
+        {/* ── Head ─────────────────────────────────────────── */}
         <header className="flex items-center gap-2 pt-7">
           <PenguinMascot size={26} />
           <span className="text-mono-label" style={{ color: INK }}>
@@ -223,11 +222,14 @@ export default function Home() {
           it is crew-first.
         </p>
 
-        {/* ── Produkt ──────────────────────────────────────── */}
+        {/* ── Product ──────────────────────────────────────── */}
         <Rule label="The product" num="02" />
         <p className="mb-8 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
-          Riding vocabulary stays English throughout, because that is how
-          this crowd actually speaks. All five screens are clickable in the{" "}
+          The interface is English. Riding vocabulary already is, and the
+          first users include Erasmus students and seasonal workers who do
+          not speak German. A German localisation is needed before a real
+          launch in Austria, and it does not exist yet. Every screen is
+          clickable in the{" "}
           <Link href="/demo" className="underline" style={{ color: RUST }}>
             prototype
           </Link>
@@ -296,7 +298,7 @@ export default function Home() {
           })}
         </div>
 
-        {/* ── Geschäftsmodell ──────────────────────────────── */}
+        {/* ── Business model ───────────────────────────────── */}
         <Rule label="Business model" num="04" />
         <p className="max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
           Coordination stays free. All of it: feed, map, carpool board, crew,
@@ -352,7 +354,7 @@ export default function Home() {
           hypothesis, not a result.
         </p>
 
-        {/* ── Haltung ──────────────────────────────────────── */}
+        {/* ── Position ─────────────────────────────────────── */}
         <Rule label="Why I am not shipping faster" num="05" />
         <p className="max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
           The users are 16 to 25, so a share of them are minors, and the app
@@ -382,7 +384,7 @@ export default function Home() {
           is a display choice, not protection.
         </p>
 
-        {/* ── Handwerk ─────────────────────────────────────── */}
+        {/* ── Craft ────────────────────────────────────────── */}
         <Rule label="How it is built" num="06" />
         <div className="grid gap-5 sm:grid-cols-2">
           {[
@@ -402,7 +404,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* ── Gründernotiz ─────────────────────────────────── */}
+        {/* ── Founder note ────────────────────────────────── */}
         <Rule label="Who is building this" num="07" />
         <div
           className="px-5 py-5"

@@ -67,7 +67,7 @@ export default function FeedPage() {
             style={{ background: "var(--rust)", color: "var(--paper-0)", border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="plus" size={13} strokeWidth={2.6} />
-            Posten
+            Post
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -105,10 +105,10 @@ export default function FeedPage() {
         <div className="flex items-center gap-2">
           <span className="pulse-dot" />
           <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            {ridersToday} heute unterwegs
+            {ridersToday} out today
           </span>
         </div>
-        <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>Di, 8. Jan</span>
+        <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>Tue 8 Jan</span>
       </div>
 
       {/* Feed */}
@@ -139,17 +139,17 @@ export default function FeedPage() {
           );
         })}
 
-        {/* Ein leerer Feed heisst meistens: noch keine Freunde da.
-            Genau dann ist der Weg zu den offenen Events die Antwort,
-            nicht die Aufforderung, selbst etwas zu posten. */}
+        {/* An empty feed usually means no friends yet. That is exactly
+            when the answer is the open events, not a prompt to post
+            something yourself. */}
         {posts.length === 0 && (
           <div className="flex flex-col items-center gap-4 py-14 text-center">
             <PenguinMascot size={72} />
             <div>
-              <p className="font-bold" style={{ color: "var(--text-primary)" }}>Heute noch keine Ausfahrt</p>
+              <p className="font-bold" style={{ color: "var(--text-primary)" }}>No rides today yet</p>
               <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
-                Hier stehen Ausfahrten deiner Crew. Offene Events findest du
-                bei Events, dafür brauchst du niemanden zu kennen.
+                This shows rides from your crew. Open events live under
+                Events, and you do not need to know anyone for those.
               </p>
             </div>
             <Link
@@ -162,7 +162,7 @@ export default function FeedPage() {
                 boxShadow: "var(--shadow-print)",
               }}
             >
-              Offene Events ansehen
+              Browse open events
             </Link>
           </div>
         )}
@@ -171,7 +171,7 @@ export default function FeedPage() {
       {/* FAB */}
       <button
         onClick={() => setShowPostModal(true)}
-        aria-label="Ausfahrt posten"
+        aria-label="Post a ride"
         className="card-tap fixed bottom-[96px] z-40 flex h-14 w-14 items-center justify-center"
         style={{
           right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))",
@@ -228,7 +228,7 @@ export default function FeedPage() {
             <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M8 1L2 8.5h5L6 13l6-7.5H7L8 1Z" fill="var(--ochre)" />
             </svg>
-            +50 XP · Du bist dabei
+            +50 XP · You are in
           </div>
         </div>
       )}

@@ -70,7 +70,7 @@ export default function Input({
             type="button"
             onClick={() => setRevealed((v) => !v)}
             disabled={disabled}
-            aria-label={revealed ? "Passwort verbergen" : "Passwort anzeigen"}
+            aria-label={revealed ? "Hide password" : "Show password"}
             aria-pressed={revealed}
             className="flex flex-shrink-0 items-center justify-center self-stretch"
             style={{

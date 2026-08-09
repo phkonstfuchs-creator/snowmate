@@ -2,10 +2,10 @@
 
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
-/* Gedruckte Blöcke: kantig, Versal-Display-Schrift, harter
-   Schattenversatz. Der Druck-Effekt beim Antippen kommt aus
-   globals.css (:active verschiebt den Block) — nicht aus JS,
-   sonst überschreibt ein Inline-Transform die CSS-Regel. */
+/* Printed blocks: sharp corners, uppercase display type, hard
+   shadow offset. The press effect on tap comes from globals.css
+   (:active shifts the block), not from JS — otherwise an inline
+   transform would override the CSS rule. */
 const SIZES = {
   sm: { h: 36, pad: "0 14px", font: "600 13px var(--font-body-stack)", gap: 6 },
   md: { h: 48, pad: "0 20px", font: "600 15px var(--font-body-stack)", gap: 8 },

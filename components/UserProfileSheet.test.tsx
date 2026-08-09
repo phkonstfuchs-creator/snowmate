@@ -12,14 +12,14 @@ describe("UserProfileSheet", () => {
     render(<UserProfileSheet user={user!} onClose={vi.fn()} />);
 
     const profile = screen.getByRole("dialog", {
-      name: `Profil von ${user!.name}`,
+      name: `Profile of ${user!.name}`,
     });
-    const messageButton = screen.getByRole("button", { name: "Nachricht" });
+    const messageButton = screen.getByRole("button", { name: "Message" });
     profile.scrollTop = 120;
 
     fireEvent.click(messageButton);
     fireEvent.click(
-      screen.getByRole("button", { name: "Unterhaltung schließen" }),
+      screen.getByRole("button", { name: "Close conversation" }),
     );
 
     await waitFor(() => expect(messageButton).toHaveFocus());

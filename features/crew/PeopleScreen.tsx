@@ -27,10 +27,10 @@ const PINE = "var(--pine)";
 
 type Mode = "find" | "requests";
 
-/* Wer die Anfrage gestellt hat, wartet — deshalb sind das zwei
-   getrennte Ansichten und nicht eine Liste mit zwei Knopfarten.
-   u9 ist minderjaehrig: genau dort muss die U18-Kennzeichnung
-   sichtbar sein, weil sie die Entscheidung beeinflusst. */
+/* Whoever sent the request is waiting, which is why these are two
+   separate views rather than one list with two kinds of button.
+   u9 is a minor: that is exactly where the U18 marker has to show,
+   because it changes the decision. */
 const INCOMING_IDS = ["u6", "u9", "u8"];
 
 function PersonRow({
@@ -76,13 +76,13 @@ function PersonRow({
   );
 }
 
-/* Meta bewusst kurz: die Zeile hat neben Avatar und Knopf rund
-   180px, alles Laengere bricht in ein Ellipsenende ab. */
+/* Meta kept short on purpose: next to the avatar and button the
+   line has roughly 180px, anything longer ends in an ellipsis. */
 function personMeta(user: User): string {
   const mutual = countMutualFriends(user, ME);
   return mutual > 0
-    ? `@${user.handle} · ${mutual} gemeinsam`
-    : `@${user.handle} · Stufe ${user.level}`;
+    ? `@${user.handle} · ${mutual} mutual`
+    : `@${user.handle} · Level ${user.level}`;
 }
 
 function PeopleSection({
@@ -119,7 +119,7 @@ function PeopleSection({
               action={
                 <button
                   onClick={() => onRequest(user.id)}
-                  aria-label={sent ? `Anfrage an ${user.name} zurückziehen` : `${user.name} anfragen`}
+                  aria-label={sent ? `Withdraw request to ${user.name}` : `Request ${user.name}`}
                   className="text-mono-label card-tap px-3 py-2"
                   style={
                     sent
@@ -127,7 +127,7 @@ function PeopleSection({
                       : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thin)" }
                   }
                 >
-                  {sent ? "Gesendet" : "Anfragen"}
+                  {sent ? "Sent" : "Request"}
                 </button>
               }
             />
@@ -146,9 +146,9 @@ export default function PeopleScreen() {
 
   const results = useMemo(() => searchPeople(MOCK_USERS, query, ME), [query]);
   const suggestions = useMemo(() => suggestPeople(MOCK_USERS, ME), []);
-  /* Ohne gemeinsame Freunde gibt es keinen Vorschlag — sonst waere
-     es eine Fremdenliste. Die uebrigen Leute stehen trotzdem
-     darunter, damit der Screen nicht in eine Sackgasse laeuft. */
+  /* No mutual friends means no suggestion, otherwise it would be a
+     list of strangers. The remaining people still appear below, so
+     the screen does not dead-end. */
   const others = useMemo(() => {
     const suggested = new Set(suggestions.map((entry) => entry.user.id));
     return searchPeople(MOCK_USERS, "", ME).filter(
@@ -180,19 +180,19 @@ export default function PeopleScreen() {
         <div className="flex items-center gap-2 px-4 pt-4 pb-3">
           <Link
             href={`${basePath}/crew`}
-            aria-label="Zurück zur Crew"
+            aria-label="Back to crew"
             className="-ml-2 flex h-11 w-11 items-center justify-center"
           >
             <Icon name="arrow-left" size={18} color={INK} strokeWidth={2} />
           </Link>
           <div>
             <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>
-              Leute
+              People
             </h1>
             <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
-              {ME.friendIds.length} in deiner Crew
+              {ME.friendIds.length} in your crew
               {openRequests > 0
-                ? ` · ${openRequests} offene ${openRequests === 1 ? "Anfrage" : "Anfragen"}`
+                ? ` · ${openRequests} open ${openRequests === 1 ? "request" : "requests"}`
                 : ""}
             </p>
           </div>
@@ -200,12 +200,12 @@ export default function PeopleScreen() {
         <div className="px-4 pb-3">
           <SegmentedControl
             options={[
-              { value: "find", label: "Finden" },
-              { value: "requests", label: openRequests > 0 ? `Anfragen (${openRequests})` : "Anfragen" },
+              { value: "find", label: "Find" },
+              { value: "requests", label: openRequests > 0 ? `Requests (${openRequests})` : "Requests" },
             ]}
             value={mode}
             onChange={setMode}
-            ariaLabel="Ansicht"
+            ariaLabel="View"
           />
         </div>
       </header>
@@ -214,7 +214,7 @@ export default function PeopleScreen() {
         <div className="pb-6">
           <div className="px-4 pt-4">
             <label htmlFor="people-search" className="sr-only">
-              Nach Name oder Handle suchen
+              Search by name or handle
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
@@ -225,7 +225,7 @@ export default function PeopleScreen() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Name oder @handle"
+                placeholder="Name or @handle"
                 className="form-input"
                 style={{ paddingLeft: 38 }}
                 autoComplete="off"
@@ -235,7 +235,7 @@ export default function PeopleScreen() {
 
           {!isSearching && suggestions.length > 0 && (
             <PeopleSection
-              title="Gemeinsame Freunde"
+              title="Mutual friends"
               users={suggestions.map((entry) => entry.user)}
               ledger={ledger}
               onRequest={sendOrWithdraw}
@@ -244,7 +244,7 @@ export default function PeopleScreen() {
 
           {!isSearching && others.length > 0 && (
             <PeopleSection
-              title="Weitere in deiner Region"
+              title="More in your region"
               users={others}
               ledger={ledger}
               onRequest={sendOrWithdraw}
@@ -257,16 +257,16 @@ export default function PeopleScreen() {
                 <Icon name="search" size={26} color={INK_2} strokeWidth={1.5} />
                 <div>
                   <p className="font-semibold" style={{ color: INK }}>
-                    Niemanden gefunden
+                    No one found
                   </p>
                   <p className="mt-1 text-sm" style={{ color: INK_2 }}>
-                    Prüf die Schreibweise, oder lade die Person per Link ein.
+                    Check the spelling, or invite them with a link.
                   </p>
                 </div>
               </div>
             ) : (
               <PeopleSection
-                title="Treffer"
+                title="Matches"
                 count={results.length}
                 users={results}
                 ledger={ledger}
@@ -281,7 +281,7 @@ export default function PeopleScreen() {
               style={{ border: "var(--rule-thin)", background: PAPER_1, color: INK }}
             >
               <Icon name="share" size={15} strokeWidth={1.9} />
-              <span className="text-mono-label">Einladungslink teilen · +200 XP</span>
+              <span className="text-mono-label">Share invite link · +200 XP</span>
             </button>
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function PeopleScreen() {
             <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
               <Icon name="user-check" size={28} color={INK_2} strokeWidth={1.5} />
               <p className="font-semibold" style={{ color: INK }}>
-                Keine offenen Anfragen
+                No open requests
               </p>
             </div>
           ) : (
@@ -307,7 +307,7 @@ export default function PeopleScreen() {
                     <PersonRow
                       key={user.id}
                       user={user}
-                      meta={`@${user.handle} · Stufe ${user.level}`}
+                      meta={`@${user.handle} · Level ${user.level}`}
                       action={
                         <span
                           className="text-mono-label px-2 py-1"
@@ -316,7 +316,7 @@ export default function PeopleScreen() {
                             background: PAPER_1,
                           }}
                         >
-                          {requestState === "accepted" ? "In der Crew" : "Abgelehnt"}
+                          {requestState === "accepted" ? "In your crew" : "Declined"}
                         </span>
                       }
                     />
@@ -351,7 +351,7 @@ export default function PeopleScreen() {
                           )}
                         </div>
                         <p className="truncate text-sm" style={{ color: INK_2 }}>
-                          @{user.handle} · {mutual > 0 ? `${mutual} gemeinsam` : "keine gemeinsamen Freunde"}
+                          @{user.handle} · {mutual > 0 ? `${mutual} mutual` : "no mutual friends"}
                         </p>
                       </div>
                     </div>
@@ -362,14 +362,14 @@ export default function PeopleScreen() {
                         className="card-tap flex-1 py-2.5"
                         style={{ border: "var(--rule-thin)", color: INK_1, background: "transparent" }}
                       >
-                        <span className="text-mono-label">Ablehnen</span>
+                        <span className="text-mono-label">Decline</span>
                       </button>
                       <button
                         onClick={() => decide(user.id, "accepted")}
                         className="card-tap flex-1 py-2.5"
                         style={{ background: PINE, color: "var(--paper-0)", border: "var(--rule-thin)" }}
                       >
-                        <span className="text-mono-label">Annehmen</span>
+                        <span className="text-mono-label">Accept</span>
                       </button>
                     </div>
                   </li>

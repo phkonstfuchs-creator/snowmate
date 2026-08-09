@@ -25,7 +25,7 @@ export default function AuthScreen({
       >
         <Link
           href="/onboarding"
-          aria-label="Zurück zur Startseite"
+          aria-label="Back to the start page"
           className="-my-2 flex w-fit items-center gap-2 py-2 pt-6"
         >
           <PenguinMascot size={26} />
@@ -36,22 +36,22 @@ export default function AuthScreen({
 
         <div className="flex flex-1 flex-col justify-center py-8">
           <p className="text-mono-label" style={{ color: "var(--rust)" }}>
-            {isSignup ? "Werde Teil der Crew" : "Willkommen zurück"}
+            {isSignup ? "Join the crew" : "Welcome back"}
           </p>
           <h1
             className="text-display-lg mt-3"
             style={{ color: "var(--ink-0)" }}
           >
-            {/* Leerzeichen vor dem Umbruch, sonst liest der Screenreader
-                "Accounterstellen" als einen Namen */}
+            {/* Space before the break, otherwise a screen reader reads
+                "Createaccount" as a single word */}
             {isSignup ? (
               <>
-                Account{" "}
+                Create{" "}
                 <br />
-                erstellen
+                account
               </>
             ) : (
-              "Anmelden"
+              "Sign in"
             )}
           </h1>
           <p
@@ -59,8 +59,8 @@ export default function AuthScreen({
             style={{ color: "var(--ink-1)" }}
           >
             {isSignup
-              ? "Zuerst dein Zugang. Die Profildaten kommen gleich danach."
-              : "Mach dort weiter, wo deine Crew aufgehört hat."}
+              ? "Your access first. Profile details come right after."
+              : "Pick up where your crew left off."}
           </p>
 
           <div
@@ -88,8 +88,8 @@ export default function AuthScreen({
                 className="text-sm leading-relaxed"
                 style={{ color: "var(--crimson)" }}
               >
-                Dieser Bestätigungslink ist ungültig oder abgelaufen. Melde dich
-                unten an oder registriere dich erneut.
+                This confirmation link is invalid or has expired. Sign in
+                below or register again.
               </p>
             </div>
           ) : null}

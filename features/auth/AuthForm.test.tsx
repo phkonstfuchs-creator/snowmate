@@ -32,26 +32,26 @@ describe("AuthForm", () => {
   it("renders the compact login fields", () => {
     render(<AuthForm mode="login" />);
 
-    expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
-    expect(screen.getByLabelText("Passwort")).toHaveAttribute(
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Password")).toHaveAttribute(
       "autocomplete",
       "current-password",
     );
-    expect(screen.queryByLabelText("Passwort bestätigen")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Anmelden" })).toBeEnabled();
+    expect(screen.queryByLabelText("Confirm password")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeEnabled();
   });
 
   it("renders strong-password guidance for signup", () => {
     render(<AuthForm mode="signup" />);
 
-    expect(screen.getByLabelText("Passwort bestätigen")).toBeInTheDocument();
+    expect(screen.getByLabelText("Confirm password")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben und einer Zahl",
+        "At least 12 characters with upper and lower case and a number",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Account erstellen" }),
+      screen.getByRole("button", { name: "Create account" }),
     ).toBeEnabled();
   });
 
@@ -91,8 +91,8 @@ describe("AuthForm", () => {
 
     render(<AuthForm mode="signup" />);
 
-    expect(screen.getByText("Anfrage erhalten")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Passwort")).not.toBeInTheDocument();
+    expect(screen.getByText("Request received")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
   });
 
   it("disables submission while authentication is pending", () => {
@@ -129,7 +129,7 @@ describe("AuthForm", () => {
     ]);
     rerender(<AuthForm mode="login" />);
 
-    expect(screen.getByLabelText("E-Mail")).toHaveFocus();
+    expect(screen.getByLabelText("Email")).toHaveFocus();
   });
 
   it("moves focus to the error summary when no field is invalid", () => {

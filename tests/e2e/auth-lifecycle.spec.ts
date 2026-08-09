@@ -87,10 +87,10 @@ test.describe("account lifecycle", () => {
     const password = "Snowmate2026Pass";
 
     await page.goto("/signup");
-    await page.getByLabel("E-Mail").fill(email);
-    await page.getByLabel("Passwort", { exact: true }).fill(password);
-    await page.getByLabel("Passwort bestätigen").fill(password);
-    await page.getByRole("button", { name: "Account erstellen" }).click();
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByLabel("Confirm password").fill(password);
+    await page.getByRole("button", { name: "Create account" }).click();
 
     await expect(page.getByText("Anfrage erhalten")).toBeVisible();
 
@@ -113,22 +113,22 @@ test.describe("account lifecycle", () => {
     await expect(page).toHaveURL(/\/login$/);
 
     await page.goto(new URL("/signup", page.url()).toString());
-    await page.getByLabel("E-Mail").fill(email);
-    await page.getByLabel("Passwort", { exact: true }).fill(password);
-    await page.getByLabel("Passwort bestätigen").fill(password);
-    await page.getByRole("button", { name: "Account erstellen" }).click();
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByLabel("Confirm password").fill(password);
+    await page.getByRole("button", { name: "Create account" }).click();
 
     await expect(page.getByText("Anfrage erhalten")).toBeVisible();
     await expect(
       page.getByText(
-        "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
+        "If this address can be used, you will receive a confirmation email shortly.",
       ),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Zurück zur Anmeldung" }).click();
+    await page.getByRole("link", { name: "Back to sign in" }).click();
 
-    await page.getByLabel("E-Mail").fill(email);
-    await page.getByLabel("Passwort").fill(password);
-    await page.getByRole("button", { name: "Anmelden" }).click();
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(password);
+    await page.getByRole("button", { name: "Sign in" }).click();
 
     await expect(page).toHaveURL(/\/feed$/);
   });

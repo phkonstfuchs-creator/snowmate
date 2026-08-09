@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Snowmate",
-  description: "Finde deine Crew. Heute.",
+  description: "Find your crew. Today.",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Snowmate" },
 };
 

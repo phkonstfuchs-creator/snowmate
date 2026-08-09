@@ -4,22 +4,23 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-/* Nimmt die Screenshots fuer die Startseite neu auf.
+/* Recaptures the screenshots for the landing page.
  *
- *   npm run dev
- *   node scripts/capture-shots.mjs
+ *   npx next build && npx next start -p 3100
+ *   SHOT_BASE=http://localhost:3100 node scripts/capture-shots.mjs
  *
- * Aufnahme bei 430px Geraetebreite und Faktor 2, danach auf 860px
- * skaliert — das ist genau die Breite, in der die Startseite die
- * Bilder ausgibt. Groesser waere nur Ballast.
+ * Captured at 430px device width and scale factor 2, then resized to
+ * 860px — exactly the width the landing page renders them at.
+ * Anything larger is dead weight. Run against a production build,
+ * otherwise the Next.js dev badge ends up in the picture.
  */
 
 const BASE = process.env.SHOT_BASE ?? "http://localhost:3000";
 const OUT = path.resolve("public/shots");
 
-/* Aus dem Demo-Bereich aufgenommen, weil dort dieselben Screens
-   ohne Anmeldung erreichbar sind. Das Demo-Banner wird vor der
-   Aufnahme entfernt, es gehoert nicht ins Produktbild. */
+/* Captured from the demo area, because the same screens are
+   reachable there without signing in. The demo banner is removed
+   before the shot; it labels the prototype, not the product. */
 const SHOTS = [
   ["feed", "/demo/feed"],
   ["events", "/demo/events"],
@@ -43,20 +44,20 @@ const page = await browser.newPage({
 for (const [name, route] of SHOTS) {
   await page.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
 
-  // Demo-Banner ausblenden: es beschriftet den Prototyp, nicht das Produkt.
+  // Hide the demo banner: it labels the prototype, not the product.
   await page.evaluate(() => {
     const banner = document.querySelector(".app-shell > div:first-child");
     if (banner && banner.textContent?.includes("Demo")) banner.remove();
   });
 
-  // Karten und Animationen zur Ruhe kommen lassen
+  // Let maps and animations settle
   await page.waitForTimeout(name === "map" ? 2500 : 700);
 
   const file = path.join(staging, `${name}.png`);
   await page.screenshot({ path: file });
 
-  /* Skalieren und nach WebP ueber Pillow — cwebp ist auf dem Rechner
-     nicht installiert, Pillow schon. */
+  /* Resize and convert to WebP via Pillow — cwebp is not installed
+     on this machine, Pillow is. */
   execFileSync(
     "python3",
     [

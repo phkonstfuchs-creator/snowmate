@@ -18,7 +18,7 @@ const RUST = "var(--rust)";
 const PINE = "var(--pine)";
 const OCHRE = "var(--ochre)";
 
-/* Sektionsmarke: Mono-Label auf einer gedruckten Linie */
+/* Section mark: mono label on a printed rule */
 function SectionRule({ label, right }: { label: string; right?: React.ReactNode }) {
   return (
     <div className="section-rule">
@@ -34,9 +34,9 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
   const FEATURES: [string, string][] = [
-    ["Powder-Alarm", "Push, sobald 15+ cm in deiner Region fallen"],
-    ["Saisonvergleich", "Deine Zahlen gegen die letzte Saison und die Region"],
-    ["Saisonstempel", "Stempel auf dem Profil für die ganze Saison"],
+    ["Powder alerts", "Push as soon as 15+ cm falls in your region"],
+    ["Season comparison", "Your numbers against last season and the region"],
+    ["Season stamp", "A stamp on your profile for the whole season"],
   ];
 
   return (
@@ -53,11 +53,11 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
         <div className="px-5 pt-6 pb-5" style={{ borderBottom: "var(--rule-thin)" }}>
-          <p className="text-mono-label mb-2" style={{ color: RUST }}>Dezember bis April · Saison 25/26</p>
+          <p className="text-mono-label mb-2" style={{ color: RUST }}>December to April · Season 25/26</p>
           <h2 className="text-display-md" style={{ color: INK }}>Season{" "}<br />Pass</h2>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
-            Einmal für die ganze Saison. Kein Abo, keine Verlängerung.
-            Alles zum Verabreden bleibt kostenlos.
+            Once for the whole season. No subscription, no renewal.
+            Everything you need to meet up stays free.
           </p>
         </div>
 
@@ -84,13 +84,13 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
             className="w-full py-4 font-display text-lg uppercase"
             style={{ background: OCHRE, color: INK, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
-            14,99 € einmalig
+            14.99 € one time
           </button>
           <p className="text-center text-mono-label" style={{ color: INK_2 }}>
-            Gilt bis Ende April · Keine Verlängerung
+            Valid until end of April · No renewal
           </p>
           <button onClick={dismiss} className="w-full py-2.5 text-sm font-semibold underline" style={{ color: INK_2 }}>
-            Jetzt nicht
+            Not now
           </button>
         </div>
       </div>
@@ -111,14 +111,14 @@ const BADGE_ICON_NAME: Record<string, string> = {
   multi_pass: "map",
 };
 
-/* Stempelfarbe nach Seltenheit — wie unterschiedliche Stempelkissen */
+/* Stamp colour by rarity — like different ink pads */
 const STAMP: Record<BadgeRarity, string> = {
   common: "var(--ink-2)",
   rare: PINE,
   epic: RUST,
 };
 
-/* Hüttenstempel: Doppelring, leicht schief aufgedrückt */
+/* Mountain hut stamp: double ring, pressed slightly askew */
 function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index: number }) {
   const color = STAMP[badge.rarity];
   const iconName = BADGE_ICON_NAME[badge.icon] ?? badge.icon;
@@ -153,7 +153,7 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
           color: earned ? INK : "var(--ink-3)",
         }}
       >
-        <span className="sr-only">{earned ? "Erhalten: " : "Noch gesperrt: "}</span>
+        <span className="sr-only">{earned ? "Earned: " : "Locked: "}</span>
         {badge.name}
       </span>
     </li>
@@ -170,31 +170,31 @@ export default function ProfilePage() {
   const maxXp = topThree[0]?.xp ?? 1;
 
   const STATS: [string, number][] = [
-    ["Tage", ME.daysThisSeason],
-    ["Orte", ME.resortsVisited],
+    ["Days", ME.daysThisSeason],
+    ["Resorts", ME.resortsVisited],
     ["Crew", ME.friendIds.length],
   ];
 
   return (
     <div className="paper-grain" style={{ background: PAPER }}>
-      {/* ── Plakatkopf ─────────────────────────────────────── */}
+      {/* ── Poster head ────────────────────────────────────── */}
       <header className="relative overflow-hidden px-4 pt-5 pb-6" style={{ borderBottom: "var(--rule-heavy)" }}>
         <div className="halftone absolute -top-8 -right-10 w-44 h-44" aria-hidden="true" />
 
         <div className="relative flex items-start justify-between">
           <p className="text-mono-label" style={{ color: RUST }}>
-            Saison 25/26 · {leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg"}
+            Season 25/26 · {leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg"}
           </p>
           <button
-            aria-label="Einstellungen öffnen"
+            aria-label="Open settings"
             className="-mt-2 -mr-1 flex h-11 w-11 items-center justify-center"
           >
             <Icon name="settings" size={18} color={INK} strokeWidth={1.9} />
           </button>
         </div>
 
-        {/* Leerzeichen zwischen den Zeilen, sonst ergibt der
-            Blockumbruch den Namen "FelixGruber" fuer Screenreader */}
+        {/* Space between the lines, otherwise the block break makes the
+            name read as "FelixGruber" to a screen reader */}
         <h1 className="text-display-hero relative mt-2" style={{ color: INK }}>
           {ME.name.split(" ").map((word, i) => (
             <span key={word} className="block">
@@ -213,22 +213,22 @@ export default function ProfilePage() {
           </div>
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
-              Stufe {ME.level} · {ME.levelTitle}
+              Level {ME.level} · {ME.levelTitle}
             </p>
             <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{ME.handle}</p>
           </div>
         </div>
       </header>
 
-      {/* ── Messfeld: XP als Instrumentenanzeige ───────────── */}
+      {/* ── Gauge: XP as an instrument reading ─────────────── */}
       <section className="px-4 pt-5">
         <div className="print-card px-4 py-4">
           <div className="flex items-baseline justify-between">
             <span className="text-mono-data-lg" style={{ color: INK }}>
-              {ME.xp.toLocaleString("de-DE")}
+              {ME.xp.toLocaleString("en-GB")}
             </span>
             <span className="text-mono-label" style={{ color: INK_2 }}>
-              / {ME.xpToNext.toLocaleString("de-DE")} XP
+              / {ME.xpToNext.toLocaleString("en-GB")} XP
             </span>
           </div>
 
@@ -236,7 +236,7 @@ export default function ProfilePage() {
             <div className="xp-bar-fill" style={{ width: `${pct}%` }} />
           </div>
           <p className="text-mono-label mt-2" style={{ color: INK_2 }}>
-            Noch {(ME.xpToNext - ME.xp).toLocaleString("de-DE")} XP bis Stufe {ME.level + 1}
+            {(ME.xpToNext - ME.xp).toLocaleString("en-GB")} XP to level {ME.level + 1}
           </p>
 
           <div className="mt-4 grid grid-cols-3" style={{ borderTop: "var(--rule-thin)" }}>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* ── Premium: Ocker-Block, hart versetzt ────────────── */}
+      {/* ── Season Pass: ochre block, hard offset ──────────── */}
       {!ME.isPremium && (
         <section className="px-4 pt-5">
           <button
@@ -267,10 +267,10 @@ export default function ProfilePage() {
               <p className="font-display text-lg uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>
                 Season Pass
               </p>
-              {/* Volltinte, nicht ink-1: auf Ocker kommt ink-1 nur auf
-                  4,01:1 und verfehlt AA. */}
+              {/* Full ink, not ink-1: on ochre, ink-1 only reaches
+                  4.01:1 and misses AA. */}
               <p className="text-sm mt-1" style={{ color: INK }}>
-                Powder-Alarm und Saisonzahlen · 14,99 € einmalig
+                Powder alerts and season stats · 14.99 € one time
               </p>
             </div>
             <Icon name="chevron-right" size={18} color={INK} strokeWidth={2} />
@@ -278,11 +278,11 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {/* ── Stempel ────────────────────────────────────────── */}
+      {/* ── Stamps ─────────────────────────────────────────── */}
       <section className="pt-7">
         <div className="px-4">
           <SectionRule
-            label="Stempel"
+            label="Stamps"
             right={
               <span className="text-mono-label" style={{ color: INK_2 }}>
                 {ME.badges.length}/{BADGES.length}
@@ -291,7 +291,7 @@ export default function ProfilePage() {
           />
         </div>
         <ul
-          aria-label="Stempel"
+          aria-label="Stamps"
           className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1 outline-none focus-visible:ring-2 focus-visible:ring-rust"
           tabIndex={0}
         >
@@ -301,13 +301,13 @@ export default function ProfilePage() {
         </ul>
       </section>
 
-      {/* ── Serie ──────────────────────────────────────────── */}
+      {/* ── Streak ─────────────────────────────────────────── */}
       <section className="px-4 pt-7">
-        <SectionRule label="Serie" />
+        <SectionRule label="Streak" />
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-mono-data-lg" style={{ color: INK }}>{ME.streakWeeks}</p>
-            <p className="text-sm mt-1" style={{ color: INK_2 }}>Wochen in Folge am Berg</p>
+            <p className="text-sm mt-1" style={{ color: INK_2 }}>weeks in a row on the mountain</p>
           </div>
           <Icon name="flame" size={30} color={RUST} strokeWidth={1.8} />
         </div>
@@ -329,12 +329,12 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* ── Saisonwertung ──────────────────────────────────── */}
+      {/* ── Season ranking ─────────────────────────────────── */}
       <section className="px-4 pt-7 pb-6">
         <SectionRule
-          label="Saisonwertung"
+          label="Season ranking"
           right={
-            <div className="city-toggle-track" role="group" aria-label="Region der Wertung" style={{ width: 132 }}>
+            <div className="city-toggle-track" role="group" aria-label="Ranking region" style={{ width: 132 }}>
               {(["innsbruck", "salzburg"] as const).map((c) => (
                 <button
                   key={c}
@@ -350,7 +350,7 @@ export default function ProfilePage() {
           }
         />
 
-        {/* Balken statt Podest — gedruckte Skala */}
+        {/* Bars instead of a podium — a printed scale */}
         <div className="space-y-2.5">
           {topThree.map((entry) => {
             const user = getUserById(entry.userId);
@@ -367,10 +367,10 @@ export default function ProfilePage() {
                       className="truncate text-[0.9375rem]"
                       style={{ color: INK, fontWeight: isMe ? 700 : 500 }}
                     >
-                      {isMe ? "Du" : user.name}
+                      {isMe ? "You" : user.name}
                     </span>
                     <span className="text-mono-label flex-shrink-0" style={{ color: INK_2 }}>
-                      {entry.xp.toLocaleString("de-DE")}
+                      {entry.xp.toLocaleString("en-GB")}
                     </span>
                   </div>
                   <div className="mt-1" style={{ height: 10, background: "var(--paper-2)", border: "1px solid var(--border-hairline)" }}>
@@ -388,7 +388,7 @@ export default function ProfilePage() {
           })}
         </div>
 
-        {/* Ränge 4–6 als gedruckte Tabelle */}
+        {/* Ranks 4 to 6 as a printed table */}
         <div className="mt-4" style={{ borderTop: "var(--rule-thin)" }}>
           {leaderboard.slice(3, 6).map((entry) => {
             const user = getUserById(entry.userId);
@@ -405,11 +405,11 @@ export default function ProfilePage() {
               >
                 <span className="text-mono-label w-5" style={{ color: INK_2 }}>{entry.rank}</span>
                 <span className="flex-1 truncate text-[0.9375rem]" style={{ color: INK, fontWeight: isMe ? 700 : 400 }}>
-                  {isMe ? "Du" : user.name}
+                  {isMe ? "You" : user.name}
                 </span>
-                <span className="text-mono-label" style={{ color: INK_2 }}>{entry.days} Tage</span>
+                <span className="text-mono-label" style={{ color: INK_2 }}>{entry.days} days</span>
                 <span className="text-mono-label w-14 text-right" style={{ color: INK }}>
-                  {entry.xp.toLocaleString("de-DE")}
+                  {entry.xp.toLocaleString("en-GB")}
                 </span>
               </div>
             );
@@ -421,17 +421,17 @@ export default function ProfilePage() {
               style={{ borderBottom: "1px solid var(--border-hairline)", background: "var(--accent-primary-subtle)" }}
             >
               <span className="text-mono-label w-5" style={{ color: INK_2 }}>{myRank.rank}</span>
-              <span className="flex-1 text-[0.9375rem] font-bold" style={{ color: INK }}>Du</span>
-              <span className="text-mono-label" style={{ color: INK_2 }}>{myRank.days} Tage</span>
+              <span className="flex-1 text-[0.9375rem] font-bold" style={{ color: INK }}>You</span>
+              <span className="text-mono-label" style={{ color: INK_2 }}>{myRank.days} days</span>
               <span className="text-mono-label w-14 text-right" style={{ color: INK }}>
-                {myRank.xp.toLocaleString("de-DE")}
+                {myRank.xp.toLocaleString("en-GB")}
               </span>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Abmelden ───────────────────────────────────────── */}
+      {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">
         <form action={signOutAction}>
           <button
@@ -440,7 +440,7 @@ export default function ProfilePage() {
             style={{ border: "var(--rule-thin)", color: "var(--crimson)", background: PAPER_1 }}
           >
             <Icon name="log-out" size={15} />
-            Abmelden
+            Sign out
           </button>
         </form>
       </div>

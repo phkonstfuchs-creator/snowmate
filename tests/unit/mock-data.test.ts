@@ -52,9 +52,9 @@ describe("mock data integrity", () => {
     ).toEqual([]);
   });
 
-  /* Bei grossen Events ist joinedUserIds nur der sichtbare Ausschnitt
-     der Teilnehmenden, nicht die vollstaendige Liste. Deshalb gilt
-     hier eine Spanne statt der Gleichheit wie im Freundes-Feed. */
+  /* On large events joinedUserIds is only the visible slice of
+     participants, not the complete list. So a range applies here
+     rather than the equality used in the friends feed. */
   it("keeps public event capacity within bounds", () => {
     expect(
       PUBLIC_EVENTS.filter(

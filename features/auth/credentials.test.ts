@@ -29,9 +29,9 @@ describe("validateLoginCredentials", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.fieldErrors.email).toContain(
-        "Gib eine gültige E-Mail-Adresse ein.",
+        "Enter a valid email address.",
       );
-      expect(result.fieldErrors.password).toContain("Passwort ist zu lang.");
+      expect(result.fieldErrors.password).toContain("Password is too long.");
     }
   });
 });
@@ -68,7 +68,7 @@ describe("validateSignupCredentials", () => {
     }
   });
 
-  it("returns German guidance for a weak password", () => {
+  it("returns guidance for a weak password", () => {
     const result = validateSignupCredentials({
       email: "new.rider@example.com",
       password: "short",
@@ -78,12 +78,12 @@ describe("validateSignupCredentials", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.fieldErrors.password).toContain(
-        "Verwende mindestens 12 Zeichen.",
+        "Use at least 12 characters.",
       );
       expect(result.fieldErrors.password).toContain(
-        "Füge einen Großbuchstaben hinzu.",
+        "Add an uppercase letter.",
       );
-      expect(result.fieldErrors.password).toContain("Füge eine Zahl hinzu.");
+      expect(result.fieldErrors.password).toContain("Add a number.");
     }
   });
 });

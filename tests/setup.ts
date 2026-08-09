@@ -2,10 +2,10 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
-/* jsdom kennt matchMedia nicht. Ohne den Stub wirft jedes Sheet
-   beim Schliessen, weil useSheetDismiss auf prefers-reduced-motion
-   prueft. Standard ist "keine Reduktion", damit Tests denselben Weg
-   nehmen wie ein normaler Browser. */
+/* jsdom has no matchMedia. Without this stub every sheet throws on
+   close, because useSheetDismiss checks prefers-reduced-motion. The
+   default is "no reduction", so tests take the same path a normal
+   browser does. */
 if (!window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,

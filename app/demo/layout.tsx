@@ -2,10 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import BottomNav from "@/components/BottomNav";
 
-/* Klickbarer Prototyp ausserhalb der Anmeldung. Zeigt dieselben
-   Screens wie die App, laeuft aber auf Beispieldaten. Das Banner
-   bleibt dauerhaft sichtbar, damit niemand das Gezeigte fuer
-   echte Nutzerdaten haelt. */
+/* Clickable prototype outside the login. Shows the same screens as
+   the app but runs on sample data. The banner stays visible at all
+   times so nobody mistakes this for real user data. */
 
 export const metadata: Metadata = {
   title: "Snowmate demo: clickable prototype",

@@ -1,9 +1,9 @@
 import Image from "next/image";
 
-/* Die Marke bleibt der Original-Pinguin — nur auf die
-   Siebdruck-Spotfarben reduziert (public/logo-print.png, erzeugt
-   aus public/logo.png). Mütze rostrot, Schnabel und Zunge ocker,
-   Schnee auf Papierton, Himmel im Blau der Palette. */
+/* The brand stays the original penguin, only reduced to the
+   screen-print spot colours (public/logo-print.png, generated from
+   public/logo.png). Hat in rust, beak and tongue in ochre, snow on
+   the paper tone, sky in the palette blue. */
 
 interface PenguinMascotProps {
   size?: number;

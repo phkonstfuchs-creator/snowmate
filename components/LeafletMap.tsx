@@ -155,7 +155,7 @@ export default function LeafletMap({
   return (
     <div
       ref={containerRef}
-      aria-label={`Karte der Skigebiete in ${city === "innsbruck" ? "Innsbruck" : "Salzburg"}`}
+      aria-label={`Map of ski resorts around ${city === "innsbruck" ? "Innsbruck" : "Salzburg"}`}
       className="printed-map"
       style={{ width: "100%", height: "100%", minHeight: 260 }}
     />

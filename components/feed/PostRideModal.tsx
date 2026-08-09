@@ -26,9 +26,9 @@ interface PostData {
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
-  { value: "chill", label: "Chill", desc: "Blaue Pisten, entspanntes Tempo" },
-  { value: "park", label: "Park", desc: "Kicker, Sprünge, Rails" },
-  { value: "off-piste", label: "Off-Piste", desc: "Powder, Gelände, technisch" },
+  { value: "chill", label: "Chill", desc: "Blue runs, relaxed pace" },
+  { value: "park", label: "Park", desc: "Kickers, jumps, rails" },
+  { value: "off-piste", label: "Off-piste", desc: "Powder, terrain, technical" },
 ];
 
 export default function PostRideModal({ city, onClose, onPost }: PostRideModalProps) {
@@ -45,9 +45,9 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   const [visibility, setVisibility] = useState<RideVisibility>("friends");
 
   const resorts = RESORT_STATUS.filter((r) => r.city === city).map((r) => r.name);
-  /* Minderjaehrige koennen nicht oeffentlich posten. Der Schalter
-     ist dann gesperrt statt versteckt, sonst wirkt das Fehlen wie
-     ein Fehler statt wie eine Regel. */
+  /* Minors cannot post publicly. The toggle is disabled rather than
+     hidden — an absent control reads as a bug, a locked one reads as
+     a rule. */
   const mayGoPublic = canPostPublicRide(ME);
 
   const handleSubmit = () => {
@@ -66,7 +66,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Ausfahrt posten" tabIndex={-1}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Post a ride" tabIndex={-1}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
@@ -76,14 +76,14 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
         <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
           {step === 2 ? (
             <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
-              Zurück
+              Back
             </button>
           ) : (
             <button onClick={dismiss} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
-              Abbrechen
+              Cancel
             </button>
           )}
-          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Ausfahrt posten</span>
+          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Post a ride</span>
           {step === 1 ? (
             <button
               onClick={() => resort && setStep(2)}
@@ -91,7 +91,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               className="text-sm font-semibold"
               style={{ color: resort ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Weiter
+              Next
             </button>
           ) : (
             <button
@@ -100,7 +100,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               className="text-sm font-bold"
               style={{ color: meetPoint ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Veröffentlichen
+              Publish
             </button>
           )}
         </div>
@@ -110,7 +110,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
           <div className="px-5 pt-5 pb-6 space-y-5">
             <div>
               <label htmlFor="post-ride-resort" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Skigebiet
+                Resort
               </label>
               <select
                 id="post-ride-resort"
@@ -118,7 +118,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                 onChange={(e) => setResort(e.target.value)}
                 className="form-input"
               >
-                <option value="">Gebiet wählen …</option>
+                <option value="">Choose a resort …</option>
                 {resorts.map((r) => (
                   <option key={r} value={r}>{r}</option>
                 ))}
@@ -127,7 +127,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             <div>
               <p id="post-ride-level-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Fahrstil
+                Riding style
               </p>
               <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="post-ride-level-label">
                 {ABILITY_OPTIONS.map((opt) => {
@@ -158,7 +158,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
             <div className="flex gap-3">
               <div className="flex-1">
                 <label htmlFor="post-ride-time" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Uhrzeit
+                  Time
                 </label>
                 <input
                   id="post-ride-time"
@@ -170,7 +170,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               </div>
               <div className="w-24">
                 <label htmlFor="post-ride-spots" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Plätze
+                  Spots
                 </label>
                 <select
                   id="post-ride-spots"
@@ -187,12 +187,12 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             <div>
               <label htmlFor="post-ride-meeting-point" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Treffpunkt
+                Meeting point
               </label>
               <input
                 id="post-ride-meeting-point"
                 type="text"
-                placeholder="z. B. Talstation oder Parkplatz"
+                placeholder="e.g. base station or car park"
                 value={meetPoint}
                 onChange={(e) => setMeetPoint(e.target.value)}
                 className="form-input"
@@ -201,11 +201,11 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             <div>
               <label htmlFor="post-ride-caption" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Notiz (optional)
+                Note (optional)
               </label>
               <textarea
                 id="post-ride-caption"
-                placeholder="Was ist der Plan?"
+                placeholder="What is the plan?"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 rows={3}
@@ -215,12 +215,12 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
 
             <div>
               <p id="post-ride-visibility-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Wer sieht das
+                Who can see this
               </p>
               <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="post-ride-visibility-label">
                 {([
-                  { value: "friends", label: "Freunde", desc: "Freunde und deren Freunde" },
-                  { value: "public", label: "Öffentlich", desc: "Alle, auch ohne Freundschaft" },
+                  { value: "friends", label: "Friends", desc: "Friends and their friends" },
+                  { value: "public", label: "Public", desc: "Anyone, no friendship needed" },
                 ] as const).map((opt) => {
                   const active = visibility === opt.value;
                   const locked = opt.value === "public" && !mayGoPublic;
@@ -251,7 +251,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                         {locked && <Icon name="lock" size={11} color="var(--text-tertiary)" strokeWidth={2} />}
                       </span>
                       <span className="text-[0.65rem] leading-tight" style={{ color: "var(--text-tertiary)" }}>
-                        {locked ? "Erst ab 18 möglich" : opt.desc}
+                        {locked ? "18 and over only" : opt.desc}
                       </span>
                     </button>
                   );
@@ -259,8 +259,8 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               </div>
               {visibility === "public" && mayGoPublic && (
                 <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
-                  Gebiet und Uhrzeit sieht jeder. Der genaue Treffpunkt wird
-                  erst nach der Zusage sichtbar.
+                  Everyone sees the resort and time. The exact meeting point
+                  only becomes visible after someone joins.
                 </p>
               )}
             </div>
@@ -270,7 +270,7 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>
-                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{meetTime} · {totalSpots} Plätze</span>
+                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{meetTime} · {totalSpots} spots</span>
               </div>
             </div>
           </div>

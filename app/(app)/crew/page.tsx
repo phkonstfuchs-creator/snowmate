@@ -40,11 +40,11 @@ export default function CrewPage() {
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
             <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Crew</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} Freunde · {CREWS.length} Squads</p>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} friends · {CREWS.length} squads</p>
           </div>
           <Link
             href={`${basePath}/people`}
-            aria-label="Leute finden"
+            aria-label="Find people"
             className="card-tap flex h-11 w-11 items-center justify-center"
             style={{ background: BRAND, color: D }}
           >
@@ -80,8 +80,8 @@ export default function CrewPage() {
           <div className="flex items-start gap-3 rounded-none px-4 py-3 mb-4" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
             <Icon name="shield-check" size={16} color={BRAND} strokeWidth={1.6} className="flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-black" style={{ color: BRAND }}>So funktioniert Sichtbarkeit</p>
-              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Freunde von Freunden sehen Ausfahrten auf Gebietsebene. Der genaue Treffpunkt wird erst nach der Zusage sichtbar.</p>
+              <p className="text-xs font-black" style={{ color: BRAND }}>How visibility works</p>
+              <p className="text-xs font-medium mt-0.5 leading-snug" style={{ color: MUTED }}>Friends of friends see rides at resort level. The exact meeting point only becomes visible after you join.</p>
             </div>
           </div>
 
@@ -93,12 +93,12 @@ export default function CrewPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm" style={{ color: INK }}>{friend.name}</span>
                     <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: "var(--rust-ink)" }}>
-                      Stufe {friend.level}
+                      Level {friend.level}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-xs font-bold" style={{ color: MUTED }}>@{friend.handle}</span>
-                    <span className="text-xs font-bold" style={{ color: MUTED }}>{friend.daysThisSeason} Tage</span>
+                    <span className="text-xs font-bold" style={{ color: MUTED }}>{friend.daysThisSeason} days</span>
                   </div>
                 </div>
                 <button
@@ -121,8 +121,8 @@ export default function CrewPage() {
               <Icon name="user-plus" size={18} color={BRAND} strokeWidth={2} />
             </div>
             <div className="flex-1">
-              <p className="font-black text-sm" style={{ color: INK }}>Leute finden</p>
-              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>Suchen, anfragen und offene Anfragen beantworten</p>
+              <p className="font-black text-sm" style={{ color: INK }}>Find people</p>
+              <p className="text-xs font-medium mt-0.5" style={{ color: MUTED }}>Search, request and answer the ones you got</p>
             </div>
             <Icon name="chevron-right" size={16} color={MUTED} strokeWidth={2} />
           </Link>
@@ -141,7 +141,7 @@ export default function CrewPage() {
                     <p className="font-black text-[0.9375rem]" style={{ color: INK }}>{crew.name}</p>
                     <p className="text-xs font-bold" style={{ color: MUTED }}>{members.length} members · {crew.city === "innsbruck" ? "Innsbruck" : "Salzburg"}</p>
                   </div>
-                  <button className="text-xs font-black px-3 py-1.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>Ausfahrt planen</button>
+                  <button className="text-xs font-black px-3 py-1.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>Plan a ride</button>
                 </div>
                 <div className="flex -space-x-2">
                   {members.map((m) => (
@@ -169,8 +169,8 @@ export default function CrewPage() {
                 <Icon name="message-circle" size={28} color={BRAND} strokeWidth={1.8} />
               </div>
               <div>
-                <p className="font-black" style={{ color: INK }}>Noch keine Chats</p>
-                <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Schreib jemanden aus einer Ausfahrt an.</p>
+                <p className="font-black" style={{ color: INK }}>No chats yet</p>
+                <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Message someone from a ride.</p>
               </div>
             </div>
           ) : (
@@ -200,8 +200,8 @@ export default function CrewPage() {
                         <span className="text-[0.6rem] flex-shrink-0 ml-2" style={{ color: MUTED }}>{lastMsg?.sentAt}</span>
                       </div>
                       <p className={clsx("text-xs truncate", unread > 0 ? "font-bold" : "font-medium")} style={{ color: MUTED }}>
-                        {conv.contextType === "ride" && <span className="font-black" style={{ color: BRAND }}>Ausfahrt · </span>}
-                        {lastMsg ? (lastMsg.senderId === "me" ? "Du: " : "") + lastMsg.text : "Noch keine Nachrichten"}
+                        {conv.contextType === "ride" && <span className="font-black" style={{ color: BRAND }}>Ride · </span>}
+                        {lastMsg ? (lastMsg.senderId === "me" ? "You: " : "") + lastMsg.text : "No messages yet"}
                       </p>
                     </div>
 

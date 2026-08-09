@@ -40,7 +40,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Ausfahrtsdetails" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Ride details" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
@@ -70,7 +70,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} · Lv {author.level} · {post.postedAt}</span>
             </div>
           </button>
-          <button onClick={dismiss} aria-label="Ausfahrtsdetails schließen" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
+          <button onClick={dismiss} aria-label="Close ride details" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
             <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -99,18 +99,18 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         <div className="mx-5 my-4 rounded-none overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
           <div className="grid grid-cols-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <div className="px-4 py-3" style={{ borderRight: `1px solid ${BORDER}` }}>
-              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Uhrzeit</p>
+              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Time</p>
               <p className="font-black text-sm font-mono" style={{ color: INK }}>{post.meetTime}</p>
             </div>
             <div className="px-4 py-3">
-              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Freie Plätze</p>
+              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Open spots</p>
               <p className="font-black text-sm font-mono" style={{ color: isFull ? MUTED : openSpots === 1 ? "var(--rust)" : BRAND }}>
-                {isFull ? "Voll" : `${openSpots} frei`}
+                {isFull ? "Full" : `${openSpots} open`}
               </p>
             </div>
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Treffpunkt</p>
+            <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Meeting point</p>
             <p className="font-black text-sm" style={{ color: INK }}>{post.meetPoint}</p>
           </div>
         </div>
@@ -122,16 +122,16 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Riders */}
         <div className="px-5 pt-2 pb-2" style={{ borderTop: `1px solid ${BORDER}` }}>
-          <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>Dabei ({post.takenSpots})</p>
+          <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>Going ({post.takenSpots})</p>
           <div className="space-y-2.5">
             <button className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => setSelectedUser(author)}>
               <Avatar id={author.id} initials={author.avatar} size={36} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                  <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>Gastgeber</span>
+                  <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>Host</span>
                 </div>
-                <span className="text-xs font-bold" style={{ color: MUTED }}>Stufe {author.level} · {author.levelTitle}</span>
+                <span className="text-xs font-bold" style={{ color: MUTED }}>Level {author.level} · {author.levelTitle}</span>
               </div>
               <Icon name="chevron-right" size={13} color={MUTED} strokeWidth={2} />
             </button>
@@ -141,7 +141,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
                 <Avatar id={u.id} initials={u.avatar} size={36} />
                 <div className="flex-1 min-w-0">
                   <span className="font-black text-sm block" style={{ color: INK }}>{u.name}</span>
-                  <span className="text-xs font-bold" style={{ color: MUTED }}>Stufe {u.level} · {u.levelTitle}</span>
+                  <span className="text-xs font-bold" style={{ color: MUTED }}>Level {u.level} · {u.levelTitle}</span>
                 </div>
                 <Icon name="chevron-right" size={13} color={MUTED} strokeWidth={2} />
               </button>
@@ -162,7 +162,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               : { background: BRAND, color: "var(--text-on-accent)" }
             }
           >
-            {isJoined ? "Du bist dabei – tippen zum Verlassen" : isFull ? "Ausfahrt ist voll" : "Ausfahrt beitreten"}
+            {isJoined ? "You are in, tap to leave" : isFull ? "Ride is full" : "Join ride"}
           </button>
         </div>
       </div>

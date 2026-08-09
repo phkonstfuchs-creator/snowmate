@@ -2,9 +2,9 @@
 
 import React, { useId } from "react";
 
-/* Siebdruck-Bergszene: flache Spotfarben, harte Kanten, keine
-   Verläufe. Jeder Ort bekommt über den Namens-Hash eine eigene
-   Farbauflage — wie verschiedene Druckausgaben derselben Serie. */
+/* Screen-print mountain scene: flat spot colours, hard edges, no
+   gradients. Each resort gets its own colour edition via a hash of
+   its name — like different print runs of the same series. */
 
 const PAPER = "#f2eadb";
 const INK = "#1c1815";
@@ -82,7 +82,7 @@ export default function ResortScene({
   const instanceId = useId().replaceAll(":", "");
   const dotId = `rsd-${instanceId}`;
 
-  // Sonnenstand variiert je Ort, bleibt aber immer über dem Grat
+  // Sun position varies per resort but always stays above the ridge
   const sunX = 84 + (h % 5) * 58;
 
   return (
@@ -94,13 +94,13 @@ export default function ResortScene({
       aria-hidden="true"
     >
       <defs>
-        {/* Halbton-Raster — der Siebdruck-Punkt über dem Himmel */}
+        {/* Halftone grid — the screen-print dot over the sky */}
         <pattern id={dotId} width="6" height="6" patternUnits="userSpaceOnUse">
           <circle cx="1.5" cy="1.5" r="1.1" fill={INK} opacity="0.16" />
         </pattern>
       </defs>
 
-      {/* Himmel als flache Fläche */}
+      {/* Sky as a flat area */}
       <rect width="400" height="180" fill={ed.sky} />
 
       {/* Sonnenscheibe */}
@@ -112,7 +112,7 @@ export default function ResortScene({
       {/* Ferne Kette */}
       <path d={scene.far} fill={ed.far} />
 
-      {/* Schneefelder — ausgesparte Papierfläche */}
+      {/* Snowfields — knocked-out paper */}
       {scene.snow.map((d, i) => (
         <path key={i} d={d} fill={PAPER} />
       ))}

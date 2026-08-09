@@ -76,7 +76,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       >
         <button
           onClick={onClose}
-          aria-label="Unterhaltung schließen"
+          aria-label="Close conversation"
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
           style={{ background: "var(--bg-surface-2)" }}
         >
@@ -88,7 +88,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
           <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
             @{other.handle}
             {existing?.contextType === "ride" && (
-              <span style={{ color: "var(--sky)" }}> · über Ausfahrt</span>
+              <span style={{ color: "var(--sky)" }}> · via ride</span>
             )}
           </p>
         </div>

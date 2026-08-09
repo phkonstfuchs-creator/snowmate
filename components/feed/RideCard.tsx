@@ -34,7 +34,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
       {/* Resort scene header */}
       <div className="relative h-32 overflow-hidden" style={{ borderBottom: "var(--rule-thick)" }}>
         <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
-        {/* Treffzeit als aufgedruckte Marke */}
+        {/* Meeting time as a printed stamp */}
         <div
           className="text-mono-label absolute left-0 top-0 flex items-center gap-1.5 px-2.5 py-1"
           style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
@@ -47,7 +47,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
         </div>
       </div>
 
-      {/* Ort als gedruckte Zeile unter der Szene */}
+      {/* Resort as a printed line under the scene */}
       <div
         className="flex items-center gap-1.5 px-4 py-2"
         style={{ background: "var(--paper-0)", borderBottom: "1px solid var(--border-hairline)" }}
@@ -96,7 +96,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
               </div>
             ))}
             {joinedUsers.length > 0 && (
-              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{post.takenSpots} dabei</span>
+              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{post.takenSpots} in</span>
             )}
           </div>
 
@@ -105,7 +105,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
               className="text-[0.7rem] font-bold font-mono"
               style={{ color: isFull ? "var(--ink-3)" : openSpots === 1 ? "var(--rust)" : "var(--ink-2)" }}
             >
-              {isFull ? "voll" : `${openSpots} frei`}
+              {isFull ? "full" : `${openSpots} open`}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
@@ -119,7 +119,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
                   : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
               }
             >
-              {isJoined ? "Dabei" : "Mitfahren"}
+              {isJoined ? "Joined" : "Join"}
             </button>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
         className="text-mono-label flex items-center justify-center gap-1.5 py-2"
         style={{ borderTop: "1px solid var(--border-hairline)", color: "var(--ink-2)" }}
       >
-        Details &amp; Profil
+        Details &amp; profile
         <Icon name="chevron-right" size={11} color="var(--ink-2)" strokeWidth={2} />
       </div>
     </article>

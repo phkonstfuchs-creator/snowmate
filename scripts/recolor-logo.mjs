@@ -1,8 +1,8 @@
-/* Erzeugt public/logo-print.png aus public/logo.png:
-   reduziert das Original auf die Siebdruck-Spotfarben der
-   Design-Tokens. Neu ausfuehren, wenn sich das Logo oder die
-   Palette aendert:  node scripts/recolor-logo.mjs
-   Benoetigt Python 3 mit Pillow. */
+/* Generates public/logo-print.png from public/logo.png: reduces the
+   original to the screen-print spot colours of the design tokens.
+   Re-run when the logo or the palette changes:
+     node scripts/recolor-logo.mjs
+   Requires Python 3 with Pillow. */
 import { execFileSync } from "node:child_process";
 
 const PY = `

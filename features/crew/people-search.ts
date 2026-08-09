@@ -1,16 +1,15 @@
 import type { FriendRequestState, User } from "@/lib/types";
 
-/* Suche und Anfragestatus fuer den Screen "Leute finden".
-   Reine Funktionen, damit die Regeln testbar bleiben und nicht in
-   der Komponente verstreut liegen. */
+/* Search and request state for the "Find people" screen. Pure
+   functions, so the rules stay testable instead of being scattered
+   through the component. */
 
 export function normalizeQuery(raw: string): string {
   return raw.trim().toLowerCase().replace(/^@/, "");
 }
 
-/* Sucht ueber Name und Handle. Der eigene Account und bestehende
-   Freunde fallen raus — beides waere in einer Trefferliste nur
-   Rauschen. */
+/* Searches name and handle. Your own account and existing friends
+   drop out — both would be noise in a result list. */
 export function searchPeople(
   users: readonly User[],
   rawQuery: string,
@@ -29,9 +28,9 @@ export function searchPeople(
   );
 }
 
-/* Vorschlaege sind Leute mit gemeinsamen Freunden, absteigend
-   sortiert. Ohne gemeinsame Freunde kein Vorschlag: sonst waere es
-   eine Fremdenliste, und genau das will das Produkt nicht. */
+/* Suggestions are people with mutual friends, sorted descending.
+   No mutual friends means no suggestion: otherwise it would be a
+   list of strangers, which is exactly what this product avoids. */
 export function suggestPeople(
   users: readonly User[],
   viewer: Pick<User, "id" | "friendIds">,
@@ -68,9 +67,9 @@ export function getRequestState(
   return ledger[userId] ?? "none";
 }
 
-/* Gesendete Anfragen lassen sich zurueckziehen, entschiedene nicht.
-   Eine Zusage per Klick wieder aufzuloesen waere ein anderer
-   Vorgang (Freund entfernen) und gehoert nicht hierher. */
+/* Sent requests can be withdrawn, decided ones cannot. Undoing an
+   acceptance with one click is a different operation (remove
+   friend) and does not belong here. */
 export function toggleOutgoingRequest(
   ledger: RequestLedger,
   userId: string,

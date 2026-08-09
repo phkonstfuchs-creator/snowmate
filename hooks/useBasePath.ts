@@ -2,12 +2,12 @@
 
 import { usePathname } from "next/navigation";
 
-/* Der klickbare Prototyp unter /demo verwendet dieselben
-   Komponenten wie die App. Ein fest verdrahtetes href="/people"
-   wuerde einen Besucher aus dem Prototyp heraus in die geschuetzte
-   Route werfen — und damit in den Login, hinter dem er nichts zu
-   suchen hat. Der Hook leitet das Praefix aus der Adresse ab,
-   statt es durch jede Komponente zu reichen. */
+/* The clickable prototype under /demo reuses the same components
+   as the app. A hardcoded href="/people" would throw a visitor out
+   of the prototype into the protected route — and therefore into
+   the login, where they have no business being. This hook derives
+   the prefix from the URL instead of threading it through every
+   component. */
 export function useBasePath(): string {
   const pathname = usePathname();
   return pathname === "/demo" || pathname.startsWith("/demo/") ? "/demo" : "";

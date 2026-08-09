@@ -5,10 +5,10 @@ export type FriendStatus = "friend" | "pending" | "suggested";
 export type CarpoolRole = "driver" | "rider";
 export type BadgeRarity = "common" | "rare" | "epic";
 
-/* "friends" ist die bisherige Sichtbarkeit: nur Freunde und
-   Freundesfreunde. "public" oeffnet die Ausfahrt fuer alle, auch
-   fuer Fremde — deshalb haengt daran eine strengere Regel fuer
-   den Treffpunkt (siehe features/rides/visibility.ts). */
+/* "friends" is the existing visibility: friends and friends of
+   friends only. "public" opens the ride to everyone, strangers
+   included — which is why a stricter meeting-point rule hangs off
+   it (see features/rides/visibility.ts). */
 export type RideVisibility = "friends" | "public";
 
 export type FriendRequestState = "none" | "sent" | "accepted" | "declined";
@@ -53,15 +53,14 @@ export interface RidePost {
   caption: string;
   postedAt: string;
   visibility: RideVisibility;
-  /* Nur bei oeffentlichen Events gesetzt: gibt der Ausfahrt einen
-     eigenen Namen, damit sie in der Liste nicht nur als Gebiet
-     erscheint. */
+  /* Only set on public events: gives the ride its own name so it
+     does not appear in the list as just a resort. */
   title?: string;
 }
 
-/* Was ein Betrachter tatsaechlich sehen darf. `meetPoint` ist
-   bewusst nullable: bei oeffentlichen Events kennt nur, wer
-   zugesagt hat, den genauen Treffpunkt. */
+/* What a viewer is actually allowed to see. `meetPoint` is nullable
+   on purpose: for public events only those who joined know the exact
+   meeting point. */
 export interface VisibleRide {
   post: Omit<RidePost, "meetPoint">;
   meetPoint: string | null;

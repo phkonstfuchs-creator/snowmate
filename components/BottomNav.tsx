@@ -5,27 +5,27 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Icon from "@/components/ui/Icon";
 
-/* Events steht bewusst weit vorn: Wer neu ist, hat einen leeren Feed,
-   und dann muss der Einstieg ohne Freunde sofort sichtbar sein.
-   Sechs Ziele sind eins mehr als die uebliche Obergrenze — der
-   Preis dafuer, dass Mitfahrt eine eigene Flaeche behaelt. */
+/* Events sits far forward on purpose: a new user has an empty feed,
+   and then the way in without friends has to be immediately visible.
+   Six destinations is one above the usual ceiling — the price of
+   keeping carpool its own surface. */
 const TABS = [
-  { href: "/feed", label: "Heute", icon: "flame" },
+  { href: "/feed", label: "Today", icon: "flame" },
   { href: "/events", label: "Events", icon: "calendar-days" },
-  { href: "/map", label: "Karte", icon: "map-pinned" },
-  { href: "/carpool", label: "Mitfahrt", icon: "car" },
+  { href: "/map", label: "Map", icon: "map-pinned" },
+  { href: "/carpool", label: "Carpool", icon: "car" },
   { href: "/crew", label: "Crew", icon: "users" },
-  { href: "/profile", label: "Profil", icon: "user" },
+  { href: "/profile", label: "Profile", icon: "user" },
 ];
 
-/* Ziele ohne eigenen Tab. Ohne diese Zuordnung faerbt sich in der
-   Leiste nichts, sobald man auf /people steht. */
+/* Destinations without their own tab. Without this mapping nothing
+   in the bar lights up once you are on /people. */
 const OWNED_BY: Record<string, string> = {
   "/people": "/crew",
 };
 
-/* basePath erlaubt dieselbe Leiste im klickbaren Demo-Bereich
-   unter /demo, ohne die Zieladressen zu duplizieren. */
+/* basePath lets the same bar serve the clickable demo under /demo
+   without duplicating the destinations. */
 export default function BottomNav({ basePath = "" }: { basePath?: string }) {
   const pathname = usePathname();
   const route = basePath && pathname.startsWith(basePath)
@@ -36,7 +36,7 @@ export default function BottomNav({ basePath = "" }: { basePath?: string }) {
   )?.[1];
 
   return (
-    <nav className="bottom-nav" aria-label="Hauptnavigation">
+    <nav className="bottom-nav" aria-label="Main navigation">
       <div className="flex items-stretch">
         {TABS.map((tab) => {
           const href = `${basePath}${tab.href}`;

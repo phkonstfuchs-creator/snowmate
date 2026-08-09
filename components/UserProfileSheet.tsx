@@ -67,7 +67,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         className="sheet-panel"
         role="dialog"
         aria-modal="true"
-        aria-label={`Profil von ${user.name}`}
+        aria-label={`Profile of ${user.name}`}
         aria-hidden={showThread || undefined}
         inert={showThread}
         tabIndex={-1}
@@ -76,7 +76,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 z-10" style={{ background: SURFACE }}>
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-          <button type="button" onClick={dismiss} aria-label="Profil schließen" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label="Close profile" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -105,7 +105,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
                   <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>U18</span>
                 )}
               </div>
-              <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Stufe {user.level} {user.levelTitle}</p>
+              <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Level {user.level} {user.levelTitle}</p>
               {user.bio && <p className="text-sm font-medium mt-1.5 leading-snug" style={{ color: "var(--text-secondary)" }}>{user.bio}</p>}
             </div>
           </div>
@@ -136,9 +136,9 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Stats */}
         <div className="grid grid-cols-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
           {[
-            { label: "Tage", value: user.daysThisSeason },
-            { label: "Gebiete", value: user.resortsVisited },
-            { label: "Serie", value: `${user.streakWeeks} Wo.` },
+            { label: "Days", value: user.daysThisSeason },
+            { label: "Resorts", value: user.resortsVisited },
+            { label: "Streak", value: `${user.streakWeeks} wk` },
           ].map(({ label, value }, i) => (
             <div key={label} className="flex flex-col items-center py-4 gap-0.5" style={i < 2 ? { borderRight: `1px solid ${BORDER}` } : {}}>
               <span className="font-mono font-bold text-xl" style={{ color: INK }}>{value}</span>
@@ -150,7 +150,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* XP bar */}
         <div className="px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="mb-2">
-            <span className="text-xs font-black" style={{ color: BRAND }}>Stufe {user.level} · {user.levelTitle}</span>
+            <span className="text-xs font-black" style={{ color: BRAND }}>Level {user.level} · {user.levelTitle}</span>
           </div>
           <XPBar current={user.xp} max={user.xpToNext} />
         </div>
@@ -159,14 +159,14 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {user.favoriteResort && (
           <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <Icon name="mountain" size={14} color={BRAND} strokeWidth={2} />
-            <span className="text-sm font-medium" style={{ color: MUTED }}>Lieblingsgebiet: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
+            <span className="text-sm font-medium" style={{ color: MUTED }}>Home resort: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
           </div>
         )}
 
         {/* Badges */}
         {earnedBadges.length > 0 && (
           <div className="px-5 pt-4 pb-5">
-            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Abzeichen ({earnedBadges.length})</p>
+            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Badges ({earnedBadges.length})</p>
             <div className="flex flex-wrap gap-2">
               {earnedBadges.map((b) => (
                 <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-black"
@@ -187,11 +187,11 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
               className="flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform"
               style={{ background: BRAND, color: D }}
             >
-              Nachricht
+              Message
             </button>
             <button className={clsx("flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
-              {isFriend ? "Teil der Crew" : "Zur Crew hinzufügen"}
+              {isFriend ? "In your crew" : "Add to crew"}
             </button>
           </div>
         )}

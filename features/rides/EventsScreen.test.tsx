@@ -5,8 +5,8 @@ import EventsScreen from "./EventsScreen";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/events" }));
 
-/* Der Screen ist das erste Fenster nach draussen. Die Tests decken
-   deshalb vor allem ab, was Fremde sehen duerfen und was nicht. */
+/* This screen is the first window facing outward, so the tests
+   mainly cover what strangers may and may not see. */
 
 function openFirstEvent() {
   fireEvent.click(screen.getAllByRole("button", { name: /Jan/ })[0]!);
@@ -17,23 +17,23 @@ describe("EventsScreen", () => {
   it("states the visibility rule on the screen where it applies", () => {
     render(<EventsScreen />);
 
-    expect(screen.getByText("Für alle offen")).toBeInTheDocument();
+    expect(screen.getByText("Open to everyone")).toBeInTheDocument();
     expect(
-      screen.getByText(/den genauen Treffpunkt erst, wer zugesagt hat/),
+      screen.getByText(/only those who joined see the exact meeting point/),
     ).toBeInTheDocument();
   });
 
   it("lists only events of the selected region", () => {
     render(<EventsScreen />);
 
-    expect(screen.getByText("Erstsemester-Tag Axamer Lizum")).toBeInTheDocument();
+    expect(screen.getByText("Freshers Day Axamer Lizum")).toBeInTheDocument();
     expect(screen.queryByText("Season Opening Saalbach")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Salzburg" }));
 
     expect(screen.getByText("Season Opening Saalbach")).toBeInTheDocument();
     expect(
-      screen.queryByText("Erstsemester-Tag Axamer Lizum"),
+      screen.queryByText("Freshers Day Axamer Lizum"),
     ).not.toBeInTheDocument();
   });
 
@@ -44,7 +44,7 @@ describe("EventsScreen", () => {
       .getAllByRole("heading", { level: 3 })
       .map((heading) => heading.textContent);
 
-    // Ladies Powder Morning ist voll (12/12) und darf nicht oben stehen.
+    // Ladies Powder Morning is full (12/12) and must not sit at the top.
     expect(titles.indexOf("Ladies Powder Morning")).toBe(titles.length - 1);
   });
 
@@ -53,10 +53,10 @@ describe("EventsScreen", () => {
     const dialog = openFirstEvent();
 
     expect(
-      within(dialog).getByText(/Treffpunkt wird nach der Zusage sichtbar/),
+      within(dialog).getByText(/Exact meeting point becomes visible once you join/),
     ).toBeInTheDocument();
     expect(
-      within(dialog).queryByText("Bushaltestelle Axams Zentrum"),
+      within(dialog).queryByText("Axams centre bus stop"),
     ).not.toBeInTheDocument();
   });
 
@@ -72,16 +72,16 @@ describe("EventsScreen", () => {
     render(<EventsScreen />);
     const dialog = openFirstEvent();
 
-    fireEvent.click(within(dialog).getByRole("button", { name: "Zusagen" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Join event" }));
     expect(
-      within(dialog).getByText("Bushaltestelle Axams Zentrum"),
+      within(dialog).getByText("Axams centre bus stop"),
     ).toBeInTheDocument();
 
     fireEvent.click(
-      within(dialog).getByRole("button", { name: "Zusage zurückziehen" }),
+      within(dialog).getByRole("button", { name: "Leave event" }),
     );
     expect(
-      within(dialog).getByText(/Treffpunkt wird nach der Zusage sichtbar/),
+      within(dialog).getByText(/Exact meeting point becomes visible once you join/),
     ).toBeInTheDocument();
   });
 
@@ -90,7 +90,7 @@ describe("EventsScreen", () => {
     const dialog = openFirstEvent();
 
     expect(within(dialog).getByText("23/40")).toBeInTheDocument();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Zusagen" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Join event" }));
     expect(within(dialog).getByText("24/40")).toBeInTheDocument();
   });
 
@@ -99,7 +99,7 @@ describe("EventsScreen", () => {
     fireEvent.click(screen.getByText("Ladies Powder Morning"));
 
     const dialog = screen.getByRole("dialog");
-    const cta = within(dialog).getByRole("button", { name: "Event ist voll" });
+    const cta = within(dialog).getByRole("button", { name: "Event is full" });
     expect(cta).toBeDisabled();
   });
 
@@ -113,10 +113,10 @@ describe("EventsScreen", () => {
   it("marks a joined event in the list", () => {
     render(<EventsScreen />);
     const dialog = openFirstEvent();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Zusagen" }));
-    fireEvent.click(within(dialog).getByRole("button", { name: "Event schließen" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Join event" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close event" }));
 
-    expect(screen.getByText("Zugesagt")).toBeInTheDocument();
+    expect(screen.getByText("Joined")).toBeInTheDocument();
   });
 
   it("only ever renders events flagged public", () => {

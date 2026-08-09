@@ -58,7 +58,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           />
           <div>
             <p className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-              Anfrage erhalten
+              Request received
             </p>
             <p
               className="mt-1.5 text-sm leading-relaxed"
@@ -73,7 +73,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           className="block text-center text-sm font-semibold underline"
           style={{ color: "var(--ink-1)" }}
         >
-          Zurück zur Anmeldung
+          Back to sign in
         </Link>
       </div>
     );
@@ -83,7 +83,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
     <form action={formAction} className="space-y-4" noValidate>
       <Input
         ref={emailRef}
-        label="E-Mail"
+        label="Email"
         name="email"
         type="email"
         autoComplete="email"
@@ -95,13 +95,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
       />
       <Input
         ref={passwordRef}
-        label="Passwort"
+        label="Password"
         name="password"
         type="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
         helper={
           isSignup
-            ? "Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben und einer Zahl"
+            ? "At least 12 characters with upper and lower case and a number"
             : undefined
         }
         error={state.fieldErrors?.password?.[0]}
@@ -111,7 +111,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {isSignup ? (
         <Input
           ref={confirmPasswordRef}
-          label="Passwort bestätigen"
+          label="Confirm password"
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
@@ -146,19 +146,19 @@ export default function AuthForm({ mode }: AuthFormProps) {
               ? "Wird erstellt…"
               : "Wird angemeldet…"
             : isSignup
-              ? "Account erstellen"
-              : "Anmelden"}
+              ? "Create account"
+              : "Sign in"}
         </Button>
       </div>
 
       <p className="text-center text-sm" style={{ color: "var(--ink-2)" }}>
-        {isSignup ? "Schon dabei?" : "Noch keinen Account?"}{" "}
+        {isSignup ? "Already have one?" : "No account yet?"}{" "}
         <Link
           href={isSignup ? "/login" : "/signup"}
           className="font-semibold underline"
           style={{ color: "var(--rust)" }}
         >
-          {isSignup ? "Anmelden" : "Registrieren"}
+          {isSignup ? "Sign in" : "Register"}
         </Link>
       </p>
     </form>

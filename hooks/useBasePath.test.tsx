@@ -23,8 +23,8 @@ describe("useBasePath", () => {
     },
   );
 
-  /* Ohne die exakte Praefix-Pruefung wuerde eine spaetere Route wie
-     /demonstration faelschlich als Prototyp gelten. */
+  /* Without the exact prefix check, a later route such as
+     /demonstration would wrongly count as the prototype. */
   it("does not treat a route that merely starts with the same letters as the prototype", () => {
     usePathname.mockReturnValue("/demonstration");
     expect(renderHook(() => useBasePath()).result.current).toBe("");

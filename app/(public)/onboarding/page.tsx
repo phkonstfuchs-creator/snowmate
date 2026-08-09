@@ -18,27 +18,27 @@ const OCHRE = "var(--ochre)";
 type Style = AbilityLevel;
 
 const STYLE_OPTIONS: { id: Style; label: string; desc: string; color: string }[] = [
-  { id: "chill", label: "Chill", desc: "Präparierte Hänge, Sonne, gute Laune", color: PINE },
-  { id: "park", label: "Park", desc: "Kicker, Rails, Kreativität", color: OCHRE },
-  { id: "off-piste", label: "Off-Piste", desc: "Powder, Backcountry, volle Freiheit", color: RUST },
+  { id: "chill", label: "Chill", desc: "Groomed slopes, sun, good mood", color: PINE },
+  { id: "park", label: "Park", desc: "Kickers, rails, creativity", color: OCHRE },
+  { id: "off-piste", label: "Off-piste", desc: "Powder, backcountry, full freedom", color: RUST },
 ];
 
 const CITIES: { id: City; label: string; sub: string; scene: string }[] = [
-  { id: "innsbruck", label: "Innsbruck", sub: "Nordkette, Stubai, Axamer & Co.", scene: "Nordkette" },
-  { id: "salzburg", label: "Salzburg", sub: "Zell am See, Saalbach, Gastein & Co.", scene: "Zell am See" },
+  { id: "innsbruck", label: "Innsbruck", sub: "Nordkette, Stubai, Axamer and more", scene: "Nordkette" },
+  { id: "salzburg", label: "Salzburg", sub: "Zell am See, Saalbach, Gastein and more", scene: "Zell am See" },
 ];
 
-/* Schrittanzeige als gedruckte Laufnummer, nicht als Fortschrittspille */
+/* Step indicator as a printed serial number, not a progress pill */
 function StepMark({ step, total }: { step: number; total: number }) {
   return (
     <div
       className="flex items-center gap-2 px-4 pt-5 pb-3"
       role="progressbar"
-      aria-label="Fortschritt der Einrichtung"
+      aria-label="Setup progress"
       aria-valuenow={step}
       aria-valuemin={0}
       aria-valuemax={total}
-      aria-valuetext={`Schritt ${step} von ${total}`}
+      aria-valuetext={`Step ${step} of ${total}`}
     >
       <span className="text-mono-label" style={{ color: RUST }}>
         {String(step).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -71,7 +71,7 @@ function StepHeader({
     <div className="px-4 pb-4" style={{ borderBottom: "var(--rule-thin)" }}>
       <button
         onClick={onBack}
-        aria-label="Zurück"
+        aria-label="Back"
         className="-ml-2 mb-2 flex h-11 w-11 items-center justify-center"
       >
         <Icon name="chevron-left" size={20} color={INK} strokeWidth={2} />
@@ -127,11 +127,11 @@ export default function OnboardingPage() {
     maxWidth: 430,
   };
 
-  // ── Schritt 0: Titelseite ────────────────────────────────────
+  // ── Step 0: title page ─────────────────────────────────────
   if (step === 0) {
     return (
       <div className={shell} style={shellStyle}>
-        {/* Bergszene als oberes Drittel, hart abgeschnitten */}
+        {/* Mountain scene as the top third, hard cropped */}
         <div className="relative" style={{ height: "38%", borderBottom: "var(--rule-heavy)" }}>
           <ResortScene name="Snowmate" className="h-full w-full" />
           <div className="absolute left-4 top-5 flex items-center gap-2">
@@ -141,22 +141,22 @@ export default function OnboardingPage() {
         </div>
 
         <div className="flex flex-1 flex-col px-4 pt-6">
-          <p className="text-mono-label" style={{ color: RUST }}>Saison 25/26 · Tirol &amp; Salzburg</p>
-          {/* Leerzeichen vor jedem Umbruch, sonst liest der Screenreader
-              "FindedeineCrew" als ein Wort */}
+          <p className="text-mono-label" style={{ color: RUST }}>Season 25/26 · Tyrol &amp; Salzburg</p>
+          {/* Space before each break, otherwise a screen reader reads
+              "Findyourcrew" as one word */}
           <h1 className="text-display-hero mt-3" style={{ color: INK }}>
-            Finde{" "}
+            Find{" "}
             <br />
-            deine{" "}
+            your{" "}
             <br />
-            Crew
+            crew
           </h1>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
             {[
-              ["01", "Wer heute wo fährt — live im Feed"],
-              ["02", "Mitfahrbörse für freie Plätze"],
-              ["03", "Deine Crew, privat und sicher"],
+              ["01", "Who rides where today, live in the feed"],
+              ["02", "Carpool board for open seats"],
+              ["03", "Your crew, private and safe"],
             ].map(([num, text]) => (
               <div
                 key={num}
@@ -181,14 +181,14 @@ export default function OnboardingPage() {
                 letterSpacing: 0,
               }}
             >
-              Los geht&rsquo;s
+              Get started
             </button>
             <button
               onClick={() => router.push("/login")}
               className="mt-3 w-full py-3 text-sm font-semibold underline"
               style={{ color: INK_2 }}
             >
-              Ich habe schon einen Account
+              I already have an account
             </button>
           </div>
         </div>
@@ -196,15 +196,15 @@ export default function OnboardingPage() {
     );
   }
 
-  // ── Schritt 1: Region ────────────────────────────────────────
+  // ── Step 1: region ─────────────────────────────────────────
   if (step === 1) {
     return (
       <div className={shell} style={shellStyle}>
         <StepMark step={1} total={3} />
         <StepHeader
           onBack={back}
-          title="Wo fährst du?"
-          sub="Bestimmt deine Region im Feed und auf der Karte"
+          title="Where do you ride?"
+          sub="Sets your region in the feed and on the map"
           headingRef={headingRef}
         />
 
@@ -247,21 +247,21 @@ export default function OnboardingPage() {
         </div>
 
         <p className="px-4 pb-8 text-center text-mono-label" style={{ color: INK_2 }}>
-          Später jederzeit änderbar
+          You can change this any time
         </p>
       </div>
     );
   }
 
-  // ── Schritt 2: Fahrstil ──────────────────────────────────────
+  // ── Step 2: riding style ───────────────────────────────────
   if (step === 2) {
     return (
       <div className={shell} style={shellStyle}>
         <StepMark step={2} total={3} />
         <StepHeader
           onBack={back}
-          title="Wie fährst du?"
-          sub="Prägt deinen Feed und deine Crew"
+          title="How do you ride?"
+          sub="Shapes your feed and your crew"
           headingRef={headingRef}
         />
 
@@ -320,26 +320,26 @@ export default function OnboardingPage() {
             className="w-full py-3 text-sm font-semibold underline"
             style={{ color: INK_2 }}
           >
-            Überspringen
+            Skip
           </button>
         </div>
       </div>
     );
   }
 
-  // ── Schritt 3: Name ──────────────────────────────────────────
+  // ── Step 3: name ───────────────────────────────────────────
   return (
     <div className={shell} style={shellStyle}>
       <StepMark step={3} total={3} />
       <StepHeader
         onBack={back}
-        title="Wie heißt du?"
-        sub="Sichtbar für bestätigte Crew-Mitglieder"
+        title="What is your name?"
+        sub="Visible to confirmed crew members"
         headingRef={headingRef}
       />
 
       <div className="flex flex-1 flex-col justify-center px-4">
-        {/* Namenszug als Stempelvorschau */}
+        {/* Name as a stamp preview */}
         <div className="mb-6 flex justify-center" aria-hidden="true">
           <div
             className="flex items-center justify-center rounded-full"
@@ -433,11 +433,11 @@ export default function OnboardingPage() {
             letterSpacing: 0,
           }}
         >
-          Account erstellen
+          Create account
         </button>
         <p className="mt-3 text-center text-xs leading-relaxed" style={{ color: INK_2 }}>
-          Mit dem Erstellen akzeptierst du unsere Nutzungsbedingungen.
-          Unter 18? Dann brauchst du die Zustimmung deiner Eltern.
+          By creating an account you accept our terms of use.
+          Under 18? You need your parents&rsquo; consent.
         </p>
       </div>
     </div>

@@ -1,55 +1,55 @@
 @import "tailwindcss";
 
 /* ─── Snowmate design tokens ───────────────────────────────────
-   DNA: Alpines Tourismusplakat der 70er, gedruckt auf Papier.
-   Warmes Creme statt Bildschirm-Schwarz, Siebdruck-Spotfarben
-   (Rost, Tanne, Ocker, Himmel) statt Verläufen und Glow.
-   Flächen und Linien tragen die Struktur — keine weichen
-   Schatten, kein Blur, keine abgerundeten Karten-Stapel.
-   Zahlen laufen in Mono wie auf einem Messgerät.
-   Alle Textpaare sind gegen WCAG AA (4.5:1) geprüft.
+   DNA: 1970s alpine tourism poster, printed on paper.
+   Warm cream instead of screen black, screen-print spot colours
+   (rust, pine, ochre, sky) instead of gradients and glow.
+   Areas and rules carry the structure — no soft shadows, no blur,
+   no stacks of rounded cards.
+   Numbers run in mono like readings on an instrument.
+   Every text pair is checked against WCAG AA (4.5:1).
    ──────────────────────────────────────────────────────────── */
 :root {
   --font-display: "Jost Variable";
   --font-body: "Hanken Grotesk Variable";
   --font-mono: "Space Mono";
 
-  /* Papier — die Basis. Gealtertes Creme, nie reines Weiß. */
-  --paper-0: #f2eadb; /* Bogen / Canvas */
-  --paper-1: #ece2d0; /* Karte, leicht abgesetzt */
-  --paper-2: #e2d6bf; /* eingesenkte Fläche, Inputs */
-  --paper-3: #d4c5a9; /* Rand, Trennlinie */
+  /* Paper — the base. Aged cream, never pure white. */
+  --paper-0: #f2eadb; /* sheet / canvas */
+  --paper-1: #ece2d0; /* card, slightly offset */
+  --paper-2: #e2d6bf; /* recessed area, inputs */
+  --paper-3: #d4c5a9; /* border, divider */
 
-  /* Tinte — warmes Schwarzbraun, nie #000 */
-  --ink-0: #1c1815; /* Volltinte */
-  --ink-1: #4a4038; /* Fließtext gedämpft */
-  --ink-2: #62574e; /* Beschriftung */
-  --ink-3: #6f6257; /* deaktiviert */
+  /* Ink — warm black-brown, never #000 */
+  --ink-0: #1c1815; /* full ink */
+  --ink-1: #4a4038; /* body text, muted */
+  --ink-2: #62574e; /* labels */
+  --ink-3: #6f6257; /* disabled */
 
-  /* Spotfarben — vier, mehr nicht. Wie im Siebdruck. */
-  --rust-ink: #8f3415; /* dunkle Variante für Text auf Ocker/Papier */
-  --rust: #a83f1b; /* Hauptakzent: Aktion, Marke */
-  --rust-light: #c0512a; /* nur als Fläche, nie als Text */
+  /* Spot colours — four, no more. Like screen printing. */
+  --rust-ink: #8f3415; /* dark variant for text on ochre/paper */
+  --rust: #a83f1b; /* main accent: action, brand */
+  --rust-light: #c0512a; /* areas only, never as text */
 
-  --pine: #2a5647; /* Struktur, Erfolg, ruhige Flächen */
+  --pine: #2a5647; /* structure, success, calm areas */
   --pine-light: #3b7561;
 
-  --ochre: #d9962b; /* Belohnung — NUR Fläche, Tinte darauf */
+  --ochre: #d9962b; /* reward — areas ONLY, ink on top */
   --sky: #3e6e8e; /* Live / Info */
-  /* Auf getoenten Flaechen reicht --sky nicht: gegen den
-     Park-Hintergrund kommt es nur auf 3,76:1. Dunkle Variante wie
-     bei --rust-ink, damit 11px fett die 4,5:1 halten (5,35:1). */
+  /* On tinted areas --sky is not enough: against the park
+     background it only reaches 3.76:1. Dark variant like
+     --rust-ink, so 11px bold holds 4.5:1 (5.35:1). */
   --sky-ink: #2f5670;
-  --crimson: #8e2420; /* Fehler */
+  --crimson: #8e2420; /* error */
 
-  /* Semantische Zuordnung */
+  /* Semantic mapping */
   --bg-canvas: var(--paper-0);
   --bg-surface-1: var(--paper-1);
   --bg-surface-2: var(--paper-2);
   --bg-surface-3: var(--paper-2);
   --bg-overlay: rgba(28, 24, 21, 0.55);
 
-  --border-rule: var(--ink-0); /* die gedruckte Linie */
+  --border-rule: var(--ink-0); /* the printed rule */
   --border-subtle: var(--paper-3);
   --border-hairline: rgba(28, 24, 21, 0.12);
 
@@ -72,20 +72,20 @@
   --status-warning: var(--rust);
   --live-dot: var(--rust);
 
-  /* Abstände — 4px Basis */
+  /* Spacing — 4px base */
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
   --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
 
-  /* Radien — Druck kennt keine weichen Ecken. Fast alles kantig. */
+  /* Radii — print has no soft corners. Almost everything is sharp. */
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 2px;
   --radius-xl: 2px;
   --radius-2xl: 2px;
-  --radius-pill: 999px; /* nur für Marken/Stempel-Momente */
+  --radius-pill: 999px; /* brand and stamp moments only */
 
-  /* Tiefe entsteht durch Linien und harten Versatz, nicht durch Blur */
+  /* Depth comes from rules and hard offset, not from blur */
   --rule-thin: 1px solid var(--border-rule);
   --rule-thick: 2px solid var(--border-rule);
   --rule-heavy: 4px solid var(--border-rule);
@@ -94,12 +94,12 @@
   --shadow-sheet: 0 -2px 0 var(--ink-0);
   --glow-focus: 0 0 0 3px rgba(168, 63, 27, 0.3);
 
-  /* Bewegung — Druck bewegt sich nicht weich. Kurz und trocken.
-     Zwei echte Kurven statt einer: Eintretendes und Austretendes
-     laeuft ease-out (startet sofort, fuehlt sich reaktionsschnell
-     an), Bewegung auf dem Schirm ease-in-out. Die alte Kurve
-     (0.2, 0, 0, 1) startete flach — also ease-in — und liess jede
-     Interaktion traeger wirken, als sie war. */
+  /* Motion — print does not move softly. Short and dry.
+     Two real curves instead of one: things entering and leaving run
+     ease-out (starts immediately, feels responsive), movement across
+     the screen runs ease-in-out. The old curve (0.2, 0, 0, 1)
+     started flat — that is ease-in — and made every interaction feel
+     more sluggish than it was. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-standard: var(--ease-out);
@@ -107,13 +107,13 @@
   --duration-fast: 100ms;
   --duration-base: 180ms;
   --duration-slow: 300ms;
-  /* Nur fuer seltene Belohnungsmomente (XP-Einblendung). Alles,
-     was oft passiert, bleibt unter 300ms. */
+  /* Rare reward moments only (the XP toast). Anything that happens
+     often stays under 300ms. */
   --duration-celebrate: 700ms;
 
-  /* Typografie — drei Stimmen.
-     Jost (geometrisch, Futura-Erbe) für Plakat-Überschriften,
-     Hanken Grotesk für Fließtext, Space Mono für alle Zahlen. */
+  /* Typography — three voices.
+     Jost (geometric, Futura heritage) for poster headlines,
+     Hanken Grotesk for body text, Space Mono for all numbers. */
   --font-display-stack: var(--font-display), "Futura", "Century Gothic", sans-serif;
   --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", monospace;
   --font-body-stack: var(--font-body), -apple-system, "Segoe UI", sans-serif;
@@ -131,12 +131,12 @@
   --text-body-sm: 400 13px / 1.5 var(--font-body-stack);
   --text-caption: 500 13px / 1.4 var(--font-body-stack);
 
-  /* Zeilenhöhe großzügig, sonst beschneiden Versal-Umlaute (Ä/Ö/Ü) */
+  /* Generous line height, otherwise capital umlauts (Ä/Ö/Ü) clip */
   --text-mono-label: 700 11px / 1.5 var(--font-mono-stack);
   --text-mono-data: 700 20px / 1.1 var(--font-mono-stack);
   --text-mono-data-lg: 700 34px / 1 var(--font-mono-stack);
 
-  /* Plakat-Typo läuft eng und in Versalien */
+  /* Poster type runs tight and in capitals */
   --tracking-display: 0;
   --tracking-mono-label: 0;
 
@@ -147,7 +147,7 @@
   --z-toast: 500;
   --z-tooltip: 600;
 
-  /* Von Komponenten weiterhin genutzt */
+  /* Still used by components */
   --border-strong: var(--ink-3);
   --accent-warm-hover: #e3a63f;
   --flame: var(--rust-ink);
@@ -188,18 +188,18 @@ body {
   overscroll-behavior: none;
 }
 
-/* ─── Tastaturfokus ──────────────────────────────────────────
-   Vorher gab es gar keinen: Tastaturnutzer bekamen den blauen
-   Browser-Default, der auf Papier wie ein Fremdkoerper wirkt.
-   Jetzt eine harte Passermarke in Volltinte — sichtbar, aber im
-   Duktus des Drucks. :focus-visible statt :focus, damit der
-   Rahmen bei Mausklick nicht aufblitzt. */
+/* ─── Keyboard focus ─────────────────────────────────────────
+   There was none before: keyboard users got the blue browser
+   default, which looks like a foreign object on paper. Now a hard
+   registration mark in full ink — visible, but in the language of
+   print. :focus-visible rather than :focus, so the ring does not
+   flash on mouse clicks. */
 :focus-visible {
   outline: 2px solid var(--ink-0);
   outline-offset: 2px;
   border-radius: 0;
 }
-/* Auf farbigen Flaechen (Rost, Tanne) wuerde Tinte untergehen */
+/* On coloured areas (rust, pine) ink would disappear */
 .sm-btn-primary:focus-visible,
 .sm-btn-warm:focus-visible,
 .city-toggle-btn.active:focus-visible {
@@ -207,7 +207,7 @@ body {
   outline-offset: -5px;
 }
 
-/* ─── App-Rahmen ─────────────────────────────────────────────── */
+/* ─── App frame ──────────────────────────────────────────────── */
 .app-shell {
   max-width: 430px;
   min-height: 100dvh;
@@ -219,7 +219,7 @@ body {
   overflow: hidden;
 }
 
-/* Außerhalb des Bogens: die dunkle Werkbank, auf der er liegt */
+/* Outside the sheet: the dark workbench it rests on */
 @media (min-width: 640px) {
   body { background: var(--ink-0); }
   .app-shell { box-shadow: 0 0 0 1px var(--ink-0); }
@@ -240,9 +240,9 @@ body {
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-/* ─── Papier-Textur — feines Korn, wie echter Druckbogen ───────
-   Liegt in @layer components, damit Tailwind-Utilities wie
-   `fixed` die Positionierung weiterhin überschreiben können. */
+/* ─── Paper texture — fine grain, like a real print sheet ──────
+   Lives in @layer components so Tailwind utilities such as `fixed`
+   can still override the positioning. */
 @layer components {
   .paper-grain { position: relative; }
 }
@@ -256,14 +256,14 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
 }
 
-/* Rasterpunkte — der Siebdruck-Halbton für Signature-Flächen */
+/* Screen dots — the halftone for signature areas */
 .halftone {
   background-image: radial-gradient(var(--ink-0) 1px, transparent 1px);
   background-size: 6px 6px;
   opacity: 0.14;
 }
 
-/* ─── Untere Navigation — gedruckte Fußleiste ───────────────── */
+/* ─── Bottom navigation — printed footer bar ────────────────── */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -277,7 +277,7 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ─── Typografie-Hilfsklassen ───────────────────────────────── */
+/* ─── Typography helpers ────────────────────────────────────── */
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }
 .text-display-hero { font: var(--text-display-hero); letter-spacing: var(--tracking-display); text-transform: uppercase; }
@@ -291,7 +291,7 @@ body {
 .text-mono-data { font: var(--text-mono-data); }
 .text-mono-data-lg { font: var(--text-mono-data-lg); }
 
-/* Sektionsmarke: Mono-Label über einer Volllinie */
+/* Section mark: mono label above a solid rule */
 .section-rule {
   display: flex;
   align-items: baseline;
@@ -302,7 +302,7 @@ body {
   margin-bottom: var(--space-4);
 }
 
-/* ─── Karten — Bogen mit Linie, kein schwebendes Rechteck ───── */
+/* ─── Cards — a sheet with a rule, not a floating rectangle ─── */
 .print-card {
   background: var(--paper-1);
   border: var(--rule-thin);
@@ -329,18 +329,18 @@ body {
   border: 1.5px solid var(--ink-0);
 }
 
-/* ─── Fahrstil-Marken ────────────────────────────────────────── */
+/* ─── Riding style badges ───────────────────────────────────── */
 .badge-chill    { background: var(--accent-warm-subtle); color: var(--rust-ink); }
 .badge-park     { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
 .badge-offpiste { background: rgba(42, 86, 71, 0.16); color: var(--pine); }
 
-/* ─── Schneelage-Marken ──────────────────────────────────────── */
+/* ─── Snow condition badges ─────────────────────────────────── */
 .cond-fresh   { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
 .cond-groomed { background: var(--paper-2); color: var(--ink-1); }
 .cond-icy     { background: var(--paper-2); color: var(--ink-2); }
 .cond-slushy  { background: var(--accent-warm-subtle); color: var(--rust-ink); }
 
-/* ─── XP-Balken — Skala eines Messgeräts, nicht Fortschrittspille */
+/* ─── XP bar — an instrument scale, not a progress pill ─────── */
 .xp-bar-track {
   background: var(--paper-2);
   border: var(--rule-thin);
@@ -365,8 +365,8 @@ body {
   touch-action: none;
   overflow: hidden;
 }
-/* Ausblenden schneller als Einblenden: beim Oeffnen schaut man
-   hin, beim Schliessen ist die Entscheidung schon gefallen. */
+/* Exit faster than entrance: opening is what you watch, by closing
+   the decision is already made. */
 .sheet-overlay[data-state="closing"] {
   animation: fade-out 0.16s var(--ease-out) forwards;
 }
@@ -440,7 +440,7 @@ body {
   }
 }
 
-/* ─── Antippbare Karte — mechanischer Versatz statt Skalierung ── */
+/* ─── Tappable card — mechanical offset instead of scaling ──── */
 .card-tap {
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-standard),
@@ -452,15 +452,15 @@ body {
   box-shadow: none !important;
 }
 
-/* ─── Karte / Map ────────────────────────────────────────────── */
+/* ─── Map ───────────────────────────────────────────────────── */
 .map-container {
   position: relative;
   overflow: hidden;
   background: var(--paper-2);
 }
-/* Der helle Kartenlayer ist neutralgrau. Sepia plus leichte
-   Drehung zieht ihn auf den Papierton, damit die Karte wie ein
-   gedruckter Plan wirkt statt wie eine fremde Web-Kachel. */
+/* The light map layer is neutral grey. Sepia plus a slight hue
+   rotation pulls it onto the paper tone, so the map reads as a
+   printed plan rather than a foreign web tile. */
 .printed-map .leaflet-tile-pane {
   filter: sepia(0.42) saturate(0.72) hue-rotate(-8deg) brightness(1.02) contrast(0.94);
 }
@@ -478,7 +478,7 @@ body {
   animation: pin-drop 0.3s var(--ease-standard) both;
 }
 
-/* ─── Nachrichten ────────────────────────────────────────────── */
+/* ─── Messages ──────────────────────────────────────────────── */
 .msg-bubble-me {
   background: var(--rust);
   color: var(--paper-0);
@@ -500,7 +500,7 @@ body {
   word-break: break-word;
 }
 
-/* ─── Formulare — Eintragsfeld auf einem Formular ────────────── */
+/* ─── Forms — an entry field on a printed form ──────────────── */
 .form-input {
   width: 100%;
   background: var(--paper-0);
@@ -520,7 +520,7 @@ body {
   box-shadow: var(--glow-focus);
 }
 
-/* ─── Live-Punkt ─────────────────────────────────────────────── */
+/* ─── Live dot ──────────────────────────────────────────────── */
 .pulse-dot {
   width: 8px;
   height: 8px;
@@ -544,7 +544,7 @@ body {
   .pulse-dot::after { animation: none; }
 }
 
-/* ─── Schaltflächen — gedruckte Blöcke mit hartem Versatz ────── */
+/* ─── Buttons — printed blocks with a hard offset ───────────── */
 .sm-btn-primary {
   background: var(--rust);
   color: var(--paper-0);
@@ -580,9 +580,9 @@ body {
   box-shadow: none;
 }
 
-/* Hover nur auf echten Zeigergeraeten. Ohne diesen Schutz loest
-   ein Fingertipp den Hover-Zustand aus und laesst ihn danach
-   haengen — auf einer Mobile-First-App der Normalfall. */
+/* Hover only on real pointing devices. Without this guard a tap
+   triggers the hover state and leaves it stuck afterwards — the
+   normal case on a mobile-first app. */
 @media (hover: hover) and (pointer: fine) {
   .sm-btn-primary:hover:not(:disabled) { background: var(--rust-ink); }
   .sm-btn-secondary:hover:not(:disabled) { background: var(--paper-1); }
@@ -590,7 +590,7 @@ body {
   .sm-btn-warm:hover:not(:disabled) { background: #e3a63f; }
 }
 
-/* ─── Umschalter — Reiter auf einem Register ────────────────── */
+/* ─── Toggle — tabs on a printed index ─────────────────────── */
 .city-toggle-track {
   display: flex;
   background: var(--paper-0);
@@ -613,7 +613,7 @@ body {
 .city-toggle-btn.active { background: var(--ink-0); color: var(--paper-0); }
 .city-toggle-btn:not(.active) { background: transparent; color: var(--ink-2); }
 
-/* ─── Stempelring — für die Nummer eins ─────────────────────── */
+/* ─── Stamp ring — for number one ───────────────────────────── */
 .story-ring {
   padding: 3px;
   border-radius: 9999px;
@@ -621,7 +621,7 @@ body {
   border: 1.5px solid var(--ink-0);
 }
 
-/* ─── XP-Einblendung ─────────────────────────────────────────── */
+/* ─── XP toast ──────────────────────────────────────────────── */
 @keyframes xp-pop {
   0%   { opacity: 0; transform: translateY(8px); }
   20%  { opacity: 1; transform: translateY(0); }

@@ -14,8 +14,8 @@ describe("getAuthRedirect", () => {
     expect(getAuthRedirect(pathname, false)).toBe("/login");
   });
 
-  /* Der klickbare Prototyp liegt bewusst ausserhalb der Anmeldung
-     und darf davon nicht eingefangen werden. */
+  /* The clickable prototype deliberately sits outside the login and
+     must not get caught by it. */
   it.each(["/demo", "/demo/events", "/demo/people"])(
     "keeps the prototype route %s public",
     (pathname) => {

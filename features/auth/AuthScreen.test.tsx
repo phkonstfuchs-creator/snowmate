@@ -10,7 +10,7 @@ describe("AuthScreen", () => {
   it("renders the login screen", () => {
     render(<AuthScreen mode="login" />);
 
-    expect(screen.getByRole("heading", { name: "Anmelden" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
     expect(screen.getByText("auth-form-login")).toBeInTheDocument();
   });
 
@@ -18,7 +18,7 @@ describe("AuthScreen", () => {
     render(<AuthScreen mode="signup" />);
 
     expect(
-      screen.getByRole("heading", { name: "Account erstellen" }),
+      screen.getByRole("heading", { name: "Create account" }),
     ).toBeInTheDocument();
     expect(screen.getByText("auth-form-signup")).toBeInTheDocument();
   });
@@ -29,7 +29,7 @@ describe("AuthScreen", () => {
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "ungültig oder abgelaufen",
+      "invalid or has expired",
     );
 
     rerender(<AuthScreen mode="login" />);

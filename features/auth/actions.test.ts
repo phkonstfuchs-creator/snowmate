@@ -92,7 +92,7 @@ describe("auth actions", () => {
 
     expect(result).toMatchObject({
       status: "error",
-      message: "E-Mail-Adresse oder Passwort ist falsch.",
+      message: "Email or password is incorrect.",
     });
   });
 
@@ -114,7 +114,7 @@ describe("auth actions", () => {
     expect(result).toEqual({
       status: "success",
       message:
-        "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
+        "If this address can be used, you will receive a confirmation email shortly.",
       email: "new.rider@example.com",
     });
   });
@@ -141,7 +141,7 @@ describe("auth actions", () => {
     expect(result).toEqual({
       status: "success",
       message:
-        "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
+        "If this address can be used, you will receive a confirmation email shortly.",
       email: "known.rider@example.com",
     });
   });
