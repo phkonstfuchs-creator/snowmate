@@ -13,18 +13,21 @@ const TABS = [
   { href: "/profile", label: "Profil", icon: "user" },
 ];
 
-export default function BottomNav() {
+/* basePath erlaubt dieselbe Leiste im klickbaren Demo-Bereich
+   unter /demo, ohne die Zieladressen zu duplizieren. */
+export default function BottomNav({ basePath = "" }: { basePath?: string }) {
   const pathname = usePathname();
 
   return (
     <nav className="bottom-nav" aria-label="Hauptnavigation">
       <div className="flex items-stretch">
         {TABS.map((tab) => {
-          const isActive = pathname.startsWith(tab.href);
+          const href = `${basePath}${tab.href}`;
+          const isActive = pathname.startsWith(href);
           return (
             <Link
               key={tab.href}
-              href={tab.href}
+              href={href}
               className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-3 min-h-[56px] transition-colors duration-150"
               style={{ color: isActive ? "var(--rust)" : "var(--ink-2)" }}
               aria-current={isActive ? "page" : undefined}
