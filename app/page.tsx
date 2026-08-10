@@ -375,11 +375,10 @@ export default function Home() {
             averaging 1.4 on the German scale where 1.0 is the top mark.
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            Alongside that I run a registered business for web design, video
-            editing and motion design. I founded it at 16. A minor cannot do
-            that alone in Germany: it takes both parents&rsquo; consent and
-            approval from the family court. Snowmate is the product I build on
-            the side.
+            At 16, I founded my own business, navigating the extensive legal
+            approval process required for minors in Germany. It does web
+            design, video editing and motion design. Snowmate is the product I
+            build on the side.
           </p>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
