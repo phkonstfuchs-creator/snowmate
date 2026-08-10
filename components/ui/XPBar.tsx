@@ -13,7 +13,7 @@ export default function XPBar({ current, max, level }: XPBarProps) {
         <span style={{ font: "600 12px var(--font-mono)", color: "var(--sky)" }}>{current.toLocaleString("en-US")}/{max.toLocaleString("en-US")} XP</span>
       </div>
       <div className="xp-bar-track">
-        <div className="xp-bar-fill" style={{ width: `${pct}%` }} />
+        <div className="xp-bar-fill" style={{ transform: `scaleX(${pct / 100})` }} />
       </div>
     </div>
   );

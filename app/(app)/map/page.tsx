@@ -191,7 +191,7 @@ export default function MapPage() {
       {/* Brennpunkt strip */}
       {hotResort && (
         <button
-          className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] active:scale-[0.98] transition-transform overflow-hidden"
+          className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] overflow-hidden card-tap"
           style={{ background: BRAND }}
           onClick={() => setActiveSheet({ type: "resort", resort: hotResort })}
         >
@@ -214,7 +214,7 @@ export default function MapPage() {
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
         <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>All resorts</p>
-        <div className="space-y-2 stagger">
+        <div className="space-y-2">
           {sorted.map((resort, i) => (
             <button
               key={resort.name}

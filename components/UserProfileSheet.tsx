@@ -184,12 +184,12 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             <button
               ref={messageButtonRef}
               onClick={() => { if (onMessage) { onMessage(user.id); } else { setShowThread(true); } }}
-              className="flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform"
+              className="card-tap flex-1 py-3 rounded-none font-black text-sm"
               style={{ background: BRAND, color: D }}
             >
               Message
             </button>
-            <button className={clsx("flex-1 py-3 rounded-none font-black text-sm active:scale-95 transition-transform border-2")}
+            <button className={clsx("card-tap flex-1 py-3 rounded-none font-black text-sm border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
               {isFriend ? "In your crew" : "Add to crew"}
             </button>

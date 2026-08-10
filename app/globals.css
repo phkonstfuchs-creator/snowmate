@@ -155,6 +155,10 @@
 }
 
 @theme inline {
+  /* Tailwind's own default is cubic-bezier(.4,0,.2,1), an ease-in-out.
+     Every transition-* utility without an explicit ease was using it,
+     so presses and tab switches started slow. */
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   --color-paper: var(--paper-0);
   --color-paper-1: var(--paper-1);
   --color-paper-2: var(--paper-2);
@@ -350,8 +354,10 @@ body {
 .xp-bar-fill {
   background: var(--rust);
   height: 100%;
+  width: 100%;
   border-radius: 0;
-  transition: width 0.5s var(--ease-standard);
+  transform-origin: left;
+  transition: transform 0.26s var(--ease-out);
 }
 
 /* ─── Sheet ──────────────────────────────────────────────────── */
@@ -419,15 +425,11 @@ body {
 .anim-fade-up  { animation: fade-up 0.28s var(--ease-standard) both; }
 .anim-scale-in { animation: scale-in 0.2s var(--ease-standard) both; }
 
-.stagger > *:nth-child(1) { animation-delay: 0ms; }
-.stagger > *:nth-child(2) { animation-delay: 45ms; }
-.stagger > *:nth-child(3) { animation-delay: 90ms; }
-.stagger > *:nth-child(4) { animation-delay: 135ms; }
-.stagger > *:nth-child(5) { animation-delay: 180ms; }
-.stagger > *:nth-child(6) { animation-delay: 225ms; }
-.stagger > *:nth-child(7) { animation-delay: 270ms; }
-.stagger > *:nth-child(8) { animation-delay: 315ms; }
-
+/* Reduced motion means gentler, not none. Keyframes carry the travel
+   (sheets sliding, cards rising, pins dropping), so those are
+   neutralised. Transitions stay: colour, opacity and the 2px press
+   offset are how the interface confirms a tap, and removing them
+   costs comprehension without reducing vestibular load. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -435,8 +437,8 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
   }
+  .xp-bar-fill { transition: none; }
 }
 
 /* ─── Tappable card — mechanical offset instead of scaling ──── */
@@ -533,7 +535,7 @@ body {
   inset: -3px;
   border-radius: 9999px;
   background: rgba(168, 63, 27, 0.3);
-  animation: pulse-ring 1.8s ease-out infinite;
+  animation: pulse-ring 1.8s linear infinite;
 }
 @keyframes pulse-ring {
   0%   { transform: scale(0.8); opacity: 1; }

@@ -61,7 +61,7 @@ function OfferModal({ onClose }: { onClose: () => void }) {
         <div className="px-5">
           <button
             onClick={dismiss}
-            className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
+            className="card-tap w-full py-4 rounded-none font-black text-base"
             style={{ background: BRAND, color: D }}
           >
             Publish offer
@@ -124,7 +124,7 @@ export default function CarpoolPage() {
                 Seats open · {drivers.length}
               </h2>
             </div>
-            <div className="space-y-3 stagger">
+            <div className="space-y-3">
               {drivers.map((post, i) => {
                 const author = getUserById(post.authorId);
                 if (!author) return null;
@@ -202,7 +202,7 @@ export default function CarpoolPage() {
                 Looking for a seat · {riders.length}
               </h2>
             </div>
-            <div className="space-y-2 stagger">
+            <div className="space-y-2">
               {riders.map((post, i) => {
                 const author = getUserById(post.authorId);
                 if (!author) return null;

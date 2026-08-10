@@ -356,7 +356,7 @@ export default function EventsScreen() {
         </div>
       </div>
 
-      <div className="space-y-3 px-4 pt-4 pb-6 stagger">
+      <div className="space-y-3 px-4 pt-4 pb-6">
         {events.map((event, index) => {
           const author = getUserById(event.authorId);
           if (!author) return null;

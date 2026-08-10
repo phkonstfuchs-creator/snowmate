@@ -77,7 +77,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         <button
           onClick={onClose}
           aria-label="Close conversation"
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
           style={{ background: "var(--bg-surface-2)" }}
         >
           <Icon name="chevron-left" size={16} color="var(--text-tertiary)" strokeWidth={2} />
@@ -97,7 +97,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
             href={`https://instagram.com/${other.instagram}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[0.65rem] font-bold px-2 py-1 rounded-full active:scale-95 transition-transform"
+            className="card-tap text-[0.65rem] font-bold px-2 py-1 rounded-full"
             style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: "1px solid rgba(200,90,160,0.3)" }}
           >
             IG
@@ -161,7 +161,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
           onClick={send}
           disabled={!input.trim()}
           aria-label="Nachricht senden"
-          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40 flex-shrink-0"
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 flex-shrink-0"
           style={{ background: "var(--sky)" }}
         >
           <Icon name="arrow-right" size={16} color="white" strokeWidth={2} />

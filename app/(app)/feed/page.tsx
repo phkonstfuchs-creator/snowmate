@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
@@ -26,7 +26,19 @@ export default function FeedPage() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const [storyUser, setStoryUser] = useState<User | null>(null);
-  const [showXp, setShowXp] = useState(false);
+  /* Counter, not a boolean: the hold time lives inside the keyframe,
+     so joining a second ride while the first toast is up would leave
+     the animation mid-flight. A changing key remounts it and the toast
+     starts over instead of being swallowed. */
+  const [xpToast, setXpToast] = useState(0);
+
+  /* The effect owns the timer, so each new toast cancels the previous
+     one through the cleanup and unmounting cannot leave one running. */
+  useEffect(() => {
+    if (xpToast === 0) return;
+    const timer = setTimeout(() => setXpToast(0), 1750);
+    return () => clearTimeout(timer);
+  }, [xpToast]);
 
   const ridersToday = city === "innsbruck" ? 174 : 127;
   const posts = RIDE_POSTS.filter((p) => p.city === city);
@@ -45,8 +57,7 @@ export default function FeedPage() {
       !joinedPostIds.has(postId) && nextJoinedPostIds.has(postId);
 
     if (didJoin) {
-      setShowXp(true);
-      setTimeout(() => setShowXp(false), 1750);
+      setXpToast((n) => n + 1);
     }
 
     setJoinedPostIds(nextJoinedPostIds);
@@ -87,7 +98,7 @@ export default function FeedPage() {
             <button
               key={u.id}
               onClick={() => setStoryUser(u)}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-90 transition-transform"
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform"
             >
               <div className="story-ring">
                 <Avatar id={u.id} initials={u.avatar} size={52} />
@@ -112,7 +123,7 @@ export default function FeedPage() {
       </div>
 
       {/* Feed */}
-      <div className="px-4 pb-4 space-y-3 stagger">
+      <div className="px-4 pb-4 space-y-3">
         {posts.map((post, i) => {
           const author = getUserById(post.authorId);
           if (!author) return null;
@@ -218,9 +229,10 @@ export default function FeedPage() {
       )}
 
       {/* XP toast */}
-      {showXp && (
+      {xpToast > 0 && (
         <div className="fixed bottom-[150px] left-1/2 -translate-x-1/2 z-[450] pointer-events-none">
           <div
+            key={xpToast}
             className="xp-toast text-mono-label flex items-center gap-2 px-4 py-2.5"
             style={{ background: "var(--ink-0)", color: "var(--paper-0)", boxShadow: "var(--shadow-print)" }}
           >

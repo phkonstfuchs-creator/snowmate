@@ -233,7 +233,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="xp-bar-track mt-3">
-            <div className="xp-bar-fill" style={{ width: `${pct}%` }} />
+            <div className="xp-bar-fill" style={{ transform: `scaleX(${pct / 100})` }} />
           </div>
           <p className="text-mono-label mt-2" style={{ color: INK_2 }}>
             {(ME.xpToNext - ME.xp).toLocaleString("en-GB")} XP to level {ME.level + 1}

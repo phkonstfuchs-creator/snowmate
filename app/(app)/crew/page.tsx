@@ -104,7 +104,7 @@ export default function CrewPage() {
                 <button
                   onClick={() => { setSelectedConvUserId(friend.id); setTab("chats"); }}
                   aria-label={`Message ${friend.name}`}
-                  className="h-11 w-11 rounded-full flex items-center justify-center active:scale-90 transition-transform flex-shrink-0"
+                  className="h-11 w-11 rounded-full flex items-center justify-center active:scale-95 transition-transform flex-shrink-0"
                   style={{ background: "var(--accent-primary-subtle)" }}
                 >
                   <Icon name="message-circle" size={15} color={BRAND} strokeWidth={1.8} />
