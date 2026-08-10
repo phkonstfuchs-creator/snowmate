@@ -260,7 +260,7 @@ export default function PeopleScreen() {
                     No one found
                   </p>
                   <p className="mt-1 text-sm" style={{ color: INK_2 }}>
-                    Check the spelling, or invite them with a link.
+                    Check the spelling, or send them an invite link.
                   </p>
                 </div>
               </div>

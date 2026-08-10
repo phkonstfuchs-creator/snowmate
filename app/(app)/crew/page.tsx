@@ -92,7 +92,7 @@ export default function CrewPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm" style={{ color: INK }}>{friend.name}</span>
-                    <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: "var(--rust-ink)" }}>
+                    <span className="text-mono-label px-1.5" style={{ background: "var(--accent-primary-subtle)", color: "var(--rust-ink)" }}>
                       Level {friend.level}
                     </span>
                   </div>
@@ -142,7 +142,7 @@ export default function CrewPage() {
                     <p className="font-black text-[0.9375rem]" style={{ color: INK }}>{crew.name}</p>
                     <p className="text-xs font-bold" style={{ color: MUTED }}>{members.length} members · {crew.city === "innsbruck" ? "Innsbruck" : "Salzburg"}</p>
                   </div>
-                  <button className="text-xs font-black px-3 py-1.5 rounded-full" style={{ background: "var(--accent-primary-subtle)", color: BRAND }}>Plan a ride</button>
+                  <button className="text-mono-label px-3 py-1.5" style={{ background: "var(--accent-primary-subtle)", color: "var(--rust-ink)" }}>Plan a ride</button>
                 </div>
                 <div className="flex -space-x-2">
                   {members.map((m) => (

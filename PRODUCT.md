@@ -44,7 +44,7 @@ The app should feel like what Instagram would look like if it were built specifi
 
 Voice: direct, crew-native, zero corporate-speak. The interface talks like a friend who skis, not a product manager.
 
-Language: the interface is English. Riding vocabulary already is, and the earliest users include Erasmus students and seasonal workers who do not speak German. A German localisation is a prerequisite for a real launch in Austria and does not exist yet — treat any claim otherwise as false.
+Language: launching in German and English.
 
 ## Anti-references
 

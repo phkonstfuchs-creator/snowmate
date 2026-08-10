@@ -132,8 +132,8 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
               <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="post-ride-level-label">
                 {ABILITY_OPTIONS.map((opt) => {
                   const active = abilityLevel === opt.value;
-                  const accent = opt.value === "chill" ? "var(--sky)" : opt.value === "park" ? "var(--rust)" : "#FF9C9C";
-                  const bg = opt.value === "chill" ? "var(--accent-primary-subtle)" : opt.value === "park" ? "var(--accent-warm-subtle)" : "rgba(255,107,107,0.14)";
+                  const accent = opt.value === "chill" ? "var(--rust-ink)" : opt.value === "park" ? "var(--sky-ink)" : "var(--pine)";
+                  const bg = opt.value === "chill" ? "var(--accent-warm-subtle)" : opt.value === "park" ? "rgba(62, 110, 142, 0.16)" : "rgba(42, 86, 71, 0.16)";
                   return (
                     <button
                       key={opt.value}

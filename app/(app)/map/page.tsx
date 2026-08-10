@@ -45,15 +45,26 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         </button>
 
         {/* Vector scene hero */}
-        <div className="mx-5 mt-4 rounded-none overflow-hidden relative" style={{ height: 140 }}>
-          <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65) 100%)" }} />
-          <div className="absolute bottom-3 left-4">
-            <p className="font-black text-white text-lg drop-shadow">{resort.name}</p>
-            <p className="text-white/70 text-xs font-semibold">{resort.altitudeMin}–{resort.altitudeMax} m</p>
+        <div className="mx-5 mt-4" style={{ border: "var(--rule-thin)" }}>
+          <div className="relative overflow-hidden" style={{ height: 118 }}>
+            <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
+            <span
+              className="text-mono-label absolute right-0 top-0 px-2 py-1"
+              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+            >
+              {resort.snowDepth} cm
+            </span>
           </div>
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
-            <span className="text-xs font-black text-white">{resort.snowDepth} cm snow</span>
+          <div
+            className="flex items-baseline justify-between gap-3 px-3 py-2"
+            style={{ background: "var(--paper-0)", borderTop: "var(--rule-thin)" }}
+          >
+            <span className="font-display text-base uppercase" style={{ color: INK, letterSpacing: 0 }}>
+              {resort.name}
+            </span>
+            <span className="text-mono-label" style={{ color: MUTED }}>
+              {resort.altitudeMin}–{resort.altitudeMax} m
+            </span>
           </div>
         </div>
 
@@ -78,16 +89,16 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
         <div className="px-5 mt-4">
           <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>Who rides what</p>
           {[
-            { label: "Chill",     count: resort.chillRiders,    color: "var(--sky)",   bg: "var(--accent-primary-subtle)" },
-            { label: "Park",      count: resort.parkRiders,     color: "var(--rust)", bg: "var(--accent-warm-subtle)" },
-            { label: "Off-piste", count: resort.offPisteRiders, color: "#FF9C9C",          bg: "rgba(255,107,107,0.14)" },
+            { label: "Chill",     count: resort.chillRiders,    color: "var(--rust-ink)", bg: "var(--accent-warm-subtle)" },
+            { label: "Park",      count: resort.parkRiders,     color: "var(--sky-ink)",  bg: "rgba(62, 110, 142, 0.16)" },
+            { label: "Off-piste", count: resort.offPisteRiders, color: "var(--pine)",     bg: "rgba(42, 86, 71, 0.16)" },
           ].map(({ label, count, color, bg }) => {
             const pct = resort.ridersNow > 0 ? Math.round((count / resort.ridersNow) * 100) : 0;
             return (
               <div key={label} className="flex items-center gap-3 mb-1.5">
                 <span className="w-16 text-xs font-bold" style={{ color: MUTED }}>{label}</span>
-                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: bg }}>
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                <div className="flex-1 overflow-hidden" style={{ height: 10, background: bg, border: "1px solid var(--border-hairline)" }}>
+                  <div style={{ width: `${pct}%`, height: "100%", background: color }} />
                 </div>
                 <span className="w-6 text-xs font-black text-right" style={{ color: INK }}>{count}</span>
               </div>
@@ -109,7 +120,7 @@ function ResortDetailSheet({ resort, onClose }: { resort: ResortStatus; onClose:
                     <p className="text-sm font-black" style={{ color: INK }}>{a.name}</p>
                     <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {ride.totalSpots - ride.takenSpots} open</p>
                   </div>
-                  <span className={clsx("text-[0.65rem] font-black px-2 py-0.5 rounded-full flex-shrink-0",
+                  <span className={clsx("text-mono-label px-2 py-0.5 flex-shrink-0",
                     ride.abilityLevel === "chill" && "badge-chill",
                     ride.abilityLevel === "park" && "badge-park",
                     ride.abilityLevel === "off-piste" && "badge-offpiste")}>
@@ -218,7 +229,7 @@ export default function MapPage() {
                 <div className="flex items-center gap-2">
                   <span className="font-black text-sm truncate" style={{ color: INK }}>{resort.name}</span>
                   {resort.conditions === "fresh" && (
-                    <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full flex-shrink-0 badge-chill">Fresh</span>
+                    <span className="text-mono-label px-1.5 flex-shrink-0 badge-chill">Fresh</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">

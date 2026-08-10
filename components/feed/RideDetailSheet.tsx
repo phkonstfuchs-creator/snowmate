@@ -47,15 +47,27 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         </div>
 
         {/* Resort scene hero */}
-        <div className="mx-5 mt-4 rounded-none overflow-hidden relative" style={{ height: 130 }}>
-          <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)" }} />
-          <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-            <div>
-              <p className="font-display text-white drop-shadow" style={{ fontSize: 17, fontWeight: 700 }}>{post.resort}</p>
-              <p className="text-white/70 text-xs font-semibold mt-0.5 font-mono">{post.meetTime} · {post.meetPoint}</p>
+        <div className="mx-5 mt-4" style={{ border: "var(--rule-thin)" }}>
+          <div className="relative overflow-hidden" style={{ height: 108 }}>
+            <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
+            <span
+              className="text-mono-label absolute left-0 top-0 px-2 py-1"
+              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+            >
+              {post.meetTime}
+            </span>
+            <div className="absolute right-2 top-2">
+              <Tag level={post.abilityLevel} />
             </div>
-            <Tag level={post.abilityLevel} />
+          </div>
+          <div
+            className="px-3 py-2"
+            style={{ background: "var(--paper-0)", borderTop: "var(--rule-thin)" }}
+          >
+            <p className="font-display text-base uppercase" style={{ color: INK, letterSpacing: 0 }}>
+              {post.resort}
+            </p>
+            <p className="text-mono-label mt-0.5" style={{ color: MUTED }}>{post.meetPoint}</p>
           </div>
         </div>
 
@@ -82,13 +94,13 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         {(author.instagram || author.snapchat) && (
           <div className="flex gap-2 px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
             {author.instagram && (
-              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: `1px solid rgba(200,90,160,0.3)` }}>
+              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1" style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: `1px solid rgba(200,90,160,0.3)` }}>
                 <Icon name="instagram" size={11} />
                 {author.instagram}
               </span>
             )}
             {author.snapchat && (
-              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)", border: `1px solid var(--rust-ink)` }}>
+              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)", border: `1px solid var(--rust-ink)` }}>
                 {author.snapchat}
               </span>
             )}
@@ -129,7 +141,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                  <span className="text-[0.65rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm)", color: "var(--ink-0)" }}>Host</span>
+                  <span className="text-mono-label px-1.5" style={{ background: "var(--ochre)", color: "var(--ink-0)" }}>Host</span>
                 </div>
                 <span className="text-xs font-bold" style={{ color: MUTED }}>Level {author.level} · {author.levelTitle}</span>
               </div>

@@ -136,7 +136,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
       <div className="pt-1">
         <Button
           type="submit"
-          size="lg"
           fullWidth
           disabled={isPending}
           aria-busy={isPending}

@@ -102,7 +102,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
                   <Icon name="badge-check" size={16} color={BRAND} fill={BRAND} strokeWidth={1.5} />
                 )}
                 {user.isMinor && (
-                  <span className="text-[0.6rem] font-black px-1.5 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>U18</span>
+                  <span className="text-mono-label px-1.5" style={{ background: "var(--paper-2)", color: "var(--ink-1)" }}>U18</span>
                 )}
               </div>
               <p className="text-sm font-bold mt-0.5" style={{ color: MUTED }}>@{user.handle} · Level {user.level} {user.levelTitle}</p>
@@ -114,7 +114,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             <div className="flex gap-2 mt-3">
               {user.instagram && (
                 <a href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+                  className="card-tap flex items-center gap-1.5 text-xs font-bold px-3 py-1.5"
                   style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: "1px solid rgba(200,90,160,0.3)" }}
                   onClick={(e) => e.stopPropagation()}>
                   <Icon name="instagram" size={12} />
@@ -123,7 +123,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
               )}
               {user.snapchat && (
                 <a href={`https://snapchat.com/add/${user.snapchat}`} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+                  className="card-tap flex items-center gap-1.5 text-xs font-bold px-3 py-1.5"
                   style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)", border: "1px solid var(--rust-ink)" }}
                   onClick={(e) => e.stopPropagation()}>
                   {user.snapchat}
@@ -169,7 +169,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Badges ({earnedBadges.length})</p>
             <div className="flex flex-wrap gap-2">
               {earnedBadges.map((b) => (
-                <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-black"
+                <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-black"
                   style={{ background: BADGE_BG[b.id] ?? "var(--accent-primary-subtle)", color: BADGE_INK[b.id] ?? BRAND }}>
                   {b.name}
                 </div>

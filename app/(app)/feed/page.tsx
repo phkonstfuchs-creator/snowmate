@@ -148,8 +148,7 @@ export default function FeedPage() {
             <div>
               <p className="font-bold" style={{ color: "var(--text-primary)" }}>No rides today yet</p>
               <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
-                This shows rides from your crew. Open events live under
-                Events, and you do not need to know anyone for those.
+                Open events need no crew.
               </p>
             </div>
             <Link

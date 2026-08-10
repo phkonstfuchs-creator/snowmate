@@ -4,8 +4,7 @@ Snowmate is a mobile-first coordination app for ski crews around Innsbruck and
 Salzburg. The repository contains the interactive product prototype and the
 first Supabase account foundation.
 
-The interface is English. A German localisation is needed before a real launch
-in Austria and does not exist yet.
+Launching in German and English.
 
 `/demo` serves the same screens outside the login on sample data. It is the
 clickable prototype linked from the landing page; nothing there is saved.

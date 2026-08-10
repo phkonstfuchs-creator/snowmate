@@ -97,10 +97,10 @@ export default function CarpoolPage() {
           </div>
           <button
             onClick={() => setShowOfferModal(true)}
-            className="flex min-h-11 items-center gap-1.5 text-sm font-black px-4 rounded-full active:scale-95 transition-transform"
-            style={{ background: BRAND, color: D }}
+            className="card-tap text-mono-label flex min-h-11 items-center gap-1.5 px-3"
+            style={{ background: BRAND, color: D, border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
-            <Icon name="plus" size={14} strokeWidth={2.4} />
+            <Icon name="plus" size={13} strokeWidth={2.6} />
             Post
           </button>
         </div>
@@ -137,19 +137,24 @@ export default function CarpoolPage() {
                     style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
                   >
                     {/* Mini resort scene strip */}
-                    <div className="relative h-20 overflow-hidden">
+                    <div className="relative h-16 overflow-hidden" style={{ borderBottom: "var(--rule-thin)" }}>
                       <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
-                      <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)" }} />
-                      <div className="absolute inset-0 flex items-center px-4 gap-3">
-                        <Avatar id={author.id} initials={author.avatar} size={42} />
-                        <div>
-                          <p className="font-black text-white text-sm">{author.name}</p>
-                          <p className="text-white/70 text-xs font-semibold">{post.resort}</p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-1 bg-black/40 rounded-full px-2.5 py-1">
-                          <span className="text-xs font-black text-white font-mono">{post.availableSeats}</span>
-                          <Icon name="users" size={12} color="white" strokeWidth={2} />
-                        </div>
+                      <span
+                        className="text-mono-label absolute right-0 top-0 flex items-center gap-1 px-2 py-1"
+                        style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+                      >
+                        {post.availableSeats}
+                        <Icon name="users" size={11} strokeWidth={2} />
+                      </span>
+                    </div>
+                    <div
+                      className="flex items-center gap-3 px-4 py-2.5"
+                      style={{ borderBottom: "1px solid var(--border-hairline)" }}
+                    >
+                      <Avatar id={author.id} initials={author.avatar} size={34} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold" style={{ color: INK }}>{author.name}</p>
+                        <p className="text-mono-label" style={{ color: MUTED }}>{post.resort}</p>
                       </div>
                     </div>
 
@@ -214,7 +219,7 @@ export default function CarpoolPage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)" }}>
+                          <span className="text-mono-label px-2 py-0.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)" }}>
                             Needs a seat
                           </span>
                         </div>

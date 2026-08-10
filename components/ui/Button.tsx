@@ -1,37 +1,15 @@
 "use client";
 
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes } from "react";
 
-/* Printed blocks: sharp corners, uppercase display type, hard
-   shadow offset. The press effect on tap comes from globals.css
-   (:active shifts the block), not from JS — otherwise an inline
-   transform would override the CSS rule. */
-const SIZES = {
-  sm: { h: 36, pad: "0 14px", font: "600 13px var(--font-body-stack)", gap: 6 },
-  md: { h: 48, pad: "0 20px", font: "600 15px var(--font-body-stack)", gap: 8 },
-  lg: { h: 56, pad: "0 26px", font: "700 19px var(--font-display-stack)", gap: 10 },
-};
-
-const VARIANT_CLASS: Record<string, string> = {
-  primary: "sm-btn-primary",
-  secondary: "sm-btn-secondary",
-  ghost: "sm-btn-ghost",
-  warm: "sm-btn-warm",
-};
-
+/* Printed block: sharp corners, uppercase display type, hard shadow
+   offset. The press effect comes from globals.css (:active shifts the
+   block), not from JS — an inline transform would override it. */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "warm";
-  size?: "sm" | "md" | "lg";
-  icon?: ReactNode;
-  iconPosition?: "left" | "right";
   fullWidth?: boolean;
 }
 
 export default function Button({
-  variant = "primary",
-  size = "md",
-  icon,
-  iconPosition = "left",
   fullWidth = false,
   disabled,
   children,
@@ -39,21 +17,20 @@ export default function Button({
   style,
   ...rest
 }: ButtonProps) {
-  const s = SIZES[size];
   return (
     <button
       disabled={disabled}
-      className={`${VARIANT_CLASS[variant]} inline-flex select-none items-center justify-center ${className}`}
+      className={`sm-btn-primary inline-flex select-none items-center justify-center ${className}`}
       style={{
-        height: s.h,
-        padding: s.pad,
-        font: s.font,
-        gap: s.gap,
+        height: 56,
+        padding: "0 26px",
+        font: "700 19px var(--font-display-stack)",
+        gap: 10,
         borderRadius: 0,
         width: fullWidth ? "100%" : undefined,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,
-        textTransform: size === "lg" ? "uppercase" : "none",
+        textTransform: "uppercase",
         letterSpacing: 0,
         transition:
           "transform var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard)",
@@ -61,9 +38,7 @@ export default function Button({
       }}
       {...rest}
     >
-      {icon && iconPosition === "left" ? icon : null}
       {children}
-      {icon && iconPosition === "right" ? icon : null}
     </button>
   );
 }

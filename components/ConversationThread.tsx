@@ -66,7 +66,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
     >
       {/* Header */}
       <div
-        className="flex items-center gap-3 px-4 backdrop-blur-md"
+        className="flex items-center gap-3 px-4"
         style={{
           paddingTop: "max(44px, env(safe-area-inset-top, 16px) + 16px)",
           paddingBottom: "12px",
@@ -109,7 +109,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-3 space-y-3">
         {existing?.contextType === "ride" && messages.length > 0 && (
           <div className="flex justify-center mb-1">
-            <span className="text-[0.62rem] px-3 py-1 rounded-full font-medium" style={{ background: "var(--accent-primary-subtle)", color: "var(--sky)" }}>
+            <span className="text-mono-label px-3 py-1" style={{ background: "var(--accent-primary-subtle)", color: "var(--sky)" }}>
               Ausfahrtskontext
             </span>
           </div>
@@ -120,7 +120,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
             <Avatar id={other.id} initials={other.avatar} size={56} />
             <div>
               <p className="font-bold" style={{ color: "var(--text-primary)" }}>{other.name}</p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>Schreib die erste Nachricht!</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>No messages yet.</p>
             </div>
           </div>
         )}

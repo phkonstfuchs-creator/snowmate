@@ -37,9 +37,9 @@ const auth = {
 };
 
 function formData(values: Record<string, string>): FormData {
-  const data = new FormData();
-  Object.entries(values).forEach(([name, value]) => data.set(name, value));
-  return data;
+  const fields = new FormData();
+  Object.entries(values).forEach(([name, value]) => fields.set(name, value));
+  return fields;
 }
 
 describe("auth actions", () => {

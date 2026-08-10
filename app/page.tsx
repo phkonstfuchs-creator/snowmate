@@ -21,19 +21,19 @@ const LINKEDIN = "https://www.linkedin.com/in/philipp-k-fuchs";
    themselves, adjectives would only dilute them. */
 const EXPERIENCE: [string, string][] = [
   [
-    "Aug 2026",
-    "Silicon Valley Technology and Management Program at San José State University, in the Bay Area.",
+    "Aug–Sep 2026",
+    "Korea Tech & AI Founders Program, a cross-border founder track. German cohort in Saarbrücken, Korean cohort in Korea.",
   ],
   [
-    "Aug 2026 – Sep 2026",
-    "Korea Tech & AI Founders Program, a cross-border founder track. German cohort in Saarbrücken, Korean cohort in Korea.",
+    "Aug 2026",
+    "Silicon Valley Technology and Management Program at San José State University, in the Bay Area.",
   ],
   [
     "Jul 2026",
     "Bocconi Summer School, Entrepreneurship Lab in Milan.",
   ],
   [
-    "Nov 2025 – Jan 2026",
+    "Nov 2025–Jan 2026",
     "ODDO BHF Future Pioneers. Built an AI-native multi-agent equity research MVP with an international team and pitched it to the bank's senior management in Paris.",
   ],
   [
@@ -385,15 +385,15 @@ export default function Home() {
             {EXPERIENCE.map(([year, what], i) => (
               <div
                 key={what}
-                className="flex flex-wrap items-baseline gap-x-3 py-2.5"
+                className="py-3"
                 style={{ borderBottom: i < EXPERIENCE.length - 1 ? "1px solid var(--border-hairline)" : "none" }}
               >
-                <span className="text-mono-label flex-shrink-0" style={{ color: RUST, minWidth: 52 }}>
+                <p className="text-mono-label" style={{ color: RUST }}>
                   {year}
-                </span>
-                <span className="flex-1 text-sm leading-relaxed" style={{ color: INK_1 }}>
+                </p>
+                <p className="mt-1 text-sm leading-relaxed" style={{ color: INK_1 }}>
                   {what}
-                </span>
+                </p>
               </div>
             ))}
           </div>
