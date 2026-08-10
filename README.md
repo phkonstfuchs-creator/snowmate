@@ -1,13 +1,20 @@
 # Snowmate
 
 Snowmate is a mobile-first coordination app for ski crews around Innsbruck and
-Salzburg. The repository contains the interactive product prototype and the
-first Supabase account foundation.
+Salzburg. It answers one question: who is riding today, where, and can I join?
+
+**[snowmate-umber.vercel.app](https://snowmate-umber.vercel.app)** — build
+status and reasoning
+**[snowmate-umber.vercel.app/demo](https://snowmate-umber.vercel.app/demo)** —
+clickable prototype, sample data, nothing is saved
 
 Launching in German and English.
 
-`/demo` serves the same screens outside the login on sample data. It is the
-clickable prototype linked from the landing page; nothing there is saved.
+This repository holds the product prototype and the Supabase account
+foundation. Sign-up, e-mail confirmation, sign-in and sign-out run against
+Supabase with server-side sessions. Every content screen still renders from a
+local fixture file. [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md) lists
+what the backend needs before real data can be attached, in priority order.
 
 ## Local development
 
