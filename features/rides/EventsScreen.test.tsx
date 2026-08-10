@@ -41,7 +41,7 @@ describe("EventsScreen", () => {
     render(<EventsScreen />);
 
     const titles = screen
-      .getAllByRole("heading", { level: 3 })
+      .getAllByRole("heading", { level: 2 })
       .map((heading) => heading.textContent);
 
     // Ladies Powder Morning is full (12/12) and must not sit at the top.
@@ -126,5 +126,38 @@ describe("EventsScreen", () => {
       screen.queryByText(event.title!),
     );
     expect(rendered.every((event) => event.visibility === "public")).toBe(true);
+  });
+});
+
+describe("EventsScreen accessibility", () => {
+  /* The card titles used to be h3 under an h1, skipping a level.
+     Screen readers navigate by headings, so the jump hid the list
+     structure. */
+  it("keeps the heading levels sequential", () => {
+    render(<EventsScreen />);
+
+    const levels = screen
+      .getAllByRole("heading")
+      .map((h) => Number(h.tagName[1]));
+
+    expect(levels[0]).toBe(1);
+
+    const jumps = levels.flatMap((level, i) => {
+      const previous = levels[i - 1];
+      return previous !== undefined && level - previous > 1
+        ? [`h${previous} -> h${level}`]
+        : [];
+    });
+    expect(jumps).toEqual([]);
+  });
+
+  it("gives every control an accessible name", () => {
+    render(<EventsScreen />);
+
+    const unnamed = screen
+      .getAllByRole("button")
+      .filter((b) => !(b.getAttribute("aria-label") || b.textContent || "").trim());
+
+    expect(unnamed).toEqual([]);
   });
 });

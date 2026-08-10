@@ -25,7 +25,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
         }}
       >
         <span>Demo · sample data · nothing is saved</span>
-        <Link href="/" className="underline whitespace-nowrap">
+        <Link href="/" className="-my-2 flex min-h-11 items-center whitespace-nowrap px-3 underline">
           Back
         </Link>
       </div>

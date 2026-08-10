@@ -155,7 +155,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         {isSignup ? "Already have one?" : "No account yet?"}{" "}
         <Link
           href={isSignup ? "/login" : "/signup"}
-          className="font-semibold underline"
+          className="-my-2 inline-flex min-h-11 items-center px-1 font-semibold underline"
           style={{ color: "var(--rust)" }}
         >
           {isSignup ? "Sign in" : "Register"}

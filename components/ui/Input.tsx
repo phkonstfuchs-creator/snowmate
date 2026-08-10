@@ -61,7 +61,10 @@ export default function Input({
           onBlur={() => setFocused(false)}
           aria-invalid={error ? true : undefined}
           aria-describedby={helper || error ? messageId : undefined}
-          className={`min-w-0 flex-1 border-none bg-transparent outline-none ${className ?? ""}`}
+          className={`min-w-0 flex-1 self-stretch border-none bg-transparent outline-none ${className ?? ""}`}
+          /* self-stretch is load-bearing: without it the input is only as
+             tall as its line box (24px) inside a 52px frame, so tapping the
+             visual top or bottom edge of the field does nothing. */
           style={{ font: "var(--text-body)", color: "var(--ink-0)" }}
           {...rest}
         />

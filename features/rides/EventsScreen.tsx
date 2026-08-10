@@ -256,9 +256,9 @@ function EventCard({
 
       <div className="px-4 pt-3 pb-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-[1.0625rem] font-semibold leading-snug" style={{ color: INK }}>
+          <h2 className="text-[1.0625rem] font-semibold leading-snug" style={{ color: INK }}>
             {post.title ?? post.resort}
-          </h3>
+          </h2>
           <Tag level={post.abilityLevel} />
         </div>
 

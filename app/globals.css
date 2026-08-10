@@ -601,6 +601,7 @@ body {
 }
 .city-toggle-btn {
   flex: 1;
+  min-height: 44px;
   padding: 9px 12px;
   border-radius: 0;
   font: var(--text-mono-label);

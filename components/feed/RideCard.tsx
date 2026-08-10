@@ -110,7 +110,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
               disabled={isFull && !isJoined}
-              className="text-mono-label px-3.5 py-2 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
+              className="text-mono-label min-h-11 px-3.5 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
               style={
                 isJoined
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", border: "1px solid var(--ink-0)" }

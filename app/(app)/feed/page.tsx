@@ -63,7 +63,7 @@ export default function FeedPage() {
           </div>
           <button
             onClick={() => setShowPostModal(true)}
-            className="card-tap text-mono-label flex items-center gap-1.5 px-3 py-2"
+            className="card-tap text-mono-label flex min-h-11 items-center gap-1.5 px-3"
             style={{ background: "var(--rust)", color: "var(--paper-0)", border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="plus" size={13} strokeWidth={2.6} />

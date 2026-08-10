@@ -58,7 +58,7 @@ export default function CrewPage() {
             const isActive = tab === t;
             return (
               <button key={t} onClick={() => setTab(t)}
-                className="flex-1 pb-2.5 text-xs font-black transition-colors duration-150 relative pt-1"
+                className="flex-1 min-h-11 pb-2.5 text-xs font-black transition-colors duration-150 relative pt-1"
                 style={{ color: isActive ? BRAND : MUTED }}
               >
                 {TAB_LABELS[t]}
@@ -103,7 +103,8 @@ export default function CrewPage() {
                 </div>
                 <button
                   onClick={() => { setSelectedConvUserId(friend.id); setTab("chats"); }}
-                  className="w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-transform flex-shrink-0"
+                  aria-label={`Message ${friend.name}`}
+                  className="h-11 w-11 rounded-full flex items-center justify-center active:scale-90 transition-transform flex-shrink-0"
                   style={{ background: "var(--accent-primary-subtle)" }}
                 >
                   <Icon name="message-circle" size={15} color={BRAND} strokeWidth={1.8} />

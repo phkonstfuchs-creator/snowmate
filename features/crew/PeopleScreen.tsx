@@ -120,7 +120,7 @@ function PeopleSection({
                 <button
                   onClick={() => onRequest(user.id)}
                   aria-label={sent ? `Withdraw request to ${user.name}` : `Request ${user.name}`}
-                  className="text-mono-label card-tap px-3 py-2"
+                  className="text-mono-label card-tap min-h-11 px-3"
                   style={
                     sent
                       ? { background: PAPER_1, color: INK_1, border: "var(--rule-thin)" }

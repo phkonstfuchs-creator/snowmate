@@ -97,7 +97,7 @@ export default function CarpoolPage() {
           </div>
           <button
             onClick={() => setShowOfferModal(true)}
-            className="flex items-center gap-1.5 text-sm font-black px-4 py-2 rounded-full active:scale-95 transition-transform"
+            className="flex min-h-11 items-center gap-1.5 text-sm font-black px-4 rounded-full active:scale-95 transition-transform"
             style={{ background: BRAND, color: D }}
           >
             <Icon name="plus" size={14} strokeWidth={2.4} />
@@ -170,7 +170,7 @@ export default function CarpoolPage() {
                       <button
                         onClick={() => toggle(post.id)}
                         disabled={post.availableSeats === 0 && !isReq}
-                        className="w-full py-2.5 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
+                        className="w-full min-h-11 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
                         style={isReq
                           ? { background: "var(--accent-primary-subtle)", color: BRAND }
                           : post.availableSeats === 0
@@ -224,7 +224,7 @@ export default function CarpoolPage() {
                         {post.note && <p className="text-xs mt-1.5 font-medium" style={{ color: MUTED }}>{post.note}</p>}
                         <button
                           onClick={() => toggle(post.id + "_offer")}
-                          className="mt-3 w-full py-2 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
+                          className="mt-3 w-full min-h-11 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
                           style={isOffered
                             ? { background: "var(--accent-primary-subtle)", color: BRAND }
                             : { border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }

@@ -118,7 +118,7 @@ export default function LeafletMap({
       if (!coordinates) return [];
 
       const isHot = resort.name === hotResort?.name;
-      const size = isHot ? 50 : Math.max(36, 32 + resort.ridersNow * 0.3);
+      const size = isHot ? 56 : Math.max(44, 40 + resort.ridersNow * 0.3);
       const icon = leaflet.divIcon({
         className: "",
         html: createMarkerContent(resort, isHot, size),
