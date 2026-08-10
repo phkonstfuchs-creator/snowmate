@@ -225,11 +225,7 @@ export default function Home() {
         {/* ── Product ──────────────────────────────────────── */}
         <Rule label="The product" num="02" />
         <p className="mb-8 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_2 }}>
-          The interface is English. Riding vocabulary already is, and the
-          first users include Erasmus students and seasonal workers who do
-          not speak German. A German localisation is needed before a real
-          launch in Austria, and it does not exist yet. Every screen is
-          clickable in the{" "}
+          Every screen is clickable in the{" "}
           <Link href="/demo" className="underline" style={{ color: RUST }}>
             prototype
           </Link>
