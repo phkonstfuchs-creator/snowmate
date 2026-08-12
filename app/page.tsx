@@ -376,9 +376,9 @@ export default function Home() {
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
             At 16, I founded my own business, navigating the extensive legal
-            approval process required for minors in Germany. It does web
-            design, video editing and motion design. Snowmate is the product I
-            build on the side.
+            approval process required for minors in Germany. I provide motion
+            design, video editing and web design services. Snowmate is the
+            product I build on the side.
           </p>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
@@ -399,10 +399,11 @@ export default function Home() {
           </div>
 
           <p className="mt-6 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            Snowmate is not my first attempt at this. PeakBuddy was an
-            earlier ski-app concept I worked through at the Bocconi
-            entrepreneurship lab, and FixItNow was a tradesperson-matching
-            platform I dropped once I understood the marketplace problem.
+            Snowmate is not the first product I have tried to build.
+            PeakBuddy was an earlier ski-app concept I worked through at the
+            Bocconi entrepreneurship lab, and FixItNow was a
+            tradesperson-matching platform I dropped once I understood the
+            marketplace problem.
             Snowmate is the first one I have taken far enough to hand someone
             a link.
           </p>
