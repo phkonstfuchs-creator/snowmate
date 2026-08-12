@@ -2,7 +2,7 @@
   "name": "snowmate",
   "version": "0.1.0",
   "description": "Coordination app for ski crews around Innsbruck and Salzburg.",
-  "homepage": "https://snowmate-umber.vercel.app",
+  "homepage": "https://snowmate-info.vercel.app",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/phkonstfuchs-creator/snowmate.git"

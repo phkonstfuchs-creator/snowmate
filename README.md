@@ -3,9 +3,9 @@
 Snowmate is a mobile-first coordination app for ski crews around Innsbruck and
 Salzburg. It answers one question: who is riding today, where, and can I join?
 
-**[snowmate-umber.vercel.app](https://snowmate-umber.vercel.app)** — build
+**[snowmate-info.vercel.app](https://snowmate-info.vercel.app)** — build
 status and reasoning
-**[snowmate-umber.vercel.app/demo](https://snowmate-umber.vercel.app/demo)** —
+**[snowmate-info.vercel.app/demo](https://snowmate-info.vercel.app/demo)** —
 clickable prototype, sample data, nothing is saved
 
 Launching in German and English.
