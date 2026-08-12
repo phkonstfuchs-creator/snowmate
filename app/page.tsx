@@ -342,6 +342,10 @@ export default function Home() {
           handled properly. That is also why a percentage of a trip beats a
           subscription: it scales with something that is already moving.
         </p>
+        <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
+          Innsbruck and Salzburg first, then the alpine regions that have
+          exactly the same problem.
+        </p>
 
         {/* ── Craft ────────────────────────────────────────── */}
         <Rule label="How it is built" num="05" />
