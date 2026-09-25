@@ -25,8 +25,14 @@ describe("listRides", () => {
     });
 
     const result = await listRides(new Date("2027-01-08T10:00:00Z"));
-    expect(mocks.rpc).toHaveBeenCalledWith("list_rides");
+    expect(mocks.rpc).toHaveBeenCalledWith("list_rides", {});
     expect(result.status === "ok" && result.rides[0]?.post.resort).toBe("Nordkette");
+  });
+
+  it("asks for past rides when requested", async () => {
+    mocks.rpc.mockResolvedValue({ data: [], error: null });
+    await listRides(new Date(), { includePast: true });
+    expect(mocks.rpc).toHaveBeenCalledWith("list_rides", { include_past: true });
   });
 
   it("is unavailable on an error, a non-array or a throw", async () => {

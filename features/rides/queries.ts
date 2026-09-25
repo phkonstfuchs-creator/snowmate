@@ -8,10 +8,13 @@ export type RidesResult =
 /* Every ride read goes through list_rides(), which applies the audience
    and meeting-point rules in the database. Nothing here filters for
    safety; it only reshapes. */
-export async function listRides(now: Date = new Date()): Promise<RidesResult> {
+export async function listRides(
+  now: Date = new Date(),
+  { includePast = false }: { includePast?: boolean } = {},
+): Promise<RidesResult> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.rpc("list_rides");
+    const { data, error } = await supabase.rpc("list_rides", includePast ? { include_past: true } : {});
 
     if (error || !Array.isArray(data)) {
       return { status: "unavailable" };

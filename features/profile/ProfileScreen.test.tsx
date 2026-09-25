@@ -22,6 +22,7 @@ describe("ProfileScreen", () => {
     render(<ProfileScreen />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Felix Gruber");
+    expect(screen.getByText("Stamps")).toBeInTheDocument();
     expect(screen.queryByText("Profile incomplete")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit profile" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -31,8 +32,14 @@ describe("ProfileScreen", () => {
     render(
       <ProfileScreen
         account={{ ...incomplete, displayName: "Lena Moser", handle: "lena_m", city: "salzburg", abilityLevel: "park", onboardingCompleted: true }}
+        stats={{ rides: 3, resorts: 2, crew: 5 }}
       />,
     );
+
+    expect(screen.getByText("Salzburg · Park")).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.queryByText("Stamps")).not.toBeInTheDocument();
+    expect(screen.queryByText(/XP to level/)).not.toBeInTheDocument();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Lena Moser");
     expect(screen.getByText("@lena_m")).toBeInTheDocument();
@@ -53,6 +60,8 @@ describe("ProfileScreen", () => {
     render(<ProfileScreen account={null} />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("New rider");
+    expect(screen.getByText("Rider")).toBeInTheDocument();
+    expect(screen.getAllByText("–")).toHaveLength(3);
     fireEvent.click(screen.getByRole("button", { name: "Edit profile" }));
     expect(screen.getByRole("dialog", { name: "Edit profile" })).toBeInTheDocument();
   });

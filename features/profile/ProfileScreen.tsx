@@ -166,7 +166,22 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
    sample rider. In the app it is the signed-in profile, or null when the
    backend could not be reached. Name, handle and region are real; the
    season numbers below still come from the fixtures. */
-export default function ProfileScreen({ account }: { account?: OwnProfile | null }) {
+export interface AccountStats {
+  rides: number;
+  resorts: number;
+  crew: number;
+}
+
+const CITY_LABEL = { innsbruck: "Innsbruck", salzburg: "Salzburg" } as const;
+const ABILITY_LABEL = { chill: "Chill", park: "Park", "off-piste": "Off-piste" } as const;
+
+export default function ProfileScreen({
+  account,
+  stats = null,
+}: {
+  account?: OwnProfile | null;
+  stats?: AccountStats | null;
+}) {
   const isLive = account !== undefined;
   const displayName = isLive ? account?.displayName ?? "New rider" : ME.name;
   const handle = isLive ? account?.handle ?? null : ME.handle;
@@ -231,7 +246,11 @@ export default function ProfileScreen({ account }: { account?: OwnProfile | null
           </div>
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
-              Level {ME.level} · {ME.levelTitle}
+              {isLive
+                ? [account?.city ? CITY_LABEL[account.city] : null, account?.abilityLevel ? ABILITY_LABEL[account.abilityLevel] : null]
+                    .filter(Boolean)
+                    .join(" · ") || "Rider"
+                : `Level ${ME.level} · ${ME.levelTitle}`}
             </p>
             {handle && <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{handle}</p>}
           </div>
@@ -257,6 +276,27 @@ export default function ProfileScreen({ account }: { account?: OwnProfile | null
         </section>
       )}
 
+      {isLive ? (
+        <section className="px-4 pt-5">
+          <div className="print-card grid grid-cols-3 px-4 py-4">
+            {([
+              ["Rides", stats?.rides],
+              ["Resorts", stats?.resorts],
+              ["Crew", stats?.crew],
+            ] as const).map(([label, value], i) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-0.5"
+                style={{ borderLeft: i > 0 ? "1px solid var(--border-hairline)" : "none" }}
+              >
+                <span className="text-mono-data" style={{ color: INK }}>{value ?? "–"}</span>
+                <span className="text-mono-label" style={{ color: INK_2 }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <>
       {/* ── Gauge: XP as an instrument reading ─────────────── */}
       <section className="px-4 pt-5">
         <div className="print-card px-4 py-4">
@@ -290,6 +330,8 @@ export default function ProfileScreen({ account }: { account?: OwnProfile | null
           </div>
         </div>
       </section>
+        </>
+      )}
 
       {/* ── Season Pass: ochre block, hard offset ──────────── */}
       {!ME.isPremium && (
@@ -315,6 +357,13 @@ export default function ProfileScreen({ account }: { account?: OwnProfile | null
         </section>
       )}
 
+      {/* XP, stamps, streaks and the ranking have no backend yet. The
+          prototype shows them; the app leaves them out rather than
+          presenting sample numbers as the user's own. */}
+      {isLive ? (
+        <div className="pb-6" />
+      ) : (
+        <>
       {/* ── Stamps ─────────────────────────────────────────── */}
       <section className="pt-7">
         <div className="px-4">
@@ -467,6 +516,8 @@ export default function ProfileScreen({ account }: { account?: OwnProfile | null
           )}
         </div>
       </section>
+        </>
+      )}
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">
