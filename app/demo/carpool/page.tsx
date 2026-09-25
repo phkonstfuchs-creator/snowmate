@@ -1,5 +1,5 @@
-import Screen from "@/app/(app)/carpool/page";
+import CarpoolScreen from "@/features/carpool/CarpoolScreen";
 
 export default function DemoScreen() {
-  return <Screen />;
+  return <CarpoolScreen />;
 }

@@ -12,9 +12,9 @@ Launching in German and English.
 
 This repository holds the product prototype and its Supabase backend.
 Sign-up, e-mail confirmation, sign-in and sign-out run against Supabase with
-server-side sessions. Profile, Feed, Events and Crew read and write real data;
-Map, Carpool, chats and the season numbers still render from a local fixture
-file. `/demo` always runs on fixtures. [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md) lists
+server-side sessions. Profile, Feed, Events, Carpool and Crew read and write
+real data; Map, chats and the season numbers still render from a local
+fixture file. `/demo` always runs on fixtures. [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md) lists
 what the backend needs before real data can be attached, in priority order.
 
 ## Local development
@@ -127,13 +127,13 @@ service-role keys must never be committed or exposed to client code.
 
 Implemented: email/password authentication, SSR cookies, protected product
 routes, email confirmation, logout, the profile (including adoption of the
-onboarding answers), the friend graph, rides and public events. Rides are
+onboarding answers), the friend graph, rides, public events and carpools. Rides are
 readable only through `list_rides()`, which applies the audience and
 meeting-point rules in the database; `supabase/tests/database/` holds the
 negative pgTAP tests. The migrations after the first one still need to be
 applied to `snowmate-dev` with `npx supabase db push`.
 
-Chats, carpools, consent, live location and the season statistics remain
+Chats, consent, live location and the season statistics remain
 mock-only. Do not connect real social, minor, or location data until their own
 normalized schema, authorization rules, negative RLS tests, and server DTOs
 exist.

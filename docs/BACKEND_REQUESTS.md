@@ -14,9 +14,9 @@ Status: `OPEN` · `IN PROGRESS` · `DONE`
 
 ## 1. Feed, Map, Carpool, Crew and Events run on fixtures
 
-**Status:** IN PROGRESS — Feed, Events and Crew (friends and requests) run
-on real data (see *Done*). Map, Carpool, squads, conversations and profile
-numbers remain fixtures.
+**Status:** IN PROGRESS — Feed, Events, Carpool and Crew (friends and
+requests) run on real data (see *Done*). Map, resort status, squads,
+conversations and profile numbers remain fixtures.
 **Affects:** new tables plus read access; today `lib/data/mock-data.ts`
 
 Only sign-in, sign-up and sign-out actually talk to Supabase. Every content
@@ -182,7 +182,20 @@ friends by handle, answers and withdraws requests and removes friends.
 Signed-in `/people` redirects there, since people search only exists over
 fixtures; `/demo/crew` and `/demo/people` keep the prototype.
 
-**Still open:** applying both new migrations to `snowmate-dev`.
+### Carpool board
+
+**Resolved:** migration `20260925110000_create_carpools.sql`, read through
+`list_carpools()`. Stricter than rides because it means getting into a
+car: no public carpools, friends of friends see a post only when both
+sides are adults, and the pickup spot is visible only to the author,
+confirmed friends and riders the author accepted. Requests (a seat on a
+driver post, a lift on a rider post) are confirmed by the author; seats are
+counted under a row lock. `carpools.test.sql` holds 24 assertions.
+`/carpool` runs on it via `features/carpool/`; `/demo/carpool` keeps the
+fixtures.
+
+**Still open:** applying the three new migrations to `snowmate-dev`
+(`npx supabase db push`).
 
 ### Onboarding answers were lost after sign-up (was item 4)
 
