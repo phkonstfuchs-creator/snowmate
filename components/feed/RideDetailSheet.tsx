@@ -23,9 +23,14 @@ interface Props {
   onClose: () => void;
   onJoin?: () => void;
   isJoined: boolean;
+  isHost?: boolean;
+  onCancel?: () => void;
+  /* Real accounts do not expose the fixture profile stats yet, so the
+     app turns the rider profiles off; the demo keeps them. */
+  profilesEnabled?: boolean;
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isHost = false, onCancel, profilesEnabled = true }: Props) {
   useScrollLock();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
@@ -73,7 +78,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Author header */}
         <div className="flex items-center justify-between px-5 pt-4 pb-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
-          <button className="flex items-center gap-3" onClick={() => setSelectedUser(author)}>
+          <button className="flex items-center gap-3" onClick={() => profilesEnabled && setSelectedUser(author)}>
             <Avatar id={author.id} initials={author.avatar} size={42} verified={author.accountType === "verified"} />
             <div className="text-left">
               <div className="flex items-center gap-1.5">
@@ -136,7 +141,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         <div className="px-5 pt-2 pb-2" style={{ borderTop: `1px solid ${BORDER}` }}>
           <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>Going ({post.takenSpots})</p>
           <div className="space-y-2.5">
-            <button className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => setSelectedUser(author)}>
+            <button className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => profilesEnabled && setSelectedUser(author)}>
               <Avatar id={author.id} initials={author.avatar} size={36} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -149,7 +154,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
             </button>
 
             {joinedUsers.map((u) => (
-              <button key={u.id} className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => setSelectedUser(u)}>
+              <button key={u.id} className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => profilesEnabled && setSelectedUser(u)}>
                 <Avatar id={u.id} initials={u.avatar} size={36} />
                 <div className="flex-1 min-w-0">
                   <span className="font-black text-sm block" style={{ color: INK }}>{u.name}</span>
@@ -163,6 +168,16 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Join CTA */}
         <div className="px-5 pt-4">
+          {isHost ? (
+            <button
+              onClick={onCancel}
+              disabled={!onCancel}
+              className="w-full py-4 font-black text-base"
+              style={{ background: "var(--bg-surface-2)", color: "var(--crimson)", border: "1px solid var(--crimson)" }}
+            >
+              {onCancel ? "Cancel this ride" : "You are hosting"}
+            </button>
+          ) : (
           <button
             onClick={onJoin}
             disabled={isFull && !isJoined}
@@ -176,6 +191,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           >
             {isJoined ? "You are in, tap to leave" : isFull ? "Ride is full" : "Join ride"}
           </button>
+          )}
         </div>
       </div>
     </>

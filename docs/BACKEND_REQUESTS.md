@@ -14,7 +14,9 @@ Status: `OPEN` · `IN PROGRESS` · `DONE`
 
 ## 1. Feed, Map, Carpool, Crew and Events run on fixtures
 
-**Status:** OPEN
+**Status:** IN PROGRESS — Feed and Events read and write real rides (see
+*Done*). Map, Carpool, Crew, conversations and profile numbers remain
+fixtures.
 **Affects:** new tables plus read access; today `lib/data/mock-data.ts`
 
 Only sign-in, sign-up and sign-out actually talk to Supabase. Every content
@@ -46,7 +48,8 @@ translation layer everywhere.
 
 ## 2. Friend-graph visibility is text, not enforcement
 
-**Status:** OPEN
+**Status:** DONE for rides — see *Done*. The Crew screen itself still
+renders fixtures.
 **Affects:** RLS rules
 
 The crew screen promises: *"Friends of friends see rides at resort level.
@@ -68,7 +71,8 @@ strangers are reading along.
 
 ## 3. Public events need server-side visibility
 
-**Status:** OPEN — **highest priority of everything on this page**
+**Status:** DONE in the migration, pending `supabase db push` to
+`snowmate-dev` — see *Done*.
 **Affects:** schema for `rides`, RLS rules, read DTO
 
 With the *Events* screen (`/events`) there is content visible **without any
@@ -143,6 +147,39 @@ in the UI must start suggesting a payment is possible before this is real.
 ---
 
 ## Done
+
+### Rides, public events and the friend graph in the database (items 2 and 3)
+
+**Resolved:** migration `20260925100000_create_friendships_and_rides.sql`.
+
+- Clients cannot select from `rides`, `ride_participants` or
+  `friendships` at all. The only read path is `list_rides()`, a
+  security-definer function that applies the audience per row and
+  returns `meet_point` as null for anyone who may not see it. That
+  replaces the suggested two-view contract with the same guarantee: the
+  field never leaves the database for the wrong viewer.
+- Audience: host, participants and confirmed friends always; adult
+  hosts' friends rides also reach friends of friends; minors' rides
+  reach confirmed friends only; public rides reach everyone unless the
+  host is a minor (rule 5).
+- Meeting point: host, participants, and on friends rides confirmed
+  friends. Friendship does not unlock a public ride (rules 1 and 2).
+  The participant list follows the same lock; outsiders only get a count.
+- A trigger rejects public rides hosted by minors (rule 3).
+- `join_ride()` checks capacity under a row lock (rule 4);
+  `leave_ride()` and `cancel_ride()` cover the rest.
+- Friend requests go by exact handle (`request_friendship`), no search;
+  asking back accepts. `accept_friendship`, `remove_friendship` and
+  `list_my_friendships` complete the set.
+
+`supabase/tests/database/rides_visibility.test.sql` holds 48 assertions,
+most of them negative. The Feed (`/feed`) and Events (`/events`) routes
+now render `list_rides()` through `features/rides/queries.ts` and write
+through `features/rides/actions.ts`; `/demo` keeps the fixtures via the
+same `useRideBoard` hook.
+
+**Still open:** a Crew screen on top of the friendship functions, and
+applying both new migrations to `snowmate-dev`.
 
 ### Onboarding answers were lost after sign-up (was item 4)
 

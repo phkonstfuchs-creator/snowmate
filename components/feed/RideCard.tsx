@@ -11,12 +11,13 @@ interface RideCardProps {
   author: User;
   joinedUsers: User[];
   isJoined: boolean;
+  isHost?: boolean;
   onClick: () => void;
   onJoin?: (e: React.MouseEvent) => void;
   index?: number;
 }
 
-export default function RideCard({ post, author, joinedUsers, isJoined, onClick, onJoin, index = 0 }: RideCardProps) {
+export default function RideCard({ post, author, joinedUsers, isJoined, isHost = false, onClick, onJoin, index = 0 }: RideCardProps) {
   const openSpots = post.totalSpots - post.takenSpots;
   const isFull = openSpots <= 0;
 
@@ -107,6 +108,11 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
             >
               {isFull ? "full" : `${openSpots} open`}
             </span>
+            {isHost ? (
+              <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
+                Your ride
+              </span>
+            ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
               disabled={isFull && !isJoined}
@@ -121,6 +127,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
             >
               {isJoined ? "Joined" : "Join"}
             </button>
+            )}
           </div>
         </div>
       </div>

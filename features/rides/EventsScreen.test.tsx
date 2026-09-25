@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { PUBLIC_EVENTS } from "@/lib/data";
 import EventsScreen from "./EventsScreen";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/events" }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/events", useRouter: () => ({ refresh: vi.fn() }) }));
 
 /* This screen is the first window facing outward, so the tests
    mainly cover what strangers may and may not see. */

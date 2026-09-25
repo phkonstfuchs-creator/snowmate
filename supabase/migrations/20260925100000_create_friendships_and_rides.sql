@@ -411,7 +411,7 @@ returns table (
   created_at timestamptz,
   is_host boolean,
   is_joined boolean,
-  participant_ids uuid[]
+  participants jsonb
 )
 language plpgsql
 stable
@@ -447,12 +447,24 @@ begin
     r.created_at,
     r.host_id = viewer,
     viewer = any(coalesce(parts.ids, '{}')),
-    coalesce(parts.ids, '{}')
+    -- Who else is going is inside information, like the meeting point:
+    -- people who cannot see the meeting point only get the count.
+    case when unlocked.ok then coalesce(parts.people, '[]'::jsonb) else '[]'::jsonb end
   from public.rides r
   join public.profiles p on p.id = r.host_id
   left join lateral (
-    select array_agg(rp.user_id order by rp.joined_at) as ids
+    select
+      array_agg(rp.user_id order by rp.joined_at) as ids,
+      jsonb_agg(
+        jsonb_build_object(
+          'id', pp.id,
+          'display_name', pp.display_name,
+          'handle', pp.handle
+        )
+        order by rp.joined_at
+      ) as people
     from public.ride_participants rp
+    join public.profiles pp on pp.id = rp.user_id
     where rp.ride_id = r.id
   ) parts on true
   cross join lateral (

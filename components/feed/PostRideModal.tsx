@@ -7,22 +7,28 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { AbilityLevel, City, RideVisibility } from "@/lib/types";
 import { RESORT_STATUS, ME } from "@/lib/data";
 import { canPostPublicRide } from "@/features/rides/visibility";
+import type { RideFormInput } from "@/features/rides/ride-input";
+import type { RideActionResult } from "@/features/rides/actions";
 import Icon from "@/components/ui/Icon";
 
 interface PostRideModalProps {
   city: City;
   onClose: () => void;
-  onPost: (data: PostData) => void;
+  onPost: (data: RideFormInput) => Promise<RideActionResult> | void;
+  /* Server-side the database refuses public rides by minors anyway;
+     this only decides whether the toggle is offered. Defaults to the
+     prototype user. */
+  mayGoPublic?: boolean;
 }
 
-interface PostData {
-  resort: string;
-  abilityLevel: AbilityLevel;
-  meetTime: string;
-  meetPoint: string;
-  totalSpots: number;
-  caption: string;
-  visibility: RideVisibility;
+function localIsoDate(offsetDays = 0): string {
+  const now = new Date();
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
+  return [
+    day.getFullYear(),
+    String(day.getMonth() + 1).padStart(2, "0"),
+    String(day.getDate()).padStart(2, "0"),
+  ].join("-");
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
@@ -31,7 +37,7 @@ const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = 
   { value: "off-piste", label: "Off-piste", desc: "Powder, terrain, technical" },
 ];
 
-export default function PostRideModal({ city, onClose, onPost }: PostRideModalProps) {
+export default function PostRideModal({ city, onClose, onPost, mayGoPublic = canPostPublicRide(ME) }: PostRideModalProps) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -43,23 +49,42 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
   const [totalSpots, setTotalSpots] = useState(4);
   const [caption, setCaption] = useState("");
   const [visibility, setVisibility] = useState<RideVisibility>("friends");
+  const [rideDate, setRideDate] = useState(() => localIsoDate());
+  const [title, setTitle] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const resorts = RESORT_STATUS.filter((r) => r.city === city).map((r) => r.name);
   /* Minors cannot post publicly. The toggle is disabled rather than
      hidden — an absent control reads as a bug, a locked one reads as
      a rule. */
-  const mayGoPublic = canPostPublicRide(ME);
+  const effectiveVisibility: RideVisibility = mayGoPublic ? visibility : "friends";
+  const canPublish =
+    meetPoint.trim().length >= 2 &&
+    (effectiveVisibility === "friends" || title.trim().length >= 3) &&
+    !submitting;
 
-  const handleSubmit = () => {
-    onPost({
+  const handleSubmit = async () => {
+    if (!canPublish) return;
+    setSubmitting(true);
+    setError(null);
+    const result = await onPost({
       resort,
+      city,
       abilityLevel,
+      rideDate,
       meetTime,
       meetPoint,
       totalSpots,
       caption,
-      visibility: mayGoPublic ? visibility : "friends",
+      visibility: effectiveVisibility,
+      ...(effectiveVisibility === "public" ? { title } : {}),
     });
+    setSubmitting(false);
+    if (result && !result.ok) {
+      setError(result.message);
+      return;
+    }
     dismiss();
   };
 
@@ -96,11 +121,11 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
           ) : (
             <button
               onClick={handleSubmit}
-              disabled={!meetPoint}
+              disabled={!canPublish}
               className="text-sm font-bold"
-              style={{ color: meetPoint ? "var(--sky)" : "var(--text-disabled)" }}
+              style={{ color: canPublish ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Publish
+              {submitting ? "Publishing…" : "Publish"}
             </button>
           )}
         </div>
@@ -155,6 +180,24 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
         {/* Step 2: Time, meet point, spots, caption */}
         {step === 2 && (
           <div className="px-5 pt-5 pb-6 space-y-4">
+            {error && (
+              <p role="alert" className="px-3 py-2 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>
+                {error}
+              </p>
+            )}
+            <div>
+              <label htmlFor="post-ride-date" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                Day
+              </label>
+              <input
+                id="post-ride-date"
+                type="date"
+                min={localIsoDate()}
+                value={rideDate}
+                onChange={(e) => setRideDate(e.target.value)}
+                className="form-input"
+              />
+            </div>
             <div className="flex gap-3">
               <div className="flex-1">
                 <label htmlFor="post-ride-time" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
@@ -258,10 +301,24 @@ export default function PostRideModal({ city, onClose, onPost }: PostRideModalPr
                 })}
               </div>
               {visibility === "public" && mayGoPublic && (
-                <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
-                  Everyone sees the resort and time. The exact meeting point
-                  only becomes visible after someone joins.
-                </p>
+                <>
+                  <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
+                    Everyone sees the resort and time. The exact meeting point
+                    only becomes visible after someone joins.
+                  </p>
+                  <label htmlFor="post-ride-title" className="block text-xs font-semibold uppercase mt-3 mb-2" style={{ color: "var(--text-tertiary)" }}>
+                    Event name
+                  </label>
+                  <input
+                    id="post-ride-title"
+                    type="text"
+                    maxLength={60}
+                    placeholder="e.g. Sunday park session"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="form-input"
+                  />
+                </>
               )}
             </div>
 

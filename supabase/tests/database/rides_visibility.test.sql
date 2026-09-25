@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(46);
+select plan(48);
 
 -- Cast: adult host A, friend F, friend-of-friend G, stranger S,
 -- pending requestee P, minor M (friends with F).
@@ -219,9 +219,21 @@ select results_eq(
 
 select is(public.join_ride((select public_ride from ride_ids)), 'already_joined', 'joining twice is a no-op');
 
+select is(
+  (select participants -> 0 ->> 'handle' from public.list_rides() where id = (select public_ride from ride_ids)),
+  'rider_4',
+  'a participant sees who else is going'
+);
+
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000003';
 
 select is(public.join_ride((select public_ride from ride_ids)), 'full', 'rule 4: joining a full ride is refused');
+
+select results_eq(
+  $$select taken_spots, participants from public.list_rides() where id = (select public_ride from ride_ids)$$,
+  $$values (1, '[]'::jsonb)$$,
+  'someone outside the ride sees the count but not who joined'
+);
 
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000001';
 

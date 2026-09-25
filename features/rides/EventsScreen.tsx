@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { City, RidePost, User } from "@/lib/types";
-import { PUBLIC_EVENTS, getUserById, getUsersByIds, ME } from "@/lib/data";
-import { isDiscoverablePublicRide, toVisibleRide } from "@/features/rides/visibility";
-import { toggleSetValue } from "@/lib/collections";
+import { City } from "@/lib/types";
+import { PUBLIC_EVENTS } from "@/lib/data";
+import { isDiscoverablePublicRide } from "@/features/rides/visibility";
+import type { LiveRide } from "./live-ride";
+import { useRideBoard } from "./useRideBoard";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -50,17 +51,13 @@ function MeetingPoint({ value, locked }: { value: string | null; locked: boolean
 }
 
 function EventDetailSheet({
-  post,
-  author,
-  joinedUsers,
-  isJoined,
+  ride,
+  pending,
   onJoin,
   onClose,
 }: {
-  post: RidePost;
-  author: User;
-  joinedUsers: User[];
-  isJoined: boolean;
+  ride: LiveRide;
+  pending: boolean;
   onJoin: () => void;
   onClose: () => void;
 }) {
@@ -68,13 +65,8 @@ function EventDetailSheet({
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
-  const view = toVisibleRide(post, {
-    viewer: ME,
-    author,
-    isJoined,
-    friendIds: ME.friendIds,
-  });
-  const taken = post.takenSpots + (isJoined ? 1 : 0);
+  const { post, host: author, participants: joinedUsers, isJoined, isHost } = ride;
+  const taken = post.takenSpots;
   const openSpots = post.totalSpots - taken;
   const isFull = openSpots <= 0;
 
@@ -134,7 +126,7 @@ function EventDetailSheet({
           <div className="min-w-0 flex-1">
             <p className="text-[0.9375rem] font-semibold" style={{ color: INK }}>{author.name}</p>
             <p className="text-sm" style={{ color: INK_2 }}>
-              Host · Level {author.level}
+              {isHost ? "You are hosting" : `Host · Level ${author.level}`}
             </p>
           </div>
           <Tag level={post.abilityLevel} />
@@ -148,7 +140,7 @@ function EventDetailSheet({
 
         <div className="px-5 pt-4">
           <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Meeting point</p>
-          <MeetingPoint value={view.meetPoint} locked={view.meetPointLocked} />
+          <MeetingPoint value={ride.meetPointLocked ? null : post.meetPoint} locked={ride.meetPointLocked} />
         </div>
 
         <div className="mx-5 mt-4 grid grid-cols-2" style={{ border: "var(--rule-thin)" }}>
@@ -187,9 +179,10 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-5">
+          {!isHost && (
           <button
             onClick={onJoin}
-            disabled={isFull && !isJoined}
+            disabled={(isFull && !isJoined) || pending}
             className="card-tap w-full py-4 font-display text-lg uppercase"
             style={
               isJoined
@@ -199,8 +192,9 @@ function EventDetailSheet({
                   : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }
             }
           >
-            {isJoined ? "Leave event" : isFull ? "Event is full" : "Join event"}
+            {pending ? "One moment…" : isJoined ? "Leave event" : isFull ? "Event is full" : "Join event"}
           </button>
+          )}
         </div>
       </div>
     </>
@@ -208,19 +202,16 @@ function EventDetailSheet({
 }
 
 function EventCard({
-  post,
-  author,
-  isJoined,
+  ride,
   index,
   onOpen,
 }: {
-  post: RidePost;
-  author: User;
-  isJoined: boolean;
+  ride: LiveRide;
   index: number;
   onOpen: () => void;
 }) {
-  const taken = post.takenSpots + (isJoined ? 1 : 0);
+  const { post, host: author, isJoined } = ride;
+  const taken = post.takenSpots;
   const openSpots = post.totalSpots - taken;
   const isFull = openSpots <= 0;
   const filled = Math.min(100, Math.round((taken / post.totalSpots) * 100));
@@ -283,40 +274,44 @@ function EventCard({
   );
 }
 
-export default function EventsScreen() {
-  const [city, setCity] = useState<City>("innsbruck");
-  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+export interface LiveEvents {
+  /* null when the backend could not be reached */
+  rides: LiveRide[] | null;
+  defaultCity: City;
+}
+
+/* A full event you are already in is not "too late" for you. */
+function isClosedToViewer(ride: LiveRide): boolean {
+  return !ride.isJoined && ride.post.takenSpots >= ride.post.totalSpots;
+}
+
+/* `live` is undefined in the /demo prototype, which runs on fixtures. */
+export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
+  const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
+  const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
+  const unavailable = live !== undefined && live.rides === null;
 
   /* Filtering runs through isDiscoverablePublicRide rather than a
      plain visibility comparison, so a wrongly flagged ride hosted by
-     a minor drops out too. */
+     a minor drops out too. The database applies the same rule; this
+     is the second line. */
   const events = useMemo(
     () =>
-      PUBLIC_EVENTS.filter((event) => {
-        if (event.city !== city) return false;
-        const author = getUserById(event.authorId);
-        return author ? isDiscoverablePublicRide(event, author) : false;
-      })
+      board.rides
+        .filter((ride) => ride.post.city === city && isDiscoverablePublicRide(ride.post, ride.host))
         /* Full events go last. This screen is the entry point for
            people without contacts, so the top must show where you can
            still join, not where you are too late. */
-        .sort(
-          (a, b) =>
-            Number(a.takenSpots >= a.totalSpots) -
-            Number(b.takenSpots >= b.totalSpots),
-        ),
-    [city],
+        .sort((a, b) => Number(isClosedToViewer(a)) - Number(isClosedToViewer(b))),
+    [board.rides, city],
   );
 
-  const openEvent = events.find((event) => event.id === openEventId) ?? null;
+  const openEvent = events.find((event) => event.post.id === openEventId) ?? null;
   const openSeats = events.reduce(
-    (sum, event) => sum + Math.max(0, event.totalSpots - event.takenSpots),
+    (sum, event) => sum + Math.max(0, event.post.totalSpots - event.post.takenSpots),
     0,
   );
-
-  const toggleJoin = (id: string) =>
-    setJoinedIds((previous) => toggleSetValue(previous, id));
 
   return (
     <>
@@ -357,22 +352,22 @@ export default function EventsScreen() {
       </div>
 
       <div className="space-y-3 px-4 pt-4 pb-6">
-        {events.map((event, index) => {
-          const author = getUserById(event.authorId);
-          if (!author) return null;
-          return (
-            <EventCard
-              key={event.id}
-              post={event}
-              author={author}
-              isJoined={joinedIds.has(event.id)}
-              index={index}
-              onOpen={() => setOpenEventId(event.id)}
-            />
-          );
-        })}
+        {(board.notice || unavailable) && (
+          <p role="status" className="px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)", background: PAPER_1 }}>
+            {board.notice ?? "Events could not be loaded. Try again shortly."}
+          </p>
+        )}
 
-        {events.length === 0 && (
+        {events.map((event, index) => (
+          <EventCard
+            key={event.post.id}
+            ride={event}
+            index={index}
+            onOpen={() => setOpenEventId(event.post.id)}
+          />
+        ))}
+
+        {events.length === 0 && !unavailable && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <Icon name="calendar-days" size={30} color={INK_2} strokeWidth={1.5} />
             <div>
@@ -387,20 +382,14 @@ export default function EventsScreen() {
         )}
       </div>
 
-      {openEvent && (() => {
-        const author = getUserById(openEvent.authorId);
-        if (!author) return null;
-        return (
-          <EventDetailSheet
-            post={openEvent}
-            author={author}
-            joinedUsers={getUsersByIds(openEvent.joinedUserIds)}
-            isJoined={joinedIds.has(openEvent.id)}
-            onJoin={() => toggleJoin(openEvent.id)}
-            onClose={() => setOpenEventId(null)}
-          />
-        );
-      })()}
+      {openEvent && (
+        <EventDetailSheet
+          ride={openEvent}
+          pending={board.pendingId === openEvent.post.id}
+          onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
+          onClose={() => setOpenEventId(null)}
+        />
+      )}
     </>
   );
 }
