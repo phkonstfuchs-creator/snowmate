@@ -12,6 +12,7 @@ export default async function FeedPage() {
         /* Unknown counts as minor: the narrower rule is the safe default. */
         viewerIsMinor: profile?.isMinor ?? true,
         defaultCity: profile?.city ?? "innsbruck",
+        profileComplete: profile?.onboardingCompleted ?? false,
       }}
     />
   );

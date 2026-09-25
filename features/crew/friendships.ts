@@ -30,7 +30,8 @@ export type FriendRequestOutcome =
   | "already_requested"
   | "already_friends"
   | "not_found"
-  | "self";
+  | "self"
+  | "profile_incomplete";
 
 export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean; message: string }> = {
   requested: { ok: true, message: "Request sent." },
@@ -39,4 +40,5 @@ export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean
   already_friends: { ok: true, message: "You are already friends." },
   not_found: { ok: false, message: "No rider with that handle." },
   self: { ok: false, message: "That is your own handle." },
+  profile_incomplete: { ok: false, message: "Finish your profile first: add your name and handle on the Profile tab." },
 };

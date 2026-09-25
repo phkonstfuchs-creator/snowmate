@@ -67,6 +67,11 @@ describe("ride actions", () => {
       });
     });
 
+    it("asks for a finished profile when the insert policy refuses", async () => {
+      mocks.insert.mockResolvedValue({ error: { code: "42501", message: "new row violates row-level security policy" } });
+      await expect(createRideAction(ride)).resolves.toMatchObject({ ok: false, message: expect.stringContaining("Finish your profile") });
+    });
+
     it.each([
       ["a database error", () => mocks.insert.mockResolvedValue({ error: { message: "boom" } })],
       ["a thrown error", () => mocks.insert.mockRejectedValue(new Error("offline"))],
@@ -83,6 +88,7 @@ describe("ride actions", () => {
       ["joined", true, "You are in."],
       ["full", false, "This ride is full."],
       ["not_found", false, "This ride is no longer available."],
+      ["profile_incomplete", false, "Finish your profile first: add your name and handle on the Profile tab."],
       ["something_new", false, "That did not work. Try again shortly."],
     ])("maps %s", async (status, ok, message) => {
       mocks.rpc.mockResolvedValue({ data: status, error: null });

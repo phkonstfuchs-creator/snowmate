@@ -39,6 +39,7 @@ describe("friend actions", () => {
   it.each([
     ["not_found", "error", "No rider with that handle."],
     ["self", "error", "That is your own handle."],
+    ["profile_incomplete", "error", "Finish your profile first: add your name and handle on the Profile tab."],
     ["accepted", "success", "They had already asked you. You are friends now."],
     ["surprise", "error", "That did not work. Try again shortly."],
   ])("maps %s", async (data, status, message) => {

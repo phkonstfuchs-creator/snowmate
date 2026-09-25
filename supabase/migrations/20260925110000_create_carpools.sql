@@ -78,7 +78,13 @@ create policy "carpools_insert_as_self"
   on public.carpools
   for insert
   to authenticated
-  with check ((select auth.uid()) = author_id);
+  with check (
+    (select auth.uid()) = author_id
+    and exists (
+      select 1 from public.profiles p
+      where p.id = (select auth.uid()) and p.onboarding_completed
+    )
+  );
 
 create or replace function private.can_see_carpool(viewer uuid, pool public.carpools)
 returns boolean
@@ -218,6 +224,10 @@ declare
 begin
   if viewer is null then
     raise exception 'not authenticated' using errcode = '42501';
+  end if;
+
+  if not private.has_complete_profile(viewer) then
+    return 'profile_incomplete';
   end if;
 
   select * into pool from public.carpools c where c.id = target_carpool;

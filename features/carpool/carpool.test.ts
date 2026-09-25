@@ -126,6 +126,8 @@ describe("carpool actions", () => {
 
   it("rejects invalid input and database errors", async () => {
     await expect(createCarpoolAction({ ...input, seats: 0 })).resolves.toMatchObject({ ok: false });
+    mocks.insert.mockResolvedValueOnce({ error: { code: "42501" } });
+    await expect(createCarpoolAction(input)).resolves.toMatchObject({ message: expect.stringContaining("Finish your profile") });
     mocks.insert.mockResolvedValueOnce({ error: { code: "x" } });
     await expect(createCarpoolAction(input)).resolves.toMatchObject({ ok: false });
     mocks.insert.mockRejectedValueOnce(new Error("offline"));
@@ -135,6 +137,7 @@ describe("carpool actions", () => {
   it.each([
     ["requested", true],
     ["full", false],
+    ["profile_incomplete", false],
     ["unknown", false],
   ])("maps request status %s", async (data, ok) => {
     mocks.rpc.mockResolvedValue({ data, error: null });

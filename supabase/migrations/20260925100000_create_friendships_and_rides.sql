@@ -83,6 +83,22 @@ revoke all on function private.are_friends(uuid, uuid) from public, anon, authen
 revoke all on function private.friend_ids(uuid) from public, anon, authenticated;
 revoke all on function private.are_friends_of_friends(uuid, uuid) from public, anon, authenticated;
 
+-- Taking part (posting, joining, asking) requires a finished profile, so
+-- nobody meets an anonymous "Rider" with no handle.
+create or replace function private.has_complete_profile(u uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.profiles p where p.id = u and p.onboarding_completed
+  );
+$$;
+
+revoke all on function private.has_complete_profile(uuid) from public, anon, authenticated;
+
 -- Send a request by exact handle. There is no search: you need to know
 -- the handle, which keeps minors out of open stranger discovery.
 -- If the other side already asked you, this accepts instead.
@@ -99,6 +115,10 @@ declare
 begin
   if me is null then
     raise exception 'not authenticated' using errcode = '42501';
+  end if;
+
+  if not private.has_complete_profile(me) then
+    return 'profile_incomplete';
   end if;
 
   select p.id into target
@@ -311,11 +331,18 @@ grant insert (
   visibility
 ) on table public.rides to authenticated;
 
+-- The policy runs as the caller, who can read their own profile row.
 create policy "rides_insert_as_self"
   on public.rides
   for insert
   to authenticated
-  with check ((select auth.uid()) = host_id);
+  with check (
+    (select auth.uid()) = host_id
+    and exists (
+      select 1 from public.profiles p
+      where p.id = (select auth.uid()) and p.onboarding_completed
+    )
+  );
 
 
 -- Rule 3: a minor can never host a public ride. A trigger rather than a
@@ -505,6 +532,10 @@ declare
 begin
   if viewer is null then
     raise exception 'not authenticated' using errcode = '42501';
+  end if;
+
+  if not private.has_complete_profile(viewer) then
+    return 'profile_incomplete';
   end if;
 
   select * into ride from public.rides r where r.id = target_ride for update;

@@ -131,6 +131,11 @@ describe("FeedScreen with real data", () => {
     expect(mocks.cancel).toHaveBeenCalledWith("ride-1");
   });
 
+  it("points an unfinished profile to the profile tab", () => {
+    render(<FeedScreen live={{ ...live([]), profileComplete: false }} />);
+    expect(screen.getByRole("link", { name: /Finish your profile/ })).toHaveAttribute("href", "/profile");
+  });
+
   it("says when rides could not be loaded", () => {
     render(<FeedScreen live={live(null)} />);
     expect(screen.getByText(/Rides could not be loaded/)).toBeInTheDocument();

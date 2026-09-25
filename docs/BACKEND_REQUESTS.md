@@ -196,6 +196,14 @@ counted under a row lock. `carpools.test.sql` holds 24 assertions.
 `/carpool` runs on it via `features/carpool/`; `/demo/carpool` keeps the
 fixtures.
 
+### Taking part requires a finished profile
+
+Posting a ride or carpool (insert policies), joining a ride, asking for a
+seat and sending friend requests (functions answer `profile_incomplete`)
+all require `onboarding_completed`. Otherwise other riders would meet an
+anonymous "Rider" without a handle. `complete_profile.test.sql` covers it;
+the feed links an unfinished profile to the Profile tab.
+
 **Still open:** applying the three new migrations to `snowmate-dev`
 (`npx supabase db push`).
 

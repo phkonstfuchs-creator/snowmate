@@ -21,6 +21,8 @@ export interface LiveFeed {
   rides: LiveRide[] | null;
   viewerIsMinor: boolean;
   defaultCity: City;
+  /* Posting and joining need a finished profile (enforced in the database). */
+  profileComplete?: boolean;
 }
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
@@ -130,6 +132,19 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             : "Tue 8 Jan"}
         </span>
       </div>
+
+      {live && live.profileComplete === false && (
+        <Link
+          href="/profile"
+          className="card-tap mx-4 mb-3 flex items-center justify-between gap-3 px-3 py-3"
+          style={{ background: "var(--paper-1)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
+        >
+          <span className="text-sm font-semibold" style={{ color: "var(--ink-0)" }}>
+            Finish your profile to post rides and join your crew.
+          </span>
+          <Icon name="chevron-right" size={16} color="var(--ink-0)" strokeWidth={2} />
+        </Link>
+      )}
 
       {(board.notice || unavailable) && (
         <div role="status" className="mx-4 mb-3 flex items-start justify-between gap-3 px-3 py-2.5" style={{ border: "1px solid var(--crimson)", background: "var(--paper-1)" }}>

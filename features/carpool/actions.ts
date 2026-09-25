@@ -17,6 +17,7 @@ const MESSAGES: Record<string, CarpoolActionResult> = {
   accepted: { ok: true, message: "Confirmed." },
   declined: { ok: true, message: "Declined." },
   full: { ok: false, message: "All seats are taken." },
+  profile_incomplete: { ok: false, message: "Finish your profile first: add your name and handle on the Profile tab." },
 };
 
 const UNAVAILABLE_SENTINEL = Symbol("unavailable");
@@ -56,7 +57,10 @@ export async function createCarpoolAction(input: unknown): Promise<CarpoolAction
       seats: pool.seats,
       note: pool.note,
     });
-    if (error) return UNAVAILABLE;
+    if (error) {
+      /* A failed RLS check here means the profile is not finished. */
+      return error.code === "42501" ? MESSAGES.profile_incomplete! : UNAVAILABLE;
+    }
   } catch {
     return UNAVAILABLE;
   }

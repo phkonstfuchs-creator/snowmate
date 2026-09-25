@@ -12,6 +12,12 @@ function revalidateRides() {
   RIDE_PATHS.forEach((path) => revalidatePath(path));
 }
 
+const PROFILE_INCOMPLETE = "Finish your profile first: add your name and handle on the Profile tab.";
+
+/* Postgres' code for a failed RLS check. On the ride insert the only
+   policy condition a signed-in client can miss is the finished profile. */
+const RLS_VIOLATION = "42501";
+
 const JOIN_MESSAGES: Record<string, RideActionResult> = {
   joined: { ok: true, message: "You are in." },
   already_joined: { ok: true, message: "You are already in." },
@@ -19,6 +25,7 @@ const JOIN_MESSAGES: Record<string, RideActionResult> = {
   host: { ok: false, message: "You are hosting this ride." },
   past: { ok: false, message: "This ride has already happened." },
   not_found: { ok: false, message: "This ride is no longer available." },
+  profile_incomplete: { ok: false, message: PROFILE_INCOMPLETE },
 };
 
 const UNAVAILABLE: RideActionResult = {
@@ -56,6 +63,9 @@ export async function createRideAction(input: unknown): Promise<RideActionResult
     if (error) {
       if (error.message?.includes("minors cannot host public rides")) {
         return { ok: false, message: "Public events are 18 and over only." };
+      }
+      if (error.code === RLS_VIOLATION) {
+        return { ok: false, message: PROFILE_INCOMPLETE };
       }
       return UNAVAILABLE;
     }
