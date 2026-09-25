@@ -10,10 +10,11 @@ clickable prototype, sample data, nothing is saved
 
 Launching in German and English.
 
-This repository holds the product prototype and the Supabase account
-foundation. Sign-up, e-mail confirmation, sign-in and sign-out run against
-Supabase with server-side sessions. Every content screen still renders from a
-local fixture file. [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md) lists
+This repository holds the product prototype and its Supabase backend.
+Sign-up, e-mail confirmation, sign-in and sign-out run against Supabase with
+server-side sessions. Profile, Feed, Events and Crew read and write real data;
+Map, Carpool, chats and the season numbers still render from a local fixture
+file. `/demo` always runs on fixtures. [docs/BACKEND_REQUESTS.md](docs/BACKEND_REQUESTS.md) lists
 what the backend needs before real data can be attached, in priority order.
 
 ## Local development
@@ -124,17 +125,18 @@ service-role keys must never be committed or exposed to client code.
 
 ## Current backend boundary
 
-Email/password authentication, SSR cookies, protected product routes, email
-confirmation, logout, and a private RLS-backed profile shell are implemented
-locally. The first migration must still pass the database test suite and be
-explicitly applied to `snowmate-dev`.
+Implemented: email/password authentication, SSR cookies, protected product
+routes, email confirmation, logout, the profile (including adoption of the
+onboarding answers), the friend graph, rides and public events. Rides are
+readable only through `list_rides()`, which applies the audience and
+meeting-point rules in the database; `supabase/tests/database/` holds the
+negative pgTAP tests. The migrations after the first one still need to be
+applied to `snowmate-dev` with `npx supabase db push`.
 
-Rides, public events, friendships, chats, consent, and location remain
+Chats, carpools, consent, live location and the season statistics remain
 mock-only. Do not connect real social, minor, or location data until their own
 normalized schema, authorization rules, negative RLS tests, and server DTOs
-exist. Public events raise that bar rather than lowering it: they are the first
-surface readable by strangers, so their visibility rules need negative pgTAP
-tests before any real ride is attached.
+exist.
 
 See [the structural audit](docs/STRUCTURAL_AUDIT.md) for the findings, completed
 work, and backend follow-up.

@@ -50,7 +50,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label={`Unterhaltung mit ${other.name}`}
+      aria-label={`Conversation with ${other.name}`}
       tabIndex={-1}
       className="fixed flex flex-col"
       style={{
@@ -147,7 +147,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       >
         <input
           className="flex-1 form-input"
-          placeholder="Nachricht …"
+          placeholder="Message …"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -160,7 +160,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         <button
           onClick={send}
           disabled={!input.trim()}
-          aria-label="Nachricht senden"
+          aria-label="Send message"
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 flex-shrink-0"
           style={{ background: "var(--sky)" }}
         >

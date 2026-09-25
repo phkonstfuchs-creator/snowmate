@@ -14,9 +14,9 @@ Status: `OPEN` · `IN PROGRESS` · `DONE`
 
 ## 1. Feed, Map, Carpool, Crew and Events run on fixtures
 
-**Status:** IN PROGRESS — Feed and Events read and write real rides (see
-*Done*). Map, Carpool, Crew, conversations and profile numbers remain
-fixtures.
+**Status:** IN PROGRESS — Feed, Events and Crew (friends and requests) run
+on real data (see *Done*). Map, Carpool, squads, conversations and profile
+numbers remain fixtures.
 **Affects:** new tables plus read access; today `lib/data/mock-data.ts`
 
 Only sign-in, sign-up and sign-out actually talk to Supabase. Every content
@@ -48,8 +48,7 @@ translation layer everywhere.
 
 ## 2. Friend-graph visibility is text, not enforcement
 
-**Status:** DONE for rides — see *Done*. The Crew screen itself still
-renders fixtures.
+**Status:** DONE — see *Done*.
 **Affects:** RLS rules
 
 The crew screen promises: *"Friends of friends see rides at resort level.
@@ -178,8 +177,12 @@ now render `list_rides()` through `features/rides/queries.ts` and write
 through `features/rides/actions.ts`; `/demo` keeps the fixtures via the
 same `useRideBoard` hook.
 
-**Still open:** a Crew screen on top of the friendship functions, and
-applying both new migrations to `snowmate-dev`.
+The signed-in `/crew` screen (`features/crew/LiveCrewScreen.tsx`) adds
+friends by handle, answers and withdraws requests and removes friends.
+Signed-in `/people` redirects there, since people search only exists over
+fixtures; `/demo/crew` and `/demo/people` keep the prototype.
+
+**Still open:** applying both new migrations to `snowmate-dev`.
 
 ### Onboarding answers were lost after sign-up (was item 4)
 
