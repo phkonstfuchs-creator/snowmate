@@ -121,6 +121,15 @@ begin
     return 'profile_incomplete';
   end if;
 
+  -- A cap on unanswered requests keeps this from being used to probe
+  -- handles or to spray requests at people, minors included.
+  if (
+    select count(*) from public.friendships f
+    where f.requester_id = me and f.status = 'pending'
+  ) >= 20 then
+    return 'too_many_pending';
+  end if;
+
   select p.id into target
   from public.profiles p
   where p.handle = lower(btrim(target_handle, ' @'))

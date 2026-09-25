@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(48);
+select plan(49);
 
 -- Cast: adult host A, friend F, friend-of-friend G, stranger S,
 -- pending requestee P, minor M (friends with F).
@@ -284,6 +284,23 @@ select is(public.request_friendship('@Rider_2'), 'requested', 'a request by hand
 select is(public.request_friendship('rider_2'), 'already_requested', 'a second request is not duplicated');
 select is(public.request_friendship('nobody_here'), 'not_found', 'an unknown handle is not found');
 select is(public.request_friendship('rider_4'), 'self', 'you cannot befriend yourself');
+
+reset role;
+insert into auth.users (id, email)
+select ('eeeeeeee-0000-4000-8000-' || lpad(n::text, 12, '0'))::uuid, 'bulk' || n || '@example.com'
+from generate_series(1, 19) n;
+insert into public.friendships (requester_id, addressee_id)
+select 'aaaaaaaa-0000-4000-8000-000000000004', ('eeeeeeee-0000-4000-8000-' || lpad(n::text, 12, '0'))::uuid
+from generate_series(1, 19) n;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000004';
+
+select is(public.request_friendship('rider_3'), 'too_many_pending', 'twenty unanswered requests stop further ones');
+
+reset role;
+delete from public.friendships where addressee_id::text like 'eeeeeeee-%';
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000004';
 
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
