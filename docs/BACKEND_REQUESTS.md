@@ -15,8 +15,10 @@ Status: `OPEN` · `IN PROGRESS` · `DONE`
 ## 1. Feed, Map, Carpool, Crew and Events run on fixtures
 
 **Status:** IN PROGRESS — Feed, Events, Carpool and Crew (friends and
-requests) run on real data (see *Done*). Map, resort status, squads,
-conversations and profile numbers remain fixtures.
+requests) run on real data (see *Done*). The Map counts people on today's
+visible rides; snow depth, lifts and conditions have no source yet and are
+hidden in the app (shown only in `/demo`). Squads, conversations and profile
+numbers remain fixtures.
 **Affects:** new tables plus read access; today `lib/data/mock-data.ts`
 
 Only sign-in, sign-up and sign-out actually talk to Supabase. Every content
