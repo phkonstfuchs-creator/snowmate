@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
 import { RIDE_POSTS } from "@/lib/data";
-import type { LiveRide } from "./live-ride";
+import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
 import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
@@ -126,7 +126,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         </div>
         <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>
           {board.isLive
-            ? new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })
+            ? new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: APP_TIME_ZONE })
             : "Tue 8 Jan"}
         </span>
       </div>

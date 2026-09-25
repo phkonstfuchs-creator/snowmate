@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import FeedScreen from "./FeedScreen";
-import { toLiveRide, type RideRow } from "./live-ride";
+import { toIsoDay, toLiveRide, type RideRow } from "./live-ride";
 
 const mocks = vi.hoisted(() => ({
   join: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 const NOW = new Date();
-const today = [NOW.getFullYear(), String(NOW.getMonth() + 1).padStart(2, "0"), String(NOW.getDate()).padStart(2, "0")].join("-");
+const today = toIsoDay(NOW);
 
 function row(patch: Partial<RideRow>): RideRow {
   return {

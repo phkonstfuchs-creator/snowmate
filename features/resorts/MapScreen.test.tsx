@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
-import { toLiveRide } from "@/features/rides/live-ride";
+import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
 
 vi.mock("next/dynamic", () => ({ default: () => () => <div data-testid="map" /> }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const now = new Date();
-const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+const today = toIsoDay(now);
 
 const liveRide = toLiveRide(
   {

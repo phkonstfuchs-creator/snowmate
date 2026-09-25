@@ -226,6 +226,19 @@ grant execute on function public.list_my_friendships() to authenticated;
 
 -- ─── Rides ─────────────────────────────────────────────────────────────
 
+-- The database runs in UTC; riders live in Austria. "Past" means before
+-- today in Vienna, so a ride does not vanish or reappear around midnight.
+create or replace function private.local_today()
+returns date
+language sql
+stable
+set search_path = ''
+as $$
+  select (now() at time zone 'Europe/Vienna')::date;
+$$;
+
+revoke all on function private.local_today() from public, anon, authenticated;
+
 create table public.rides (
   id uuid primary key default gen_random_uuid(),
   host_id uuid not null default auth.uid() references public.profiles (id) on delete cascade,
@@ -470,7 +483,7 @@ begin
   cross join lateral (
     select private.can_see_meet_point(viewer, r) as ok
   ) unlocked
-  where (include_past or r.ride_date >= current_date)
+  where (include_past or r.ride_date >= private.local_today())
     and private.can_see_ride(viewer, r, p.is_minor)
   order by r.ride_date, r.meet_time;
 end;
@@ -510,7 +523,7 @@ begin
     return 'host';
   end if;
 
-  if ride.ride_date < current_date then
+  if ride.ride_date < private.local_today() then
     return 'past';
   end if;
 

@@ -200,7 +200,7 @@ begin
   cross join lateral (
     select private.can_see_departure_point(viewer, c) as ok
   ) unlocked
-  where (include_past or c.ride_date >= current_date)
+  where (include_past or c.ride_date >= private.local_today())
     and private.can_see_carpool(viewer, c)
   order by c.ride_date, c.departure_time;
 end;
@@ -230,7 +230,7 @@ begin
     return 'own';
   end if;
 
-  if pool.ride_date < current_date then
+  if pool.ride_date < private.local_today() then
     return 'past';
   end if;
 

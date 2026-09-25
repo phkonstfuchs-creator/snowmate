@@ -92,7 +92,7 @@ test.describe("account lifecycle", () => {
     await page.getByLabel("Confirm password").fill(password);
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page.getByText("Anfrage erhalten")).toBeVisible();
+    await expect(page.getByText("Request received")).toBeVisible();
 
     const confirmationLink = await waitForConfirmationLink(
       request,
@@ -106,7 +106,7 @@ test.describe("account lifecycle", () => {
     await expect(page.getByText("Snowmate").first()).toBeVisible();
 
     await page.goto(new URL("/profile", page.url()).toString());
-    await page.getByRole("button", { name: "Abmelden" }).click();
+    await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login$/);
 
     await page.goto(new URL("/feed", page.url()).toString());
@@ -118,7 +118,7 @@ test.describe("account lifecycle", () => {
     await page.getByLabel("Confirm password").fill(password);
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page.getByText("Anfrage erhalten")).toBeVisible();
+    await expect(page.getByText("Request received")).toBeVisible();
     await expect(
       page.getByText(
         "If this address can be used, you will receive a confirmation email shortly.",

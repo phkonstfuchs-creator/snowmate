@@ -8,7 +8,7 @@ import {
   type RideRow,
 } from "./live-ride";
 
-const NOW = new Date(2027, 0, 8, 12, 0, 0);
+const NOW = new Date(Date.UTC(2027, 0, 8, 11, 0, 0));
 
 const row: RideRow = {
   id: "ride-1",
@@ -28,7 +28,7 @@ const row: RideRow = {
   caption: null,
   title: null,
   visibility: "friends",
-  created_at: new Date(2027, 0, 8, 11, 37).toISOString(),
+  created_at: new Date(Date.UTC(2027, 0, 8, 10, 37)).toISOString(),
   is_host: false,
   is_joined: false,
   participants: [],
@@ -99,7 +99,14 @@ describe("formatRideDate", () => {
   });
 
   it("crosses a month boundary for tomorrow", () => {
-    expect(formatRideDate("2027-02-01", new Date(2027, 0, 31, 9))).toBe("Tomorrow");
+    expect(formatRideDate("2027-02-01", new Date(Date.UTC(2027, 0, 31, 9)))).toBe("Tomorrow");
+  });
+
+  it("follows Vienna midnight, not the server's UTC day", () => {
+    /* 23:30 UTC on 8 Jan is already 00:30 on 9 Jan in Vienna */
+    const lateUtc = new Date(Date.UTC(2027, 0, 8, 23, 30));
+    expect(formatRideDate("2027-01-09", lateUtc)).toBe("Today");
+    expect(formatRideDate("2027-01-10", lateUtc)).toBe("Tomorrow");
   });
 });
 

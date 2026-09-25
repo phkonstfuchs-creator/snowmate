@@ -22,6 +22,7 @@ import {
   withdrawCarpoolRequestAction,
   type CarpoolActionResult,
 } from "./actions";
+import { toIsoDay } from "@/features/rides/live-ride";
 
 const D = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -29,12 +30,6 @@ const BORDER = "var(--border-subtle)";
 const MUTED = "var(--text-tertiary)";
 const INK = "var(--text-primary)";
 const BRAND = "var(--accent-primary)";
-
-function localIsoDate(offsetDays = 0): string {
-  const now = new Date();
-  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
-  return [day.getFullYear(), String(day.getMonth() + 1).padStart(2, "0"), String(day.getDate()).padStart(2, "0")].join("-");
-}
 
 function OfferModal({
   city,
@@ -50,7 +45,7 @@ function OfferModal({
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [role, setRole] = useState<CarpoolRole>("driver");
   const [resort, setResort] = useState("");
-  const [rideDate, setRideDate] = useState(() => localIsoDate());
+  const [rideDate, setRideDate] = useState(() => toIsoDay(new Date()));
   const [departurePoint, setDeparturePoint] = useState("");
   const [departureTime, setDepartureTime] = useState("08:00");
   const [seats, setSeats] = useState(3);
@@ -120,9 +115,9 @@ function OfferModal({
           <div className="flex gap-3">
             <div className="flex-1">
               <label htmlFor="carpool-date" className={label} style={{ color: MUTED }}>Day</label>
-              <input id="carpool-date" type="date" min={localIsoDate()} className="form-input" value={rideDate} onChange={(e) => setRideDate(e.target.value)} />
+              <input id="carpool-date" type="date" min={toIsoDay(new Date())} className="form-input" value={rideDate} onChange={(e) => setRideDate(e.target.value)} />
             </div>
-            <div className="w-28">
+            <div className="w-36">
               <label htmlFor="carpool-time" className={label} style={{ color: MUTED }}>Time</label>
               <input id="carpool-time" type="time" className="form-input" value={departureTime} onChange={(e) => setDepartureTime(e.target.value)} />
             </div>

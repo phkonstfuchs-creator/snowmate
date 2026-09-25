@@ -10,6 +10,7 @@ import { canPostPublicRide } from "@/features/rides/visibility";
 import type { RideFormInput } from "@/features/rides/ride-input";
 import type { RideActionResult } from "@/features/rides/actions";
 import Icon from "@/components/ui/Icon";
+import { toIsoDay } from "@/features/rides/live-ride";
 
 interface PostRideModalProps {
   city: City;
@@ -19,16 +20,6 @@ interface PostRideModalProps {
      this only decides whether the toggle is offered. Defaults to the
      prototype user. */
   mayGoPublic?: boolean;
-}
-
-function localIsoDate(offsetDays = 0): string {
-  const now = new Date();
-  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
-  return [
-    day.getFullYear(),
-    String(day.getMonth() + 1).padStart(2, "0"),
-    String(day.getDate()).padStart(2, "0"),
-  ].join("-");
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
@@ -49,7 +40,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
   const [totalSpots, setTotalSpots] = useState(4);
   const [caption, setCaption] = useState("");
   const [visibility, setVisibility] = useState<RideVisibility>("friends");
-  const [rideDate, setRideDate] = useState(() => localIsoDate());
+  const [rideDate, setRideDate] = useState(() => toIsoDay(new Date()));
   const [title, setTitle] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,14 +82,15 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Post a ride" tabIndex={-1}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Post a ride" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+        {/* Sticky, so Publish stays reachable while the form scrolls */}
+        <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)", background: "var(--paper-0)" }}>
           {step === 2 ? (
             <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
               Back
@@ -192,7 +184,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
               <input
                 id="post-ride-date"
                 type="date"
-                min={localIsoDate()}
+                min={toIsoDay(new Date())}
                 value={rideDate}
                 onChange={(e) => setRideDate(e.target.value)}
                 className="form-input"

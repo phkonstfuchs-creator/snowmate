@@ -47,6 +47,12 @@ npx supabase db reset
 npm run test:db
 ```
 
+Without Docker, `scripts/test-db-local.sh` runs the same migrations and
+pgTAP tests against a plain local Postgres with the `pgtap` extension, using
+a small stand-in for Supabase's roles and `auth` schema
+(`PGURL=postgresql://postgres@localhost:5432/postgres scripts/test-db-local.sh`).
+CI still runs the real `npm run test:db`.
+
 `supabase/config.toml` configures the local stack. Hosted Auth settings are
 managed separately in the Supabase Dashboard and do not synchronize from that
 file.

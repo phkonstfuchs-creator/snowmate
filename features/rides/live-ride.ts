@@ -70,23 +70,31 @@ export function profileToUser(profile: {
   };
 }
 
-function toIsoDay(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+/* Snowmate's users are in Austria, but the server runs in UTC. Day
+   boundaries follow Vienna time so "Today" flips at local midnight. */
+export const APP_TIME_ZONE = "Europe/Vienna";
+
+const isoDayFormat = new Intl.DateTimeFormat("en-CA", {
+  timeZone: APP_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+export function toIsoDay(date: Date): string {
+  return isoDayFormat.format(date);
 }
 
 export function formatRideDate(isoDate: string, now: Date): string {
   const today = toIsoDay(now);
-  const tomorrow = toIsoDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+  const tomorrow = toIsoDay(new Date(now.getTime() + 24 * 60 * 60 * 1000));
 
   if (isoDate === today) return "Today";
   if (isoDate === tomorrow) return "Tomorrow";
 
   const [y, m, d] = isoDate.split("-").map(Number);
-  const date = new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1);
-  return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  const date = new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1, 12));
+  return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 }
 
 export function formatPostedAt(isoTimestamp: string, now: Date): string {
