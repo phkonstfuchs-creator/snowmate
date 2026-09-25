@@ -1,5 +1,5 @@
-import Screen from "@/app/(app)/profile/page";
+import ProfileScreen from "@/features/profile/ProfileScreen";
 
 export default function DemoScreen() {
-  return <Screen />;
+  return <ProfileScreen />;
 }

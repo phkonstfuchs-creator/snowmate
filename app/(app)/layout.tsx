@@ -1,4 +1,5 @@
 import BottomNav from "@/components/BottomNav";
+import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -18,6 +19,7 @@ export default async function AppLayout({
     <div className="app-shell">
       <main className="page-content">{children}</main>
       <BottomNav />
+      <OnboardingDraftSync />
     </div>
   );
 }

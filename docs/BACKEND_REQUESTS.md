@@ -122,24 +122,6 @@ to 3 must exist as negative pgTAP tests.
 
 ---
 
-## 4. No access to the signed-in account's profile data
-
-**Status:** OPEN
-
-Onboarding collects region, riding style, display name and handle and stores
-them in `localStorage` under `sm_onboarding_draft`. After sign-up the draft
-is **never read back** — the answers are lost.
-
-**Why:** the user enters data that disappears without trace. From their
-point of view, that is a bug.
-
-**Workaround today:** the `localStorage` entry is simply left behind.
-
-**Needed:** a profile table plus a server action to adopt the draft once the
-account is confirmed.
-
----
-
 ## 5. Payments for trips and carpool seats
 
 **Status:** OPEN — not urgent, listed so the shape is known early
@@ -161,6 +143,26 @@ in the UI must start suggesting a payment is possible before this is real.
 ---
 
 ## Done
+
+### Onboarding answers were lost after sign-up (was item 4)
+
+**Resolved:** `features/profile/OnboardingDraftSync.tsx` runs inside the
+signed-in app shell, hands the `sm_onboarding_draft` entry to
+`adoptOnboardingDraftAction` once, and clears it. The action validates the
+draft (`features/profile/profile-input.ts`, mirroring the table
+constraints), takes the user id from the session, and writes only to a
+profile that is not yet complete, so an old draft on a shared device
+cannot overwrite later edits. A taken handle keeps the draft so the edit
+sheet can prefill the rest.
+
+Migration `20260925090000_derive_onboarding_completed.sql` derives
+`onboarding_completed` from the four required fields in a trigger. The
+column stays out of the client update grant; the new pgTAP file
+`profile_onboarding.test.sql` covers both.
+
+`/profile` now reads the real account (name, handle, region, bio) and
+offers an edit sheet backed by `updateProfileAction`. The season numbers
+on that screen are still fixtures.
 
 ### Server-side auth messages were German
 
