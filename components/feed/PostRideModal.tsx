@@ -6,8 +6,7 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { AbilityLevel, City, RideVisibility } from "@/lib/types";
-import { RESORT_STATUS, ME } from "@/lib/data";
-import { canPostPublicRide } from "@/features/rides/visibility";
+import { resortNamesIn } from "@/lib/resorts";
 import type { RideFormInput } from "@/features/rides/ride-input";
 import type { RideActionResult } from "@/features/rides/actions";
 import Icon from "@/components/ui/Icon";
@@ -18,9 +17,8 @@ interface PostRideModalProps {
   onClose: () => void;
   onPost: (data: RideFormInput) => Promise<RideActionResult> | void;
   /* Server-side the database refuses public rides by minors anyway;
-     this only decides whether the toggle is offered. Defaults to the
-     prototype user. */
-  mayGoPublic?: boolean;
+     this only decides whether the toggle is offered. */
+  mayGoPublic: boolean;
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
@@ -29,7 +27,7 @@ const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = 
   { value: "off-piste", label: "Off-piste", desc: "Powder, terrain, technical" },
 ];
 
-export default function PostRideModal({ city, onClose, onPost, mayGoPublic = canPostPublicRide(ME) }: PostRideModalProps) {
+export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: PostRideModalProps) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -46,7 +44,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resorts = RESORT_STATUS.filter((r) => r.city === city).map((r) => r.name);
+  const resorts = resortNamesIn(city);
   /* Minors cannot post publicly. The toggle is disabled rather than
      hidden — an absent control reads as a bug, a locked one reads as
      a rule. */

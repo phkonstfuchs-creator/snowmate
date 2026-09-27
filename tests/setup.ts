@@ -6,7 +6,7 @@ import { afterEach, vi } from "vitest";
    close, because useSheetDismiss checks prefers-reduced-motion. The
    default is "no reduction", so tests take the same path a normal
    browser does. */
-if (!window.matchMedia) {
+if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,

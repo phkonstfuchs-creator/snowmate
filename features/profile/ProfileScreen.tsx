@@ -12,6 +12,7 @@ import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
 import { initialsFor, type OwnProfile } from "./profile-input";
+import type { AccountStats } from "./account-stats";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -167,12 +168,6 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
    sample rider. In the app it is the signed-in profile, or null when the
    backend could not be reached. Name, handle and region are real; the
    season numbers below still come from the fixtures. */
-export interface AccountStats {
-  rides: number;
-  resorts: number;
-  crew: number;
-}
-
 const CITY_LABEL = { innsbruck: "Innsbruck", salzburg: "Salzburg" } as const;
 const ABILITY_LABEL = { chill: "Chill", park: "Park", "off-piste": "Off-piste" } as const;
 

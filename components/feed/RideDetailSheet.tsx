@@ -10,6 +10,7 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
+import { isFull, openSpots } from "@/features/rides/capacity";
 
 const BORDER = "var(--border-subtle)";
 const MUTED = "var(--text-tertiary)";
@@ -36,8 +37,8 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss, selectedUser === null);
-  const openSpots = post.totalSpots - post.takenSpots;
-  const isFull = openSpots <= 0;
+  const open = openSpots(post);
+  const full = isFull(post);
 
   if (selectedUser) {
     return <UserProfileSheet user={selectedUser} onClose={() => setSelectedUser(null)} />;
@@ -122,8 +123,8 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
             </div>
             <div className="px-4 py-3">
               <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Open spots</p>
-              <p className="font-black text-sm font-mono" style={{ color: isFull ? MUTED : openSpots === 1 ? "var(--rust)" : BRAND }}>
-                {isFull ? "Full" : `${openSpots} open`}
+              <p className="font-black text-sm font-mono" style={{ color: full ? MUTED : open === 1 ? "var(--rust)" : BRAND }}>
+                {full ? "Full" : `${open} open`}
               </p>
             </div>
           </div>
@@ -191,16 +192,16 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           ) : (
           <button
             onClick={onJoin}
-            disabled={isFull && !isJoined}
+            disabled={full && !isJoined}
             className="w-full py-4 font-black text-base transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
             style={isJoined
               ? { background: "var(--accent-primary-subtle)", color: BRAND }
-              : isFull
+              : full
               ? { background: "var(--bg-surface-2)", color: MUTED, opacity: 0.5 }
               : { background: BRAND, color: "var(--text-on-accent)" }
             }
           >
-            {isJoined ? "You are in, tap to leave" : isFull ? "Ride is full" : "Join ride"}
+            {isJoined ? "You are in, tap to leave" : full ? "Ride is full" : "Join ride"}
           </button>
           )}
         </div>

@@ -5,6 +5,7 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
+import { isFull, openSpots } from "@/features/rides/capacity";
 
 interface RideCardProps {
   post: RidePost;
@@ -18,8 +19,8 @@ interface RideCardProps {
 }
 
 export default function RideCard({ post, author, joinedUsers, isJoined, isHost = false, onClick, onJoin, index = 0 }: RideCardProps) {
-  const openSpots = post.totalSpots - post.takenSpots;
-  const isFull = openSpots <= 0;
+  const open = openSpots(post);
+  const full = isFull(post);
 
   return (
     <article
@@ -104,9 +105,9 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isHost =
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <span
               className="text-[0.7rem] font-bold font-mono"
-              style={{ color: isFull ? "var(--ink-3)" : openSpots === 1 ? "var(--rust)" : "var(--ink-2)" }}
+              style={{ color: full ? "var(--ink-3)" : open === 1 ? "var(--rust)" : "var(--ink-2)" }}
             >
-              {isFull ? "full" : `${openSpots} open`}
+              {full ? "full" : `${open} open`}
             </span>
             {isHost ? (
               <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
@@ -115,12 +116,12 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isHost =
             ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
-              disabled={isFull && !isJoined}
+              disabled={full && !isJoined}
               className="text-mono-label min-h-11 px-3.5 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
               style={
                 isJoined
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", border: "1px solid var(--ink-0)" }
-                  : isFull
+                  : full
                   ? { background: "var(--paper-2)", color: "var(--ink-3)", border: "1px solid var(--paper-3)" }
                   : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
               }

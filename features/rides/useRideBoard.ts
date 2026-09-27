@@ -7,6 +7,7 @@ import type { RidePost } from "@/lib/types";
 import { ME, getUserById, getUsersByIds } from "@/lib/data";
 import { toggleSetValue } from "@/lib/collections";
 import { toVisibleRide } from "./visibility";
+import { isClosedTo } from "./capacity";
 import { LOCKED_MEET_POINT_LABEL, type LiveRide } from "./live-ride";
 import {
   cancelRideAction,
@@ -85,8 +86,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
       if (!ride) return false;
 
       if (!isLive) {
-        const isFull = ride.post.takenSpots >= ride.post.totalSpots;
-        if (!ride.isJoined && isFull) return false;
+        if (isClosedTo(ride.post, ride.isJoined)) return false;
         setDemoJoined((previous) => toggleSetValue(previous, rideId));
         return !ride.isJoined;
       }

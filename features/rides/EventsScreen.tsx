@@ -6,6 +6,7 @@ import { PUBLIC_EVENTS } from "@/lib/data";
 import { isDiscoverablePublicRide } from "@/features/rides/visibility";
 import type { LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
+import { isClosedTo, isFull, openSpots, totalOpenSpots } from "./capacity";
 import EditRideSheet from "./EditRideSheet";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
@@ -72,8 +73,8 @@ function EventDetailSheet({
 
   const { post, host: author, participants: joinedUsers, isJoined, isHost } = ride;
   const taken = post.takenSpots;
-  const openSpots = post.totalSpots - taken;
-  const isFull = openSpots <= 0;
+  const open = openSpots(post);
+  const full = isFull(post);
 
   return (
     <>
@@ -157,8 +158,8 @@ function EventDetailSheet({
           </div>
           <div className="px-4 py-3">
             <p className="text-mono-label" style={{ color: INK_2 }}>Open</p>
-            <p className="text-mono-data mt-0.5" style={{ color: isFull ? INK_2 : PINE }}>
-              {isFull ? "full" : openSpots}
+            <p className="text-mono-data mt-0.5" style={{ color: full ? INK_2 : PINE }}>
+              {full ? "full" : open}
             </p>
           </div>
         </div>
@@ -208,17 +209,17 @@ function EventDetailSheet({
           {!isHost && (
           <button
             onClick={onJoin}
-            disabled={(isFull && !isJoined) || pending}
+            disabled={(full && !isJoined) || pending}
             className="card-tap w-full py-4 font-display text-lg uppercase"
             style={
               isJoined
                 ? { background: PAPER_1, color: INK, border: "var(--rule-thick)" }
-                : isFull
+                : full
                   ? { background: PAPER_1, color: INK_2, border: "var(--rule-thin)", cursor: "not-allowed" }
                   : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }
             }
           >
-            {pending ? "One moment…" : isJoined ? "Leave event" : isFull ? "Event is full" : "Join event"}
+            {pending ? "One moment…" : isJoined ? "Leave event" : full ? "Event is full" : "Join event"}
           </button>
           )}
         </div>
@@ -238,8 +239,8 @@ function EventCard({
 }) {
   const { post, host: author, isJoined } = ride;
   const taken = post.takenSpots;
-  const openSpots = post.totalSpots - taken;
-  const isFull = openSpots <= 0;
+  const open = openSpots(post);
+  const full = isFull(post);
   const filled = Math.min(100, Math.round((taken / post.totalSpots) * 100));
 
   return (
@@ -289,10 +290,10 @@ function EventCard({
 
         <div className="mt-3 flex items-center gap-3">
           <div className="h-2 flex-1" style={{ background: "var(--paper-2)", border: "1px solid var(--border-hairline)" }}>
-            <div style={{ width: `${filled}%`, height: "100%", background: isFull ? INK_2 : RUST }} />
+            <div style={{ width: `${filled}%`, height: "100%", background: full ? INK_2 : RUST }} />
           </div>
-          <span className="text-mono-label flex-shrink-0" style={{ color: isFull ? INK_2 : INK }}>
-            {isFull ? "full" : `${openSpots} open`}
+          <span className="text-mono-label flex-shrink-0" style={{ color: full ? INK_2 : INK }}>
+            {full ? "full" : `${open} open`}
           </span>
         </div>
       </div>
@@ -306,10 +307,6 @@ export interface LiveEvents {
   defaultCity: City;
 }
 
-/* A full event you are already in is not "too late" for you. */
-function isClosedToViewer(ride: LiveRide): boolean {
-  return !ride.isJoined && ride.post.takenSpots >= ride.post.totalSpots;
-}
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
@@ -330,16 +327,13 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
         /* Full events go last. This screen is the entry point for
            people without contacts, so the top must show where you can
            still join, not where you are too late. */
-        .sort((a, b) => Number(isClosedToViewer(a)) - Number(isClosedToViewer(b))),
+        .sort((a, b) => Number(isClosedTo(a.post, a.isJoined)) - Number(isClosedTo(b.post, b.isJoined))),
     [board.rides, city],
   );
 
   const openEvent = events.find((event) => event.post.id === openEventId) ?? null;
   const editingEvent = events.find((event) => event.post.id === editingEventId) ?? null;
-  const openSeats = events.reduce(
-    (sum, event) => sum + Math.max(0, event.post.totalSpots - event.post.takenSpots),
-    0,
-  );
+  const openSeats = totalOpenSpots(events.map((event) => event.post));
 
   return (
     <>

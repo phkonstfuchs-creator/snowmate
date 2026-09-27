@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
-import { RIDE_POSTS } from "@/lib/data";
+import { ME, RIDE_POSTS } from "@/lib/data";
+import { canPostPublicRide } from "./visibility";
 import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
 import EditRideSheet from "./EditRideSheet";
@@ -230,7 +231,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           city={city}
           onClose={() => setShowPostModal(false)}
           onPost={board.postRide}
-          {...(live ? { mayGoPublic: !live.viewerIsMinor } : {})}
+          mayGoPublic={live ? !live.viewerIsMinor : canPostPublicRide(ME)}
         />
       )}
 

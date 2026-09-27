@@ -4,7 +4,8 @@ import { OFFLINE_RESULT, settle } from "@/lib/settle";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { CarpoolPost, CarpoolRole, City } from "@/lib/types";
-import { CARPOOL_POSTS, RESORT_STATUS, getUserById, getUsersByIds } from "@/lib/data";
+import { CARPOOL_POSTS, getUserById, getUsersByIds } from "@/lib/data";
+import { resortNamesIn } from "@/lib/resorts";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -54,7 +55,7 @@ function OfferModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resorts = RESORT_STATUS.filter((r) => r.city === city).map((r) => r.name);
+  const resorts = resortNamesIn(city);
   const canSubmit = resort !== "" && departurePoint.trim().length >= 2 && !submitting;
 
   const submit = async () => {

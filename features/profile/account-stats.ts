@@ -1,6 +1,11 @@
 import type { LiveRide } from "@/features/rides/live-ride";
 import type { FriendGraph } from "@/features/crew/friendships";
-import type { AccountStats } from "./ProfileScreen";
+
+export interface AccountStats {
+  rides: number;
+  resorts: number;
+  crew: number;
+}
 
 /* Numbers the backend can actually back: rides hosted or joined, the
    distinct resorts among them, and confirmed friends. */

@@ -8,6 +8,7 @@ import { RESORT_STATUS, RIDE_POSTS } from "@/lib/data";
 import type { LiveRide } from "@/features/rides/live-ride";
 import { fixtureToLiveRide } from "@/features/rides/useRideBoard";
 import { applyRideActivity, ridesAt } from "./resort-activity";
+import { openSpots as spotsOpen, totalOpenSpots } from "@/features/rides/capacity";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -44,7 +45,7 @@ function ResortDetailSheet({
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
-  const openSpots = ridesHere.reduce((sum, ride) => sum + Math.max(0, ride.post.totalSpots - ride.post.takenSpots), 0);
+  const openSpots = totalOpenSpots(ridesHere.map((ride) => ride.post));
   /* Snow, lifts and conditions have no data source yet. The prototype
      shows sample values; the app shows what it actually knows. */
   const stats: { label: string; val: string | number; live?: boolean; cond?: ResortStatus["conditions"] }[] = isLive
@@ -140,7 +141,7 @@ function ResortDetailSheet({
                   <Avatar id={a.id} initials={a.avatar} size={32} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-black" style={{ color: INK }}>{a.name}</p>
-                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {ride.totalSpots - ride.takenSpots} open</p>
+                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {spotsOpen(ride)} open</p>
                   </div>
                   <span className={clsx("text-mono-label px-2 py-0.5 flex-shrink-0",
                     ride.abilityLevel === "chill" && "badge-chill",
