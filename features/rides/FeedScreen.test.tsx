@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   leave: vi.fn(),
   cancel: vi.fn(),
   create: vi.fn(),
+  update: vi.fn(),
   refresh: vi.fn(),
 }));
 
@@ -16,6 +17,7 @@ vi.mock("./actions", () => ({
   leaveRideAction: mocks.leave,
   cancelRideAction: mocks.cancel,
   createRideAction: mocks.create,
+  updateRideAction: mocks.update,
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/feed",
@@ -160,6 +162,30 @@ describe("FeedScreen with real data", () => {
   it("points an unfinished profile to the profile tab", () => {
     render(<FeedScreen live={{ ...live([]), profileComplete: false }} />);
     expect(screen.getByRole("link", { name: /Finish your profile/ })).toHaveAttribute("href", "/profile");
+  });
+
+  it("lets the host edit their ride and shows a refusal", async () => {
+    mocks.update.mockResolvedValueOnce({ ok: false, message: "More people have already joined than that. Pick more spots." });
+    mocks.update.mockResolvedValueOnce({ ok: true, message: "Ride updated." });
+    render(<FeedScreen live={live([row({ is_host: true, meet_point: "Congress", meet_point_locked: false, taken_spots: 1 })])} />);
+
+    fireEvent.click(screen.getByText("Rails are set"));
+    fireEvent.click(screen.getByRole("button", { name: "Edit ride" }));
+    const dialog = screen.getByRole("dialog", { name: "Edit ride" });
+    expect(within(dialog).getByLabelText("Meeting point")).toHaveValue("Congress");
+    expect(within(dialog).queryByRole("option", { name: "1" })).toBeInTheDocument();
+    fireEvent.change(within(dialog).getByLabelText("Meeting point"), { target: { value: "Hungerburg" } });
+
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    });
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("Pick more spots");
+
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    });
+    expect(mocks.update).toHaveBeenLastCalledWith("ride-1", expect.objectContaining({ meetPoint: "Hungerburg", meetTime: "09:00" }));
+    expect(mocks.refresh).toHaveBeenCalled();
   });
 
   it("says when rides could not be loaded", () => {

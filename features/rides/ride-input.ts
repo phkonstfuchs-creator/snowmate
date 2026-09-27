@@ -40,3 +40,21 @@ export function validateRideInput(
   if (result.success) return { success: true, data: result.data };
   return { success: false, message: result.error.issues[0]?.message ?? "Check the ride details." };
 }
+
+/* What a host may change after posting (see update_ride()). */
+export const rideEditSchema = z.object({
+  meetTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Pick a time."),
+  meetPoint: z.string().trim().min(2, "Add a meeting point.").max(120, "Use at most 120 characters."),
+  totalSpots: z.number().int().min(1, "At least one spot.").max(50, "At most 50 spots."),
+  caption: z.string().trim().max(280, "Use at most 280 characters."),
+});
+
+export type RideEditInput = z.input<typeof rideEditSchema>;
+
+export function validateRideEdit(
+  input: unknown,
+): { success: true; data: z.infer<typeof rideEditSchema> } | { success: false; message: string } {
+  const result = rideEditSchema.safeParse(input);
+  if (result.success) return { success: true, data: result.data };
+  return { success: false, message: result.error.issues[0]?.message ?? "Check the ride details." };
+}

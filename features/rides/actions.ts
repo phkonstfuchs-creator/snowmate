@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { validateRideInput } from "./ride-input";
+import { validateRideEdit, validateRideInput } from "./ride-input";
 
 export type RideActionResult = { ok: true; message: string } | { ok: false; message: string };
 
@@ -118,4 +118,34 @@ export async function cancelRideAction(rideId: string): Promise<RideActionResult
   return result.data === true
     ? { ok: true, message: "Ride cancelled." }
     : { ok: false, message: "Only the host can cancel this ride." };
+}
+
+export async function updateRideAction(rideId: string, input: unknown): Promise<RideActionResult> {
+  const validation = validateRideEdit(input);
+  if (!validation.success) return { ok: false, message: validation.message };
+  if (typeof rideId !== "string" || rideId.length === 0) return UNAVAILABLE;
+
+  const edit = validation.data;
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("update_ride", {
+      target_ride: rideId,
+      new_meet_time: edit.meetTime,
+      new_meet_point: edit.meetPoint,
+      new_total_spots: edit.totalSpots,
+      new_caption: edit.caption,
+    });
+
+    if (error) return UNAVAILABLE;
+    if (data === "below_taken") {
+      return { ok: false, message: "More people have already joined than that. Pick more spots." };
+    }
+    if (data !== "updated") return { ok: false, message: "Only the host can edit this ride." };
+  } catch {
+    return UNAVAILABLE;
+  }
+
+  revalidateRides();
+  return { ok: true, message: "Ride updated." };
 }

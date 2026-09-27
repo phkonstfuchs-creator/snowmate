@@ -6,6 +6,7 @@ import { PUBLIC_EVENTS } from "@/lib/data";
 import { isDiscoverablePublicRide } from "@/features/rides/visibility";
 import type { LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
+import EditRideSheet from "./EditRideSheet";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -55,12 +56,14 @@ function EventDetailSheet({
   pending,
   onJoin,
   onCancel,
+  onEdit,
   onClose,
 }: {
   ride: LiveRide;
   pending: boolean;
   onJoin: () => void;
   onCancel?: () => void;
+  onEdit?: () => void;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -181,6 +184,16 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-5">
+          {isHost && onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="card-tap mb-2 w-full py-4 font-display text-lg uppercase"
+              style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
+            >
+              Edit event
+            </button>
+          )}
           {isHost && onCancel && (
             <button
               type="button"
@@ -302,6 +315,7 @@ function isClosedToViewer(ride: LiveRide): boolean {
 export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
   const unavailable = live !== undefined && live.rides === null;
 
@@ -321,6 +335,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
   );
 
   const openEvent = events.find((event) => event.post.id === openEventId) ?? null;
+  const editingEvent = events.find((event) => event.post.id === editingEventId) ?? null;
   const openSeats = events.reduce(
     (sum, event) => sum + Math.max(0, event.post.totalSpots - event.post.takenSpots),
     0,
@@ -402,6 +417,10 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
           onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
           {...(board.isLive
             ? {
+                onEdit: () => {
+                  setOpenEventId(null);
+                  setEditingEventId(openEvent.post.id);
+                },
                 onCancel: () => {
                   if (!window.confirm("Cancel this event for everyone who joined?")) return;
                   setOpenEventId(null);
@@ -410,6 +429,14 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
               }
             : {})}
           onClose={() => setOpenEventId(null)}
+        />
+      )}
+
+      {editingEvent && (
+        <EditRideSheet
+          post={editingEvent.post}
+          onSave={(input) => board.updateRide(editingEvent.post.id, input)}
+          onClose={() => setEditingEventId(null)}
         />
       )}
     </>

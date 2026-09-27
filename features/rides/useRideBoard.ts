@@ -13,9 +13,10 @@ import {
   createRideAction,
   joinRideAction,
   leaveRideAction,
+  updateRideAction,
   type RideActionResult,
 } from "./actions";
-import type { RideFormInput } from "./ride-input";
+import type { RideEditInput, RideFormInput } from "./ride-input";
 
 /* Turns a fixture post into the same shape the database delivers, with
    the prototype's local join state applied. That way the screens have
@@ -56,6 +57,7 @@ export interface RideBoard {
   toggleJoin: (rideId: string) => Promise<boolean>;
   postRide: (input: RideFormInput) => Promise<RideActionResult>;
   cancelRide: (rideId: string) => Promise<RideActionResult>;
+  updateRide: (rideId: string, input: RideEditInput) => Promise<RideActionResult>;
 }
 
 /* `live` is undefined in the /demo prototype and the list from the
@@ -131,9 +133,22 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
     [isLive, router],
   );
 
+  const updateRide = useCallback(
+    async (rideId: string, input: RideEditInput): Promise<RideActionResult> => {
+      if (!isLive) {
+        return { ok: true, message: "Demo: nothing is saved." };
+      }
+      const result = await settle<RideActionResult>(updateRideAction(rideId, input), OFFLINE_RESULT);
+      if (result.ok) startTransition(() => router.refresh());
+      return result;
+    },
+    [isLive, router],
+  );
+
   return {
     rides,
     cancelRide,
+    updateRide,
     isLive,
     pendingId,
     notice,

@@ -7,6 +7,7 @@ import { City, User } from "@/lib/types";
 import { RIDE_POSTS } from "@/lib/data";
 import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
+import EditRideSheet from "./EditRideSheet";
 import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
@@ -31,6 +32,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS);
   const unavailable = live !== undefined && live.rides === null;
 
@@ -52,6 +54,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   /* Public events have their own screen; the feed is the crew's rides. */
   const rides = board.rides.filter((ride) => ride.post.city === city && ride.post.visibility === "friends");
   const selectedRide = rides.find((ride) => ride.post.id === selectedPostId) ?? null;
+  const editingRide = rides.find((ride) => ride.post.id === editingPostId) ?? null;
   /* "Out today" means today: a ride next Saturday is in the list, but
      its riders are not on the mountain yet. */
   const todaysRides = rides.filter((ride) => ride.post.date === "Today");
@@ -242,6 +245,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           profilesEnabled={!board.isLive}
           {...(board.isLive
             ? {
+                onEdit: () => {
+                  setSelectedPostId(null);
+                  setEditingPostId(selectedRide.post.id);
+                },
                 onCancel: () => {
                   /* Cancelling also drops everyone who joined. */
                   if (!window.confirm("Cancel this ride for everyone who joined?")) return;
@@ -252,6 +259,14 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             : {})}
           onClose={() => setSelectedPostId(null)}
           onJoin={() => { void handleJoin(selectedRide.post.id); }}
+        />
+      )}
+
+      {editingRide && (
+        <EditRideSheet
+          post={editingRide.post}
+          onSave={(input) => board.updateRide(editingRide.post.id, input)}
+          onClose={() => setEditingPostId(null)}
         />
       )}
 

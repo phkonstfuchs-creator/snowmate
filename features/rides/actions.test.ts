@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cancelRideAction, createRideAction, joinRideAction, leaveRideAction } from "./actions";
+import { cancelRideAction, createRideAction, joinRideAction, leaveRideAction, updateRideAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
@@ -121,6 +121,41 @@ describe("ride actions", () => {
       mocks.rpc.mockResolvedValue({ data: null, error: { code: "x" } });
       await expect(leaveRideAction("r")).resolves.toMatchObject({ ok: false });
       await expect(cancelRideAction("r")).resolves.toMatchObject({ ok: false });
+    });
+  });
+
+  describe("updateRideAction", () => {
+    const edit = { meetTime: "10:30", meetPoint: " Hungerburg ", totalSpots: 3, caption: "" };
+
+    it("sends the trimmed edit to update_ride", async () => {
+      mocks.rpc.mockResolvedValue({ data: "updated", error: null });
+      await expect(updateRideAction("r1", edit)).resolves.toEqual({ ok: true, message: "Ride updated." });
+      expect(mocks.rpc).toHaveBeenCalledWith("update_ride", {
+        target_ride: "r1",
+        new_meet_time: "10:30",
+        new_meet_point: "Hungerburg",
+        new_total_spots: 3,
+        new_caption: "",
+      });
+      expect(mocks.revalidatePath).toHaveBeenCalledWith("/feed");
+    });
+
+    it.each([
+      ["below_taken", "More people have already joined than that. Pick more spots."],
+      ["not_found", "Only the host can edit this ride."],
+    ])("explains %s", async (data, message) => {
+      mocks.rpc.mockResolvedValue({ data, error: null });
+      await expect(updateRideAction("r1", edit)).resolves.toEqual({ ok: false, message });
+    });
+
+    it("rejects invalid input and failures", async () => {
+      await expect(updateRideAction("r1", { ...edit, meetTime: "25:00" })).resolves.toEqual({ ok: false, message: "Pick a time." });
+      await expect(updateRideAction("", edit)).resolves.toMatchObject({ ok: false });
+      mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "x" } });
+      await expect(updateRideAction("r1", edit)).resolves.toMatchObject({ ok: false });
+      mocks.createClient.mockRejectedValueOnce(new Error("env"));
+      await expect(updateRideAction("r1", edit)).resolves.toMatchObject({ ok: false });
+      expect(mocks.revalidatePath).not.toHaveBeenCalled();
     });
   });
 });

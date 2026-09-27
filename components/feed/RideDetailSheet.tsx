@@ -25,12 +25,13 @@ interface Props {
   isJoined: boolean;
   isHost?: boolean;
   onCancel?: () => void;
+  onEdit?: () => void;
   /* Real accounts do not expose the fixture profile stats yet, so the
      app turns the rider profiles off; the demo keeps them. */
   profilesEnabled?: boolean;
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isHost = false, onCancel, profilesEnabled = true }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isHost = false, onCancel, onEdit, profilesEnabled = true }: Props) {
   useScrollLock();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
@@ -168,6 +169,16 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Join CTA */}
         <div className="px-5 pt-4">
+          {isHost && onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="mb-2 w-full py-4 font-black text-base"
+              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+            >
+              Edit ride
+            </button>
+          )}
           {isHost ? (
             <button
               onClick={onCancel}

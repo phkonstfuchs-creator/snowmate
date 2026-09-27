@@ -216,7 +216,7 @@ download and a typed-confirmation delete. Worth one manual check after
 applying: the delete relies on the migration owner being allowed to
 delete from `auth.users`, which is the Supabase default.
 
-**Still open:** applying the four new migrations to `snowmate-dev`
+**Still open:** applying the five new migrations to `snowmate-dev`
 (`npx supabase db push`).
 
 ### Onboarding answers were lost after sign-up (was item 4)
