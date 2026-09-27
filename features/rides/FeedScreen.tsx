@@ -175,7 +175,9 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             author={ride.host}
             joinedUsers={ride.participants}
             isJoined={ride.isJoined}
+            isPending={ride.isPending}
             isHost={ride.isHost}
+            requestCount={ride.requests.length}
             index={i}
             onClick={() => setSelectedPostId(ride.post.id)}
             onJoin={() => handleJoin(ride.post.id)}
@@ -242,6 +244,9 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           author={selectedRide.host}
           joinedUsers={selectedRide.participants}
           isJoined={selectedRide.isJoined}
+          isPending={selectedRide.isPending}
+          requests={selectedRide.requests}
+          onRespond={(userId, accept) => { void board.respondRequest(selectedRide.post.id, userId, accept); }}
           isHost={selectedRide.isHost}
           profilesEnabled={!board.isLive}
           {...(board.isLive

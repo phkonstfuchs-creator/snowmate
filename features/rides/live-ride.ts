@@ -26,6 +26,10 @@ export interface RideRow {
   is_host: boolean;
   is_joined: boolean;
   participants: { id: string; display_name: string | null; handle: string | null }[];
+  /* The viewer's own participation: pending means asked, not yet let in. */
+  my_status?: "pending" | "accepted" | null;
+  /* Host only: friends of friends asking to join. */
+  requests?: { id: string; display_name: string | null; handle: string | null }[];
 }
 
 export interface LiveRide {
@@ -34,6 +38,10 @@ export interface LiveRide {
   participants: User[];
   isHost: boolean;
   isJoined: boolean;
+  /* Asked to join and waiting for the host. */
+  isPending: boolean;
+  /* Host only: people waiting for an answer. */
+  requests: User[];
   meetPointLocked: boolean;
 }
 
@@ -140,6 +148,8 @@ export function toLiveRide(row: RideRow, now: Date): LiveRide {
     participants,
     isHost: row.is_host,
     isJoined: row.is_joined,
+    isPending: row.my_status === "pending",
+    requests: (row.requests ?? []).map((p) => profileToUser({ ...p, city: row.city })),
     meetPointLocked: row.meet_point_locked,
   };
 }

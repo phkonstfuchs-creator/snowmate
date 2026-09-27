@@ -68,6 +68,7 @@ begin
         'ride_id', rp.ride_id,
         'resort', r.resort,
         'ride_date', r.ride_date,
+        'status', rp.status,
         'joined_at', rp.joined_at
       ) order by rp.joined_at)
       from public.ride_participants rp
@@ -94,10 +95,10 @@ begin
 end;
 $$;
 
--- What is waiting for the caller: friend requests to answer and
--- requests on their own upcoming carpools.
+-- What is waiting for the caller: friend requests to answer and requests
+-- to join their own upcoming rides and carpools.
 create or replace function public.my_pending_counts()
-returns table (friend_requests integer, carpool_requests integer)
+returns table (friend_requests integer, carpool_requests integer, ride_requests integer)
 language sql
 stable
 security definer
@@ -115,6 +116,14 @@ as $$
       where c.author_id = auth.uid()
         and cr.status = 'pending'
         and c.ride_date >= private.local_today()
+    ),
+    (
+      select count(*)::integer
+      from public.ride_participants rp
+      join public.rides r on r.id = rp.ride_id
+      where r.host_id = auth.uid()
+        and rp.status = 'pending'
+        and r.ride_date >= private.local_today()
     );
 $$;
 

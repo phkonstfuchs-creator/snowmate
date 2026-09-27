@@ -20,7 +20,10 @@ export async function getFriendGraph(): Promise<FriendGraph | null> {
 export interface PendingCounts {
   friendRequests: number;
   carpoolRequests: number;
+  rideRequests: number;
 }
+
+const NONE: PendingCounts = { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 };
 
 /* What is waiting for the caller, for the navigation badges. Zero on any
    failure: a missing badge is better than a broken app shell. */
@@ -30,13 +33,14 @@ export async function getPendingCounts(): Promise<PendingCounts> {
     const { data, error } = await supabase.rpc("my_pending_counts");
     const row = Array.isArray(data) ? data[0] : null;
 
-    if (error || !row) return { friendRequests: 0, carpoolRequests: 0 };
+    if (error || !row) return NONE;
 
     return {
       friendRequests: Number(row.friend_requests) || 0,
       carpoolRequests: Number(row.carpool_requests) || 0,
+      rideRequests: Number(row.ride_requests) || 0,
     };
   } catch {
-    return { friendRequests: 0, carpoolRequests: 0 };
+    return NONE;
   }
 }

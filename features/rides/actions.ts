@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { validateRideEdit, validateRideInput } from "./ride-input";
 
-export type RideActionResult = { ok: true; message: string } | { ok: false; message: string };
+/* pending: the viewer asked to join and waits for the host. */
+export type RideActionResult = { ok: true; message: string; pending?: boolean } | { ok: false; message: string };
 
 const RIDE_PATHS = ["/feed", "/events"] as const;
 
@@ -20,6 +21,8 @@ const RLS_VIOLATION = "42501";
 
 const JOIN_MESSAGES: Record<string, RideActionResult> = {
   joined: { ok: true, message: "You are in." },
+  requested: { ok: true, message: "Asked. The host lets you in.", pending: true },
+  already_requested: { ok: true, message: "You already asked. Waiting for the host.", pending: true },
   already_joined: { ok: true, message: "You are already in." },
   full: { ok: false, message: "This ride is full." },
   host: { ok: false, message: "You are hosting this ride." },
@@ -148,4 +151,33 @@ export async function updateRideAction(rideId: string, input: unknown): Promise<
 
   revalidateRides();
   return { ok: true, message: "Ride updated." };
+}
+
+const RESPOND_MESSAGES: Record<string, RideActionResult> = {
+  accepted: { ok: true, message: "Let in." },
+  declined: { ok: true, message: "Declined." },
+  full: { ok: false, message: "The ride is full. Add spots first." },
+  not_found: { ok: false, message: "That request is no longer open." },
+};
+
+export async function respondRideRequestAction(
+  rideId: string,
+  requesterId: string,
+  accept: boolean,
+): Promise<RideActionResult> {
+  if (!rideId || !requesterId) return UNAVAILABLE;
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("respond_ride_request", {
+      target_ride: rideId,
+      requester: requesterId,
+      accept,
+    });
+    if (error) return UNAVAILABLE;
+    revalidateRides();
+    return RESPOND_MESSAGES[String(data)] ?? UNAVAILABLE;
+  } catch {
+    return UNAVAILABLE;
+  }
 }

@@ -35,12 +35,12 @@ describe("getPendingCounts", () => {
   });
 
   it("reads the counts", async () => {
-    mocks.rpc.mockResolvedValue({ data: [{ friend_requests: 2, carpool_requests: 1 }], error: null });
-    await expect(getPendingCounts()).resolves.toEqual({ friendRequests: 2, carpoolRequests: 1 });
+    mocks.rpc.mockResolvedValue({ data: [{ friend_requests: 2, carpool_requests: 1, ride_requests: 3 }], error: null });
+    await expect(getPendingCounts()).resolves.toEqual({ friendRequests: 2, carpoolRequests: 1, rideRequests: 3 });
   });
 
   it("falls back to zero", async () => {
-    const zero = { friendRequests: 0, carpoolRequests: 0 };
+    const zero = { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 };
     mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "x" } });
     await expect(getPendingCounts()).resolves.toEqual(zero);
     mocks.rpc.mockResolvedValueOnce({ data: [{ friend_requests: null, carpool_requests: "x" }], error: null });

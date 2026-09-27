@@ -23,7 +23,13 @@ export default async function AppLayout({
   return (
     <div className="app-shell">
       <main className="page-content">{children}</main>
-      <BottomNav badges={{ "/crew": pending.friendRequests, "/carpool": pending.carpoolRequests }} />
+      <BottomNav
+        badges={{
+          "/feed": pending.rideRequests,
+          "/crew": pending.friendRequests,
+          "/carpool": pending.carpoolRequests,
+        }}
+      />
       <OnboardingDraftSync />
     </div>
   );

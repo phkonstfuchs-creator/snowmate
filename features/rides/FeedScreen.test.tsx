@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   cancel: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
+  respond: vi.fn(),
   refresh: vi.fn(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock("./actions", () => ({
   cancelRideAction: mocks.cancel,
   createRideAction: mocks.create,
   updateRideAction: mocks.update,
+  respondRideRequestAction: mocks.respond,
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/feed",
@@ -115,6 +117,55 @@ describe("FeedScreen with real data", () => {
 
     expect(screen.getByText("No connection. Try again in a moment.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Join" })).toBeEnabled();
+  });
+
+  it("asks to join as a friend of a friend without the joined toast", async () => {
+    mocks.join.mockResolvedValue({ ok: true, message: "Asked. The host lets you in.", pending: true });
+    render(<FeedScreen live={live([row({})])} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+    });
+
+    expect(mocks.join).toHaveBeenCalledWith("ride-1");
+    expect(screen.queryByText(/You are in/)).not.toBeInTheDocument();
+  });
+
+  it("withdraws a pending request", async () => {
+    mocks.leave.mockResolvedValue({ ok: true, message: "You left the ride." });
+    render(<FeedScreen live={live([row({ my_status: "pending" })])} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Asked" }));
+    });
+    expect(mocks.leave).toHaveBeenCalledWith("ride-1");
+  });
+
+  it("lets the host answer requests", async () => {
+    mocks.respond.mockResolvedValue({ ok: true, message: "Let in." });
+    render(
+      <FeedScreen
+        live={live([
+          row({
+            is_host: true,
+            meet_point: "Congress",
+            meet_point_locked: false,
+            requests: [{ id: "u9", display_name: "Max Rider", handle: "max_r" }],
+          }),
+        ])}
+      />,
+    );
+
+    expect(screen.getByText("Your ride · 1 asking")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Rails are set"));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Let in" }));
+    });
+    expect(mocks.respond).toHaveBeenCalledWith("ride-1", "u9", true);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Decline Max Rider" }));
+    });
+    expect(mocks.respond).toHaveBeenCalledWith("ride-1", "u9", false);
   });
 
   it("leaves a joined ride", async () => {

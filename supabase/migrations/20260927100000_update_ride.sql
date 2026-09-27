@@ -29,7 +29,8 @@ begin
     return 'not_found';
   end if;
 
-  select count(*) into taken from public.ride_participants rp where rp.ride_id = target_ride;
+  select count(*) into taken from public.ride_participants rp
+  where rp.ride_id = target_ride and rp.status = 'accepted';
 
   if new_total_spots < taken then
     return 'below_taken';

@@ -12,13 +12,16 @@ interface RideCardProps {
   author: User;
   joinedUsers: User[];
   isJoined: boolean;
+  isPending?: boolean;
   isHost?: boolean;
+  /* Host only: how many are asking to join */
+  requestCount?: number;
   onClick: () => void;
   onJoin?: (e: React.MouseEvent) => void;
   index?: number;
 }
 
-export default function RideCard({ post, author, joinedUsers, isJoined, isHost = false, onClick, onJoin, index = 0 }: RideCardProps) {
+export default function RideCard({ post, author, joinedUsers, isJoined, isPending = false, isHost = false, requestCount = 0, onClick, onJoin, index = 0 }: RideCardProps) {
   const open = openSpots(post);
   const full = isFull(post);
 
@@ -111,22 +114,22 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isHost =
             </span>
             {isHost ? (
               <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
-                Your ride
+                {requestCount > 0 ? `Your ride · ${requestCount} asking` : "Your ride"}
               </span>
             ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
-              disabled={full && !isJoined}
+              disabled={full && !isJoined && !isPending}
               className="text-mono-label min-h-11 px-3.5 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
               style={
-                isJoined
+                isJoined || isPending
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", border: "1px solid var(--ink-0)" }
                   : full
                   ? { background: "var(--paper-2)", color: "var(--ink-3)", border: "1px solid var(--paper-3)" }
                   : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
               }
             >
-              {isJoined ? "Joined" : "Join"}
+              {isJoined ? "Joined" : isPending ? "Asked" : "Join"}
             </button>
             )}
           </div>

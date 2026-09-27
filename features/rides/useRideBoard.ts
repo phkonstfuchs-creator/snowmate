@@ -14,6 +14,7 @@ import {
   createRideAction,
   joinRideAction,
   leaveRideAction,
+  respondRideRequestAction,
   updateRideAction,
   type RideActionResult,
 } from "./actions";
@@ -44,6 +45,8 @@ export function fixtureToLiveRide(post: RidePost, isJoined: boolean): LiveRide |
     participants,
     isHost: host.id === ME.id,
     isJoined,
+    isPending: false,
+    requests: [],
     meetPointLocked: view.meetPointLocked,
   };
 }
@@ -59,6 +62,7 @@ export interface RideBoard {
   postRide: (input: RideFormInput) => Promise<RideActionResult>;
   cancelRide: (rideId: string) => Promise<RideActionResult>;
   updateRide: (rideId: string, input: RideEditInput) => Promise<RideActionResult>;
+  respondRequest: (rideId: string, userId: string, accept: boolean) => Promise<void>;
 }
 
 /* `live` is undefined in the /demo prototype and the list from the
@@ -94,14 +98,15 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
       setPendingId(rideId);
       setNotice(null);
       const result = await settle<RideActionResult>(
-        ride.isJoined ? leaveRideAction(rideId) : joinRideAction(rideId),
+        ride.isJoined || ride.isPending ? leaveRideAction(rideId) : joinRideAction(rideId),
         OFFLINE_RESULT,
       );
       setPendingId(null);
 
       if (!result.ok) setNotice(result.message);
       startTransition(() => router.refresh());
-      return !ride.isJoined && result.ok;
+      /* Only a real join counts; asking to join is not being in yet. */
+      return !ride.isJoined && !ride.isPending && result.ok && !("pending" in result && result.pending);
     },
     [rides, isLive, router],
   );
@@ -145,8 +150,22 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
     [isLive, router],
   );
 
+  const respondRequest = useCallback(
+    async (rideId: string, userId: string, accept: boolean) => {
+      if (!isLive) return;
+      setPendingId(rideId);
+      setNotice(null);
+      const result = await settle<RideActionResult>(respondRideRequestAction(rideId, userId, accept), OFFLINE_RESULT);
+      setPendingId(null);
+      if (!result.ok) setNotice(result.message);
+      startTransition(() => router.refresh());
+    },
+    [isLive, router],
+  );
+
   return {
     rides,
+    respondRequest,
     cancelRide,
     updateRide,
     isLive,

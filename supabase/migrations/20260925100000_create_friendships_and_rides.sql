@@ -311,8 +311,13 @@ create table public.ride_participants (
   ride_id uuid not null references public.rides (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   joined_at timestamptz not null default now(),
+  -- Friends and public-event riders are in straight away. A friend of a
+  -- friend asks, and only the host's acceptance lets them in (and shows
+  -- them the meeting point).
+  status text not null default 'accepted',
 
-  primary key (ride_id, user_id)
+  primary key (ride_id, user_id),
+  constraint ride_participants_status_value check (status in ('pending', 'accepted'))
 );
 
 create index ride_participants_user_idx on public.ride_participants (user_id);
@@ -415,7 +420,8 @@ as $$
     or (ride.visibility = 'public' and not host_is_minor);
 $$;
 
--- Who may see the exact meeting point (rules 1 and 2).
+-- Who may see the exact meeting point (rules 1 and 2). A pending request
+-- does not count: the host has not let that person in yet.
 create or replace function private.can_see_meet_point(viewer uuid, ride public.rides)
 returns boolean
 language sql
@@ -427,7 +433,7 @@ as $$
     viewer = ride.host_id
     or exists (
       select 1 from public.ride_participants rp
-      where rp.ride_id = ride.id and rp.user_id = viewer
+      where rp.ride_id = ride.id and rp.user_id = viewer and rp.status = 'accepted'
     )
     -- On a public ride friendship alone does not unlock it; only joining.
     or (ride.visibility = 'friends' and private.are_friends(viewer, ride.host_id));
@@ -460,7 +466,9 @@ returns table (
   created_at timestamptz,
   is_host boolean,
   is_joined boolean,
-  participants jsonb
+  participants jsonb,
+  my_status text,
+  requests jsonb
 )
 language plpgsql
 stable
@@ -498,7 +506,21 @@ begin
     viewer = any(coalesce(parts.ids, '{}')),
     -- Who else is going is inside information, like the meeting point:
     -- people who cannot see the meeting point only get the count.
-    case when unlocked.ok then coalesce(parts.people, '[]'::jsonb) else '[]'::jsonb end
+    case when unlocked.ok then coalesce(parts.people, '[]'::jsonb) else '[]'::jsonb end,
+    (
+      select rp.status from public.ride_participants rp
+      where rp.ride_id = r.id and rp.user_id = viewer
+    ),
+    -- Only the host sees who is asking to join.
+    case when r.host_id = viewer then coalesce((
+      select jsonb_agg(
+        jsonb_build_object('id', rq.id, 'display_name', rq.display_name, 'handle', rq.handle)
+        order by rp.joined_at
+      )
+      from public.ride_participants rp
+      join public.profiles rq on rq.id = rp.user_id
+      where rp.ride_id = r.id and rp.status = 'pending'
+    ), '[]'::jsonb) else '[]'::jsonb end
   from public.rides r
   join public.profiles p on p.id = r.host_id
   left join lateral (
@@ -514,7 +536,7 @@ begin
       ) as people
     from public.ride_participants rp
     join public.profiles pp on pp.id = rp.user_id
-    where rp.ride_id = r.id
+    where rp.ride_id = r.id and rp.status = 'accepted'
   ) parts on true
   cross join lateral (
     select private.can_see_meet_point(viewer, r) as ok
@@ -571,13 +593,25 @@ begin
     select 1 from public.ride_participants rp
     where rp.ride_id = target_ride and rp.user_id = viewer
   ) then
-    return 'already_joined';
+    return (
+      select case when rp.status = 'pending' then 'already_requested' else 'already_joined' end
+      from public.ride_participants rp
+      where rp.ride_id = target_ride and rp.user_id = viewer
+    );
   end if;
 
-  select count(*) into taken from public.ride_participants rp where rp.ride_id = target_ride;
+  select count(*) into taken from public.ride_participants rp
+  where rp.ride_id = target_ride and rp.status = 'accepted';
 
   if taken >= ride.total_spots then
     return 'full';
+  end if;
+
+  -- A friends ride is the host's circle: a friend of a friend asks first.
+  if ride.visibility = 'friends' and not private.are_friends(viewer, ride.host_id) then
+    insert into public.ride_participants (ride_id, user_id, status)
+    values (target_ride, viewer, 'pending');
+    return 'requested';
   end if;
 
   insert into public.ride_participants (ride_id, user_id) values (target_ride, viewer);
@@ -622,6 +656,57 @@ begin
 end;
 $$;
 
+-- The host lets a friend of a friend in, or turns them down. Accepting
+-- takes a spot, checked under the same row lock as join_ride().
+create or replace function public.respond_ride_request(
+  target_ride uuid,
+  requester uuid,
+  accept boolean
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  ride public.rides;
+  taken integer;
+begin
+  if auth.uid() is null then
+    raise exception 'not authenticated' using errcode = '42501';
+  end if;
+
+  select * into ride from public.rides r
+  where r.id = target_ride and r.host_id = auth.uid()
+  for update;
+
+  if not found then
+    return 'not_found';
+  end if;
+
+  if not accept then
+    delete from public.ride_participants rp
+    where rp.ride_id = target_ride and rp.user_id = requester and rp.status = 'pending';
+    return case when found then 'declined' else 'not_found' end;
+  end if;
+
+  select count(*) into taken from public.ride_participants rp
+  where rp.ride_id = target_ride and rp.status = 'accepted';
+
+  if taken >= ride.total_spots then
+    return 'full';
+  end if;
+
+  update public.ride_participants rp
+  set status = 'accepted', joined_at = now()
+  where rp.ride_id = target_ride and rp.user_id = requester and rp.status = 'pending';
+
+  return case when found then 'accepted' else 'not_found' end;
+end;
+$$;
+
+revoke all on function public.respond_ride_request(uuid, uuid, boolean) from public, anon;
+grant execute on function public.respond_ride_request(uuid, uuid, boolean) to authenticated;
 revoke all on function public.leave_ride(uuid) from public, anon;
 revoke all on function public.cancel_ride(uuid) from public, anon;
 grant execute on function public.leave_ride(uuid) to authenticated;

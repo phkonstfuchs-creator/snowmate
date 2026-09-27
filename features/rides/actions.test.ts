@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cancelRideAction, createRideAction, joinRideAction, leaveRideAction, updateRideAction } from "./actions";
+import { cancelRideAction, createRideAction, joinRideAction, leaveRideAction, respondRideRequestAction, updateRideAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
@@ -86,13 +86,14 @@ describe("ride actions", () => {
   describe("joinRideAction", () => {
     it.each([
       ["joined", true, "You are in."],
+      ["requested", true, "Asked. The host lets you in."],
       ["full", false, "This ride is full."],
       ["not_found", false, "This ride is no longer available."],
       ["profile_incomplete", false, "Finish your profile first: add your name and handle on the Profile tab."],
       ["something_new", false, "That did not work. Try again shortly."],
     ])("maps %s", async (status, ok, message) => {
       mocks.rpc.mockResolvedValue({ data: status, error: null });
-      await expect(joinRideAction("ride-1")).resolves.toEqual({ ok, message });
+      await expect(joinRideAction("ride-1")).resolves.toMatchObject({ ok, message });
       expect(mocks.rpc).toHaveBeenCalledWith("join_ride", { target_ride: "ride-1" });
     });
 
@@ -156,6 +157,28 @@ describe("ride actions", () => {
       mocks.createClient.mockRejectedValueOnce(new Error("env"));
       await expect(updateRideAction("r1", edit)).resolves.toMatchObject({ ok: false });
       expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("respondRideRequestAction", () => {
+    it.each([
+      ["accepted", true],
+      ["declined", true],
+      ["full", false],
+      ["not_found", false],
+      ["weird", false],
+    ])("maps %s", async (data, ok) => {
+      mocks.rpc.mockResolvedValue({ data, error: null });
+      await expect(respondRideRequestAction("r1", "u1", true)).resolves.toMatchObject({ ok });
+      expect(mocks.rpc).toHaveBeenCalledWith("respond_ride_request", { target_ride: "r1", requester: "u1", accept: true });
+    });
+
+    it("fails closed", async () => {
+      await expect(respondRideRequestAction("", "u1", true)).resolves.toMatchObject({ ok: false });
+      mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "x" } });
+      await expect(respondRideRequestAction("r1", "u1", false)).resolves.toMatchObject({ ok: false });
+      mocks.createClient.mockRejectedValueOnce(new Error("env"));
+      await expect(respondRideRequestAction("r1", "u1", false)).resolves.toMatchObject({ ok: false });
     });
   });
 });

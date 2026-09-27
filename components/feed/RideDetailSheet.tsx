@@ -24,6 +24,10 @@ interface Props {
   onClose: () => void;
   onJoin?: () => void;
   isJoined: boolean;
+  isPending?: boolean;
+  /* Host only: friends of friends asking to join. */
+  requests?: User[];
+  onRespond?: (userId: string, accept: boolean) => void;
   isHost?: boolean;
   onCancel?: () => void;
   onEdit?: () => void;
@@ -32,7 +36,7 @@ interface Props {
   profilesEnabled?: boolean;
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isHost = false, onCancel, onEdit, profilesEnabled = true }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, profilesEnabled = true }: Props) {
   useScrollLock();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
@@ -168,6 +172,43 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           </div>
         </div>
 
+        {isHost && requests.length > 0 && (
+          <div className="px-5 pt-3" style={{ borderTop: `1px solid ${BORDER}` }}>
+            <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>
+              Asking to join ({requests.length})
+            </p>
+            <div className="space-y-2">
+              {requests.map((u) => (
+                <div key={u.id} className="flex items-center gap-3">
+                  <Avatar id={u.id} initials={u.avatar} size={32} />
+                  <div className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-black" style={{ color: INK }}>{u.name}</span>
+                    {u.handle && <span className="text-xs font-bold" style={{ color: MUTED }}>@{u.handle} · friend of a friend</span>}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRespond?.(u.id, true)}
+                    disabled={full}
+                    className="text-mono-label min-h-11 px-3 disabled:opacity-40"
+                    style={{ background: "var(--pine)", color: "var(--paper-0)" }}
+                  >
+                    Let in
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRespond?.(u.id, false)}
+                    aria-label={`Decline ${u.name}`}
+                    className="flex h-11 w-11 items-center justify-center"
+                    style={{ border: `1px solid ${BORDER}` }}
+                  >
+                    <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Join CTA */}
         <div className="px-5 pt-4">
           {isHost && onEdit && (
@@ -192,16 +233,22 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           ) : (
           <button
             onClick={onJoin}
-            disabled={full && !isJoined}
+            disabled={full && !isJoined && !isPending}
             className="w-full py-4 font-black text-base transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
-            style={isJoined
+            style={isJoined || isPending
               ? { background: "var(--accent-primary-subtle)", color: BRAND }
               : full
               ? { background: "var(--bg-surface-2)", color: MUTED, opacity: 0.5 }
               : { background: BRAND, color: "var(--text-on-accent)" }
             }
           >
-            {isJoined ? "You are in, tap to leave" : full ? "Ride is full" : "Join ride"}
+            {isJoined
+              ? "You are in, tap to leave"
+              : isPending
+                ? "Asked · tap to withdraw"
+                : full
+                  ? "Ride is full"
+                  : "Join ride"}
           </button>
           )}
         </div>
