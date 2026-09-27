@@ -26,7 +26,14 @@ const OWNED_BY: Record<string, string> = {
 
 /* basePath lets the same bar serve the clickable demo under /demo
    without duplicating the destinations. */
-export default function BottomNav({ basePath = "" }: { basePath?: string }) {
+/* badges: count of things waiting for the user, keyed by tab href. */
+export default function BottomNav({
+  basePath = "",
+  badges = {},
+}: {
+  basePath?: string;
+  badges?: Partial<Record<string, number>>;
+}) {
   const pathname = usePathname();
   const route = basePath && pathname.startsWith(basePath)
     ? pathname.slice(basePath.length) || "/"
@@ -40,6 +47,7 @@ export default function BottomNav({ basePath = "" }: { basePath?: string }) {
       <div className="flex items-stretch">
         {TABS.map((tab) => {
           const href = `${basePath}${tab.href}`;
+          const badge = badges[tab.href] ?? 0;
           const isActive = ownerTab
             ? ownerTab === tab.href
             : route === tab.href || route.startsWith(`${tab.href}/`);
@@ -50,10 +58,20 @@ export default function BottomNav({ basePath = "" }: { basePath?: string }) {
               className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-3 min-h-[56px] transition-colors duration-150"
               style={{ color: isActive ? "var(--rust)" : "var(--ink-2)" }}
               aria-current={isActive ? "page" : undefined}
+              aria-label={badge > 0 ? `${tab.label}, ${badge} waiting` : undefined}
             >
               <span className="transition-transform duration-150" style={{ transform: isActive ? "translateY(-1px)" : "none" }}>
                 <Icon name={tab.icon} size={22} strokeWidth={isActive ? 2.3 : 1.8} />
               </span>
+              {badge > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="text-mono-label absolute top-1.5 flex h-4 min-w-4 items-center justify-center px-1"
+                  style={{ left: "calc(50% + 6px)", background: "var(--rust)", color: "var(--paper-0)", fontSize: "0.6rem", lineHeight: 1 }}
+                >
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              )}
               <span className={clsx(
                 "text-[0.6875rem] leading-none",
                 isActive ? "font-black" : "font-bold"

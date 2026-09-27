@@ -10,6 +10,7 @@ import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
+import AccountSection from "./AccountSection";
 import { initialsFor, type OwnProfile } from "./profile-input";
 
 const PAPER = "var(--paper-0)";
@@ -518,6 +519,8 @@ export default function ProfileScreen({
       </section>
         </>
       )}
+
+      {isLive && <AccountSection />}
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">

@@ -204,7 +204,19 @@ all require `onboarding_completed`. Otherwise other riders would meet an
 anonymous "Rider" without a handle. `complete_profile.test.sql` covers it;
 the feed links an unfinished profile to the Profile tab.
 
-**Still open:** applying the three new migrations to `snowmate-dev`
+### Account rights and navigation badges
+
+Migration `20260927090000_account_rights_and_activity.sql`:
+`delete_my_account()` removes the caller's auth user, which cascades
+through every table (GDPR art. 17); `export_my_data()` returns everything
+stored about the caller as JSON (art. 15 and 20), served as a download at
+`/profile/export`; `my_pending_counts()` feeds the badges on Crew and
+Carpool. `account_rights.test.sql` covers them. The profile tab offers the
+download and a typed-confirmation delete. Worth one manual check after
+applying: the delete relies on the migration owner being allowed to
+delete from `auth.users`, which is the Supabase default.
+
+**Still open:** applying the four new migrations to `snowmate-dev`
 (`npx supabase db push`).
 
 ### Onboarding answers were lost after sign-up (was item 4)

@@ -35,4 +35,9 @@ describe("AuthScreen", () => {
     rerender(<AuthScreen mode="login" />);
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
+
+  it("confirms a deleted account", () => {
+    render(<AuthScreen mode="login" accountDeleted />);
+    expect(screen.getByRole("status")).toHaveTextContent("has been deleted");
+  });
 });

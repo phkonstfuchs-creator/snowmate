@@ -6,11 +6,13 @@ import AuthForm from "./AuthForm";
 interface AuthScreenProps {
   mode: "login" | "signup";
   confirmationFailed?: boolean;
+  accountDeleted?: boolean;
 }
 
 export default function AuthScreen({
   mode,
   confirmationFailed = false,
+  accountDeleted = false,
 }: AuthScreenProps) {
   const isSignup = mode === "signup";
 
@@ -90,6 +92,19 @@ export default function AuthScreen({
               >
                 This confirmation link is invalid or has expired. Sign in
                 below or register again.
+              </p>
+            </div>
+          ) : null}
+
+          {accountDeleted ? (
+            <div
+              role="status"
+              className="mb-6 flex items-start gap-3 px-4 py-3"
+              style={{ border: "var(--rule-thin)", background: "var(--paper-1)" }}
+            >
+              <Icon name="check" size={18} color="var(--pine)" className="mt-0.5 flex-shrink-0" />
+              <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
+                Your account and everything in it has been deleted.
               </p>
             </div>
           ) : null}
