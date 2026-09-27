@@ -52,12 +52,15 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   /* Public events have their own screen; the feed is the crew's rides. */
   const rides = board.rides.filter((ride) => ride.post.city === city && ride.post.visibility === "friends");
   const selectedRide = rides.find((ride) => ride.post.id === selectedPostId) ?? null;
+  /* "Out today" means today: a ride next Saturday is in the list, but
+     its riders are not on the mountain yet. */
+  const todaysRides = rides.filter((ride) => ride.post.date === "Today");
   const ridersToday = board.isLive
-    ? new Set(rides.flatMap((ride) => [ride.host.id, ...ride.participants.map((user) => user.id)])).size
+    ? todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0)
     : city === "innsbruck" ? 174 : 127;
 
   const liveUsers = [
-    ...new Map(rides.flatMap((ride) => [ride.host, ...ride.participants]).map((user) => [user.id, user])).values(),
+    ...new Map(todaysRides.flatMap((ride) => [ride.host, ...ride.participants]).map((user) => [user.id, user])).values(),
   ];
 
   const handleJoin = async (postId: string) => {
@@ -240,6 +243,8 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           {...(board.isLive
             ? {
                 onCancel: () => {
+                  /* Cancelling also drops everyone who joined. */
+                  if (!window.confirm("Cancel this ride for everyone who joined?")) return;
                   setSelectedPostId(null);
                   void board.cancelRide(selectedRide.post.id);
                 },

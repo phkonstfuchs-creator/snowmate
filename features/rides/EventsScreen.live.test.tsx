@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import EventsScreen from "./EventsScreen";
 import { toLiveRide, type RideRow } from "./live-ride";
 
-const mocks = vi.hoisted(() => ({ join: vi.fn(), leave: vi.fn(), refresh: vi.fn() }));
+const mocks = vi.hoisted(() => ({ join: vi.fn(), leave: vi.fn(), cancel: vi.fn(), refresh: vi.fn() }));
 
 vi.mock("./actions", () => ({
   joinRideAction: mocks.join,
   leaveRideAction: mocks.leave,
-  cancelRideAction: vi.fn(),
+  cancelRideAction: mocks.cancel,
   createRideAction: vi.fn(),
 }));
 vi.mock("next/navigation", () => ({
@@ -104,11 +104,19 @@ describe("EventsScreen with real data", () => {
     expect(screen.getByText("This ride is full.")).toBeInTheDocument();
   });
 
-  it("shows the host their own event without a join button", () => {
+  it("lets the host cancel their own event after confirming", async () => {
+    mocks.cancel.mockResolvedValue({ ok: true, message: "Ride cancelled." });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<EventsScreen live={live([row({ is_host: true })])} />);
     fireEvent.click(screen.getByText("Freshers day"));
     expect(screen.getByText("You are hosting")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Join event" })).not.toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Cancel event" }));
+    });
+    expect(mocks.cancel).toHaveBeenCalledWith("event-1");
+    confirm.mockRestore();
   });
 
   it("says when events could not be loaded", () => {

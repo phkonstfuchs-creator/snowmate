@@ -1,5 +1,6 @@
 "use client";
 
+import { settle } from "@/lib/settle";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Avatar from "@/components/ui/Avatar";
@@ -76,7 +77,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
   const run = async (userId: string, action: (id: string) => Promise<boolean>) => {
     setPendingId(userId);
     setRowError(null);
-    const ok = await action(userId);
+    const ok = await settle(action(userId), false);
     setPendingId(null);
     if (!ok) setRowError("That did not work. Try again shortly.");
     startTransition(() => router.refresh());

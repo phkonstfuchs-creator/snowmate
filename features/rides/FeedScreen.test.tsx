@@ -93,6 +93,28 @@ describe("FeedScreen with real data", () => {
     expect(screen.getByText(/You are in/)).toBeInTheDocument();
   });
 
+  it("counts only today's riders as out today", () => {
+    const later = new Date(NOW.getTime() + 3 * 24 * 60 * 60 * 1000);
+    render(
+      <FeedScreen
+        live={live([row({ taken_spots: 2 }), row({ id: "ride-9", ride_date: toIsoDay(later), taken_spots: 5 })])}
+      />,
+    );
+    expect(screen.getByText("3 out today")).toBeInTheDocument();
+  });
+
+  it("recovers when the server cannot be reached", async () => {
+    mocks.join.mockRejectedValue(new Error("offline"));
+    render(<FeedScreen live={live([row({})])} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+    });
+
+    expect(screen.getByText("No connection. Try again in a moment.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Join" })).toBeEnabled();
+  });
+
   it("leaves a joined ride", async () => {
     mocks.leave.mockResolvedValue({ ok: true, message: "You left the ride." });
     render(<FeedScreen live={live([row({ is_joined: true, taken_spots: 1 })])} />);
@@ -119,16 +141,20 @@ describe("FeedScreen with real data", () => {
 
   it("marks the viewer's own ride and lets the host cancel it", async () => {
     mocks.cancel.mockResolvedValue({ ok: true, message: "Ride cancelled." });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
     render(<FeedScreen live={live([row({ is_host: true, meet_point: "Congress", meet_point_locked: false })])} />);
 
     expect(screen.getByText("Your ride")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Rails are set"));
     const dialog = screen.getByRole("dialog", { name: "Ride details" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel this ride" }));
+    expect(mocks.cancel).not.toHaveBeenCalled();
     await act(async () => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Cancel this ride" }));
     });
 
     expect(mocks.cancel).toHaveBeenCalledWith("ride-1");
+    confirm.mockRestore();
   });
 
   it("points an unfinished profile to the profile tab", () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { OFFLINE_RESULT, settle } from "@/lib/settle";
 import { useState } from "react";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
@@ -59,7 +60,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
     if (!canPublish) return;
     setSubmitting(true);
     setError(null);
-    const result = await onPost({
+    const result = await settle<RideActionResult | void>(Promise.resolve(onPost({
       resort,
       city,
       abilityLevel,
@@ -70,7 +71,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic = can
       caption,
       visibility: effectiveVisibility,
       ...(effectiveVisibility === "public" ? { title } : {}),
-    });
+    })), OFFLINE_RESULT);
     setSubmitting(false);
     if (result && !result.ok) {
       setError(result.message);

@@ -1,5 +1,6 @@
 "use client";
 
+import { OFFLINE_RESULT, settle } from "@/lib/settle";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { RidePost } from "@/lib/types";
@@ -90,7 +91,10 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
 
       setPendingId(rideId);
       setNotice(null);
-      const result = ride.isJoined ? await leaveRideAction(rideId) : await joinRideAction(rideId);
+      const result = await settle<RideActionResult>(
+        ride.isJoined ? leaveRideAction(rideId) : joinRideAction(rideId),
+        OFFLINE_RESULT,
+      );
       setPendingId(null);
 
       if (!result.ok) setNotice(result.message);
@@ -105,7 +109,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
       if (!isLive) {
         return { ok: true, message: "Demo: nothing is saved." };
       }
-      const result = await createRideAction(input);
+      const result = await settle<RideActionResult>(createRideAction(input), OFFLINE_RESULT);
       if (result.ok) startTransition(() => router.refresh());
       return result;
     },
@@ -118,7 +122,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
         return { ok: false, message: "Demo: nothing is saved." };
       }
       setPendingId(rideId);
-      const result = await cancelRideAction(rideId);
+      const result = await settle<RideActionResult>(cancelRideAction(rideId), OFFLINE_RESULT);
       setPendingId(null);
       if (!result.ok) setNotice(result.message);
       startTransition(() => router.refresh());

@@ -54,11 +54,13 @@ function EventDetailSheet({
   ride,
   pending,
   onJoin,
+  onCancel,
   onClose,
 }: {
   ride: LiveRide;
   pending: boolean;
   onJoin: () => void;
+  onCancel?: () => void;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -179,6 +181,17 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-5">
+          {isHost && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={pending}
+              className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
+              style={{ background: PAPER_1, color: "var(--crimson)", border: "1px solid var(--crimson)" }}
+            >
+              Cancel event
+            </button>
+          )}
           {!isHost && (
           <button
             onClick={onJoin}
@@ -387,6 +400,15 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
           ride={openEvent}
           pending={board.pendingId === openEvent.post.id}
           onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
+          {...(board.isLive
+            ? {
+                onCancel: () => {
+                  if (!window.confirm("Cancel this event for everyone who joined?")) return;
+                  setOpenEventId(null);
+                  void board.cancelRide(openEvent.post.id);
+                },
+              }
+            : {})}
           onClose={() => setOpenEventId(null)}
         />
       )}

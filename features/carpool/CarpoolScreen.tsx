@@ -1,5 +1,6 @@
 "use client";
 
+import { OFFLINE_RESULT, settle } from "@/lib/settle";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { CarpoolPost, CarpoolRole, City } from "@/lib/types";
@@ -60,7 +61,10 @@ function OfferModal({
     if (!canSubmit) return;
     setSubmitting(true);
     setError(null);
-    const result = await onSubmit({ role, resort, city, rideDate, departurePoint, departureTime, seats, note });
+    const result = await settle<CarpoolActionResult>(
+      onSubmit({ role, resort, city, rideDate, departurePoint, departureTime, seats, note }),
+      OFFLINE_RESULT,
+    );
     setSubmitting(false);
     if (!result.ok) {
       setError(result.message);
@@ -307,7 +311,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
   const runLive = async (id: string, action: () => Promise<CarpoolActionResult>) => {
     setPendingId(id);
     setNotice(null);
-    const result = await action();
+    const result = await settle<CarpoolActionResult>(action(), OFFLINE_RESULT);
     setPendingId(null);
     if (!result.ok) setNotice(result.message);
     startTransition(() => router.refresh());
@@ -338,7 +342,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
 
   const submitOffer = async (input: CarpoolFormInput): Promise<CarpoolActionResult> => {
     if (!isLive) return { ok: true, message: "Demo: nothing is saved." };
-    const result = await createCarpoolAction(input);
+    const result = await settle<CarpoolActionResult>(createCarpoolAction(input), OFFLINE_RESULT);
     if (result.ok) startTransition(() => router.refresh());
     return result;
   };
