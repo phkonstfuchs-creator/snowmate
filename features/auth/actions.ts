@@ -43,6 +43,26 @@ function isExistingAccountError(code: string | undefined): boolean {
   );
 }
 
+/* Refusals a person can act on get their own message. Existence of an
+   account is never revealed (handled above as "confirmation pending"). */
+const SIGN_UP_ERROR_MESSAGES: Record<string, string> = {
+  over_email_send_rate_limit:
+    "Too many sign-up emails were sent in a short time. Wait a few minutes and try again.",
+  over_request_rate_limit: "Too many attempts. Wait a few minutes and try again.",
+  weak_password: "Choose a stronger password. Common or leaked passwords are refused.",
+  email_address_invalid: "This email address cannot be used. Try another one.",
+  email_address_not_authorized: "This email address cannot be used. Try another one.",
+  signup_disabled: "Sign-up is closed right now.",
+  email_provider_disabled: "Sign-up is closed right now.",
+};
+
+function signUpErrorMessage(code: string | undefined): string {
+  return (
+    (code && SIGN_UP_ERROR_MESSAGES[code]) ??
+    "We could not create the account. Check the details and try again."
+  );
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -112,10 +132,13 @@ export async function signUpAction(
         return confirmationPendingState(validation.data.email);
       }
 
+      /* The code only, never the email or password: enough to see in the
+         server log why Supabase refused (rate limit, auth settings). */
+      console.error("[auth] sign-up refused by Supabase:", error.code ?? error.status ?? "unknown");
+
       return {
         status: "error",
-        message:
-          "We could not create the account. Check the details and try again.",
+        message: signUpErrorMessage(error.code),
         email: validation.data.email,
       };
     }

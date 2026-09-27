@@ -120,6 +120,30 @@ describe("auth actions", () => {
   });
 
   it.each([
+    ["over_email_send_rate_limit", "Too many sign-up emails were sent in a short time. Wait a few minutes and try again."],
+    ["weak_password", "Choose a stronger password. Common or leaked passwords are refused."],
+    ["something_else", "We could not create the account. Check the details and try again."],
+    [undefined, "We could not create the account. Check the details and try again."],
+  ])("explains the sign-up refusal %s and logs only its code", async (code, message) => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    auth.signUp.mockResolvedValue({ data: { session: null }, error: { code } });
+
+    const result = await signUpAction(
+      initialAuthActionState,
+      formData({
+        email: "new.rider@example.com",
+        password: "Snowmate2026Pass",
+        confirmPassword: "Snowmate2026Pass",
+      }),
+    );
+
+    expect(result).toMatchObject({ status: "error", message });
+    expect(JSON.stringify(log.mock.calls)).not.toContain("new.rider@example.com");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("Snowmate2026Pass");
+    log.mockRestore();
+  });
+
+  it.each([
     "user_already_exists",
     "email_exists",
     "identity_already_exists",
