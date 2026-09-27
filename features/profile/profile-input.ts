@@ -8,11 +8,19 @@ import type { AbilityLevel, City } from "@/lib/types";
 export const CITY_VALUES = ["innsbruck", "salzburg"] as const satisfies readonly City[];
 export const ABILITY_VALUES = ["chill", "park", "off-piste"] as const satisfies readonly AbilityLevel[];
 
+/* Mirrors profiles_display_name_safe: no control or bidi-override
+   characters, which could disguise a name. */
+const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/;
+
+/* Mirrors profiles_handle_not_reserved. */
+export const RESERVED_HANDLES: readonly string[] = ["admin", "support", "snowmate"];
+
 const displayNameSchema = z
   .string()
   .trim()
   .min(2, "Use at least 2 characters.")
-  .max(50, "Use at most 50 characters.");
+  .max(50, "Use at most 50 characters.")
+  .refine((value) => !UNSAFE_NAME_CHARACTERS.test(value), "Remove the special characters.");
 
 const handleSchema = z
   .string()
@@ -24,7 +32,8 @@ const handleSchema = z
       .string()
       .min(3, "Use at least 3 characters.")
       .max(20, "Use at most 20 characters.")
-      .regex(/^[a-z0-9_]+$/, "Only letters, numbers and underscores."),
+      .regex(/^[a-z0-9_]+$/, "Only letters, numbers and underscores.")
+      .refine((value) => !RESERVED_HANDLES.includes(value), "That handle is reserved."),
   );
 
 const bioSchema = z

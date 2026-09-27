@@ -57,6 +57,17 @@ describe("validateProfileInput", () => {
     expect(validateProfileInput({ ...valid, handle: "a".repeat(21) }).success).toBe(false);
   });
 
+  it("rejects reserved handles and disguising characters like the database does", () => {
+    expect(validateProfileInput({ ...valid, handle: "Admin" })).toMatchObject({
+      success: false,
+      fieldErrors: { handle: "That handle is reserved." },
+    });
+    expect(validateProfileInput({ ...valid, displayName: "Lena\u202eMoser" })).toMatchObject({
+      success: false,
+      fieldErrors: { displayName: "Remove the special characters." },
+    });
+  });
+
   it("rejects input that is not an object", () => {
     expect(validateProfileInput(null).success).toBe(false);
   });
