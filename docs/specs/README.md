@@ -7,3 +7,5 @@ The workflow is in [../AI_WORKFLOW.md](../AI_WORKFLOW.md).
 | Spec | Status |
 |---|---|
 | [Joining a friends ride as a friend of a friend](ride-join-requests.md) | Implemented, awaiting acceptance |
+| [Invite links](invite-links.md) | Agreed |
+| [Report and block](report-and-block.md) | Agreed |

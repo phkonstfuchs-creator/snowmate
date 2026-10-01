@@ -16,5 +16,7 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0006](0006-friend-requests-by-handle.md) | Friend requests by exact handle, capped | Proposed |
 | [0007](0007-friends-of-friends-ask-to-join.md) | Friends of friends ask; the host lets them in | Proposed |
 | [0008](0008-enforce-boundaries-in-lint.md) | Enforce architecture boundaries in lint | Proposed |
+| [0009](0009-single-use-invite-links.md) | Single-use invite links | Proposed |
+| [0010](0010-blocking-hides-both-ways.md) | Blocking hides both ways and ends every connection | Proposed |
 
 Template: context, options considered, decision, consequences, status.
