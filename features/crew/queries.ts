@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { groupFriendships, type FriendGraph, type FriendshipRow } from "./friendships";
+import { isInviteStatus, isInviteToken, type InviteStatus } from "./invites";
 
 /* list_my_friendships() only ever returns the caller's own graph. */
 export async function getFriendGraph(): Promise<FriendGraph | null> {
@@ -42,5 +43,32 @@ export async function getPendingCounts(): Promise<PendingCounts> {
     };
   } catch {
     return NONE;
+  }
+}
+
+export interface InvitePreview {
+  status: InviteStatus;
+  inviterName: string | null;
+  inviterHandle: string | null;
+}
+
+/* Signed-in only: who sent this link, and whether it still works. */
+export async function previewInvite(token: string): Promise<InvitePreview | null> {
+  if (!isInviteToken(token)) return { status: "not_found", inviterName: null, inviterHandle: null };
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("preview_friend_invite", { invite_token: token });
+    const row = Array.isArray(data) ? data[0] : null;
+
+    if (error || !row || !isInviteStatus(row.status)) return null;
+
+    return {
+      status: row.status,
+      inviterName: row.inviter_display_name ?? null,
+      inviterHandle: row.inviter_handle ?? null,
+    };
+  } catch {
+    return null;
   }
 }

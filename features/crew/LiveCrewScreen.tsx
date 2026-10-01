@@ -13,6 +13,7 @@ import {
   type FriendActionState,
 } from "./actions";
 import type { FriendGraph, FriendshipRow } from "./friendships";
+import InviteLinkCard from "./InviteLinkCard";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
@@ -100,6 +101,10 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
       </header>
 
       <section className="px-4 pt-4">
+        <InviteLinkCard />
+      </section>
+
+      <section className="px-4 pt-3">
         <form ref={formRef} action={formAction} className="print-card px-4 py-4" noValidate>
           <label htmlFor="crew-add-handle" className="text-mono-label block" style={{ color: RUST }}>
             Add a friend by handle
@@ -142,8 +147,8 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
             {state.message}
           </p>
           <p className="text-xs leading-snug" style={{ color: INK_2 }}>
-            There is no search on purpose. Ask for their handle in person or in
-            your group chat.
+            There is no search on purpose. Ask for their handle, or send an
+            invite link instead.
           </p>
         </form>
       </section>

@@ -1,5 +1,6 @@
 import BottomNav from "@/components/BottomNav";
 import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
+import PendingInviteSync from "@/features/crew/PendingInviteSync";
 import { getPendingCounts } from "@/features/crew/queries";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -31,6 +32,7 @@ export default async function AppLayout({
         }}
       />
       <OnboardingDraftSync />
+      <PendingInviteSync />
     </div>
   );
 }
