@@ -1,6 +1,6 @@
 # 0008 Enforce architecture boundaries in lint
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-09-27
 
 ## Context

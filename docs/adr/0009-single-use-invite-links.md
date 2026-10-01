@@ -1,6 +1,6 @@
 # 0009 Single-use invite links
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-10-01
 - **Spec:** [invite-links](../specs/invite-links.md)
 

@@ -1,6 +1,6 @@
 # 0001 Read social data through security-definer functions
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-09-25
 
 ## Context

@@ -1,6 +1,6 @@
 # 0010 Blocking hides both ways and ends every connection
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-10-01
 - **Spec:** [report-and-block](../specs/report-and-block.md)
 

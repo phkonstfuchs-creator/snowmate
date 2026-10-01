@@ -1,6 +1,6 @@
 # 0007 Friends of friends ask; the host lets them in
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-09-27
 - **Spec:** [ride-join-requests](../specs/ride-join-requests.md)
 

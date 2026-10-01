@@ -1,6 +1,6 @@
 # 0005 Taking part requires a finished profile
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-09-25
 
 ## Context

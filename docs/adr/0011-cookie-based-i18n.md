@@ -1,6 +1,6 @@
 # 0011 German and English by cookie, without locale routes
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-10-01
 - **Checks:** `lib/i18n/i18n.test.ts`, `npm run typecheck`
 
