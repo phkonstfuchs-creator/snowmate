@@ -101,6 +101,8 @@ export interface OwnProfile {
   city: City | null;
   abilityLevel: AbilityLevel | null;
   bio: string | null;
+  /* ISO date, visible to the owner only; null until they add it. */
+  birthDate: string | null;
   isMinor: boolean;
   onboardingCompleted: boolean;
 }
@@ -111,6 +113,7 @@ export interface ProfileRow {
   city: string | null;
   ability_level: string | null;
   bio: string | null;
+  birth_date?: string | null;
   is_minor: boolean;
   onboarding_completed: boolean;
 }
@@ -130,6 +133,7 @@ export function toOwnProfile(row: ProfileRow): OwnProfile {
     city: isCity(row.city) ? row.city : null,
     abilityLevel: isAbility(row.ability_level) ? row.ability_level : null,
     bio: row.bio,
+    birthDate: row.birth_date ?? null,
     isMinor: row.is_minor,
     onboardingCompleted: row.onboarding_completed,
   };

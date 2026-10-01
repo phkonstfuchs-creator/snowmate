@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getOwnProfile } from "./queries";
+import { getOwnProfile, refreshOwnAge } from "./queries";
 
 const mocks = vi.hoisted(() => ({ createClient: vi.fn() }));
 
@@ -48,5 +48,19 @@ describe("getOwnProfile", () => {
   it("returns null when the client cannot be created", async () => {
     mocks.createClient.mockRejectedValue(new Error("missing env"));
     await expect(getOwnProfile()).resolves.toBeNull();
+  });
+});
+
+describe("refreshOwnAge", () => {
+  it("asks the database to refresh the caller's own age", async () => {
+    const rpc = vi.fn(async () => ({ data: null, error: null }));
+    mocks.createClient.mockResolvedValue({ rpc });
+    await refreshOwnAge();
+    expect(rpc).toHaveBeenCalledWith("refresh_my_age");
+  });
+
+  it("never throws when the backend is unreachable", async () => {
+    mocks.createClient.mockRejectedValue(new Error("offline"));
+    await expect(refreshOwnAge()).resolves.toBeUndefined();
   });
 });

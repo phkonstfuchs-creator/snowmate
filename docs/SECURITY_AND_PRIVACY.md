@@ -65,9 +65,13 @@ See [ADR 0010](adr/0010-blocking-hides-both-ways.md).
 
 ## Minors
 
-`profiles.is_minor` defaults to `true` and clients cannot write it. It stays
-true until an age verification flow exists. The narrower rules above
-therefore apply to everyone by default.
+`profiles.is_minor` defaults to `true` and clients cannot write it. A
+person sets their birth date once on the Profile tab
+(`set_my_birth_date()`); the database derives `is_minor` from it and lifts
+it after the 18th birthday (`refresh_my_age()`, called on every signed-in
+page). Under 14 is refused. The birth date is self-declared, visible only
+to its owner and included in the data export. Without one, the narrower
+rules above apply. See [ADR 0012](adr/0012-age-from-birth-date.md).
 
 ## Account rights (GDPR)
 

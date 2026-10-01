@@ -404,6 +404,16 @@ export const en = {
   "safety.reason.other": "Something else",
 
   // ── Profile (screens) ───────────────────────────────────────────
+  "profile.age": "Age",
+  "profile.ageHint": "Add your birth date once. From 18 you can host public events. Only you can see it.",
+  "profile.birthDate": "Birth date",
+  "profile.ageOnce": "It cannot be changed afterwards.",
+  "profile.ageAdult": "18+ confirmed.",
+  "profile.ageMinor": "Under 18: the stricter rules for minors apply to you.",
+  "age.set": "Saved.",
+  "age.alreadySet": "Your birth date is already saved.",
+  "age.tooYoung": "Snowmate is for riders aged 14 and over.",
+  "age.invalid": "Enter a valid birth date.",
   "profile.language": "Language",
   "profile.yourAccount": "Your account",
   "profile.edit": "Edit profile",

@@ -4,7 +4,7 @@ import ProfileScreen from "./ProfileScreen";
 import type { OwnProfile } from "./profile-input";
 
 vi.mock("@/features/auth/actions", () => ({ signOutAction: vi.fn() }));
-vi.mock("./actions", () => ({ updateProfileAction: vi.fn() }));
+vi.mock("./actions", () => ({ updateProfileAction: vi.fn(), setBirthDateAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const incomplete: OwnProfile = {
@@ -13,6 +13,7 @@ const incomplete: OwnProfile = {
   city: null,
   abilityLevel: null,
   bio: null,
+  birthDate: null,
   isMinor: true,
   onboardingCompleted: false,
 };

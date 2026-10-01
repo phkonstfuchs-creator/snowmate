@@ -17,7 +17,7 @@ export async function getOwnProfile(): Promise<OwnProfile | null> {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("display_name, handle, city, ability_level, bio, is_minor, onboarding_completed")
+      .select("display_name, handle, city, ability_level, bio, birth_date, is_minor, onboarding_completed")
       .eq("id", userId)
       .maybeSingle<ProfileRow>();
 
@@ -28,5 +28,18 @@ export async function getOwnProfile(): Promise<OwnProfile | null> {
     return toOwnProfile(data);
   } catch {
     return null;
+  }
+}
+
+/* Switches the caller to adult once their 18th birthday has passed
+   (refresh_my_age only ever lifts the minor flag, and only for a stored
+   birth date). Runs on every signed-in page; failures are ignored because
+   staying a minor a little longer only restricts. */
+export async function refreshOwnAge(): Promise<void> {
+  try {
+    const supabase = await createClient();
+    await supabase.rpc("refresh_my_age");
+  } catch {
+    // Fail closed: the stored flag stays as it is.
   }
 }

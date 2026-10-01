@@ -103,6 +103,7 @@ describe("toOwnProfile", () => {
       city: null,
       abilityLevel: null,
       bio: null,
+      birthDate: null,
       isMinor: true,
       onboardingCompleted: false,
     });
@@ -115,10 +116,12 @@ describe("toOwnProfile", () => {
       city: "salzburg",
       ability_level: "off-piste",
       bio: "hi",
+      birth_date: "2001-02-03",
       is_minor: false,
       onboarding_completed: true,
     });
     expect(profile.city).toBe("salzburg");
+    expect(profile.birthDate).toBe("2001-02-03");
     expect(profile.abilityLevel).toBe("off-piste");
   });
 });

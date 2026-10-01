@@ -12,6 +12,7 @@ import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
 import LanguageSwitch from "./LanguageSwitch";
+import AgeSection from "./AgeSection";
 import { useT } from "@/lib/i18n/client";
 import { initialsFor, type OwnProfile } from "./profile-input";
 import type { AccountStats } from "./account-stats";
@@ -521,6 +522,7 @@ export default function ProfileScreen({
         </>
       )}
 
+      {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
       <LanguageSwitch />
       {isLive && <AccountSection blocked={blocked} />}
 

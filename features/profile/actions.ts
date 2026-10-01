@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";
 import { translateFieldErrors } from "@/lib/i18n/translate";
 import type { DraftAdoptionResult, ProfileActionState } from "./action-state";
+import { BIRTH_DATE_MESSAGES, isBirthDateStatus, parseBirthDate } from "./birth-date";
 import {
   draftToProfileInput,
   validateProfileInput,
@@ -123,4 +124,36 @@ export async function updateProfileAction(
         message: t("profile.saveUnavailable"),
       };
   }
+}
+
+/* Stores the caller's birth date once; the database derives is_minor
+   from it and refuses a second change. */
+export async function setBirthDateAction(
+  _previousState: ProfileActionState,
+  formData: FormData,
+): Promise<ProfileActionState> {
+  const t = await getT();
+  const birthDate = parseBirthDate(stringField(formData, "birthDate"));
+
+  if (!birthDate) {
+    return { status: "error", message: t("age.invalid") };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("set_my_birth_date", { p_birth_date: birthDate });
+
+    if (error || !isBirthDateStatus(data)) {
+      return { status: "error", message: t("profile.saveUnavailable") };
+    }
+
+    if (data !== "set") {
+      return { status: "error", message: t(BIRTH_DATE_MESSAGES[data]) };
+    }
+  } catch {
+    return { status: "error", message: t("profile.saveUnavailable") };
+  }
+
+  revalidatePath("/", "layout");
+  return { status: "success", message: t("age.set") };
 }

@@ -403,6 +403,16 @@ export const de: Record<MessageKey, string> = {
   "safety.reason.other": "Etwas anderes",
 
   // ── Profile (screens) ───────────────────────────────────────────
+  "profile.age": "Alter",
+  "profile.ageHint": "Gib einmal dein Geburtsdatum an. Ab 18 kannst du öffentliche Events hosten. Nur du siehst es.",
+  "profile.birthDate": "Geburtsdatum",
+  "profile.ageOnce": "Das lässt sich danach nicht mehr ändern.",
+  "profile.ageAdult": "18+ bestätigt.",
+  "profile.ageMinor": "Unter 18: Für dich gelten die strengeren Regeln für Minderjährige.",
+  "age.set": "Gespeichert.",
+  "age.alreadySet": "Dein Geburtsdatum ist schon gespeichert.",
+  "age.tooYoung": "Snowmate ist für Rider ab 14.",
+  "age.invalid": "Gib ein gültiges Geburtsdatum ein.",
   "profile.language": "Sprache",
   "profile.yourAccount": "Dein Konto",
   "profile.edit": "Profil bearbeiten",

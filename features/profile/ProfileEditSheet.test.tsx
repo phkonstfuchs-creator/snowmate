@@ -17,6 +17,7 @@ const complete: OwnProfile = {
   city: "salzburg",
   abilityLevel: "off-piste",
   bio: "Dawn patrol",
+  birthDate: null,
   isMinor: true,
   onboardingCompleted: true,
 };
