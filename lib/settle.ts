@@ -10,4 +10,5 @@ export async function settle<T>(promise: Promise<T>, fallback: T): Promise<T> {
   }
 }
 
-export const OFFLINE_RESULT = { ok: false, message: "No connection. Try again in a moment." } as const;
+/* message is a key; screens translate it (see translateText). */
+export const OFFLINE_RESULT = { ok: false, message: "common.offline" } as const;

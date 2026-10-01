@@ -8,6 +8,8 @@ import type { LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
 import { isClosedTo, isFull, openSpots, totalOpenSpots } from "./capacity";
 import EditRideSheet from "./EditRideSheet";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
 import type { SafetyTarget } from "@/features/safety/reports";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -32,6 +34,7 @@ const OCHRE = "var(--ochre)";
    is there and why it is missing. Omitting it would read as a bug,
    a lock explains the rule. */
 function MeetingPoint({ value, locked }: { value: string | null; locked: boolean }) {
+  const t = useT();
   if (!locked && value) {
     return (
       <div className="flex items-start gap-2">
@@ -48,7 +51,7 @@ function MeetingPoint({ value, locked }: { value: string | null; locked: boolean
     >
       <Icon name="lock" size={14} color={INK_2} strokeWidth={1.9} className="mt-0.5 flex-shrink-0" />
       <p className="text-sm leading-snug" style={{ color: INK_2 }}>
-        Exact meeting point becomes visible once you join.
+        {t("events.lockedPoint")}
       </p>
     </div>
   );
@@ -72,6 +75,7 @@ function EventDetailSheet({
   onClose: () => void;
 }) {
   useScrollLock();
+  const t = useT();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
@@ -89,7 +93,7 @@ function EventDetailSheet({
         data-state={state}
         role="dialog"
         aria-modal="true"
-        aria-label={`Event: ${post.title ?? post.resort}`}
+        aria-label={t("events.eventLabel", { name: post.title ?? post.resort })}
         tabIndex={-1}
         style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
@@ -99,7 +103,7 @@ function EventDetailSheet({
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Close event"
+          aria-label={t("events.close")}
           className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center"
         >
           <Icon name="x" size={18} color={INK_2} strokeWidth={2} />
@@ -111,7 +115,7 @@ function EventDetailSheet({
             className="text-mono-label absolute left-0 top-0 px-2 py-1"
             style={{ background: OCHRE, color: INK }}
           >
-            Public
+            {t("events.public")}
           </span>
         </div>
 
@@ -136,7 +140,7 @@ function EventDetailSheet({
           <div className="min-w-0 flex-1">
             <p className="text-[0.9375rem] font-semibold" style={{ color: INK }}>{author.name}</p>
             <p className="text-sm" style={{ color: INK_2 }}>
-              {isHost ? "You are hosting" : `Host · Level ${author.level}`}
+              {isHost ? t("ride.hosting") : author.handle ? t("events.hostHandle", { handle: author.handle }) : t("events.hostLevel", { level: author.level })}
             </p>
           </div>
           <Tag level={post.abilityLevel} />
@@ -149,21 +153,21 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-4">
-          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Meeting point</p>
+          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>{t("ride.meetingPoint")}</p>
           <MeetingPoint value={ride.meetPointLocked ? null : post.meetPoint} locked={ride.meetPointLocked} />
         </div>
 
         <div className="mx-5 mt-4 grid grid-cols-2" style={{ border: "var(--rule-thin)" }}>
           <div className="px-4 py-3" style={{ borderRight: "1px solid var(--border-hairline)" }}>
-            <p className="text-mono-label" style={{ color: INK_2 }}>Signed up</p>
+            <p className="text-mono-label" style={{ color: INK_2 }}>{t("events.signedUp")}</p>
             <p className="text-mono-data mt-0.5" style={{ color: INK }}>
               {taken}/{post.totalSpots}
             </p>
           </div>
           <div className="px-4 py-3">
-            <p className="text-mono-label" style={{ color: INK_2 }}>Open</p>
+            <p className="text-mono-label" style={{ color: INK_2 }}>{t("events.open")}</p>
             <p className="text-mono-data mt-0.5" style={{ color: full ? INK_2 : PINE }}>
-              {full ? "full" : open}
+              {full ? t("card.full") : open}
             </p>
           </div>
         </div>
@@ -171,7 +175,7 @@ function EventDetailSheet({
         {joinedUsers.length > 0 && (
           <div className="px-5 pt-4">
             <p className="text-mono-label mb-2" style={{ color: INK_2 }}>
-              Among those going
+              {t("events.among")}
             </p>
             <div className="flex flex-wrap gap-2">
               {joinedUsers.map((user) => (
@@ -196,7 +200,7 @@ function EventDetailSheet({
               className="card-tap mb-2 w-full py-4 font-display text-lg uppercase"
               style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
             >
-              Edit event
+              {t("events.edit")}
             </button>
           )}
           {isHost && onCancel && (
@@ -207,7 +211,7 @@ function EventDetailSheet({
               className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
               style={{ background: PAPER_1, color: "var(--crimson)", border: "1px solid var(--crimson)" }}
             >
-              Cancel event
+              {t("events.cancel")}
             </button>
           )}
           {!isHost && (
@@ -223,14 +227,14 @@ function EventDetailSheet({
                   : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }
             }
           >
-            {pending ? "One moment…" : isJoined ? "Leave event" : full ? "Event is full" : "Join event"}
+            {pending ? t("common.oneMoment") : isJoined ? t("events.leave") : full ? t("events.isFull") : t("events.join")}
           </button>
           )}
         </div>
         {onSafety && !isHost && (
           <div className="px-5 pt-3 text-center">
             <button type="button" onClick={onSafety} className="min-h-11 text-xs font-semibold underline" style={{ color: INK_2 }}>
-              Report or block {author.name}
+              {t("ride.reportOrBlock", { name: author.name })}
             </button>
           </div>
         )}
@@ -248,6 +252,7 @@ function EventCard({
   index: number;
   onOpen: () => void;
 }) {
+  const t = useT();
   const { post, host: author, isJoined } = ride;
   const taken = post.takenSpots;
   const open = openSpots(post);
@@ -278,7 +283,7 @@ function EventCard({
             className="text-mono-label absolute right-0 top-0 px-2 py-1"
             style={{ background: PINE, color: "var(--paper-0)" }}
           >
-            Joined
+            {t("events.joined")}
           </span>
         )}
       </div>
@@ -304,7 +309,7 @@ function EventCard({
             <div style={{ width: `${filled}%`, height: "100%", background: full ? INK_2 : RUST }} />
           </div>
           <span className="text-mono-label flex-shrink-0" style={{ color: full ? INK_2 : INK }}>
-            {full ? "full" : `${open} open`}
+            {full ? t("card.full") : t("card.open", { n: open })}
           </span>
         </div>
       </div>
@@ -321,6 +326,7 @@ export interface LiveEvents {
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
+  const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
@@ -352,10 +358,10 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="px-4 pt-4 pb-3">
           <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>
-            Events
+            {t("events.title")}
           </h1>
           <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
-            {events.length} open events · {openSeats} spots left
+            {t("events.summary", { events: events.length, spots: openSeats })}
           </p>
         </div>
         <div className="px-4 pb-3">
@@ -363,7 +369,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
-            ariaLabel="Region"
+            ariaLabel={t("common.region")}
           />
         </div>
       </header>
@@ -377,10 +383,9 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
       >
         <Icon name="globe" size={16} color={PINE} strokeWidth={1.7} className="mt-0.5 flex-shrink-0" />
         <div>
-          <p className="text-mono-label" style={{ color: INK }}>Open to everyone</p>
+          <p className="text-mono-label" style={{ color: INK }}>{t("events.openToAll")}</p>
           <p className="mt-1 text-sm leading-snug" style={{ color: INK_1 }}>
-            You do not need to know anyone here. Everyone sees the resort,
-            only those who joined see the exact meeting point.
+            {t("events.openToAllHint")}
           </p>
         </div>
       </div>
@@ -388,7 +393,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
       <div className="space-y-3 px-4 pt-4 pb-6">
         {(board.notice || unavailable) && (
           <p role="status" className="px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)", background: PAPER_1 }}>
-            {board.notice ?? "Events could not be loaded. Try again shortly."}
+            {board.notice ? translateText(t, board.notice) : t("events.unavailable")}
           </p>
         )}
 
@@ -406,10 +411,10 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
             <Icon name="calendar-days" size={30} color={INK_2} strokeWidth={1.5} />
             <div>
               <p className="font-semibold" style={{ color: INK }}>
-                Nothing open here right now
+                {t("events.empty")}
               </p>
               <p className="mt-1 text-sm" style={{ color: INK_2 }}>
-                There may be some in the other region.
+                {t("events.emptyHint")}
               </p>
             </div>
           </div>
@@ -432,7 +437,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
                   setEditingEventId(openEvent.post.id);
                 },
                 onCancel: () => {
-                  if (!window.confirm("Cancel this event for everyone who joined?")) return;
+                  if (!window.confirm(t("events.confirmCancel"))) return;
                   setOpenEventId(null);
                   void board.cancelRide(openEvent.post.id);
                 },

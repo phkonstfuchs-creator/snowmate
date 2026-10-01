@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { INVITE_MESSAGES, inviteUrl, isInviteStatus, isInviteToken } from "./invites";
+import { translator } from "@/lib/i18n/translate";
+
+const t = translator("en");
 import { acceptInviteAction, createInviteAction } from "./invite-actions";
 import { previewInvite } from "./queries";
 
@@ -54,7 +57,7 @@ describe("createInviteAction", () => {
 describe("acceptInviteAction", () => {
   it("befriends and revalidates", async () => {
     mocks.rpc.mockResolvedValue({ data: "accepted", error: null });
-    await expect(acceptInviteAction(TOKEN)).resolves.toEqual({ ok: true, message: INVITE_MESSAGES.accepted });
+    await expect(acceptInviteAction(TOKEN)).resolves.toEqual({ ok: true, message: t(INVITE_MESSAGES.accepted) });
     expect(mocks.rpc).toHaveBeenCalledWith("accept_friend_invite", { invite_token: TOKEN });
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/crew");
   });
@@ -66,7 +69,7 @@ describe("acceptInviteAction", () => {
     ["already_friends", true],
   ])("maps %s", async (data, ok) => {
     mocks.rpc.mockResolvedValue({ data, error: null });
-    await expect(acceptInviteAction(TOKEN)).resolves.toMatchObject({ ok, message: INVITE_MESSAGES[data as "used"] });
+    await expect(acceptInviteAction(TOKEN)).resolves.toMatchObject({ ok, message: t(INVITE_MESSAGES[data as "used"]) });
   });
 
   it("refuses malformed tokens without asking the database", async () => {

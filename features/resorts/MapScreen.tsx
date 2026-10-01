@@ -8,6 +8,8 @@ import { RESORT_STATUS, RIDE_POSTS } from "@/lib/data";
 import type { LiveRide } from "@/features/rides/live-ride";
 import { fixtureToLiveRide } from "@/features/rides/useRideBoard";
 import { applyRideActivity, ridesAt } from "./resort-activity";
+import { useT } from "@/lib/i18n/client";
+import type { MessageKey } from "@/lib/i18n/translate";
 import { openSpots as spotsOpen, totalOpenSpots } from "@/features/rides/capacity";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
@@ -25,8 +27,8 @@ const MUTED   = "var(--text-tertiary)";
 const INK     = "var(--text-primary)";
 const BRAND   = "var(--accent-primary)";
 
-const CONDITIONS_LABELS: Record<ResortStatus["conditions"], string> = {
-  fresh: "Fresh snow", groomed: "Groomed", icy: "Icy", slushy: "Slushy",
+const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
+  fresh: "map.fresh", groomed: "map.groomed", icy: "map.icy", slushy: "map.slushy",
 };
 
 type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | null;
@@ -43,6 +45,7 @@ function ResortDetailSheet({
   onClose: () => void;
 }) {
   useScrollLock();
+  const t = useT();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const openSpots = totalOpenSpots(ridesHere.map((ride) => ride.post));
@@ -50,24 +53,24 @@ function ResortDetailSheet({
      shows sample values; the app shows what it actually knows. */
   const stats: { label: string; val: string | number; live?: boolean; cond?: ResortStatus["conditions"] }[] = isLive
     ? [
-        { label: "riding today", val: resort.ridersNow, live: true },
-        { label: "rides", val: ridesHere.length },
-        { label: "spots open", val: openSpots },
+        { label: t("map.ridingToday"), val: resort.ridersNow, live: true },
+        { label: t("map.rides"), val: ridesHere.length },
+        { label: t("map.spotsOpen"), val: openSpots },
       ]
     : [
-        { label: "riding now", val: resort.ridersNow, live: true },
-        { label: "lifts open", val: `${resort.liftsOpen}/${resort.totalLifts}` },
-        { label: CONDITIONS_LABELS[resort.conditions], val: "Snow", cond: resort.conditions },
+        { label: t("map.ridingNow"), val: resort.ridersNow, live: true },
+        { label: t("map.liftsOpen"), val: `${resort.liftsOpen}/${resort.totalLifts}` },
+        { label: t(CONDITIONS_LABELS[resort.conditions]), val: t("map.snow"), cond: resort.conditions },
       ];
 
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label={`Details for ${resort.name}`} tabIndex={-1} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label={t("map.detailsFor", { name: resort.name })} tabIndex={-1} style={{ maxHeight: "88dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}>
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <button type="button" onClick={dismiss} aria-label="Close details" className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+        <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
           <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
         </button>
 
@@ -112,11 +115,11 @@ function ResortDetailSheet({
 
         {/* Ability bars */}
         <div className="px-5 mt-4">
-          <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>Who rides what</p>
+          <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>{t("map.whoRidesWhat")}</p>
           {[
-            { label: "Chill",     count: resort.chillRiders,    color: "var(--rust-ink)", bg: "var(--accent-warm-subtle)" },
-            { label: "Park",      count: resort.parkRiders,     color: "var(--sky-ink)",  bg: "rgba(62, 110, 142, 0.16)" },
-            { label: "Off-piste", count: resort.offPisteRiders, color: "var(--pine)",     bg: "rgba(42, 86, 71, 0.16)" },
+            { label: t("common.chill"), count: resort.chillRiders,    color: "var(--rust-ink)", bg: "var(--accent-warm-subtle)" },
+            { label: t("common.park"), count: resort.parkRiders,     color: "var(--sky-ink)",  bg: "rgba(62, 110, 142, 0.16)" },
+            { label: t("common.offPiste"), count: resort.offPisteRiders, color: "var(--pine)",     bg: "rgba(42, 86, 71, 0.16)" },
           ].map(({ label, count, color, bg }) => {
             const pct = resort.ridersNow > 0 ? Math.round((count / resort.ridersNow) * 100) : 0;
             return (
@@ -134,20 +137,20 @@ function ResortDetailSheet({
         {/* Rides here */}
         {ridesHere.length > 0 && (
           <div className="px-5 mt-4">
-            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Rides here today</p>
+            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>{t("map.ridesHereToday")}</p>
             {ridesHere.map(({ post: ride, host: a }) => {
               return (
                 <div key={ride.id} className="flex items-center gap-3 py-2.5" style={{ borderBottom: `1px solid ${BORDER}` }}>
                   <Avatar id={a.id} initials={a.avatar} size={32} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-black" style={{ color: INK }}>{a.name}</p>
-                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{ride.meetTime} · {spotsOpen(ride)} open</p>
+                    <p className="text-xs font-semibold" style={{ color: MUTED }}>{t("map.rideLine", { time: ride.meetTime, n: spotsOpen(ride) })}</p>
                   </div>
                   <span className={clsx("text-mono-label px-2 py-0.5 flex-shrink-0",
                     ride.abilityLevel === "chill" && "badge-chill",
                     ride.abilityLevel === "park" && "badge-park",
                     ride.abilityLevel === "off-piste" && "badge-offpiste")}>
-                    {ride.abilityLevel === "chill" ? "Chill" : ride.abilityLevel === "park" ? "Park" : "OP"}
+                    {ride.abilityLevel === "chill" ? t("common.chill") : ride.abilityLevel === "park" ? t("common.park") : "OP"}
                   </span>
                 </div>
               );
@@ -171,6 +174,7 @@ const FIXTURE_RIDES = RIDE_POSTS.map((post) => fixtureToLiveRide(post, false)).f
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function MapScreen({ live }: { live?: LiveMap }) {
+  const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
   const isLive = live !== undefined;
@@ -191,9 +195,9 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
         style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Map</h1>
+            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("map.title")}</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-              {totalRiders} {isLive ? "riding today" : "riding now"} · {resorts.length} resorts
+              {t("map.summary", { n: totalRiders, riding: isLive ? t("map.ridingToday") : t("map.ridingNow"), resorts: resorts.length })}
             </p>
           </div>
           {!isLive && (
@@ -202,7 +206,7 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
                 {deepestSnow?.snowDepth ?? 0} cm
               </p>
               <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>
-                deepest snow
+                {t("map.deepestSnow")}
               </p>
             </div>
           )}
@@ -212,7 +216,7 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
-            ariaLabel="Region"
+            ariaLabel={t("common.region")}
           />
         </div>
       </header>
@@ -228,7 +232,7 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
 
       {live && live.rides === null && (
         <p role="status" className="mx-4 mt-3 px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>
-          Today&apos;s rides could not be loaded. Try again shortly.
+          {t("map.unavailable")}
         </p>
       )}
 
@@ -245,11 +249,11 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
           <div className="flex-1 text-left">
             <p className="font-black text-sm" style={{ color: "var(--text-on-accent)" }}>{hotResort.name}</p>
             <p className="text-xs font-semibold" style={{ color: "var(--paper-0)" }}>
-              {isLive ? `${hotResort.ridersNow} riding today` : `${hotResort.ridersNow} riding now · ${hotResort.snowDepth} cm snow`}
+              {isLive ? t("map.hotToday", { n: hotResort.ridersNow }) : t("map.hotNow", { n: hotResort.ridersNow, cm: hotResort.snowDepth })}
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs font-black" style={{ color: "var(--paper-0)" }}>Hotspot</span>
+            <span className="text-xs font-black" style={{ color: "var(--paper-0)" }}>{t("map.hotspot")}</span>
             <Icon name="chevron-right" size={14} color="var(--text-on-accent)" strokeWidth={2} />
           </div>
         </button>
@@ -257,7 +261,7 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
 
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
-        <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>All resorts</p>
+        <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>{t("map.allResorts")}</p>
         <div className="space-y-2">
           {sorted.map((resort, i) => (
             <button
@@ -273,18 +277,18 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
                 <div className="flex items-center gap-2">
                   <span className="font-black text-sm truncate" style={{ color: INK }}>{resort.name}</span>
                   {!isLive && resort.conditions === "fresh" && (
-                    <span className="text-mono-label px-1.5 flex-shrink-0 badge-chill">Fresh</span>
+                    <span className="text-mono-label px-1.5 flex-shrink-0 badge-chill">{t("map.freshTag")}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="pulse-dot" style={{ width: 5, height: 5 }} />
-                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.ridersNow} riding</span>
+                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{t("map.riding", { n: resort.ridersNow })}</span>
                   {!isLive && (
                     <>
                       <span style={{ color: "var(--ink-3)" }}>·</span>
                       <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.snowDepth} cm</span>
                       <span style={{ color: "var(--ink-3)" }}>·</span>
-                      <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.liftsOpen}/{resort.totalLifts} lifts</span>
+                      <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{t("map.lifts", { open: resort.liftsOpen, total: resort.totalLifts })}</span>
                     </>
                   )}
                 </div>

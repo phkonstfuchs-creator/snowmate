@@ -1,5 +1,7 @@
 "use server";
 
+import { getT } from "@/lib/i18n/server";
+import { translateValidation } from "@/lib/i18n/translate";
 import { revalidatePath } from "next/cache";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
@@ -8,9 +10,9 @@ import { INVITE_MESSAGES, inviteUrl, isInviteStatus, isInviteToken } from "./inv
 export type CreateInviteResult = { ok: true; url: string } | { ok: false; message: string };
 export type AcceptInviteResult = { ok: boolean; message: string };
 
-const UNAVAILABLE = "That did not work. Try again shortly.";
+const UNAVAILABLE = "common.unavailable";
 
-export async function createInviteAction(): Promise<CreateInviteResult> {
+async function createInviteActionImpl(): Promise<CreateInviteResult> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("create_friend_invite");
@@ -18,7 +20,7 @@ export async function createInviteAction(): Promise<CreateInviteResult> {
 
     if (error || !row) return { ok: false, message: UNAVAILABLE };
     if (row.status === "too_many") {
-      return { ok: false, message: "You have 10 open invite links. Wait until some are used or expire." };
+      return { ok: false, message: "invite.tooMany" };
     }
     if (row.status === "profile_incomplete") {
       return { ok: false, message: INVITE_MESSAGES.profile_incomplete };
@@ -33,7 +35,7 @@ export async function createInviteAction(): Promise<CreateInviteResult> {
   }
 }
 
-export async function acceptInviteAction(token: string): Promise<AcceptInviteResult> {
+async function acceptInviteActionImpl(token: string): Promise<AcceptInviteResult> {
   if (!isInviteToken(token)) return { ok: false, message: INVITE_MESSAGES.not_found };
 
   try {
@@ -48,4 +50,20 @@ export async function acceptInviteAction(token: string): Promise<AcceptInviteRes
   } catch {
     return { ok: false, message: UNAVAILABLE };
   }
+}
+
+/* Results carry message keys; the exported actions translate them once,
+   in the caller's language. */
+async function localize<T>(result: T): Promise<T> {
+  if (typeof result !== "object" || result === null || !("message" in result)) return result;
+  const t = await getT();
+  return { ...result, message: translateValidation(t, String(result.message)) };
+}
+
+export async function createInviteAction(): Promise<CreateInviteResult> {
+  return localize(await createInviteActionImpl());
+}
+
+export async function acceptInviteAction(token: string): Promise<AcceptInviteResult> {
+  return localize(await acceptInviteActionImpl(token));
 }

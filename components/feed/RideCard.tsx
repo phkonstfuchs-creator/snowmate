@@ -5,6 +5,7 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
+import { useT } from "@/lib/i18n/client";
 import { isFull, openSpots } from "@/features/rides/capacity";
 
 interface RideCardProps {
@@ -22,6 +23,7 @@ interface RideCardProps {
 }
 
 export default function RideCard({ post, author, joinedUsers, isJoined, isPending = false, isHost = false, requestCount = 0, onClick, onJoin, index = 0 }: RideCardProps) {
+  const t = useT();
   const open = openSpots(post);
   const full = isFull(post);
 
@@ -101,7 +103,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               </div>
             ))}
             {joinedUsers.length > 0 && (
-              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{post.takenSpots} in</span>
+              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{t("card.in", { n: post.takenSpots })}</span>
             )}
           </div>
 
@@ -110,11 +112,11 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               className="text-[0.7rem] font-bold font-mono"
               style={{ color: full ? "var(--ink-3)" : open === 1 ? "var(--rust)" : "var(--ink-2)" }}
             >
-              {full ? "full" : `${open} open`}
+              {full ? t("card.full") : t("card.open", { n: open })}
             </span>
             {isHost ? (
               <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
-                {requestCount > 0 ? `Your ride · ${requestCount} asking` : "Your ride"}
+                {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
               </span>
             ) : (
             <button
@@ -129,7 +131,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
                   : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
               }
             >
-              {isJoined ? "Joined" : isPending ? "Asked" : "Join"}
+              {isJoined ? t("card.joined") : isPending ? t("card.asked") : t("card.join")}
             </button>
             )}
           </div>
@@ -141,7 +143,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
         className="text-mono-label flex items-center justify-center gap-1.5 py-2"
         style={{ borderTop: "1px solid var(--border-hairline)", color: "var(--ink-2)" }}
       >
-        Details &amp; profile
+        {t("card.details")}
         <Icon name="chevron-right" size={11} color="var(--ink-2)" strokeWidth={2} />
       </div>
     </article>

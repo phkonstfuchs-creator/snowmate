@@ -1,3 +1,5 @@
+import type { MessageKey } from "@/lib/i18n/translate";
+
 /* Invite links: one person, one use, seven days (ADR 0009). */
 
 export const PENDING_INVITE_KEY = "sm_pending_invite";
@@ -22,14 +24,14 @@ export type InviteStatus =
   | "not_found"
   | "profile_incomplete";
 
-export const INVITE_MESSAGES: Record<Exclude<InviteStatus, "valid">, string> = {
-  accepted: "You are friends now.",
-  already_friends: "You are already friends.",
-  self: "This is your own invite link. Send it to a friend.",
-  used: "This link has already been used. Ask for a new one.",
-  expired: "This link has expired. Ask for a new one.",
-  not_found: "This invite link does not work.",
-  profile_incomplete: "Finish your profile first: add your name and handle on the Profile tab.",
+export const INVITE_MESSAGES: Record<Exclude<InviteStatus, "valid">, MessageKey> = {
+  accepted: "invite.accepted",
+  already_friends: "crew.alreadyFriends",
+  self: "invite.self",
+  used: "invite.used",
+  expired: "invite.expired",
+  not_found: "invite.notFound",
+  profile_incomplete: "common.profileIncomplete",
 };
 
 export function isInviteStatus(value: unknown): value is InviteStatus {

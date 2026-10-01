@@ -1,12 +1,14 @@
 "use server";
 
+import { getT } from "@/lib/i18n/server";
+import { translateValidation } from "@/lib/i18n/translate";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { MAX_REPORT_DETAILS, isReportReason } from "./reports";
 
 export type SafetyActionResult = { ok: boolean; message: string };
 
-const UNAVAILABLE: SafetyActionResult = { ok: false, message: "That did not work. Try again shortly." };
+const UNAVAILABLE: SafetyActionResult = { ok: false, message: "common.unavailable" };
 
 /* A block changes what every social screen shows. */
 function revalidateSocial() {
@@ -23,26 +25,26 @@ async function rpc(fn: string, args: Record<string, unknown>): Promise<{ data: u
   }
 }
 
-export async function blockUserAction(userId: string): Promise<SafetyActionResult> {
+async function blockUserActionImpl(userId: string): Promise<SafetyActionResult> {
   if (!userId) return UNAVAILABLE;
   const result = await rpc("block_user", { target: userId });
   if (!result) return UNAVAILABLE;
-  if (result.data !== "blocked") return { ok: false, message: "You cannot block this person." };
+  if (result.data !== "blocked") return { ok: false, message: "safety.cannotBlock" };
   revalidateSocial();
-  return { ok: true, message: "Blocked. You will not see each other anymore." };
+  return { ok: true, message: "safety.blocked" };
 }
 
-export async function unblockUserAction(userId: string): Promise<SafetyActionResult> {
+async function unblockUserActionImpl(userId: string): Promise<SafetyActionResult> {
   if (!userId) return UNAVAILABLE;
   const result = await rpc("unblock_user", { target: userId });
   if (!result) return UNAVAILABLE;
   revalidateSocial();
   return result.data === true
-    ? { ok: true, message: "Unblocked." }
-    : { ok: false, message: "This person was not blocked." };
+    ? { ok: true, message: "safety.unblocked" }
+    : { ok: false, message: "safety.notBlocked" };
 }
 
-export async function reportUserAction(input: {
+async function reportUserActionImpl(input: {
   userId: string;
   reason: string;
   details?: string;
@@ -50,11 +52,11 @@ export async function reportUserAction(input: {
   alsoBlock?: boolean;
 }): Promise<SafetyActionResult> {
   if (!input.userId || !isReportReason(input.reason)) {
-    return { ok: false, message: "Pick a reason." };
+    return { ok: false, message: "v.pickReason" };
   }
   const details = (input.details ?? "").trim();
   if (details.length > MAX_REPORT_DETAILS) {
-    return { ok: false, message: `Use at most ${MAX_REPORT_DETAILS} characters.` };
+    return { ok: false, message: `v.max|${MAX_REPORT_DETAILS}` };
   }
 
   const result = await rpc("report_user", {
@@ -72,12 +74,38 @@ export async function reportUserAction(input: {
       return {
         ok: true,
         message: input.alsoBlock
-          ? "Thanks. We will look at it, and you will not see each other anymore."
-          : "Thanks. We will look at it.",
+          ? "safety.reportedAndBlocked"
+          : "safety.reported",
       };
     case "too_many":
-      return { ok: false, message: "You have sent many reports today. Try again tomorrow." };
+      return { ok: false, message: "safety.tooMany" };
     default:
-      return { ok: false, message: "You cannot report this person." };
+      return { ok: false, message: "safety.cannotReport" };
   }
+}
+
+/* Results carry message keys; the exported actions translate them once,
+   in the caller's language. */
+async function localize<T>(result: T): Promise<T> {
+  if (typeof result !== "object" || result === null || !("message" in result)) return result;
+  const t = await getT();
+  return { ...result, message: translateValidation(t, String(result.message)) };
+}
+
+export async function blockUserAction(userId: string): Promise<SafetyActionResult> {
+  return localize(await blockUserActionImpl(userId));
+}
+
+export async function unblockUserAction(userId: string): Promise<SafetyActionResult> {
+  return localize(await unblockUserActionImpl(userId));
+}
+
+export async function reportUserAction(input: {
+  userId: string;
+  reason: string;
+  details?: string;
+  rideId?: string;
+  alsoBlock?: boolean;
+}): Promise<SafetyActionResult> {
+  return localize(await reportUserActionImpl(input));
 }

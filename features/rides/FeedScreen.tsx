@@ -7,6 +7,9 @@ import { City, User } from "@/lib/types";
 import { ME, RIDE_POSTS } from "@/lib/data";
 import { canPostPublicRide } from "./visibility";
 import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
+import { useLocale, useT } from "@/lib/i18n/client";
+import { INTL_LOCALE } from "@/lib/i18n/locales";
+import { translateText } from "@/lib/i18n/translate";
 import { useRideBoard } from "./useRideBoard";
 import EditRideSheet from "./EditRideSheet";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
@@ -32,6 +35,8 @@ export interface LiveFeed {
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const basePath = useBasePath();
+  const t = useT();
+  const locale = useLocale();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -61,7 +66,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const editingRide = rides.find((ride) => ride.post.id === editingPostId) ?? null;
   /* "Out today" means today: a ride next Saturday is in the list, but
      its riders are not on the mountain yet. */
-  const todaysRides = rides.filter((ride) => ride.post.date === "Today");
+  const todaysRides = rides.filter((ride) => ride.isToday);
   const ridersToday = board.isLive
     ? todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0)
     : city === "innsbruck" ? 174 : 127;
@@ -93,7 +98,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             style={{ background: "var(--rust)", color: "var(--paper-0)", border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="plus" size={13} strokeWidth={2.6} />
-            Post
+            {t("common.post")}
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -101,7 +106,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
-            ariaLabel="Region"
+            ariaLabel={t("common.region")}
           />
         </div>
       </header>
@@ -133,12 +138,12 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         <div className="flex items-center gap-2">
           <span className="pulse-dot" />
           <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            {ridersToday} out today
+            {t("feed.outToday", { n: ridersToday })}
           </span>
         </div>
         <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>
           {board.isLive
-            ? new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: APP_TIME_ZONE })
+            ? new Date().toLocaleDateString(INTL_LOCALE[locale], { weekday: "short", day: "numeric", month: "short", timeZone: APP_TIME_ZONE })
             : "Tue 8 Jan"}
         </span>
       </div>
@@ -150,7 +155,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           style={{ background: "var(--paper-1)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
         >
           <span className="text-sm font-semibold" style={{ color: "var(--ink-0)" }}>
-            Finish your profile to post rides and join your crew.
+            {t("feed.finishProfile")}
           </span>
           <Icon name="chevron-right" size={16} color="var(--ink-0)" strokeWidth={2} />
         </Link>
@@ -159,10 +164,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {(board.notice || unavailable) && (
         <div role="status" className="mx-4 mb-3 flex items-start justify-between gap-3 px-3 py-2.5" style={{ border: "1px solid var(--crimson)", background: "var(--paper-1)" }}>
           <p className="text-sm" style={{ color: "var(--crimson)" }}>
-            {board.notice ?? "Rides could not be loaded. Pull to refresh or try again shortly."}
+            {board.notice ? translateText(t, board.notice) : t("feed.unavailable")}
           </p>
           {board.notice && (
-            <button type="button" onClick={board.clearNotice} aria-label="Dismiss" className="-my-2 -mr-2 flex h-11 w-11 flex-shrink-0 items-center justify-center">
+            <button type="button" onClick={board.clearNotice} aria-label={t("common.dismiss")} className="-my-2 -mr-2 flex h-11 w-11 flex-shrink-0 items-center justify-center">
               <Icon name="x" size={14} color="var(--crimson)" strokeWidth={2} />
             </button>
           )}
@@ -194,9 +199,9 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           <div className="flex flex-col items-center gap-4 py-14 text-center">
             <PenguinMascot size={72} />
             <div>
-              <p className="font-bold" style={{ color: "var(--text-primary)" }}>No rides today yet</p>
+              <p className="font-bold" style={{ color: "var(--text-primary)" }}>{t("feed.empty")}</p>
               <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
-                Open events need no crew.
+                {t("feed.emptyHint")}
               </p>
             </div>
             <Link
@@ -209,7 +214,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
                 boxShadow: "var(--shadow-print)",
               }}
             >
-              Browse open events
+              {t("feed.browseEvents")}
             </Link>
           </div>
         )}
@@ -218,7 +223,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {/* FAB */}
       <button
         onClick={() => setShowPostModal(true)}
-        aria-label="Post a ride"
+        aria-label={t("feed.postRide")}
         className="card-tap fixed bottom-[96px] z-40 flex h-14 w-14 items-center justify-center"
         style={{
           right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))",
@@ -264,7 +269,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
                 },
                 onCancel: () => {
                   /* Cancelling also drops everyone who joined. */
-                  if (!window.confirm("Cancel this ride for everyone who joined?")) return;
+                  if (!window.confirm(t("feed.confirmCancel"))) return;
                   setSelectedPostId(null);
                   void board.cancelRide(selectedRide.post.id);
                 },
@@ -301,7 +306,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M8 1L2 8.5h5L6 13l6-7.5H7L8 1Z" fill="var(--ochre)" />
             </svg>
-            +50 XP · You are in
+            {board.isLive ? t("feed.youAreIn") : `+50 XP · ${t("feed.youAreIn")}`}
           </div>
         </div>
       )}

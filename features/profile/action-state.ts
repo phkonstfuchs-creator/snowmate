@@ -27,5 +27,11 @@ export interface DeleteAccountState {
 export const initialDeleteAccountState: DeleteAccountState = { status: "idle", message: "" };
 
 /* The word the user types to confirm. A second, deliberate step keeps a
-   stray tap from erasing an account. */
+   stray tap from erasing an account. Either language's word works, so a
+   language switch mid-flow cannot lock anyone in. */
 export const DELETE_CONFIRMATION = "delete";
+export const DELETE_CONFIRMATION_WORDS: readonly string[] = ["delete", "löschen"];
+
+export function isDeleteConfirmation(value: string): boolean {
+  return DELETE_CONFIRMATION_WORDS.includes(value.trim().toLocaleLowerCase("de"));
+}

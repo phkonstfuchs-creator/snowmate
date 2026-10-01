@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DELETE_CONFIRMATION, type DeleteAccountState } from "./action-state";
+import { isDeleteConfirmation, type DeleteAccountState } from "./action-state";
+import { getT } from "@/lib/i18n/server";
 
 /* GDPR art. 17. delete_my_account() removes the auth user, which
    cascades through every table that references the profile. */
@@ -11,9 +12,10 @@ export async function deleteAccountAction(
   formData: FormData,
 ): Promise<DeleteAccountState> {
   const confirmation = formData.get("confirmation");
+  const t = await getT();
 
-  if (typeof confirmation !== "string" || confirmation.trim().toLowerCase() !== DELETE_CONFIRMATION) {
-    return { status: "error", message: `Type "${DELETE_CONFIRMATION}" to confirm.` };
+  if (typeof confirmation !== "string" || !isDeleteConfirmation(confirmation)) {
+    return { status: "error", message: t("profile.typeToConfirm", { word: t("profile.deleteWord") }) };
   }
 
   const supabase = await createClient();
@@ -22,10 +24,10 @@ export async function deleteAccountAction(
     const { data, error } = await supabase.rpc("delete_my_account");
 
     if (error || data !== true) {
-      return { status: "error", message: "Your account could not be deleted. Try again shortly." };
+      return { status: "error", message: t("profile.deleteFailed") };
     }
   } catch {
-    return { status: "error", message: "Your account could not be deleted. Try again shortly." };
+    return { status: "error", message: t("profile.deleteFailed") };
   }
 
   try {

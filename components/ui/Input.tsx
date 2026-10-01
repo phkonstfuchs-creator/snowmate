@@ -2,6 +2,7 @@
 
 import { InputHTMLAttributes, ReactNode, Ref, useId, useState } from "react";
 import Icon from "./Icon";
+import { useT } from "@/lib/i18n/client";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
   label?: string;
@@ -25,6 +26,7 @@ export default function Input({
 }: InputProps) {
   const [focused, setFocused] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const t = useT();
   const generatedId = useId();
   const id = providedId ?? generatedId;
   const messageId = `${id}-message`;
@@ -73,7 +75,7 @@ export default function Input({
             type="button"
             onClick={() => setRevealed((v) => !v)}
             disabled={disabled}
-            aria-label={revealed ? "Hide password" : "Show password"}
+            aria-label={revealed ? t("input.hidePassword") : t("input.showPassword")}
             aria-pressed={revealed}
             className="flex flex-shrink-0 items-center justify-center self-stretch"
             style={{

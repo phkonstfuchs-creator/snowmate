@@ -6,6 +6,8 @@ import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
 import Icon from "@/components/ui/Icon";
 import type { AbilityLevel, City } from "@/lib/types";
+import { useT } from "@/lib/i18n/client";
+import type { MessageKey } from "@/lib/i18n/translate";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -17,28 +19,29 @@ const OCHRE = "var(--ochre)";
 
 type Style = AbilityLevel;
 
-const STYLE_OPTIONS: { id: Style; label: string; desc: string; color: string }[] = [
-  { id: "chill", label: "Chill", desc: "Groomed slopes, sun, good mood", color: PINE },
-  { id: "park", label: "Park", desc: "Kickers, rails, creativity", color: OCHRE },
-  { id: "off-piste", label: "Off-piste", desc: "Powder, backcountry, full freedom", color: RUST },
+const STYLE_OPTIONS: { id: Style; label: MessageKey; desc: MessageKey; color: string }[] = [
+  { id: "chill", label: "common.chill", desc: "onb.chillDesc", color: PINE },
+  { id: "park", label: "common.park", desc: "onb.parkDesc", color: OCHRE },
+  { id: "off-piste", label: "common.offPiste", desc: "onb.offPisteDesc", color: RUST },
 ];
 
-const CITIES: { id: City; label: string; sub: string; scene: string }[] = [
-  { id: "innsbruck", label: "Innsbruck", sub: "Nordkette, Stubai, Axamer and more", scene: "Nordkette" },
-  { id: "salzburg", label: "Salzburg", sub: "Zell am See, Saalbach, Gastein and more", scene: "Zell am See" },
+const CITIES: { id: City; label: string; sub: MessageKey; scene: string }[] = [
+  { id: "innsbruck", label: "Innsbruck", sub: "onb.innsbruckSub", scene: "Nordkette" },
+  { id: "salzburg", label: "Salzburg", sub: "onb.salzburgSub", scene: "Zell am See" },
 ];
 
 /* Step indicator as a printed serial number, not a progress pill */
 function StepMark({ step, total }: { step: number; total: number }) {
+  const t = useT();
   return (
     <div
       className="flex items-center gap-2 px-4 pt-5 pb-3"
       role="progressbar"
-      aria-label="Setup progress"
+      aria-label={t("onb.progress")}
       aria-valuenow={step}
       aria-valuemin={0}
       aria-valuemax={total}
-      aria-valuetext={`Step ${step} of ${total}`}
+      aria-valuetext={t("onb.stepOf", { step, total })}
     >
       <span className="text-mono-label" style={{ color: RUST }}>
         {String(step).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -67,11 +70,12 @@ function StepHeader({
   sub: string;
   headingRef: React.Ref<HTMLHeadingElement>;
 }) {
+  const t = useT();
   return (
     <div className="px-4 pb-4" style={{ borderBottom: "var(--rule-thin)" }}>
       <button
         onClick={onBack}
-        aria-label="Back"
+        aria-label={t("common.back")}
         className="-ml-2 mb-2 flex h-11 w-11 items-center justify-center"
       >
         <Icon name="chevron-left" size={20} color={INK} strokeWidth={2} />
@@ -86,6 +90,7 @@ function StepHeader({
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const t = useT();
   const [step, setStep] = useState(0);
   const [city, setCity] = useState<City | null>(null);
   const [style, setStyle] = useState<Style | null>(null);
@@ -141,22 +146,22 @@ export default function OnboardingPage() {
         </div>
 
         <div className="flex flex-1 flex-col px-4 pt-6">
-          <p className="text-mono-label" style={{ color: RUST }}>Season 25/26 · Tyrol &amp; Salzburg</p>
+          <p className="text-mono-label" style={{ color: RUST }}>{t("onb.season")}</p>
           {/* Space before each break, otherwise a screen reader reads
               "Findyourcrew" as one word */}
           <h1 className="text-display-hero mt-3" style={{ color: INK }}>
-            Find{" "}
+            {t("onb.heroLine1")}{" "}
             <br />
-            your{" "}
+            {t("onb.heroLine2")}{" "}
             <br />
-            crew
+            {t("onb.heroLine3")}
           </h1>
 
           <div className="mt-6" style={{ borderTop: "var(--rule-thin)" }}>
             {[
-              ["01", "Who rides where today, live in the feed"],
-              ["02", "Carpool board for open seats"],
-              ["03", "Your crew, private and safe"],
+              ["01", t("onb.point1")],
+              ["02", t("onb.point2")],
+              ["03", t("onb.point3")],
             ].map(([num, text]) => (
               <div
                 key={num}
@@ -181,14 +186,14 @@ export default function OnboardingPage() {
                 letterSpacing: 0,
               }}
             >
-              Get started
+              {t("onb.getStarted")}
             </button>
             <button
               onClick={() => router.push("/login")}
               className="mt-3 w-full py-3 text-sm font-semibold underline"
               style={{ color: INK_2 }}
             >
-              I already have an account
+              {t("onb.haveAccount")}
             </button>
           </div>
         </div>
@@ -203,8 +208,8 @@ export default function OnboardingPage() {
         <StepMark step={1} total={3} />
         <StepHeader
           onBack={back}
-          title="Where do you ride?"
-          sub="Sets your region in the feed and on the map"
+          title={t("onb.whereTitle")}
+          sub={t("onb.whereSub")}
           headingRef={headingRef}
         />
 
@@ -219,7 +224,7 @@ export default function OnboardingPage() {
                   setTimeout(() => setStep(2), 180);
                 }}
                 aria-pressed={selected}
-                aria-label={`${label} — ${sub}`}
+                aria-label={`${label} — ${t(sub)}`}
                 className="card-tap relative overflow-hidden text-left"
                 style={{
                   height: 148,
@@ -239,7 +244,7 @@ export default function OnboardingPage() {
                     </p>
                     {selected && <Icon name="check" size={18} color={RUST} strokeWidth={2.6} />}
                   </div>
-                  <p className="mt-1 text-xs" style={{ color: INK_2 }}>{sub}</p>
+                  <p className="mt-1 text-xs" style={{ color: INK_2 }}>{t(sub)}</p>
                 </div>
               </button>
             );
@@ -247,7 +252,7 @@ export default function OnboardingPage() {
         </div>
 
         <p className="px-4 pb-8 text-center text-mono-label" style={{ color: INK_2 }}>
-          You can change this any time
+          {t("onb.changeLater")}
         </p>
       </div>
     );
@@ -260,8 +265,8 @@ export default function OnboardingPage() {
         <StepMark step={2} total={3} />
         <StepHeader
           onBack={back}
-          title="How do you ride?"
-          sub="Shapes your feed and your crew"
+          title={t("onb.howTitle")}
+          sub={t("onb.howSub")}
           headingRef={headingRef}
         />
 
@@ -300,13 +305,13 @@ export default function OnboardingPage() {
                       letterSpacing: 0,
                     }}
                   >
-                    {opt.label}
+                    {t(opt.label)}
                   </p>
                   <p
                     className="mt-1 text-sm"
                     style={{ color: selected ? (opt.id === "park" ? INK : PAPER) : INK_2 }}
                   >
-                    {opt.desc}
+                    {t(opt.desc)}
                   </p>
                 </div>
               </button>
@@ -320,7 +325,7 @@ export default function OnboardingPage() {
             className="w-full py-3 text-sm font-semibold underline"
             style={{ color: INK_2 }}
           >
-            Skip
+            {t("onb.skip")}
           </button>
         </div>
       </div>
@@ -333,8 +338,8 @@ export default function OnboardingPage() {
       <StepMark step={3} total={3} />
       <StepHeader
         onBack={back}
-        title="What is your name?"
-        sub="Visible to confirmed crew members"
+        title={t("onb.nameTitle")}
+        sub={t("onb.nameSub")}
         headingRef={headingRef}
       />
 
@@ -360,7 +365,7 @@ export default function OnboardingPage() {
         <div className="space-y-4">
           <div>
             <label htmlFor="onboarding-name" className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Name
+              {t("onb.name")}
             </label>
             <input
               id="onboarding-name"
@@ -379,7 +384,7 @@ export default function OnboardingPage() {
           </div>
           <div>
             <label htmlFor="onboarding-handle" className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Handle
+              {t("onb.handle")}
             </label>
             <div className="relative">
               <span
@@ -413,7 +418,7 @@ export default function OnboardingPage() {
             )}
             {style && (
               <span className="text-mono-label px-2.5 py-1" style={{ border: "var(--rule-thin)", color: INK }}>
-                {STYLE_OPTIONS.find((s) => s.id === style)?.label}
+                {(() => { const option = STYLE_OPTIONS.find((s) => s.id === style); return option ? t(option.label) : null; })()}
               </span>
             )}
           </div>
@@ -433,11 +438,10 @@ export default function OnboardingPage() {
             letterSpacing: 0,
           }}
         >
-          Create account
+          {t("auth.createAccount")}
         </button>
         <p className="mt-3 text-center text-xs leading-relaxed" style={{ color: INK_2 }}>
-          By creating an account you accept our terms of use.
-          Under 18? You need your parents&rsquo; consent.
+          {t("onb.terms")}
         </p>
       </div>
     </div>

@@ -8,6 +8,8 @@ import Icon from "@/components/ui/Icon";
 import type { RidePost } from "@/lib/types";
 import type { RideEditInput } from "./ride-input";
 import type { RideActionResult } from "./actions";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
@@ -27,6 +29,7 @@ export default function EditRideSheet({
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
+  const t = useT();
   const [meetTime, setMeetTime] = useState(post.meetTime);
   const [meetPoint, setMeetPoint] = useState(post.meetPoint);
   const [totalSpots, setTotalSpots] = useState(post.totalSpots);
@@ -44,7 +47,7 @@ export default function EditRideSheet({
     const result = await onSave({ meetTime, meetPoint, totalSpots, caption });
     setSaving(false);
     if (!result.ok) {
-      setError(result.message);
+      setError(translateText(t, result.message));
       return;
     }
     dismiss();
@@ -70,9 +73,9 @@ export default function EditRideSheet({
             <p className="text-mono-label mb-2" style={{ color: "var(--rust)" }}>
               {post.resort} · {post.date}
             </p>
-            <h2 id="edit-ride-title" className="text-display-md" style={{ color: INK }}>Edit ride</h2>
+            <h2 id="edit-ride-title" className="text-display-md" style={{ color: INK }}>{t("edit.title")}</h2>
           </div>
-          <button type="button" onClick={dismiss} aria-label="Close" className="-mr-2 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label={t("common.close")} className="-mr-2 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={INK} strokeWidth={2} />
           </button>
         </div>
@@ -85,11 +88,11 @@ export default function EditRideSheet({
           )}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label htmlFor="edit-ride-time" className={label} style={{ color: INK }}>Time</label>
+              <label htmlFor="edit-ride-time" className={label} style={{ color: INK }}>{t("post.time")}</label>
               <input id="edit-ride-time" type="time" className="form-input" value={meetTime} onChange={(e) => setMeetTime(e.target.value)} />
             </div>
             <div className="w-28">
-              <label htmlFor="edit-ride-spots" className={label} style={{ color: INK }}>Spots</label>
+              <label htmlFor="edit-ride-spots" className={label} style={{ color: INK }}>{t("post.spots")}</label>
               <select id="edit-ride-spots" className="form-input" value={totalSpots} onChange={(e) => setTotalSpots(Number(e.target.value))}>
                 {spotOptions.map((n) => (
                   <option key={n} value={n}>{n}</option>
@@ -98,18 +101,17 @@ export default function EditRideSheet({
             </div>
           </div>
           <div>
-            <label htmlFor="edit-ride-point" className={label} style={{ color: INK }}>Meeting point</label>
+            <label htmlFor="edit-ride-point" className={label} style={{ color: INK }}>{t("post.meetingPoint")}</label>
             <input id="edit-ride-point" className="form-input" maxLength={120} value={meetPoint} onChange={(e) => setMeetPoint(e.target.value)} />
           </div>
           <div>
             <label htmlFor="edit-ride-note" className={label} style={{ color: INK }}>
-              Note <span style={{ color: INK_2 }}>(optional)</span>
+              {t("post.note")} <span style={{ color: INK_2 }}>{t("common.optional")}</span>
             </label>
             <textarea id="edit-ride-note" rows={3} maxLength={280} className="form-input resize-none" value={caption} onChange={(e) => setCaption(e.target.value)} />
           </div>
           <p className="text-xs leading-snug" style={{ color: INK_2 }}>
-            Everyone who joined sees the change right away. Resort and day stay
-            as posted; for a different day, post a new ride.
+            {t("edit.hint")}
           </p>
           <button
             type="button"
@@ -118,7 +120,7 @@ export default function EditRideSheet({
             className="card-tap w-full py-4 font-display text-xl uppercase disabled:opacity-40"
             style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? t("common.saving") : t("common.save")}
           </button>
         </div>
       </div>

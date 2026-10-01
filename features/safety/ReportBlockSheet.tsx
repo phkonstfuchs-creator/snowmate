@@ -9,14 +9,17 @@ import Icon from "@/components/ui/Icon";
 import { settle } from "@/lib/settle";
 import { blockUserAction, reportUserAction, type SafetyActionResult } from "./actions";
 import { MAX_REPORT_DETAILS, REPORT_REASONS, type ReportReason, type SafetyTarget } from "./reports";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
 const CRIMSON = "var(--crimson)";
-const OFFLINE: SafetyActionResult = { ok: false, message: "No connection. Try again in a moment." };
+const OFFLINE: SafetyActionResult = { ok: false, message: "common.offline" };
 
 export default function ReportBlockSheet({ target, onClose }: { target: SafetyTarget; onClose: () => void }) {
   useScrollLock();
+  const t = useT();
   const router = useRouter();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -34,7 +37,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
   };
 
   const block = async () => {
-    if (!window.confirm(`Block ${target.name}? You will not see each other's rides or carpools anymore.`)) return;
+    if (!window.confirm(t("safety.confirmBlock", { name: target.name }))) return;
     setPending(true);
     finish(await settle(blockUserAction(target.userId), OFFLINE));
     setPending(false);
@@ -69,10 +72,10 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
           <div>
             <p className="text-mono-label mb-2" style={{ color: "var(--rust)" }}>{target.name}</p>
             <h2 id="safety-title" className="text-display-md" style={{ color: INK }}>
-              {mode === "report" ? "Report" : "Report or block"}
+              {mode === "report" ? t("safety.report") : t("safety.reportOrBlock")}
             </h2>
           </div>
-          <button type="button" onClick={dismiss} aria-label="Close" className="-mr-2 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label={t("common.close")} className="-mr-2 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={INK} strokeWidth={2} />
           </button>
         </div>
@@ -80,16 +83,15 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
         <div className="space-y-4 px-5 pt-5">
           {result ? (
             <>
-              <p role="status" className="text-base" style={{ color: result.ok ? INK : CRIMSON }}>{result.message}</p>
+              <p role="status" className="text-base" style={{ color: result.ok ? INK : CRIMSON }}>{translateText(t, result.message)}</p>
               <button type="button" onClick={dismiss} className="w-full py-4 font-display text-lg uppercase" style={{ background: INK, color: "var(--paper-0)" }}>
-                Done
+                {t("common.done")}
               </button>
             </>
           ) : mode === "choose" ? (
             <>
               <p className="text-sm leading-relaxed" style={{ color: INK_2 }}>
-                If you feel unsafe, leave the conversation and talk to someone you trust.
-                In an emergency call 112.
+                {t("safety.unsafeHint")}
               </p>
               <button
                 type="button"
@@ -97,7 +99,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
                 className="flex min-h-12 w-full items-center justify-between px-4 text-left font-semibold"
                 style={{ border: "var(--rule-thin)", color: INK }}
               >
-                Report {target.name}
+                {t("safety.reportName", { name: target.name })}
                 <Icon name="chevron-right" size={16} color={INK} strokeWidth={2} />
               </button>
               <button
@@ -107,29 +109,29 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
                 className="flex min-h-12 w-full items-center justify-between px-4 text-left font-semibold disabled:opacity-50"
                 style={{ border: `1px solid ${CRIMSON}`, color: CRIMSON }}
               >
-                Block {target.name}
+                {t("safety.blockName", { name: target.name })}
                 <Icon name="user-x" size={16} color={CRIMSON} strokeWidth={2} />
               </button>
               <p className="text-xs leading-snug" style={{ color: INK_2 }}>
-                Blocking ends your friendship and any shared rides or carpools. They are not told.
+                {t("safety.blockHint")}
               </p>
             </>
           ) : (
             <>
               <fieldset>
-                <legend className="text-mono-label mb-2" style={{ color: INK }}>What happened?</legend>
+                <legend className="text-mono-label mb-2" style={{ color: INK }}>{t("safety.whatHappened")}</legend>
                 <div className="space-y-2">
                   {REPORT_REASONS.map((option) => (
                     <label key={option.id} className="flex min-h-11 items-center gap-3 px-3" style={{ border: "var(--rule-thin)" }}>
                       <input type="radio" name="reason" value={option.id} checked={reason === option.id} onChange={() => setReason(option.id)} />
-                      <span className="text-sm" style={{ color: INK }}>{option.label}</span>
+                      <span className="text-sm" style={{ color: INK }}>{t(option.label)}</span>
                     </label>
                   ))}
                 </div>
               </fieldset>
               <div>
                 <label htmlFor="report-details" className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-                  Details <span style={{ color: INK_2 }}>(optional)</span>
+                  {t("safety.details")} <span style={{ color: INK_2 }}>{t("common.optional")}</span>
                 </label>
                 <textarea
                   id="report-details"
@@ -142,7 +144,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
               </div>
               <label className="flex min-h-11 items-center gap-3">
                 <input type="checkbox" checked={alsoBlock} onChange={(e) => setAlsoBlock(e.target.checked)} />
-                <span className="text-sm" style={{ color: INK }}>Also block {target.name}</span>
+                <span className="text-sm" style={{ color: INK }}>{t("safety.alsoBlock", { name: target.name })}</span>
               </label>
               <button
                 type="button"
@@ -151,7 +153,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
                 className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
                 style={{ background: CRIMSON, color: "var(--paper-0)", border: "var(--rule-thick)" }}
               >
-                {pending ? "Sending…" : "Send report"}
+                {pending ? t("safety.sending") : t("safety.send")}
               </button>
             </>
           )}

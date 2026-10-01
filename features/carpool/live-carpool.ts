@@ -1,5 +1,6 @@
 import type { CarpoolPost, CarpoolRole, City, User } from "@/lib/types";
 import { formatPostedAt, formatRideDate, profileToUser } from "@/features/rides/live-ride";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locales";
 
 /* Row shape returned by list_carpools(). The departure point and the
    request list arrive already filtered for the viewer. */
@@ -37,8 +38,12 @@ export interface LiveCarpool {
 }
 
 export const LOCKED_DEPARTURE_LABEL = "Pickup spot shared once you are confirmed";
+const LOCKED_DEPARTURE: Record<Locale, string> = {
+  en: LOCKED_DEPARTURE_LABEL,
+  de: "Abholort wird nach der Bestätigung geteilt",
+};
 
-export function toLiveCarpool(row: CarpoolRow, now: Date): LiveCarpool {
+export function toLiveCarpool(row: CarpoolRow, now: Date, locale: Locale = DEFAULT_LOCALE): LiveCarpool {
   const requests = row.requests.map((request) => ({
     user: profileToUser({ id: request.user_id, display_name: request.display_name, handle: request.handle, city: row.city }),
     status: request.status,
@@ -51,15 +56,15 @@ export function toLiveCarpool(row: CarpoolRow, now: Date): LiveCarpool {
       role: row.role,
       resort: row.resort,
       city: row.city,
-      departurePoint: row.departure_point ?? LOCKED_DEPARTURE_LABEL,
+      departurePoint: row.departure_point ?? LOCKED_DEPARTURE[locale],
       departureTime: row.departure_time.slice(0, 5),
       totalSeats: row.seats,
       availableSeats: Math.max(0, row.seats - row.seats_taken),
       riders: requests.filter((request) => request.status === "accepted").map((request) => request.user.id),
       note: row.note ?? "",
-      postedAt: formatPostedAt(row.created_at, now),
+      postedAt: formatPostedAt(row.created_at, now, locale),
     },
-    dateLabel: formatRideDate(row.ride_date, now),
+    dateLabel: formatRideDate(row.ride_date, now, locale),
     author: profileToUser({
       id: row.author_id,
       display_name: row.author_display_name,

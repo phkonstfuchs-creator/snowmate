@@ -7,6 +7,7 @@ import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
 import { initialAuthActionState } from "./action-state";
 import { signInAction, signUpAction } from "./actions";
+import { useT } from "@/lib/i18n/client";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -19,6 +20,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
     initialAuthActionState,
   );
   const isSignup = mode === "signup";
+  const t = useT();
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -58,7 +60,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           />
           <div>
             <p className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-              Request received
+              {t("auth.requestReceived")}
             </p>
             <p
               className="mt-1.5 text-sm leading-relaxed"
@@ -73,7 +75,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           className="block text-center text-sm font-semibold underline"
           style={{ color: "var(--ink-1)" }}
         >
-          Back to sign in
+          {t("auth.backToSignIn")}
         </Link>
       </div>
     );
@@ -83,7 +85,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
     <form action={formAction} className="space-y-4" noValidate>
       <Input
         ref={emailRef}
-        label="Email"
+        label={t("auth.email")}
         name="email"
         type="email"
         autoComplete="email"
@@ -95,13 +97,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
       />
       <Input
         ref={passwordRef}
-        label="Password"
+        label={t("auth.password")}
         name="password"
         type="password"
         autoComplete={isSignup ? "new-password" : "current-password"}
         helper={
           isSignup
-            ? "At least 12 characters with upper and lower case and a number"
+            ? t("auth.passwordHelper")
             : undefined
         }
         error={state.fieldErrors?.password?.[0]}
@@ -111,7 +113,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {isSignup ? (
         <Input
           ref={confirmPasswordRef}
-          label="Confirm password"
+          label={t("auth.confirmPassword")}
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
@@ -142,22 +144,22 @@ export default function AuthForm({ mode }: AuthFormProps) {
         >
           {isPending
             ? isSignup
-              ? "Wird erstellt…"
-              : "Wird angemeldet…"
+              ? t("auth.creating")
+              : t("auth.signingIn")
             : isSignup
-              ? "Create account"
-              : "Sign in"}
+              ? t("auth.createAccount")
+              : t("auth.signIn")}
         </Button>
       </div>
 
       <p className="text-center text-sm" style={{ color: "var(--ink-2)" }}>
-        {isSignup ? "Already have one?" : "No account yet?"}{" "}
+        {isSignup ? t("auth.haveAccount") : t("auth.noAccount")}{" "}
         <Link
           href={isSignup ? "/login" : "/signup"}
           className="-my-2 inline-flex min-h-11 items-center px-1 font-semibold underline"
           style={{ color: "var(--rust)" }}
         >
-          {isSignup ? "Sign in" : "Register"}
+          {isSignup ? t("auth.signIn") : t("auth.register")}
         </Link>
       </p>
     </form>

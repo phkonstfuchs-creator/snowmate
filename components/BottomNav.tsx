@@ -4,18 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Icon from "@/components/ui/Icon";
+import { useT } from "@/lib/i18n/client";
+import type { MessageKey } from "@/lib/i18n/translate";
 
 /* Events sits far forward on purpose: a new user has an empty feed,
    and then the way in without friends has to be immediately visible.
    Six destinations is one above the usual ceiling — the price of
    keeping carpool its own surface. */
-const TABS = [
-  { href: "/feed", label: "Today", icon: "flame" },
-  { href: "/events", label: "Events", icon: "calendar-days" },
-  { href: "/map", label: "Map", icon: "map-pinned" },
-  { href: "/carpool", label: "Carpool", icon: "car" },
-  { href: "/crew", label: "Crew", icon: "users" },
-  { href: "/profile", label: "Profile", icon: "user" },
+const TABS: { href: string; label: MessageKey; icon: string }[] = [
+  { href: "/feed", label: "nav.today", icon: "flame" },
+  { href: "/events", label: "nav.events", icon: "calendar-days" },
+  { href: "/map", label: "nav.map", icon: "map-pinned" },
+  { href: "/carpool", label: "nav.carpool", icon: "car" },
+  { href: "/crew", label: "nav.crew", icon: "users" },
+  { href: "/profile", label: "nav.profile", icon: "user" },
 ];
 
 /* Destinations without their own tab. Without this mapping nothing
@@ -35,6 +37,7 @@ export default function BottomNav({
   badges?: Partial<Record<string, number>>;
 }) {
   const pathname = usePathname();
+  const t = useT();
   const route = basePath && pathname.startsWith(basePath)
     ? pathname.slice(basePath.length) || "/"
     : pathname;
@@ -43,7 +46,7 @@ export default function BottomNav({
   )?.[1];
 
   return (
-    <nav className="bottom-nav" aria-label="Main navigation">
+    <nav className="bottom-nav" aria-label={t("nav.main")}>
       <div className="flex items-stretch">
         {TABS.map((tab) => {
           const href = `${basePath}${tab.href}`;
@@ -58,7 +61,7 @@ export default function BottomNav({
               className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-3 min-h-[56px] transition-colors duration-150"
               style={{ color: isActive ? "var(--rust)" : "var(--ink-2)" }}
               aria-current={isActive ? "page" : undefined}
-              aria-label={badge > 0 ? `${tab.label}, ${badge} waiting` : undefined}
+              aria-label={badge > 0 ? t("nav.waiting", { label: t(tab.label), n: badge }) : undefined}
             >
               <span className="transition-transform duration-150" style={{ transform: isActive ? "translateY(-1px)" : "none" }}>
                 <Icon name={tab.icon} size={22} strokeWidth={isActive ? 2.3 : 1.8} />
@@ -76,7 +79,7 @@ export default function BottomNav({
                 "text-[0.6875rem] leading-none",
                 isActive ? "font-black" : "font-bold"
               )}>
-                {tab.label}
+                {t(tab.label)}
               </span>
               {isActive && (
                 <span

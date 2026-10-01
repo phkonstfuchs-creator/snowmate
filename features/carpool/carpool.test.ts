@@ -96,10 +96,10 @@ describe("validateCarpoolInput", () => {
   });
 
   it.each([
-    [{ resort: "" }, "Pick a resort."],
-    [{ departurePoint: "x" }, "Add a pickup spot."],
-    [{ seats: 9 }, "At most 8 seats."],
-    [{ departureTime: "7:30" }, "Pick a time."],
+    [{ resort: "" }, "v.pickResort"],
+    [{ departurePoint: "x" }, "v.addPickup"],
+    [{ seats: 9 }, "v.maxSeats"],
+    [{ departureTime: "7:30" }, "v.pickTime"],
   ])("rejects %j", (patch, message) => {
     expect(validateCarpoolInput({ ...input, ...patch })).toEqual({ success: false, message });
   });

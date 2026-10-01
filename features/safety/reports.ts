@@ -1,11 +1,13 @@
+import type { MessageKey } from "@/lib/i18n/translate";
+
 /* Report reasons as the database accepts them (reports_reason_value). */
 export const REPORT_REASONS = [
-  { id: "unsafe", label: "Unsafe or threatening behaviour" },
-  { id: "harassment", label: "Harassment or bullying" },
-  { id: "spam", label: "Spam or selling" },
-  { id: "fake_profile", label: "Fake profile or pretending to be someone" },
-  { id: "other", label: "Something else" },
-] as const;
+  { id: "unsafe", label: "safety.reason.unsafe" },
+  { id: "harassment", label: "safety.reason.harassment" },
+  { id: "spam", label: "safety.reason.spam" },
+  { id: "fake_profile", label: "safety.reason.fake" },
+  { id: "other", label: "safety.reason.other" },
+] as const satisfies readonly { id: string; label: MessageKey }[];
 
 export type ReportReason = (typeof REPORT_REASONS)[number]["id"];
 

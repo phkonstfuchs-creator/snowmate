@@ -18,9 +18,9 @@ export const RESERVED_HANDLES: readonly string[] = ["admin", "support", "snowmat
 const displayNameSchema = z
   .string()
   .trim()
-  .min(2, "Use at least 2 characters.")
-  .max(50, "Use at most 50 characters.")
-  .refine((value) => !UNSAFE_NAME_CHARACTERS.test(value), "Remove the special characters.");
+  .min(2, "v.min|2")
+  .max(50, "v.max|50")
+  .refine((value) => !UNSAFE_NAME_CHARACTERS.test(value), "v.specialChars");
 
 const handleSchema = z
   .string()
@@ -30,23 +30,23 @@ const handleSchema = z
   .pipe(
     z
       .string()
-      .min(3, "Use at least 3 characters.")
-      .max(20, "Use at most 20 characters.")
-      .regex(/^[a-z0-9_]+$/, "Only letters, numbers and underscores.")
-      .refine((value) => !RESERVED_HANDLES.includes(value), "That handle is reserved."),
+      .min(3, "v.min|3")
+      .max(20, "v.max|20")
+      .regex(/^[a-z0-9_]+$/, "v.handleChars")
+      .refine((value) => !RESERVED_HANDLES.includes(value), "v.handleReserved"),
   );
 
 const bioSchema = z
   .string()
   .trim()
-  .max(300, "Use at most 300 characters.")
+  .max(300, "v.max|300")
   .transform((value) => (value === "" ? null : value));
 
 export const profileInputSchema = z.object({
   displayName: displayNameSchema,
   handle: handleSchema,
-  city: z.enum(CITY_VALUES, "Pick a region."),
-  abilityLevel: z.enum(ABILITY_VALUES, "Pick a riding style."),
+  city: z.enum(CITY_VALUES, "v.pickRegion"),
+  abilityLevel: z.enum(ABILITY_VALUES, "v.pickStyle"),
   bio: bioSchema.optional(),
 });
 

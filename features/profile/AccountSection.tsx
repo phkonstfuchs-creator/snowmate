@@ -6,7 +6,9 @@ import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Icon from "@/components/ui/Icon";
 import { deleteAccountAction } from "./account-actions";
-import { DELETE_CONFIRMATION, initialDeleteAccountState } from "./action-state";
+import { initialDeleteAccountState, isDeleteConfirmation } from "./action-state";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
 import { useRouter } from "next/navigation";
 import { settle } from "@/lib/settle";
 import { unblockUserAction } from "@/features/safety/actions";
@@ -18,11 +20,12 @@ const CRIMSON = "var(--crimson)";
 
 function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
   useScrollLock();
+  const t = useT();
   const { state: sheetState, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [state, formAction, pending] = useActionState(deleteAccountAction, initialDeleteAccountState);
   const [typed, setTyped] = useState("");
-  const confirmed = typed.trim().toLowerCase() === DELETE_CONFIRMATION;
+  const confirmed = isDeleteConfirmation(typed);
 
   return (
     <>
@@ -39,22 +42,20 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-start justify-between px-5 pt-6 pb-4" style={{ borderBottom: "var(--rule-thin)" }}>
           <h2 id="delete-account-title" className="text-display-md" style={{ color: INK }}>
-            Delete account
+            {t("profile.deleteAccount")}
           </h2>
-          <button type="button" onClick={dismiss} aria-label="Close" className="-mr-2 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label={t("common.close")} className="-mr-2 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={INK} strokeWidth={2} />
           </button>
         </div>
 
         <form action={formAction} className="space-y-4 px-5 pt-5">
           <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
-            This removes your profile, your rides and carpools, everyone you
-            joined and every friendship, right away. It cannot be undone.
-            Download your data first if you want to keep a copy.
+            {t("profile.deleteWarning")}
           </p>
           <div>
             <label htmlFor="delete-account-confirm" className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Type &ldquo;{DELETE_CONFIRMATION}&rdquo; to confirm
+              {t("profile.typeWord", { word: t("profile.deleteWord") })}
             </label>
             <input
               id="delete-account-confirm"
@@ -68,7 +69,7 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
             />
           </div>
           <p role="status" aria-live="polite" className="min-h-5 text-sm" style={{ color: CRIMSON }}>
-            {state.status === "error" ? state.message : ""}
+            {state.status === "error" ? translateText(t, state.message) : ""}
           </p>
           <button
             type="submit"
@@ -76,7 +77,7 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
             className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
             style={{ background: CRIMSON, color: "var(--paper-0)", border: "var(--rule-thick)" }}
           >
-            {pending ? "Deleting…" : "Delete my account"}
+            {pending ? t("profile.deleting") : t("profile.deleteMine")}
           </button>
         </form>
       </div>
@@ -86,6 +87,7 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
 
 /* Signed-in only: the account rights every EU user has. */
 function BlockedList({ blocked }: { blocked: BlockedPerson[] }) {
+  const t = useT();
   const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -99,12 +101,12 @@ function BlockedList({ blocked }: { blocked: BlockedPerson[] }) {
 
   return (
     <div className="mb-4">
-      <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Blocked</p>
+      <p className="text-mono-label mb-2" style={{ color: INK_2 }}>{t("profile.blocked")}</p>
       <ul className="space-y-2">
         {blocked.map((person) => (
           <li key={person.userId} className="flex items-center justify-between gap-3 px-3 py-2" style={{ border: "var(--rule-thin)" }}>
             <span className="min-w-0 truncate text-sm" style={{ color: INK }}>
-              {person.displayName ?? person.handle ?? "Rider"}
+              {person.displayName ?? person.handle ?? t("common.rider")}
               {person.handle && <span style={{ color: INK_2 }}> @{person.handle}</span>}
             </span>
             <button
@@ -114,7 +116,7 @@ function BlockedList({ blocked }: { blocked: BlockedPerson[] }) {
               className="text-mono-label min-h-11 px-3 disabled:opacity-50"
               style={{ border: "var(--rule-thin)", color: INK }}
             >
-              Unblock
+              {t("profile.unblock")}
             </button>
           </li>
         ))}
@@ -124,12 +126,13 @@ function BlockedList({ blocked }: { blocked: BlockedPerson[] }) {
 }
 
 export default function AccountSection({ blocked = [] }: { blocked?: BlockedPerson[] }) {
+  const t = useT();
   const [showDelete, setShowDelete] = useState(false);
 
   return (
     <section className="px-4 pb-4">
       <div className="section-rule">
-        <h2 className="text-mono-label" style={{ color: INK }}>Your data</h2>
+        <h2 className="text-mono-label" style={{ color: INK }}>{t("profile.yourData")}</h2>
       </div>
       {blocked.length > 0 && <div className="mt-2"><BlockedList blocked={blocked} /></div>}
       <div className="mt-2 space-y-2">
@@ -140,7 +143,7 @@ export default function AccountSection({ blocked = [] }: { blocked?: BlockedPers
           style={{ border: "var(--rule-thin)", color: INK, background: "var(--paper-1)" }}
         >
           <Icon name="download" size={15} />
-          Download my data
+          {t("profile.download")}
         </a>
         <button
           type="button"
@@ -149,7 +152,7 @@ export default function AccountSection({ blocked = [] }: { blocked?: BlockedPers
           style={{ color: INK_2 }}
         >
           <Icon name="trash-2" size={15} />
-          Delete account
+          {t("profile.deleteAccount")}
         </button>
       </div>
       {showDelete && <DeleteAccountSheet onClose={() => setShowDelete(false)} />}

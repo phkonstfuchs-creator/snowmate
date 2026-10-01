@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getT } from "@/lib/i18n/server";
+import { translateFieldErrors } from "@/lib/i18n/translate";
 import type { DraftAdoptionResult, ProfileActionState } from "./action-state";
 import {
   draftToProfileInput,
@@ -92,12 +94,13 @@ export async function updateProfileAction(
     abilityLevel: stringField(formData, "abilityLevel"),
     bio: stringField(formData, "bio"),
   });
+  const t = await getT();
 
   if (!validation.success) {
     return {
       status: "error",
-      message: "Check the highlighted fields.",
-      fieldErrors: validation.fieldErrors,
+      message: t("v.checkFields"),
+      fieldErrors: translateFieldErrors(t, validation.fieldErrors),
     };
   }
 
@@ -105,19 +108,19 @@ export async function updateProfileAction(
 
   switch (outcome) {
     case "saved":
-      return { status: "success", message: "Profile saved." };
+      return { status: "success", message: t("profile.saved") };
     case "handle_taken":
       return {
         status: "error",
-        message: "That handle is taken.",
-        fieldErrors: { handle: "That handle is taken." },
+        message: t("v.handleTaken"),
+        fieldErrors: { handle: t("v.handleTaken") },
       };
     case "unauthenticated":
-      return { status: "error", message: "Your session ended. Sign in again." };
+      return { status: "error", message: t("profile.sessionEnded") };
     default:
       return {
         status: "error",
-        message: "Saving is temporarily unavailable. Try again shortly.",
+        message: t("profile.saveUnavailable"),
       };
   }
 }

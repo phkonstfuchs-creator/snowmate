@@ -38,7 +38,17 @@ Browser ◄── feature screens (client components) ◄───────�
 | `components/` | Reusable presentation; receives data and callbacks as props | Own business rules |
 | `lib/resorts.ts` | Reference data: the resorts covered, regions, coordinates | Carry sample conditions |
 | `lib/data/` | Prototype fixtures only | Be read by signed-in routes or the server boundary |
+| `lib/i18n/` | Locale choice, the en/de dictionaries, `getT()` (server) and `useT()` (client) | Hold business rules |
 | `supabase/migrations/` | Schema, grants, RLS, security-definer functions | Be edited once applied; add a new migration instead |
+
+## Text and languages
+
+Every user-facing string in the signed-in app, auth, onboarding, invites
+and safety flows is a key in `lib/i18n/messages/en.ts`; `de.ts` must have
+the same keys and placeholders (type plus `lib/i18n/i18n.test.ts`). Rule
+modules return keys (counts as `"v.max|120"`), server actions translate
+with `getT()`, screens with `useT()`. Never hard-code copy in a screen.
+See [ADR 0011](adr/0011-cookie-based-i18n.md).
 
 ## Demo and live share one screen
 

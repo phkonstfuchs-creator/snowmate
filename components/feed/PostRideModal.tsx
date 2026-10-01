@@ -10,6 +10,8 @@ import { resortNamesIn } from "@/lib/resorts";
 import type { RideFormInput } from "@/features/rides/ride-input";
 import type { RideActionResult } from "@/features/rides/actions";
 import Icon from "@/components/ui/Icon";
+import { useT } from "@/lib/i18n/client";
+import { translateText, type MessageKey } from "@/lib/i18n/translate";
 import { toIsoDay } from "@/features/rides/live-ride";
 
 interface PostRideModalProps {
@@ -21,16 +23,17 @@ interface PostRideModalProps {
   mayGoPublic: boolean;
 }
 
-const ABILITY_OPTIONS: { value: AbilityLevel; label: string; desc: string }[] = [
-  { value: "chill", label: "Chill", desc: "Blue runs, relaxed pace" },
-  { value: "park", label: "Park", desc: "Kickers, jumps, rails" },
-  { value: "off-piste", label: "Off-piste", desc: "Powder, terrain, technical" },
+const ABILITY_OPTIONS: { value: AbilityLevel; label: MessageKey; desc: MessageKey }[] = [
+  { value: "chill", label: "common.chill", desc: "post.chillDesc" },
+  { value: "park", label: "common.park", desc: "post.parkDesc" },
+  { value: "off-piste", label: "common.offPiste", desc: "post.offPisteDesc" },
 ];
 
 export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: PostRideModalProps) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
+  const t = useT();
   const [step, setStep] = useState<1 | 2>(1);
   const [resort, setResort] = useState("");
   const [abilityLevel, setAbilityLevel] = useState<AbilityLevel>("chill");
@@ -72,7 +75,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
     })), OFFLINE_RESULT);
     setSubmitting(false);
     if (result && !result.ok) {
-      setError(result.message);
+      setError(translateText(t, result.message));
       return;
     }
     dismiss();
@@ -81,7 +84,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label="Post a ride" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto" }}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal aria-label={t("feed.postRide")} tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full" style={{ background: "var(--border-subtle)" }} />
@@ -92,14 +95,14 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
         <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border-subtle)", background: "var(--paper-0)" }}>
           {step === 2 ? (
             <button onClick={() => setStep(1)} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
-              Back
+              {t("common.back")}
             </button>
           ) : (
             <button onClick={dismiss} className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
-              Cancel
+              {t("common.cancel")}
             </button>
           )}
-          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>Post a ride</span>
+          <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>{t("feed.postRide")}</span>
           {step === 1 ? (
             <button
               onClick={() => resort && setStep(2)}
@@ -107,7 +110,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               className="text-sm font-semibold"
               style={{ color: resort ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              Next
+              {t("common.next")}
             </button>
           ) : (
             <button
@@ -116,7 +119,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               className="text-sm font-bold"
               style={{ color: canPublish ? "var(--sky)" : "var(--text-disabled)" }}
             >
-              {submitting ? "Publishing…" : "Publish"}
+              {submitting ? t("common.publishing") : t("common.publish")}
             </button>
           )}
         </div>
@@ -126,7 +129,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
           <div className="px-5 pt-5 pb-6 space-y-5">
             <div>
               <label htmlFor="post-ride-resort" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Resort
+                {t("post.resort")}
               </label>
               <select
                 id="post-ride-resort"
@@ -134,7 +137,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 onChange={(e) => setResort(e.target.value)}
                 className="form-input"
               >
-                <option value="">Choose a resort …</option>
+                <option value="">{t("post.chooseResort")}</option>
                 {resorts.map((r) => (
                   <option key={r} value={r}>{r}</option>
                 ))}
@@ -143,7 +146,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
 
             <div>
               <p id="post-ride-level-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Riding style
+                {t("post.style")}
               </p>
               <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="post-ride-level-label">
                 {ABILITY_OPTIONS.map((opt) => {
@@ -158,8 +161,8 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                       className="flex flex-col items-center gap-1 px-3 py-3 border-2 transition-colors duration-100"
                       style={{ borderColor: active ? accent : "var(--border-subtle)", background: active ? bg : "var(--bg-surface-2)" }}
                     >
-                      <span className="text-sm font-bold" style={{ color: active ? accent : "var(--text-primary)" }}>{opt.label}</span>
-                      <span className="text-[0.65rem] text-center leading-tight" style={{ color: "var(--text-tertiary)" }}>{opt.desc}</span>
+                      <span className="text-sm font-bold" style={{ color: active ? accent : "var(--text-primary)" }}>{t(opt.label)}</span>
+                      <span className="text-[0.65rem] text-center leading-tight" style={{ color: "var(--text-tertiary)" }}>{t(opt.desc)}</span>
                     </button>
                   );
                 })}
@@ -178,7 +181,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             )}
             <div>
               <label htmlFor="post-ride-date" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Day
+                {t("post.day")}
               </label>
               <input
                 id="post-ride-date"
@@ -192,7 +195,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             <div className="flex gap-3">
               <div className="flex-1">
                 <label htmlFor="post-ride-time" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Time
+                  {t("post.time")}
                 </label>
                 <input
                   id="post-ride-time"
@@ -204,7 +207,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               </div>
               <div className="w-24">
                 <label htmlFor="post-ride-spots" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                  Spots
+                  {t("post.spots")}
                 </label>
                 <select
                   id="post-ride-spots"
@@ -221,12 +224,12 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
 
             <div>
               <label htmlFor="post-ride-meeting-point" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Meeting point
+                {t("post.meetingPoint")}
               </label>
               <input
                 id="post-ride-meeting-point"
                 type="text"
-                placeholder="e.g. base station or car park"
+                placeholder={t("post.meetingPointPlaceholder")}
                 value={meetPoint}
                 onChange={(e) => setMeetPoint(e.target.value)}
                 className="form-input"
@@ -235,11 +238,11 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
 
             <div>
               <label htmlFor="post-ride-caption" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Note (optional)
+                {t("post.note")} {t("common.optional")}
               </label>
               <textarea
                 id="post-ride-caption"
-                placeholder="What is the plan?"
+                placeholder={t("post.notePlaceholder")}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 rows={3}
@@ -249,12 +252,12 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
 
             <div>
               <p id="post-ride-visibility-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
-                Who can see this
+                {t("post.audience")}
               </p>
               <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="post-ride-visibility-label">
                 {([
-                  { value: "friends", label: "Friends", desc: "Friends and their friends" },
-                  { value: "public", label: "Public", desc: "Anyone, no friendship needed" },
+                  { value: "friends", label: t("post.friends"), desc: t("post.friendsDesc") },
+                  { value: "public", label: t("post.public"), desc: t("post.publicDesc") },
                 ] as const).map((opt) => {
                   const active = visibility === opt.value;
                   const locked = opt.value === "public" && !mayGoPublic;
@@ -285,7 +288,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                         {locked && <Icon name="lock" size={11} color="var(--text-tertiary)" strokeWidth={2} />}
                       </span>
                       <span className="text-[0.65rem] leading-tight" style={{ color: "var(--text-tertiary)" }}>
-                        {locked ? "18 and over only" : opt.desc}
+                        {locked ? t("post.adultsOnly") : opt.desc}
                       </span>
                     </button>
                   );
@@ -294,17 +297,16 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               {visibility === "public" && mayGoPublic && (
                 <>
                   <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
-                    Everyone sees the resort and time. The exact meeting point
-                    only becomes visible after someone joins.
+                    {t("post.publicHint")}
                   </p>
                   <label htmlFor="post-ride-title" className="block text-xs font-semibold uppercase mt-3 mb-2" style={{ color: "var(--text-tertiary)" }}>
-                    Event name
+                    {t("post.eventName")}
                   </label>
                   <input
                     id="post-ride-title"
                     type="text"
                     maxLength={60}
-                    placeholder="e.g. Sunday park session"
+                    placeholder={t("post.eventNamePlaceholder")}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="form-input"
@@ -318,7 +320,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>
-                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{meetTime} · {totalSpots} spots</span>
+                <span className="text-xs ml-2 font-mono" style={{ color: "var(--sky)" }}>{t("post.summary", { time: meetTime, n: totalSpots })}</span>
               </div>
             </div>
           </div>

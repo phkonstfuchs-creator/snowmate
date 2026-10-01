@@ -6,6 +6,8 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Icon from "@/components/ui/Icon";
+import { useT } from "@/lib/i18n/client";
+import type { MessageKey } from "@/lib/i18n/translate";
 import { updateProfileAction } from "./actions";
 import { initialProfileActionState } from "./action-state";
 import {
@@ -23,11 +25,11 @@ const CITY_OPTIONS = [
   { id: "salzburg", label: "Salzburg" },
 ] as const;
 
-const ABILITY_OPTIONS = [
-  { id: "chill", label: "Chill" },
-  { id: "park", label: "Park" },
-  { id: "off-piste", label: "Off-piste" },
-] as const;
+const ABILITY_OPTIONS: readonly { id: string; label: MessageKey }[] = [
+  { id: "chill", label: "common.chill" },
+  { id: "park", label: "common.park" },
+  { id: "off-piste", label: "common.offPiste" },
+];
 
 interface DraftValues {
   displayName?: string;
@@ -66,6 +68,7 @@ export default function ProfileEditSheet({
   onClose: () => void;
 }) {
   useScrollLock();
+  const t = useT();
   const router = useRouter();
   const { state: sheetState, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -108,15 +111,15 @@ export default function ProfileEditSheet({
       >
         <div className="flex items-start justify-between px-5 pt-6 pb-4" style={{ borderBottom: "var(--rule-thin)" }}>
           <div>
-            <p className="text-mono-label mb-2" style={{ color: RUST }}>Your account</p>
+            <p className="text-mono-label mb-2" style={{ color: RUST }}>{t("profile.yourAccount")}</p>
             <h2 id={`${idPrefix}-title`} className="text-display-md" style={{ color: INK }}>
-              Edit profile
+              {t("profile.edit")}
             </h2>
           </div>
           <button
             type="button"
             onClick={dismiss}
-            aria-label="Close"
+            aria-label={t("common.close")}
             className="-mr-2 flex h-11 w-11 items-center justify-center"
           >
             <Icon name="x" size={18} color={INK} strokeWidth={2} />
@@ -126,7 +129,7 @@ export default function ProfileEditSheet({
         <form action={formAction} className="space-y-4 px-5 pt-5" noValidate>
           <div>
             <label htmlFor={fieldId("displayName")} className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Name
+              {t("profile.name")}
             </label>
             <input
               id={fieldId("displayName")}
@@ -143,7 +146,7 @@ export default function ProfileEditSheet({
 
           <div>
             <label htmlFor={fieldId("handle")} className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Handle
+              {t("profile.handle")}
             </label>
             <div className="relative">
               <span
@@ -172,7 +175,7 @@ export default function ProfileEditSheet({
           </div>
 
           <fieldset aria-describedby={errors.city ? errorId("city") : undefined}>
-            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>Region</legend>
+            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>{t("common.region")}</legend>
             <div className="grid grid-cols-2 gap-2">
               {CITY_OPTIONS.map((option) => (
                 <label key={option.id} className="flex min-h-11 items-center gap-2 px-3" style={{ border: "var(--rule-thin)" }}>
@@ -185,12 +188,12 @@ export default function ProfileEditSheet({
           </fieldset>
 
           <fieldset aria-describedby={errors.abilityLevel ? errorId("abilityLevel") : undefined}>
-            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>Riding style</legend>
+            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>{t("post.style")}</legend>
             <div className="grid grid-cols-3 gap-2">
               {ABILITY_OPTIONS.map((option) => (
                 <label key={option.id} className="flex min-h-11 items-center gap-2 px-3" style={{ border: "var(--rule-thin)" }}>
                   <input type="radio" name="abilityLevel" value={option.id} defaultChecked={defaultAbility === option.id} />
-                  <span className="text-sm font-semibold" style={{ color: INK }}>{option.label}</span>
+                  <span className="text-sm font-semibold" style={{ color: INK }}>{t(option.label)}</span>
                 </label>
               ))}
             </div>
@@ -199,7 +202,7 @@ export default function ProfileEditSheet({
 
           <div>
             <label htmlFor={fieldId("bio")} className="text-mono-label mb-1.5 block" style={{ color: INK }}>
-              Bio <span style={{ color: INK_2 }}>(optional)</span>
+              {t("profile.bio")} <span style={{ color: INK_2 }}>{t("common.optional")}</span>
             </label>
             <textarea
               id={fieldId("bio")}
@@ -224,7 +227,7 @@ export default function ProfileEditSheet({
             className="card-tap w-full py-4 font-display text-xl uppercase disabled:opacity-40"
             style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
           >
-            {pending ? "Saving…" : "Save"}
+            {pending ? t("common.saving") : t("common.save")}
           </button>
         </form>
       </div>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { toLiveRide, type LiveRide, type RideRow } from "./live-ride";
+import { getLocale } from "@/lib/i18n/server";
 
 export type RidesResult =
   | { status: "ok"; rides: LiveRide[] }
@@ -20,7 +21,8 @@ export async function listRides(
       return { status: "unavailable" };
     }
 
-    return { status: "ok", rides: (data as RideRow[]).map((row) => toLiveRide(row, now)) };
+    const locale = await getLocale();
+    return { status: "ok", rides: (data as RideRow[]).map((row) => toLiveRide(row, now, locale)) };
   } catch {
     return { status: "unavailable" };
   }

@@ -1,5 +1,7 @@
 "use server";
 
+import { getT } from "@/lib/i18n/server";
+import { translateValidation } from "@/lib/i18n/translate";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { FRIEND_REQUEST_MESSAGES, type FriendRequestOutcome } from "./friendships";
@@ -9,7 +11,7 @@ export interface FriendActionState {
   message: string;
 }
 
-const UNAVAILABLE = "That did not work. Try again shortly.";
+const UNAVAILABLE = "common.unavailable";
 const HANDLE_PATTERN = /^[a-z0-9_]{3,20}$/;
 
 /* Friendship changes the audience of every ride, so both ride screens
@@ -18,7 +20,7 @@ function revalidateGraph() {
   ["/crew", "/feed", "/events"].forEach((path) => revalidatePath(path));
 }
 
-export async function requestFriendshipAction(
+async function requestFriendshipActionImpl(
   _previous: FriendActionState,
   formData: FormData,
 ): Promise<FriendActionState> {
@@ -26,7 +28,7 @@ export async function requestFriendshipAction(
   const handle = typeof raw === "string" ? raw.trim().replace(/^@/, "").toLowerCase() : "";
 
   if (!HANDLE_PATTERN.test(handle)) {
-    return { status: "error", message: "Handles are 3 to 20 letters, numbers or underscores." };
+    return { status: "error", message: "v.handleFormat" };
   }
 
   try {
@@ -60,10 +62,31 @@ async function callGraphFunction(
   }
 }
 
-export async function acceptFriendshipAction(userId: string): Promise<boolean> {
+async function acceptFriendshipActionImpl(userId: string): Promise<boolean> {
   return callGraphFunction("accept_friendship", { requester: userId });
 }
 
-export async function removeFriendshipAction(userId: string): Promise<boolean> {
+async function removeFriendshipActionImpl(userId: string): Promise<boolean> {
   return callGraphFunction("remove_friendship", { other: userId });
+}
+
+/* Results carry message keys; the exported actions translate them once,
+   in the caller's language. */
+async function localize<T>(result: T): Promise<T> {
+  if (typeof result !== "object" || result === null || !("message" in result)) return result;
+  const t = await getT();
+  return { ...result, message: translateValidation(t, String(result.message)) };
+}
+
+export async function requestFriendshipAction(_previous: FriendActionState,
+  formData: FormData,): Promise<FriendActionState> {
+  return localize(await requestFriendshipActionImpl(_previous, formData));
+}
+
+export async function acceptFriendshipAction(userId: string): Promise<boolean> {
+  return localize(await acceptFriendshipActionImpl(userId));
+}
+
+export async function removeFriendshipAction(userId: string): Promise<boolean> {
+  return localize(await removeFriendshipActionImpl(userId));
 }

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useT } from "@/lib/i18n/client";
 import PenguinMascot from "@/components/PenguinMascot";
 import Icon from "@/components/ui/Icon";
 import AuthForm from "./AuthForm";
@@ -15,6 +18,7 @@ export default function AuthScreen({
   accountDeleted = false,
 }: AuthScreenProps) {
   const isSignup = mode === "signup";
+  const t = useT();
 
   return (
     <main
@@ -27,7 +31,7 @@ export default function AuthScreen({
       >
         <Link
           href="/onboarding"
-          aria-label="Back to the start page"
+          aria-label={t("auth.backToStart")}
           className="-my-2 flex w-fit items-center gap-2 py-2 pt-6"
         >
           <PenguinMascot size={26} />
@@ -38,7 +42,7 @@ export default function AuthScreen({
 
         <div className="flex flex-1 flex-col justify-center py-8">
           <p className="text-mono-label" style={{ color: "var(--rust)" }}>
-            {isSignup ? "Join the crew" : "Welcome back"}
+            {isSignup ? t("auth.joinCrew") : t("auth.welcomeBack")}
           </p>
           <h1
             className="text-display-lg mt-3"
@@ -48,12 +52,12 @@ export default function AuthScreen({
                 "Createaccount" as a single word */}
             {isSignup ? (
               <>
-                Create{" "}
+                {t("auth.createAccountLine1")}{" "}
                 <br />
-                account
+                {t("auth.createAccountLine2")}
               </>
             ) : (
-              "Sign in"
+              t("auth.signIn")
             )}
           </h1>
           <p
@@ -61,8 +65,8 @@ export default function AuthScreen({
             style={{ color: "var(--ink-1)" }}
           >
             {isSignup
-              ? "Your access first. Profile details come right after."
-              : "Pick up where your crew left off."}
+              ? t("auth.signupLead")
+              : t("auth.loginLead")}
           </p>
 
           <div
@@ -90,8 +94,7 @@ export default function AuthScreen({
                 className="text-sm leading-relaxed"
                 style={{ color: "var(--crimson)" }}
               >
-                This confirmation link is invalid or has expired. Sign in
-                below or register again.
+                {t("auth.confirmationFailed")}
               </p>
             </div>
           ) : null}
@@ -104,7 +107,7 @@ export default function AuthScreen({
             >
               <Icon name="check" size={18} color="var(--pine)" className="mt-0.5 flex-shrink-0" />
               <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
-                Your account and everything in it has been deleted.
+                {t("auth.accountDeleted")}
               </p>
             </div>
           ) : null}

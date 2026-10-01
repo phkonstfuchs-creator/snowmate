@@ -5,7 +5,7 @@ import type { LiveRide } from "@/features/rides/live-ride";
    the only honest count is people on today's rides the viewer can see:
    each host plus everyone who joined. */
 export function applyRideActivity(resorts: readonly ResortStatus[], rides: readonly LiveRide[]): ResortStatus[] {
-  const today = rides.filter((ride) => ride.post.date === "Today");
+  const today = rides.filter((ride) => ride.isToday);
 
   return resorts.map((resort) => {
     const here = today.filter((ride) => ride.post.resort === resort.name && ride.post.city === resort.city);
@@ -28,6 +28,6 @@ export function applyRideActivity(resorts: readonly ResortStatus[], rides: reado
 
 export function ridesAt(resort: Pick<ResortStatus, "name" | "city">, rides: readonly LiveRide[]): LiveRide[] {
   return rides.filter(
-    (ride) => ride.post.date === "Today" && ride.post.resort === resort.name && ride.post.city === resort.city,
+    (ride) => ride.isToday && ride.post.resort === resort.name && ride.post.city === resort.city,
   );
 }

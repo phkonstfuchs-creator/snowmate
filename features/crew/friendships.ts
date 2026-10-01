@@ -1,4 +1,5 @@
 import type { AbilityLevel, City } from "@/lib/types";
+import type { MessageKey } from "@/lib/i18n/translate";
 
 export interface FriendshipRow {
   user_id: string;
@@ -34,13 +35,13 @@ export type FriendRequestOutcome =
   | "profile_incomplete"
   | "too_many_pending";
 
-export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean; message: string }> = {
-  requested: { ok: true, message: "Request sent." },
-  accepted: { ok: true, message: "They had already asked you. You are friends now." },
-  already_requested: { ok: true, message: "You already asked. Waiting for them." },
-  already_friends: { ok: true, message: "You are already friends." },
-  not_found: { ok: false, message: "No rider with that handle." },
-  self: { ok: false, message: "That is your own handle." },
-  too_many_pending: { ok: false, message: "You have 20 requests waiting for an answer. Withdraw some first." },
-  profile_incomplete: { ok: false, message: "Finish your profile first: add your name and handle on the Profile tab." },
+export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean; message: MessageKey }> = {
+  requested: { ok: true, message: "crew.requestSent" },
+  accepted: { ok: true, message: "crew.acceptedTheirs" },
+  already_requested: { ok: true, message: "crew.alreadyRequested" },
+  already_friends: { ok: true, message: "crew.alreadyFriends" },
+  not_found: { ok: false, message: "crew.noSuchHandle" },
+  self: { ok: false, message: "crew.ownHandle" },
+  too_many_pending: { ok: false, message: "crew.tooManyPending" },
+  profile_incomplete: { ok: false, message: "common.profileIncomplete" },
 };

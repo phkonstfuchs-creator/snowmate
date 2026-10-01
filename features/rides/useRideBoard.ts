@@ -45,6 +45,8 @@ export function fixtureToLiveRide(post: RidePost, isJoined: boolean): LiveRide |
     participants,
     isHost: host.id === ME.id,
     isJoined,
+    /* Fixtures carry the label only; the prototype's rides are all today. */
+    isToday: post.date === "Today",
     isPending: false,
     requests: [],
     meetPointLocked: view.meetPointLocked,

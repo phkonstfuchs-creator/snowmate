@@ -4,28 +4,28 @@ import { ABILITY_VALUES, CITY_VALUES } from "@/features/profile/profile-input";
 /* Mirrors the constraints on public.rides. */
 export const rideInputSchema = z
   .object({
-    resort: z.string().trim().min(2, "Pick a resort.").max(60, "Resort name is too long."),
-    city: z.enum(CITY_VALUES, "Pick a region."),
-    abilityLevel: z.enum(ABILITY_VALUES, "Pick a riding style."),
-    rideDate: z.iso.date("Pick a date."),
-    meetTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Pick a time."),
-    meetPoint: z.string().trim().min(2, "Add a meeting point.").max(120, "Use at most 120 characters."),
-    totalSpots: z.number().int().min(1, "At least one spot.").max(50, "At most 50 spots."),
+    resort: z.string().trim().min(2, "v.pickResort").max(60, "v.resortTooLong"),
+    city: z.enum(CITY_VALUES, "v.pickRegion"),
+    abilityLevel: z.enum(ABILITY_VALUES, "v.pickStyle"),
+    rideDate: z.iso.date("v.pickDate"),
+    meetTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "v.pickTime"),
+    meetPoint: z.string().trim().min(2, "v.addMeetPoint").max(120, "v.max|120"),
+    totalSpots: z.number().int().min(1, "v.minSpot").max(50, "v.maxSpots"),
     caption: z
       .string()
       .trim()
-      .max(280, "Use at most 280 characters.")
+      .max(280, "v.max|280")
       .transform((value) => (value === "" ? null : value)),
     visibility: z.enum(["friends", "public"]),
     title: z
       .string()
       .trim()
-      .max(60, "Use at most 60 characters.")
+      .max(60, "v.max|60")
       .transform((value) => (value === "" ? null : value))
       .optional(),
   })
   .refine((input) => input.visibility === "friends" || (input.title?.length ?? 0) >= 3, {
-    message: "Give the event a name (at least 3 characters).",
+    message: "v.eventName",
     path: ["title"],
   });
 
@@ -38,15 +38,15 @@ export function validateRideInput(
 ): { success: true; data: RideInput } | { success: false; message: string } {
   const result = rideInputSchema.safeParse(input);
   if (result.success) return { success: true, data: result.data };
-  return { success: false, message: result.error.issues[0]?.message ?? "Check the ride details." };
+  return { success: false, message: result.error.issues[0]?.message ?? "v.checkRide" };
 }
 
 /* What a host may change after posting (see update_ride()). */
 export const rideEditSchema = z.object({
-  meetTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Pick a time."),
-  meetPoint: z.string().trim().min(2, "Add a meeting point.").max(120, "Use at most 120 characters."),
-  totalSpots: z.number().int().min(1, "At least one spot.").max(50, "At most 50 spots."),
-  caption: z.string().trim().max(280, "Use at most 280 characters."),
+  meetTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "v.pickTime"),
+  meetPoint: z.string().trim().min(2, "v.addMeetPoint").max(120, "v.max|120"),
+  totalSpots: z.number().int().min(1, "v.minSpot").max(50, "v.maxSpots"),
+  caption: z.string().trim().max(280, "v.max|280"),
 });
 
 export type RideEditInput = z.input<typeof rideEditSchema>;
@@ -56,5 +56,5 @@ export function validateRideEdit(
 ): { success: true; data: z.infer<typeof rideEditSchema> } | { success: false; message: string } {
   const result = rideEditSchema.safeParse(input);
   if (result.success) return { success: true, data: result.data };
-  return { success: false, message: result.error.issues[0]?.message ?? "Check the ride details." };
+  return { success: false, message: result.error.issues[0]?.message ?? "v.checkRide" };
 }

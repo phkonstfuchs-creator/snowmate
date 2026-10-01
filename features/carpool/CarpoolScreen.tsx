@@ -16,6 +16,8 @@ import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
 import type { LiveCarpool, RequestStatus } from "./live-carpool";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
 import type { SafetyTarget } from "@/features/safety/reports";
 import type { CarpoolFormInput } from "./carpool-input";
 import {
@@ -45,6 +47,7 @@ function OfferModal({
   onSubmit: (input: CarpoolFormInput) => Promise<CarpoolActionResult>;
 }) {
   useScrollLock();
+  const t = useT();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [role, setRole] = useState<CarpoolRole>("driver");
@@ -70,7 +73,7 @@ function OfferModal({
     );
     setSubmitting(false);
     if (!result.ok) {
-      setError(result.message);
+      setError(translateText(t, result.message));
       return;
     }
     dismiss();
@@ -81,15 +84,15 @@ function OfferModal({
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Offer a ride" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label={t("carpool.offerRide")} tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
         <div className="flex items-center justify-between px-5 mb-4">
           <h2 className="font-display" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>
-            {role === "driver" ? "Offer a ride" : "Ask for a seat"}
+            {role === "driver" ? t("carpool.offerRide") : t("carpool.askSeat")}
           </h2>
-          <button type="button" onClick={dismiss} aria-label="Close dialog" className="flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label={t("carpool.closeDialog")} className="flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -101,37 +104,37 @@ function OfferModal({
             </p>
           )}
           <SegmentedControl
-            options={[{ value: "driver", label: "I am driving" }, { value: "rider", label: "I need a seat" }]}
+            options={[{ value: "driver", label: t("carpool.driving") }, { value: "rider", label: t("carpool.needSeat") }]}
             value={role}
             onChange={setRole}
-            ariaLabel="Carpool role"
+            ariaLabel={t("carpool.role")}
           />
           <div>
-            <label htmlFor="carpool-to" className={label} style={{ color: MUTED }}>Destination</label>
+            <label htmlFor="carpool-to" className={label} style={{ color: MUTED }}>{t("carpool.destination")}</label>
             <select id="carpool-to" className="form-input" value={resort} onChange={(e) => setResort(e.target.value)}>
-              <option value="">Choose a resort …</option>
+              <option value="">{t("post.chooseResort")}</option>
               {resorts.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="carpool-from" className={label} style={{ color: MUTED }}>Pickup spot</label>
-            <input id="carpool-from" className="form-input" placeholder="e.g. Innsbruck Hbf" maxLength={120} value={departurePoint} onChange={(e) => setDeparturePoint(e.target.value)} />
+            <label htmlFor="carpool-from" className={label} style={{ color: MUTED }}>{t("carpool.pickup")}</label>
+            <input id="carpool-from" className="form-input" placeholder={t("carpool.pickupPlaceholder")} maxLength={120} value={departurePoint} onChange={(e) => setDeparturePoint(e.target.value)} />
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
-              <label htmlFor="carpool-date" className={label} style={{ color: MUTED }}>Day</label>
+              <label htmlFor="carpool-date" className={label} style={{ color: MUTED }}>{t("post.day")}</label>
               <input id="carpool-date" type="date" min={toIsoDay(new Date())} className="form-input" value={rideDate} onChange={(e) => setRideDate(e.target.value)} />
             </div>
             <div className="w-36">
-              <label htmlFor="carpool-time" className={label} style={{ color: MUTED }}>Time</label>
+              <label htmlFor="carpool-time" className={label} style={{ color: MUTED }}>{t("post.time")}</label>
               <input id="carpool-time" type="time" className="form-input" value={departureTime} onChange={(e) => setDepartureTime(e.target.value)} />
             </div>
           </div>
           <div>
             <label htmlFor="carpool-seats" className={label} style={{ color: MUTED }}>
-              {role === "driver" ? "Free seats" : "Seats needed"}
+              {role === "driver" ? t("carpool.freeSeats") : t("carpool.seatsNeeded")}
             </label>
             <select id="carpool-seats" className="form-input" value={seats} onChange={(e) => setSeats(Number(e.target.value))}>
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
@@ -140,12 +143,11 @@ function OfferModal({
             </select>
           </div>
           <div>
-            <label htmlFor="carpool-note" className={label} style={{ color: MUTED }}>Note (optional)</label>
+            <label htmlFor="carpool-note" className={label} style={{ color: MUTED }}>{t("post.note")} {t("common.optional")}</label>
             <textarea id="carpool-note" rows={2} maxLength={280} className="form-input resize-none" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
           <p className="text-xs leading-snug" style={{ color: MUTED }}>
-            Friends see the pickup spot. Friends of friends see the trip and
-            can ask; they get the pickup spot once you confirm them.
+            {t("carpool.visibilityHint")}
           </p>
         </div>
 
@@ -156,7 +158,7 @@ function OfferModal({
             className="card-tap w-full py-4 rounded-none font-black text-base disabled:opacity-40"
             style={{ background: BRAND, color: D }}
           >
-            {submitting ? "Publishing…" : "Publish"}
+            {submitting ? t("common.publishing") : t("common.publish")}
           </button>
         </div>
       </div>
@@ -195,16 +197,17 @@ function RequestButton({
   pending: boolean;
   onClick: () => void;
 }) {
+  const t = useT();
   const isDriver = pool.post.role === "driver";
   const full = isDriver && pool.post.availableSeats === 0;
   const label =
     pool.myRequest === "accepted"
-      ? "Confirmed · tap to leave"
+      ? t("carpool.confirmedTapToLeave")
       : pool.myRequest === "pending"
-        ? "Asked · tap to withdraw"
+        ? t("ride.askedTapToWithdraw")
         : isDriver
-          ? "Request seat"
-          : "Offer a ride";
+          ? t("carpool.requestSeat")
+          : t("carpool.offerRide");
 
   return (
     <button
@@ -221,7 +224,7 @@ function RequestButton({
               : { border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }
       }
     >
-      {pending ? "One moment…" : label}
+      {pending ? t("common.oneMoment") : label}
     </button>
   );
 }
@@ -237,17 +240,18 @@ function AuthorPanel({
   onRespond: (userId: string, accept: boolean) => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   return (
     <div className="space-y-2">
       <p className="text-mono-label" style={{ color: MUTED }}>
-        {pool.requests.length === 0 ? "Nobody asked yet" : `${pool.requests.length} asked`}
+        {pool.requests.length === 0 ? t("carpool.nobodyAsked") : t("carpool.nAsked", { n: pool.requests.length })}
       </p>
       {pool.requests.map(({ user, status }) => (
         <div key={user.id} className="flex items-center gap-2">
           <Avatar id={user.id} initials={user.avatar} size={26} />
           <span className="min-w-0 flex-1 truncate text-sm font-bold" style={{ color: INK }}>{user.name}</span>
           {status === "accepted" ? (
-            <span className="text-mono-label" style={{ color: "var(--status-success)" }}>Confirmed</span>
+            <span className="text-mono-label" style={{ color: "var(--status-success)" }}>{t("carpool.confirmed")}</span>
           ) : (
             <>
               <button
@@ -257,13 +261,13 @@ function AuthorPanel({
                 className="text-mono-label min-h-11 px-3 disabled:opacity-50"
                 style={{ background: "var(--pine)", color: "var(--paper-0)" }}
               >
-                Confirm
+                {t("carpool.confirm")}
               </button>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => onRespond(user.id, false)}
-                aria-label={`Decline ${user.name}`}
+                aria-label={t("common.declineName", { name: user.name })}
                 className="flex h-11 w-11 items-center justify-center disabled:opacity-50"
                 style={{ border: `1px solid ${BORDER}` }}
               >
@@ -280,7 +284,7 @@ function AuthorPanel({
         className="mt-1 w-full min-h-11 text-sm font-black disabled:opacity-50"
         style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}
       >
-        Remove post
+        {t("carpool.removePost")}
       </button>
     </div>
   );
@@ -289,6 +293,7 @@ function AuthorPanel({
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
   const router = useRouter();
+  const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [demoRequested, setDemoRequested] = useState<Set<string>>(new Set());
@@ -340,12 +345,12 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
     void runLive(pool.post.id, () => respondCarpoolRequestAction(pool.post.id, userId, accept));
 
   const cancel = (pool: LiveCarpool) => {
-    if (!window.confirm("Remove this carpool post?")) return;
+    if (!window.confirm(t("carpool.confirmRemove"))) return;
     void runLive(pool.post.id, () => cancelCarpoolAction(pool.post.id));
   };
 
   const submitOffer = async (input: CarpoolFormInput): Promise<CarpoolActionResult> => {
-    if (!isLive) return { ok: true, message: "Demo: nothing is saved." };
+    if (!isLive) return { ok: true, message: "rides.demo" };
     const result = await settle<CarpoolActionResult>(createCarpoolAction(input), OFFLINE_RESULT);
     if (result.ok) startTransition(() => router.refresh());
     return result;
@@ -369,7 +374,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
             className="mt-1 min-h-11 w-full text-xs font-semibold underline"
             style={{ color: MUTED }}
           >
-            Report or block {pool.author.name}
+            {t("ride.reportOrBlock", { name: pool.author.name })}
           </button>
         )}
       </>
@@ -383,8 +388,8 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Carpool</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>Get a seat or offer one</p>
+            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("carpool.title")}</h1>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{t("carpool.subtitle")}</p>
           </div>
           <button
             onClick={() => setShowOfferModal(true)}
@@ -392,7 +397,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
             style={{ background: BRAND, color: D, border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="plus" size={13} strokeWidth={2.6} />
-            Post
+            {t("common.post")}
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -400,7 +405,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
-            ariaLabel="Region"
+            ariaLabel={t("common.region")}
           />
         </div>
       </header>
@@ -409,10 +414,10 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
         {(notice || unavailable) && (
           <div role="status" className="flex items-start justify-between gap-3 px-3 py-2.5" style={{ border: "1px solid var(--crimson)", background: "var(--paper-1)" }}>
             <p className="text-sm" style={{ color: "var(--crimson)" }}>
-              {notice ?? "Carpools could not be loaded. Try again shortly."}
+              {notice ? translateText(t, notice) : t("carpool.unavailable")}
             </p>
             {notice && (
-              <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss" className="-my-2 -mr-2 flex h-11 w-11 flex-shrink-0 items-center justify-center">
+              <button type="button" onClick={() => setNotice(null)} aria-label={t("common.dismiss")} className="-my-2 -mr-2 flex h-11 w-11 flex-shrink-0 items-center justify-center">
                 <Icon name="x" size={14} color="var(--crimson)" strokeWidth={2} />
               </button>
             )}
@@ -425,7 +430,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--status-success)" }} />
               <h2 className="font-black text-xs uppercase" style={{ color: "var(--status-success)" }}>
-                Seats open · {drivers.length}
+                {t("carpool.seatsOpen", { n: drivers.length })}
               </h2>
             </div>
             <div className="space-y-3">
@@ -449,7 +454,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                       <span
                         className="text-mono-label absolute right-0 top-0 flex items-center gap-1 px-2 py-1"
                         style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
-                        aria-label={`${post.availableSeats} seats free`}
+                        aria-label={t("carpool.seatsFree", { n: post.availableSeats })}
                       >
                         {post.availableSeats}
                         <Icon name="users" size={11} strokeWidth={2} />
@@ -462,7 +467,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                       <Avatar id={author.id} initials={author.avatar} size={34} />
                       <div className="min-w-0">
                         <p className="text-sm font-bold" style={{ color: INK }}>
-                          {pool.isAuthor ? "You" : author.name}
+                          {pool.isAuthor ? t("carpool.you") : author.name}
                         </p>
                         <p className="text-mono-label" style={{ color: MUTED }}>{post.resort}</p>
                       </div>
@@ -497,7 +502,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--rust)" }} />
               <h2 className="font-black text-xs uppercase" style={{ color: "var(--rust)" }}>
-                Looking for a seat · {riders.length}
+                {t("carpool.looking", { n: riders.length })}
               </h2>
             </div>
             <div className="space-y-2">
@@ -513,9 +518,9 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                       <Avatar id={author.id} initials={author.avatar} size={38} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="font-black text-sm" style={{ color: INK }}>{pool.isAuthor ? "You" : author.name}</span>
+                          <span className="font-black text-sm" style={{ color: INK }}>{pool.isAuthor ? t("carpool.you") : author.name}</span>
                           <span className="text-mono-label px-2 py-0.5" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust-ink)" }}>
-                            Needs {post.totalSeats > 1 ? `${post.totalSeats} seats` : "a seat"}
+                            {post.totalSeats > 1 ? t("carpool.needsSeats", { n: post.totalSeats }) : t("carpool.needsSeat")}
                           </span>
                         </div>
                         <p className="text-xs font-semibold mt-1" style={{ color: MUTED }}>
@@ -536,8 +541,8 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
           <div className="flex flex-col items-center gap-4 py-16 text-center">
             <PenguinMascot size={64} />
             <div>
-              <p className="font-black text-lg" style={{ color: INK }}>No carpools yet</p>
-              <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Offer a ride or ask for a seat.</p>
+              <p className="font-black text-lg" style={{ color: INK }}>{t("carpool.empty")}</p>
+              <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>{t("carpool.emptyHint")}</p>
             </div>
           </div>
         )}

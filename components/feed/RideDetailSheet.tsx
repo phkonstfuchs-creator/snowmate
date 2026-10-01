@@ -11,6 +11,7 @@ import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
 import { isFull, openSpots } from "@/features/rides/capacity";
+import { useT } from "@/lib/i18n/client";
 
 const BORDER = "var(--border-subtle)";
 const MUTED = "var(--text-tertiary)";
@@ -43,6 +44,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss, selectedUser === null);
+  const t = useT();
   const open = openSpots(post);
   const full = isFull(post);
 
@@ -53,7 +55,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
   return (
     <>
       <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label="Ride details" tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
+      <div ref={dialogRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-label={t("ride.details")} tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom, 16px), 24px)" }}>
         {/* Handle */}
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
@@ -92,10 +94,10 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <div className="flex items-center gap-1.5">
                 <span className="font-black text-[0.9375rem]" style={{ color: INK }}>{author.name}</span>
               </div>
-              <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} · Lv {author.level} · {post.postedAt}</span>
+              <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} {profilesEnabled ? ` · Lv ${author.level}` : ""} · {post.postedAt}</span>
             </div>
           </button>
-          <button onClick={dismiss} aria-label="Close ride details" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
+          <button onClick={dismiss} aria-label={t("ride.closeDetails")} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
             <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -124,18 +126,18 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         <div className="mx-5 my-4 rounded-none overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
           <div className="grid grid-cols-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <div className="px-4 py-3" style={{ borderRight: `1px solid ${BORDER}` }}>
-              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Time</p>
+              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>{t("ride.time")}</p>
               <p className="font-black text-sm font-mono" style={{ color: INK }}>{post.meetTime}</p>
             </div>
             <div className="px-4 py-3">
-              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Open spots</p>
+              <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>{t("ride.openSpots")}</p>
               <p className="font-black text-sm font-mono" style={{ color: full ? MUTED : open === 1 ? "var(--rust)" : BRAND }}>
-                {full ? "Full" : `${open} open`}
+                {full ? t("ride.full") : t("card.open", { n: open })}
               </p>
             </div>
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>Meeting point</p>
+            <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>{t("ride.meetingPoint")}</p>
             <p className="font-black text-sm" style={{ color: INK }}>{post.meetPoint}</p>
           </div>
         </div>
@@ -147,16 +149,16 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Riders */}
         <div className="px-5 pt-2 pb-2" style={{ borderTop: `1px solid ${BORDER}` }}>
-          <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>Going ({post.takenSpots})</p>
+          <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>{t("ride.going", { n: post.takenSpots })}</p>
           <div className="space-y-2.5">
             <button className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onClick={() => profilesEnabled && setSelectedUser(author)}>
               <Avatar id={author.id} initials={author.avatar} size={36} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                  <span className="text-mono-label px-1.5" style={{ background: "var(--ochre)", color: "var(--ink-0)" }}>Host</span>
+                  <span className="text-mono-label px-1.5" style={{ background: "var(--ochre)", color: "var(--ink-0)" }}>{t("ride.host")}</span>
                 </div>
-                <span className="text-xs font-bold" style={{ color: MUTED }}>Level {author.level} · {author.levelTitle}</span>
+                <span className="text-xs font-bold" style={{ color: MUTED }}>{profilesEnabled ? t("ride.levelLine", { level: author.level, title: author.levelTitle }) : author.handle ? `@${author.handle}` : ""}</span>
               </div>
               <Icon name="chevron-right" size={13} color={MUTED} strokeWidth={2} />
             </button>
@@ -166,7 +168,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
                 <Avatar id={u.id} initials={u.avatar} size={36} />
                 <div className="flex-1 min-w-0">
                   <span className="font-black text-sm block" style={{ color: INK }}>{u.name}</span>
-                  <span className="text-xs font-bold" style={{ color: MUTED }}>Level {u.level} · {u.levelTitle}</span>
+                  <span className="text-xs font-bold" style={{ color: MUTED }}>{profilesEnabled ? t("ride.levelLine", { level: u.level, title: u.levelTitle }) : u.handle ? `@${u.handle}` : ""}</span>
                 </div>
                 <Icon name="chevron-right" size={13} color={MUTED} strokeWidth={2} />
               </button>
@@ -177,7 +179,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         {isHost && requests.length > 0 && (
           <div className="px-5 pt-3" style={{ borderTop: `1px solid ${BORDER}` }}>
             <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>
-              Asking to join ({requests.length})
+              {t("ride.asking", { n: requests.length })}
             </p>
             <div className="space-y-2">
               {requests.map((u) => (
@@ -185,7 +187,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
                   <Avatar id={u.id} initials={u.avatar} size={32} />
                   <div className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-black" style={{ color: INK }}>{u.name}</span>
-                    {u.handle && <span className="text-xs font-bold" style={{ color: MUTED }}>@{u.handle} · friend of a friend</span>}
+                    {u.handle && <span className="text-xs font-bold" style={{ color: MUTED }}>{t("ride.friendOfFriend", { handle: u.handle })}</span>}
                   </div>
                   <button
                     type="button"
@@ -194,12 +196,12 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
                     className="text-mono-label min-h-11 px-3 disabled:opacity-40"
                     style={{ background: "var(--pine)", color: "var(--paper-0)" }}
                   >
-                    Let in
+                    {t("ride.letIn")}
                   </button>
                   <button
                     type="button"
                     onClick={() => onRespond?.(u.id, false)}
-                    aria-label={`Decline ${u.name}`}
+                    aria-label={t("common.declineName", { name: u.name })}
                     className="flex h-11 w-11 items-center justify-center"
                     style={{ border: `1px solid ${BORDER}` }}
                   >
@@ -220,7 +222,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               className="mb-2 w-full py-4 font-black text-base"
               style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
             >
-              Edit ride
+              {t("ride.edit")}
             </button>
           )}
           {isHost ? (
@@ -230,7 +232,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               className="w-full py-4 font-black text-base"
               style={{ background: "var(--bg-surface-2)", color: "var(--crimson)", border: "1px solid var(--crimson)" }}
             >
-              {onCancel ? "Cancel this ride" : "You are hosting"}
+              {onCancel ? t("ride.cancel") : t("ride.hosting")}
             </button>
           ) : (
           <button
@@ -245,12 +247,12 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
             }
           >
             {isJoined
-              ? "You are in, tap to leave"
+              ? t("ride.inTapToLeave")
               : isPending
-                ? "Asked · tap to withdraw"
+                ? t("ride.askedTapToWithdraw")
                 : full
-                  ? "Ride is full"
-                  : "Join ride"}
+                  ? t("ride.isFull")
+                  : t("ride.join")}
           </button>
           )}
         </div>
@@ -262,7 +264,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               className="min-h-11 text-xs font-semibold underline"
               style={{ color: MUTED }}
             >
-              Report or block {author.name}
+              {t("ride.reportOrBlock", { name: author.name })}
             </button>
           </div>
         )}

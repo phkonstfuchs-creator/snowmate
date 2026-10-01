@@ -4,32 +4,32 @@ const emailSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .max(254, "Email address is too long.")
-  .email("Enter a valid email address.");
+  .max(254, "v.emailTooLong")
+  .email("v.emailInvalid");
 
 const loginCredentialsSchema = z.object({
   email: emailSchema,
   password: z
     .string()
-    .min(1, "Enter your password.")
-    .max(128, "Password is too long."),
+    .min(1, "v.enterPassword")
+    .max(128, "v.passwordTooLong"),
 });
 
 const signupCredentialsSchema = loginCredentialsSchema
   .extend({
     password: z
       .string()
-      .min(12, "Use at least 12 characters.")
-      .max(128, "Password is too long.")
-      .regex(/[a-z]/, "Add a lowercase letter.")
-      .regex(/[A-Z]/, "Add an uppercase letter.")
-      .regex(/[0-9]/, "Add a number."),
-    confirmPassword: z.string().max(128, "Password is too long."),
+      .min(12, "v.min|12")
+      .max(128, "v.passwordTooLong")
+      .regex(/[a-z]/, "v.passwordLower")
+      .regex(/[A-Z]/, "v.passwordUpper")
+      .regex(/[0-9]/, "v.passwordNumber"),
+    confirmPassword: z.string().max(128, "v.passwordTooLong"),
   })
   .refine(
     ({ password, confirmPassword }) => password === confirmPassword,
     {
-      message: "Passwords do not match.",
+      message: "v.passwordMismatch",
       path: ["confirmPassword"],
     },
   );

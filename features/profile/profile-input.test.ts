@@ -43,11 +43,11 @@ describe("validateProfileInput", () => {
     expect(result).toEqual({
       success: false,
       fieldErrors: {
-        displayName: "Use at least 2 characters.",
-        handle: "Only letters, numbers and underscores.",
-        city: "Pick a region.",
-        abilityLevel: "Pick a riding style.",
-        bio: "Use at most 300 characters.",
+        displayName: "v.min|2",
+        handle: "v.handleChars",
+        city: "v.pickRegion",
+        abilityLevel: "v.pickStyle",
+        bio: "v.max|300",
       },
     });
   });
@@ -60,11 +60,11 @@ describe("validateProfileInput", () => {
   it("rejects reserved handles and disguising characters like the database does", () => {
     expect(validateProfileInput({ ...valid, handle: "Admin" })).toMatchObject({
       success: false,
-      fieldErrors: { handle: "That handle is reserved." },
+      fieldErrors: { handle: "v.handleReserved" },
     });
     expect(validateProfileInput({ ...valid, displayName: "Lena\u202eMoser" })).toMatchObject({
       success: false,
-      fieldErrors: { displayName: "Remove the special characters." },
+      fieldErrors: { displayName: "v.specialChars" },
     });
   });
 

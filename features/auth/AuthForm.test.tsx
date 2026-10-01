@@ -105,7 +105,7 @@ describe("AuthForm", () => {
     render(<AuthForm mode="login" />);
 
     expect(
-      screen.getByRole("button", { name: "Wird angemeldet…" }),
+      screen.getByRole("button", { name: "Signing in…" }),
     ).toBeDisabled();
   });
 

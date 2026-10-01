@@ -11,6 +11,8 @@ import Icon from "@/components/ui/Icon";
 import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
+import LanguageSwitch from "./LanguageSwitch";
+import { useT } from "@/lib/i18n/client";
 import { initialsFor, type OwnProfile } from "./profile-input";
 import type { AccountStats } from "./account-stats";
 import type { BlockedPerson } from "@/features/safety/reports";
@@ -169,8 +171,8 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
    sample rider. In the app it is the signed-in profile, or null when the
    backend could not be reached. Name, handle and region are real; the
    season numbers below still come from the fixtures. */
-const CITY_LABEL = { innsbruck: "Innsbruck", salzburg: "Salzburg" } as const;
-const ABILITY_LABEL = { chill: "Chill", park: "Park", "off-piste": "Off-piste" } as const;
+const CITY_LABEL = { innsbruck: "common.innsbruck", salzburg: "common.salzburg" } as const;
+const ABILITY_LABEL = { chill: "common.chill", park: "common.park", "off-piste": "common.offPiste" } as const;
 
 export default function ProfileScreen({
   account,
@@ -182,7 +184,8 @@ export default function ProfileScreen({
   blocked?: BlockedPerson[];
 }) {
   const isLive = account !== undefined;
-  const displayName = isLive ? account?.displayName ?? "New rider" : ME.name;
+  const t = useT();
+  const displayName = isLive ? account?.displayName ?? t("profile.newRider") : ME.name;
   const handle = isLive ? account?.handle ?? null : ME.handle;
   const initials = isLive ? initialsFor(account?.displayName ?? null, account?.handle ?? null) : ME.avatar;
   const needsSetup = isLive && account?.onboardingCompleted !== true;
@@ -212,11 +215,11 @@ export default function ProfileScreen({
 
         <div className="relative flex items-start justify-between">
           <p className="text-mono-label" style={{ color: RUST }}>
-            Season 25/26 · {leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg"}
+            {t("profile.season", { city: leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg" })}
           </p>
           <button
             type="button"
-            aria-label="Edit profile"
+            aria-label={t("profile.edit")}
             onClick={isLive ? () => setShowEdit(true) : undefined}
             aria-disabled={isLive ? undefined : true}
             className="-mt-2 -mr-1 flex h-11 w-11 items-center justify-center"
@@ -246,9 +249,9 @@ export default function ProfileScreen({
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
               {isLive
-                ? [account?.city ? CITY_LABEL[account.city] : null, account?.abilityLevel ? ABILITY_LABEL[account.abilityLevel] : null]
+                ? [account?.city ? t(CITY_LABEL[account.city]) : null, account?.abilityLevel ? t(ABILITY_LABEL[account.abilityLevel]) : null]
                     .filter(Boolean)
-                    .join(" · ") || "Rider"
+                    .join(" · ") || t("common.rider")
                 : `Level ${ME.level} · ${ME.levelTitle}`}
             </p>
             {handle && <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{handle}</p>}
@@ -265,9 +268,9 @@ export default function ProfileScreen({
             style={{ background: "var(--paper-1)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             <span>
-              <span className="text-mono-label block" style={{ color: RUST }}>Profile incomplete</span>
+              <span className="text-mono-label block" style={{ color: RUST }}>{t("profile.incomplete")}</span>
               <span className="mt-1 block font-semibold text-[0.9375rem]" style={{ color: INK }}>
-                Add your name, handle, region and style so your crew can find you.
+                {t("profile.incompleteHint")}
               </span>
             </span>
             <Icon name="chevron-right" size={18} color={INK} strokeWidth={2} />
@@ -279,9 +282,9 @@ export default function ProfileScreen({
         <section className="px-4 pt-5">
           <div className="print-card grid grid-cols-3 px-4 py-4">
             {([
-              ["Rides", stats?.rides],
-              ["Resorts", stats?.resorts],
-              ["Crew", stats?.crew],
+              [t("profile.rides"), stats?.rides],
+              [t("profile.resorts"), stats?.resorts],
+              [t("profile.crew"), stats?.crew],
             ] as const).map(([label, value], i) => (
               <div
                 key={label}
@@ -518,6 +521,7 @@ export default function ProfileScreen({
         </>
       )}
 
+      <LanguageSwitch />
       {isLive && <AccountSection blocked={blocked} />}
 
       {/* ── Sign out ───────────────────────────────────────── */}
@@ -529,7 +533,7 @@ export default function ProfileScreen({
             style={{ border: "var(--rule-thin)", color: "var(--crimson)", background: PAPER_1 }}
           >
             <Icon name="log-out" size={15} />
-            Sign out
+            {t("profile.signOut")}
           </button>
         </form>
       </div>
