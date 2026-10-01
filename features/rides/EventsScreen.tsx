@@ -8,6 +8,8 @@ import type { LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
 import { isClosedTo, isFull, openSpots, totalOpenSpots } from "./capacity";
 import EditRideSheet from "./EditRideSheet";
+import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import type { SafetyTarget } from "@/features/safety/reports";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -58,6 +60,7 @@ function EventDetailSheet({
   onJoin,
   onCancel,
   onEdit,
+  onSafety,
   onClose,
 }: {
   ride: LiveRide;
@@ -65,6 +68,7 @@ function EventDetailSheet({
   onJoin: () => void;
   onCancel?: () => void;
   onEdit?: () => void;
+  onSafety?: () => void;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -223,6 +227,13 @@ function EventDetailSheet({
           </button>
           )}
         </div>
+        {onSafety && !isHost && (
+          <div className="px-5 pt-3 text-center">
+            <button type="button" onClick={onSafety} className="min-h-11 text-xs font-semibold underline" style={{ color: INK_2 }}>
+              Report or block {author.name}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -313,6 +324,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
   const unavailable = live !== undefined && live.rides === null;
 
@@ -411,6 +423,10 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
           onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
           {...(board.isLive
             ? {
+                onSafety: () => {
+                  setOpenEventId(null);
+                  setSafetyTarget({ userId: openEvent.host.id, name: openEvent.host.name, rideId: openEvent.post.id });
+                },
                 onEdit: () => {
                   setOpenEventId(null);
                   setEditingEventId(openEvent.post.id);
@@ -425,6 +441,8 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
           onClose={() => setOpenEventId(null)}
         />
       )}
+
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
 
       {editingEvent && (
         <EditRideSheet

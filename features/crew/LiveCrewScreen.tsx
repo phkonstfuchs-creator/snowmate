@@ -14,6 +14,8 @@ import {
 } from "./actions";
 import type { FriendGraph, FriendshipRow } from "./friendships";
 import InviteLinkCard from "./InviteLinkCard";
+import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import type { SafetyTarget } from "@/features/safety/reports";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
@@ -32,9 +34,11 @@ function describe(row: FriendshipRow): string {
 function PersonRow({
   row,
   children,
+  onSafety,
 }: {
   row: FriendshipRow;
   children: React.ReactNode;
+  onSafety: (target: SafetyTarget) => void;
 }) {
   const name = row.display_name ?? row.handle ?? "Rider";
   return (
@@ -44,7 +48,17 @@ function PersonRow({
         <p className="truncate text-[0.9375rem] font-semibold" style={{ color: INK }}>{name}</p>
         <p className="truncate text-xs" style={{ color: INK_2 }}>{describe(row)}</p>
       </div>
-      <div className="flex flex-shrink-0 items-center gap-1.5">{children}</div>
+      <div className="flex flex-shrink-0 items-center gap-1.5">
+        {children}
+        <button
+          type="button"
+          onClick={() => onSafety({ userId: row.user_id, name })}
+          aria-label={`Report or block ${name}`}
+          className="flex h-11 w-8 items-center justify-center"
+        >
+          <Icon name="more-horizontal" size={16} color={INK_2} strokeWidth={2} />
+        </button>
+      </div>
     </li>
   );
 }
@@ -68,6 +82,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
   const [state, formAction, submitting] = useActionState(requestFriendshipAction, initialState);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const [, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -168,7 +183,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
       {incoming.length > 0 && (
         <Section label="Waiting for you" count={incoming.length}>
           {incoming.map((row) => (
-            <PersonRow key={row.user_id} row={row}>
+            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
               <button
                 type="button"
                 onClick={() => run(row.user_id, acceptFriendshipAction)}
@@ -195,7 +210,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
 
       <Section label="Friends" count={friends.length}>
         {friends.map((row) => (
-          <PersonRow key={row.user_id} row={row}>
+          <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
             <button
               type="button"
               onClick={() => {
@@ -221,7 +236,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
       {outgoing.length > 0 && (
         <Section label="Asked, waiting" count={outgoing.length}>
           {outgoing.map((row) => (
-            <PersonRow key={row.user_id} row={row}>
+            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
               <button
                 type="button"
                 onClick={() => run(row.user_id, removeFriendshipAction)}
@@ -245,6 +260,7 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
           </p>
         </div>
       </section>
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
     </>
   );
 }

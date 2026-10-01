@@ -1,12 +1,16 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Icon from "@/components/ui/Icon";
 import { deleteAccountAction } from "./account-actions";
 import { DELETE_CONFIRMATION, initialDeleteAccountState } from "./action-state";
+import { useRouter } from "next/navigation";
+import { settle } from "@/lib/settle";
+import { unblockUserAction } from "@/features/safety/actions";
+import type { BlockedPerson } from "@/features/safety/reports";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
@@ -81,7 +85,45 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
 }
 
 /* Signed-in only: the account rights every EU user has. */
-export default function AccountSection() {
+function BlockedList({ blocked }: { blocked: BlockedPerson[] }) {
+  const router = useRouter();
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  const unblock = async (person: BlockedPerson) => {
+    setPendingId(person.userId);
+    const result = await settle(unblockUserAction(person.userId), { ok: false, message: "" });
+    setPendingId(null);
+    if (result.ok) startTransition(() => router.refresh());
+  };
+
+  return (
+    <div className="mb-4">
+      <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Blocked</p>
+      <ul className="space-y-2">
+        {blocked.map((person) => (
+          <li key={person.userId} className="flex items-center justify-between gap-3 px-3 py-2" style={{ border: "var(--rule-thin)" }}>
+            <span className="min-w-0 truncate text-sm" style={{ color: INK }}>
+              {person.displayName ?? person.handle ?? "Rider"}
+              {person.handle && <span style={{ color: INK_2 }}> @{person.handle}</span>}
+            </span>
+            <button
+              type="button"
+              onClick={() => unblock(person)}
+              disabled={pendingId === person.userId}
+              className="text-mono-label min-h-11 px-3 disabled:opacity-50"
+              style={{ border: "var(--rule-thin)", color: INK }}
+            >
+              Unblock
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default function AccountSection({ blocked = [] }: { blocked?: BlockedPerson[] }) {
   const [showDelete, setShowDelete] = useState(false);
 
   return (
@@ -89,6 +131,7 @@ export default function AccountSection() {
       <div className="section-rule">
         <h2 className="text-mono-label" style={{ color: INK }}>Your data</h2>
       </div>
+      {blocked.length > 0 && <div className="mt-2"><BlockedList blocked={blocked} /></div>}
       <div className="mt-2 space-y-2">
         <a
           href="/profile/export"

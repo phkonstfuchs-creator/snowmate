@@ -9,6 +9,8 @@ import { canPostPublicRide } from "./visibility";
 import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
 import { useRideBoard } from "./useRideBoard";
 import EditRideSheet from "./EditRideSheet";
+import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import type { SafetyTarget } from "@/features/safety/reports";
 import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
@@ -34,6 +36,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS);
   const unavailable = live !== undefined && live.rides === null;
 
@@ -251,6 +254,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           profilesEnabled={!board.isLive}
           {...(board.isLive
             ? {
+                onSafety: (user: User) => {
+                  setSelectedPostId(null);
+                  setSafetyTarget({ userId: user.id, name: user.name, rideId: selectedRide.post.id });
+                },
                 onEdit: () => {
                   setSelectedPostId(null);
                   setEditingPostId(selectedRide.post.id);
@@ -267,6 +274,8 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           onJoin={() => { void handleJoin(selectedRide.post.id); }}
         />
       )}
+
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
 
       {editingRide && (
         <EditRideSheet

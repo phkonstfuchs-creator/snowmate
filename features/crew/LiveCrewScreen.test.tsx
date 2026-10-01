@@ -84,6 +84,12 @@ describe("LiveCrewScreen", () => {
     confirm.mockRestore();
   });
 
+  it("offers report or block on every person", () => {
+    render(<LiveCrewScreen graph={graph} />);
+    fireEvent.click(screen.getByRole("button", { name: "Report or block Lena Moser" }));
+    expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
+  });
+
   it("shows a failure", async () => {
     mocks.accept.mockResolvedValue(false);
     render(<LiveCrewScreen graph={graph} />);

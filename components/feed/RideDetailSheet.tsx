@@ -31,12 +31,14 @@ interface Props {
   isHost?: boolean;
   onCancel?: () => void;
   onEdit?: () => void;
+  /* Live only: open the report/block sheet for someone on this ride. */
+  onSafety?: (user: User) => void;
   /* Real accounts do not expose the fixture profile stats yet, so the
      app turns the rider profiles off; the demo keeps them. */
   profilesEnabled?: boolean;
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, profilesEnabled = true }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, profilesEnabled = true }: Props) {
   useScrollLock();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
@@ -252,6 +254,18 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           </button>
           )}
         </div>
+        {onSafety && !isHost && (
+          <div className="px-5 pt-3 text-center">
+            <button
+              type="button"
+              onClick={() => onSafety(author)}
+              className="min-h-11 text-xs font-semibold underline"
+              style={{ color: MUTED }}
+            >
+              Report or block {author.name}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

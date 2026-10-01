@@ -44,6 +44,25 @@ See [ADR 0002](adr/0002-stricter-carpool-visibility.md).
 - Posting, joining and asking require a finished profile, so nobody meets
   an anonymous account. See [ADR 0005](adr/0005-require-finished-profile.md).
 
+## Invite links
+
+Single use, valid 7 days, at most 10 open per person. Signed-out visitors
+see no name; signed-in visitors see who invited them and must confirm.
+See [ADR 0009](adr/0009-single-use-invite-links.md).
+
+## Blocking and reporting
+
+- A block works both ways: neither person sees the other's rides or
+  carpools, every friendship, request and participation between them ends,
+  and triggers refuse new ones. The blocked person is not told; their
+  requests answer as if the handle did not exist.
+- Reports go to the operator only (no client can read them), at most 10 a
+  day per person, and are reviewed in the Supabase dashboard for now.
+- Entry points: ride and event sheets, carpool cards, every person on the
+  Crew tab. Blocked people can be unblocked from the Profile tab.
+
+See [ADR 0010](adr/0010-blocking-hides-both-ways.md).
+
 ## Minors
 
 `profiles.is_minor` defaults to `true` and clients cannot write it. It stays
@@ -66,7 +85,7 @@ response headers (CSP, frame, referrer, permissions, HSTS) are set in
 
 ## Not yet covered
 
-Chats, squads, live location, blocking and reporting have no backend.
+Chats, squads and live location have no backend.
 Do not attach real data to them before they have their own schema,
 audience rules and negative tests. Direct messages involving minors need a
 product decision on consent and moderation first.

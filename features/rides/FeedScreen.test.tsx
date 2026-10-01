@@ -239,6 +239,13 @@ describe("FeedScreen with real data", () => {
     expect(mocks.refresh).toHaveBeenCalled();
   });
 
+  it("opens report or block for the host of someone else's ride", () => {
+    render(<FeedScreen live={live([row({})])} />);
+    fireEvent.click(screen.getByText("Rails are set"));
+    fireEvent.click(screen.getByRole("button", { name: "Report or block Lena Moser" }));
+    expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
+  });
+
   it("says when rides could not be loaded", () => {
     render(<FeedScreen live={live(null)} />);
     expect(screen.getByText(/Rides could not be loaded/)).toBeInTheDocument();

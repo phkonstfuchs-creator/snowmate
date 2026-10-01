@@ -15,6 +15,8 @@ import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
 import type { LiveCarpool, RequestStatus } from "./live-carpool";
+import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import type { SafetyTarget } from "@/features/safety/reports";
 import type { CarpoolFormInput } from "./carpool-input";
 import {
   cancelCarpoolAction,
@@ -292,6 +294,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
   const [demoRequested, setDemoRequested] = useState<Set<string>>(new Set());
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const [, startTransition] = useTransition();
   const isLive = live !== undefined;
   const unavailable = isLive && live.carpools === null;
@@ -357,7 +360,19 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
         onCancel={() => cancel(pool)}
       />
     ) : (
-      <RequestButton pool={pool} pending={pendingId === pool.post.id} onClick={() => toggleRequest(pool)} />
+      <>
+        <RequestButton pool={pool} pending={pendingId === pool.post.id} onClick={() => toggleRequest(pool)} />
+        {isLive && (
+          <button
+            type="button"
+            onClick={() => setSafetyTarget({ userId: pool.author.id, name: pool.author.name })}
+            className="mt-1 min-h-11 w-full text-xs font-semibold underline"
+            style={{ color: MUTED }}
+          >
+            Report or block {pool.author.name}
+          </button>
+        )}
+      </>
     );
 
   return (
@@ -528,6 +543,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
         )}
       </div>
 
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
       {showOfferModal && <OfferModal city={city} onClose={() => setShowOfferModal(false)} onSubmit={submitOffer} />}
     </>
   );

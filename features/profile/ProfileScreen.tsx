@@ -13,6 +13,7 @@ import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
 import { initialsFor, type OwnProfile } from "./profile-input";
 import type { AccountStats } from "./account-stats";
+import type { BlockedPerson } from "@/features/safety/reports";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -174,9 +175,11 @@ const ABILITY_LABEL = { chill: "Chill", park: "Park", "off-piste": "Off-piste" }
 export default function ProfileScreen({
   account,
   stats = null,
+  blocked = [],
 }: {
   account?: OwnProfile | null;
   stats?: AccountStats | null;
+  blocked?: BlockedPerson[];
 }) {
   const isLive = account !== undefined;
   const displayName = isLive ? account?.displayName ?? "New rider" : ME.name;
@@ -515,7 +518,7 @@ export default function ProfileScreen({
         </>
       )}
 
-      {isLive && <AccountSection />}
+      {isLive && <AccountSection blocked={blocked} />}
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">
