@@ -19,6 +19,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0009](0009-single-use-invite-links.md) | Single-use invite links | Accepted |
 | [0010](0010-blocking-hides-both-ways.md) | Blocking hides both ways and ends every connection | Accepted |
 | [0011](0011-cookie-based-i18n.md) | German and English by cookie, without locale routes | Accepted |
-| [0012](0012-age-from-birth-date.md) | Age from a self-declared birth date | Accepted (minimum age 14 Proposed) |
+| [0012](0012-age-from-birth-date.md) | Age from a self-declared birth date | Accepted |
 
 Template: context, options considered, decision, consequences, status.

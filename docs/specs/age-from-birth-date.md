@@ -1,6 +1,6 @@
 # Age from a birth date
 
-- **Status:** Agreed (owner chose "birth date" on 2026-10-01); minimum age 14 is Proposed
+- **Status:** Agreed (owner chose "birth date" and the minimum age of 14 on 2026-10-01)
 - **Owner:** project owner
 - **Related:** [SECURITY_AND_PRIVACY.md](../SECURITY_AND_PRIVACY.md#minors), [ADR 0012](../adr/0012-age-from-birth-date.md)
 

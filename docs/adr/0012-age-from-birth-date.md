@@ -1,6 +1,6 @@
 # 0012 Age from a self-declared birth date
 
-- **Status:** Accepted (2026-10-01) for the birth date; the minimum age of 14 is Proposed
+- **Status:** Accepted (2026-10-01)
 - **Date:** 2026-10-01
 - **Spec:** [age-from-birth-date](../specs/age-from-birth-date.md)
 - **Checks:** `supabase/tests/database/birth_date.test.sql`
