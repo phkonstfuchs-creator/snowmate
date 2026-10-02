@@ -4,6 +4,8 @@ import "@fontsource-variable/hanken-grotesk";
 import "@fontsource/space-mono/400.css";
 import "@fontsource/space-mono/700.css";
 import "./globals.css";
+import { getLocale } from "@/lib/i18n/server";
+import { I18nProvider } from "@/lib/i18n/client";
 
 export const metadata: Metadata = {
   title: "Snowmate",
@@ -17,17 +19,21 @@ export const viewport: Viewport = {
   themeColor: "#F2EADB",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="de"
+      lang={locale}
       data-scroll-behavior="smooth"
     >
-      <body>{children}</body>
+      <body>
+        <I18nProvider locale={locale}>{children}</I18nProvider>
+      </body>
     </html>
   );
 }

@@ -1,5 +1,5 @@
-import Screen from "@/app/(app)/feed/page";
+import FeedScreen from "@/features/rides/FeedScreen";
 
 export default function DemoScreen() {
-  return <Screen />;
+  return <FeedScreen />;
 }

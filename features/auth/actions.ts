@@ -8,6 +8,8 @@ import {
   validateLoginCredentials,
   validateSignupCredentials,
 } from "./credentials";
+import { getT } from "@/lib/i18n/server";
+import { translateFieldErrors, type MessageKey, type Translate } from "@/lib/i18n/translate";
 
 function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -15,22 +17,22 @@ function stringField(formData: FormData, name: string): string {
 }
 
 function invalidState(
+  t: Translate,
   email: string,
   fieldErrors: NonNullable<AuthActionState["fieldErrors"]>,
 ): AuthActionState {
   return {
     status: "error",
-    message: "Check the highlighted fields.",
+    message: t("v.checkFields"),
     email,
-    fieldErrors,
+    fieldErrors: translateFieldErrors(t, fieldErrors),
   };
 }
 
-function confirmationPendingState(email: string): AuthActionState {
+function confirmationPendingState(t: Translate, email: string): AuthActionState {
   return {
     status: "success",
-    message:
-      "If this address can be used, you will receive a confirmation email shortly.",
+    message: t("auth.confirmationPending"),
     email,
   };
 }
@@ -43,6 +45,22 @@ function isExistingAccountError(code: string | undefined): boolean {
   );
 }
 
+/* Refusals a person can act on get their own message. Existence of an
+   account is never revealed (handled above as "confirmation pending"). */
+const SIGN_UP_ERROR_MESSAGES: Record<string, MessageKey> = {
+  over_email_send_rate_limit: "auth.emailRateLimit",
+  over_request_rate_limit: "auth.requestRateLimit",
+  weak_password: "auth.weakPassword",
+  email_address_invalid: "auth.emailRefused",
+  email_address_not_authorized: "auth.emailRefused",
+  signup_disabled: "auth.signUpClosed",
+  email_provider_disabled: "auth.signUpClosed",
+};
+
+function signUpErrorMessage(t: Translate, code: string | undefined): string {
+  return t((code && SIGN_UP_ERROR_MESSAGES[code]) || "auth.signUpFailed");
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -52,9 +70,10 @@ export async function signInAction(
     password: stringField(formData, "password"),
   };
   const validation = validateLoginCredentials(input);
+  const t = await getT();
 
   if (!validation.success) {
-    return invalidState(input.email, validation.fieldErrors);
+    return invalidState(t, input.email, validation.fieldErrors);
   }
 
   const supabase = await createClient();
@@ -65,14 +84,14 @@ export async function signInAction(
     if (error) {
       return {
         status: "error",
-        message: "Email or password is incorrect.",
+        message: t("auth.wrongCredentials"),
         email: validation.data.email,
       };
     }
   } catch {
     return {
       status: "error",
-      message: "Sign in is temporarily unavailable. Try again shortly.",
+      message: t("auth.signInUnavailable"),
       email: validation.data.email,
     };
   }
@@ -90,9 +109,10 @@ export async function signUpAction(
     confirmPassword: stringField(formData, "confirmPassword"),
   };
   const validation = validateSignupCredentials(input);
+  const t = await getT();
 
   if (!validation.success) {
-    return invalidState(input.email, validation.fieldErrors);
+    return invalidState(t, input.email, validation.fieldErrors);
   }
 
   const supabase = await createClient();
@@ -109,24 +129,27 @@ export async function signUpAction(
 
     if (error) {
       if (isExistingAccountError(error.code)) {
-        return confirmationPendingState(validation.data.email);
+        return confirmationPendingState(t, validation.data.email);
       }
+
+      /* The code only, never the email or password: enough to see in the
+         server log why Supabase refused (rate limit, auth settings). */
+      console.error("[auth] sign-up refused by Supabase:", error.code ?? error.status ?? "unknown");
 
       return {
         status: "error",
-        message:
-          "We could not create the account. Check the details and try again.",
+        message: signUpErrorMessage(t, error.code),
         email: validation.data.email,
       };
     }
 
     if (!data.session) {
-      return confirmationPendingState(validation.data.email);
+      return confirmationPendingState(t, validation.data.email);
     }
   } catch {
     return {
       status: "error",
-      message: "Sign up is temporarily unavailable. Try again shortly.",
+      message: t("auth.signUpUnavailable"),
       email: validation.data.email,
     };
   }

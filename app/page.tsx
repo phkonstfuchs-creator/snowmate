@@ -4,9 +4,8 @@ import Link from "next/link";
 import PenguinMascot from "@/components/PenguinMascot";
 
 /* Public landing page. Deliberately an honest case study rather
-   than a marketing page: it never leads into the login, because
-   there is only sample data behind it. The app itself stays
-   reachable at /onboarding. */
+   than a marketing page. The prototype stays the main call to action;
+   the real app (onboarding, sign-in) sits one quiet line below it. */
 
 export const metadata: Metadata = {
   title: "Snowmate: coordinating ski days in Innsbruck and Salzburg",
@@ -185,6 +184,18 @@ export default function Home() {
             Built by Philipp Fuchs, 17, Saarbrücken
           </span>
         </div>
+
+        <p className="mt-4 text-sm" style={{ color: INK_2 }}>
+          Early access is open:{" "}
+          <Link href="/onboarding" className="font-semibold underline" style={{ color: INK }}>
+            create an account
+          </Link>{" "}
+          or{" "}
+          <Link href="/login" className="font-semibold underline" style={{ color: INK }}>
+            sign in
+          </Link>
+          .
+        </p>
 
         {/* ── Problem ──────────────────────────────────────── */}
         <Rule label="The problem" num="01" />

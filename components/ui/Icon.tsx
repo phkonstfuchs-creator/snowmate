@@ -6,7 +6,7 @@ import {
   Sparkles, UserPlus, ArrowRight, Compass, Navigation, Route, Clock, Users2,
   BadgeCheck, Lock, ChevronDown, MoreHorizontal, MapPinned, Globe,
   Sunrise, Map, Hammer, LogOut, Eye, EyeOff, AlertCircle, MailCheck,
-  CalendarDays, Ticket, SlidersHorizontal, ArrowLeft, UserCheck, UserX,
+  CalendarDays, Ticket, SlidersHorizontal, ArrowLeft, UserCheck, UserX, Download, Trash2,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -73,6 +73,8 @@ const REGISTRY: Record<string, ComponentType<LucideProps>> = {
   "eye-off": EyeOff,
   "alert-circle": AlertCircle,
   "mail-check": MailCheck,
+  download: Download,
+  "trash-2": Trash2,
 };
 
 interface IconProps extends Omit<LucideProps, "ref"> {

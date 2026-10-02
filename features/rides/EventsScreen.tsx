@@ -1,10 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { City, RidePost, User } from "@/lib/types";
-import { PUBLIC_EVENTS, getUserById, getUsersByIds, ME } from "@/lib/data";
-import { isDiscoverablePublicRide, toVisibleRide } from "@/features/rides/visibility";
-import { toggleSetValue } from "@/lib/collections";
+import { City } from "@/lib/types";
+import { PUBLIC_EVENTS } from "@/lib/data";
+import { isDiscoverablePublicRide } from "@/features/rides/visibility";
+import type { LiveRide } from "./live-ride";
+import { useRideBoard } from "./useRideBoard";
+import { isClosedTo, isFull, openSpots, totalOpenSpots } from "./capacity";
+import EditRideSheet from "./EditRideSheet";
+import { useT } from "@/lib/i18n/client";
+import { translateText } from "@/lib/i18n/translate";
+import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import type { SafetyTarget } from "@/features/safety/reports";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -27,6 +34,7 @@ const OCHRE = "var(--ochre)";
    is there and why it is missing. Omitting it would read as a bug,
    a lock explains the rule. */
 function MeetingPoint({ value, locked }: { value: string | null; locked: boolean }) {
+  const t = useT();
   if (!locked && value) {
     return (
       <div className="flex items-start gap-2">
@@ -43,40 +51,38 @@ function MeetingPoint({ value, locked }: { value: string | null; locked: boolean
     >
       <Icon name="lock" size={14} color={INK_2} strokeWidth={1.9} className="mt-0.5 flex-shrink-0" />
       <p className="text-sm leading-snug" style={{ color: INK_2 }}>
-        Exact meeting point becomes visible once you join.
+        {t("events.lockedPoint")}
       </p>
     </div>
   );
 }
 
 function EventDetailSheet({
-  post,
-  author,
-  joinedUsers,
-  isJoined,
+  ride,
+  pending,
   onJoin,
+  onCancel,
+  onEdit,
+  onSafety,
   onClose,
 }: {
-  post: RidePost;
-  author: User;
-  joinedUsers: User[];
-  isJoined: boolean;
+  ride: LiveRide;
+  pending: boolean;
   onJoin: () => void;
+  onCancel?: () => void;
+  onEdit?: () => void;
+  onSafety?: () => void;
   onClose: () => void;
 }) {
   useScrollLock();
+  const t = useT();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
 
-  const view = toVisibleRide(post, {
-    viewer: ME,
-    author,
-    isJoined,
-    friendIds: ME.friendIds,
-  });
-  const taken = post.takenSpots + (isJoined ? 1 : 0);
-  const openSpots = post.totalSpots - taken;
-  const isFull = openSpots <= 0;
+  const { post, host: author, participants: joinedUsers, isJoined, isHost } = ride;
+  const taken = post.takenSpots;
+  const open = openSpots(post);
+  const full = isFull(post);
 
   return (
     <>
@@ -87,7 +93,7 @@ function EventDetailSheet({
         data-state={state}
         role="dialog"
         aria-modal="true"
-        aria-label={`Event: ${post.title ?? post.resort}`}
+        aria-label={t("events.eventLabel", { name: post.title ?? post.resort })}
         tabIndex={-1}
         style={{ maxHeight: "92dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
@@ -97,7 +103,7 @@ function EventDetailSheet({
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Close event"
+          aria-label={t("events.close")}
           className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center"
         >
           <Icon name="x" size={18} color={INK_2} strokeWidth={2} />
@@ -109,7 +115,7 @@ function EventDetailSheet({
             className="text-mono-label absolute left-0 top-0 px-2 py-1"
             style={{ background: OCHRE, color: INK }}
           >
-            Public
+            {t("events.public")}
           </span>
         </div>
 
@@ -134,7 +140,7 @@ function EventDetailSheet({
           <div className="min-w-0 flex-1">
             <p className="text-[0.9375rem] font-semibold" style={{ color: INK }}>{author.name}</p>
             <p className="text-sm" style={{ color: INK_2 }}>
-              Host · Level {author.level}
+              {isHost ? t("ride.hosting") : author.handle ? t("events.hostHandle", { handle: author.handle }) : t("events.hostLevel", { level: author.level })}
             </p>
           </div>
           <Tag level={post.abilityLevel} />
@@ -147,21 +153,21 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-4">
-          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>Meeting point</p>
-          <MeetingPoint value={view.meetPoint} locked={view.meetPointLocked} />
+          <p className="text-mono-label mb-2" style={{ color: INK_2 }}>{t("ride.meetingPoint")}</p>
+          <MeetingPoint value={ride.meetPointLocked ? null : post.meetPoint} locked={ride.meetPointLocked} />
         </div>
 
         <div className="mx-5 mt-4 grid grid-cols-2" style={{ border: "var(--rule-thin)" }}>
           <div className="px-4 py-3" style={{ borderRight: "1px solid var(--border-hairline)" }}>
-            <p className="text-mono-label" style={{ color: INK_2 }}>Signed up</p>
+            <p className="text-mono-label" style={{ color: INK_2 }}>{t("events.signedUp")}</p>
             <p className="text-mono-data mt-0.5" style={{ color: INK }}>
               {taken}/{post.totalSpots}
             </p>
           </div>
           <div className="px-4 py-3">
-            <p className="text-mono-label" style={{ color: INK_2 }}>Open</p>
-            <p className="text-mono-data mt-0.5" style={{ color: isFull ? INK_2 : PINE }}>
-              {isFull ? "full" : openSpots}
+            <p className="text-mono-label" style={{ color: INK_2 }}>{t("events.open")}</p>
+            <p className="text-mono-data mt-0.5" style={{ color: full ? INK_2 : PINE }}>
+              {full ? t("card.full") : open}
             </p>
           </div>
         </div>
@@ -169,7 +175,7 @@ function EventDetailSheet({
         {joinedUsers.length > 0 && (
           <div className="px-5 pt-4">
             <p className="text-mono-label mb-2" style={{ color: INK_2 }}>
-              Among those going
+              {t("events.among")}
             </p>
             <div className="flex flex-wrap gap-2">
               {joinedUsers.map((user) => (
@@ -187,42 +193,70 @@ function EventDetailSheet({
         )}
 
         <div className="px-5 pt-5">
+          {isHost && onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="card-tap mb-2 w-full py-4 font-display text-lg uppercase"
+              style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
+            >
+              {t("events.edit")}
+            </button>
+          )}
+          {isHost && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={pending}
+              className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
+              style={{ background: PAPER_1, color: "var(--crimson)", border: "1px solid var(--crimson)" }}
+            >
+              {t("events.cancel")}
+            </button>
+          )}
+          {!isHost && (
           <button
             onClick={onJoin}
-            disabled={isFull && !isJoined}
+            disabled={(full && !isJoined) || pending}
             className="card-tap w-full py-4 font-display text-lg uppercase"
             style={
               isJoined
                 ? { background: PAPER_1, color: INK, border: "var(--rule-thick)" }
-                : isFull
+                : full
                   ? { background: PAPER_1, color: INK_2, border: "var(--rule-thin)", cursor: "not-allowed" }
                   : { background: RUST, color: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }
             }
           >
-            {isJoined ? "Leave event" : isFull ? "Event is full" : "Join event"}
+            {pending ? t("common.oneMoment") : isJoined ? t("events.leave") : full ? t("events.isFull") : t("events.join")}
           </button>
+          )}
         </div>
+        {onSafety && !isHost && (
+          <div className="px-5 pt-3 text-center">
+            <button type="button" onClick={onSafety} className="min-h-11 text-xs font-semibold underline" style={{ color: INK_2 }}>
+              {t("ride.reportOrBlock", { name: author.name })}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
 function EventCard({
-  post,
-  author,
-  isJoined,
+  ride,
   index,
   onOpen,
 }: {
-  post: RidePost;
-  author: User;
-  isJoined: boolean;
+  ride: LiveRide;
   index: number;
   onOpen: () => void;
 }) {
-  const taken = post.takenSpots + (isJoined ? 1 : 0);
-  const openSpots = post.totalSpots - taken;
-  const isFull = openSpots <= 0;
+  const t = useT();
+  const { post, host: author, isJoined } = ride;
+  const taken = post.takenSpots;
+  const open = openSpots(post);
+  const full = isFull(post);
   const filled = Math.min(100, Math.round((taken / post.totalSpots) * 100));
 
   return (
@@ -249,7 +283,7 @@ function EventCard({
             className="text-mono-label absolute right-0 top-0 px-2 py-1"
             style={{ background: PINE, color: "var(--paper-0)" }}
           >
-            Joined
+            {t("events.joined")}
           </span>
         )}
       </div>
@@ -272,10 +306,10 @@ function EventCard({
 
         <div className="mt-3 flex items-center gap-3">
           <div className="h-2 flex-1" style={{ background: "var(--paper-2)", border: "1px solid var(--border-hairline)" }}>
-            <div style={{ width: `${filled}%`, height: "100%", background: isFull ? INK_2 : RUST }} />
+            <div style={{ width: `${filled}%`, height: "100%", background: full ? INK_2 : RUST }} />
           </div>
-          <span className="text-mono-label flex-shrink-0" style={{ color: isFull ? INK_2 : INK }}>
-            {isFull ? "full" : `${openSpots} open`}
+          <span className="text-mono-label flex-shrink-0" style={{ color: full ? INK_2 : INK }}>
+            {full ? t("card.full") : t("card.open", { n: open })}
           </span>
         </div>
       </div>
@@ -283,50 +317,51 @@ function EventCard({
   );
 }
 
-export default function EventsScreen() {
-  const [city, setCity] = useState<City>("innsbruck");
-  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+export interface LiveEvents {
+  /* null when the backend could not be reached */
+  rides: LiveRide[] | null;
+  defaultCity: City;
+}
+
+
+/* `live` is undefined in the /demo prototype, which runs on fixtures. */
+export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
+  const t = useT();
+  const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
+  const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
+  const unavailable = live !== undefined && live.rides === null;
 
   /* Filtering runs through isDiscoverablePublicRide rather than a
      plain visibility comparison, so a wrongly flagged ride hosted by
-     a minor drops out too. */
+     a minor drops out too. The database applies the same rule; this
+     is the second line. */
   const events = useMemo(
     () =>
-      PUBLIC_EVENTS.filter((event) => {
-        if (event.city !== city) return false;
-        const author = getUserById(event.authorId);
-        return author ? isDiscoverablePublicRide(event, author) : false;
-      })
+      board.rides
+        .filter((ride) => ride.post.city === city && isDiscoverablePublicRide(ride.post, ride.host))
         /* Full events go last. This screen is the entry point for
            people without contacts, so the top must show where you can
            still join, not where you are too late. */
-        .sort(
-          (a, b) =>
-            Number(a.takenSpots >= a.totalSpots) -
-            Number(b.takenSpots >= b.totalSpots),
-        ),
-    [city],
+        .sort((a, b) => Number(isClosedTo(a.post, a.isJoined)) - Number(isClosedTo(b.post, b.isJoined))),
+    [board.rides, city],
   );
 
-  const openEvent = events.find((event) => event.id === openEventId) ?? null;
-  const openSeats = events.reduce(
-    (sum, event) => sum + Math.max(0, event.totalSpots - event.takenSpots),
-    0,
-  );
-
-  const toggleJoin = (id: string) =>
-    setJoinedIds((previous) => toggleSetValue(previous, id));
+  const openEvent = events.find((event) => event.post.id === openEventId) ?? null;
+  const editingEvent = events.find((event) => event.post.id === editingEventId) ?? null;
+  const openSeats = totalOpenSpots(events.map((event) => event.post));
 
   return (
     <>
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="px-4 pt-4 pb-3">
           <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>
-            Events
+            {t("events.title")}
           </h1>
           <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
-            {events.length} open events · {openSeats} spots left
+            {t("events.summary", { events: events.length, spots: openSeats })}
           </p>
         </div>
         <div className="px-4 pb-3">
@@ -334,7 +369,7 @@ export default function EventsScreen() {
             options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
             value={city}
             onChange={setCity}
-            ariaLabel="Region"
+            ariaLabel={t("common.region")}
           />
         </div>
       </header>
@@ -348,59 +383,79 @@ export default function EventsScreen() {
       >
         <Icon name="globe" size={16} color={PINE} strokeWidth={1.7} className="mt-0.5 flex-shrink-0" />
         <div>
-          <p className="text-mono-label" style={{ color: INK }}>Open to everyone</p>
+          <p className="text-mono-label" style={{ color: INK }}>{t("events.openToAll")}</p>
           <p className="mt-1 text-sm leading-snug" style={{ color: INK_1 }}>
-            You do not need to know anyone here. Everyone sees the resort,
-            only those who joined see the exact meeting point.
+            {t("events.openToAllHint")}
           </p>
         </div>
       </div>
 
       <div className="space-y-3 px-4 pt-4 pb-6">
-        {events.map((event, index) => {
-          const author = getUserById(event.authorId);
-          if (!author) return null;
-          return (
-            <EventCard
-              key={event.id}
-              post={event}
-              author={author}
-              isJoined={joinedIds.has(event.id)}
-              index={index}
-              onOpen={() => setOpenEventId(event.id)}
-            />
-          );
-        })}
+        {(board.notice || unavailable) && (
+          <p role="status" className="px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)", background: PAPER_1 }}>
+            {board.notice ? translateText(t, board.notice) : t("events.unavailable")}
+          </p>
+        )}
 
-        {events.length === 0 && (
+        {events.map((event, index) => (
+          <EventCard
+            key={event.post.id}
+            ride={event}
+            index={index}
+            onOpen={() => setOpenEventId(event.post.id)}
+          />
+        ))}
+
+        {events.length === 0 && !unavailable && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <Icon name="calendar-days" size={30} color={INK_2} strokeWidth={1.5} />
             <div>
               <p className="font-semibold" style={{ color: INK }}>
-                Nothing open here right now
+                {t("events.empty")}
               </p>
               <p className="mt-1 text-sm" style={{ color: INK_2 }}>
-                There may be some in the other region.
+                {t("events.emptyHint")}
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {openEvent && (() => {
-        const author = getUserById(openEvent.authorId);
-        if (!author) return null;
-        return (
-          <EventDetailSheet
-            post={openEvent}
-            author={author}
-            joinedUsers={getUsersByIds(openEvent.joinedUserIds)}
-            isJoined={joinedIds.has(openEvent.id)}
-            onJoin={() => toggleJoin(openEvent.id)}
-            onClose={() => setOpenEventId(null)}
-          />
-        );
-      })()}
+      {openEvent && (
+        <EventDetailSheet
+          ride={openEvent}
+          pending={board.pendingId === openEvent.post.id}
+          onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
+          {...(board.isLive
+            ? {
+                onSafety: () => {
+                  setOpenEventId(null);
+                  setSafetyTarget({ userId: openEvent.host.id, name: openEvent.host.name, rideId: openEvent.post.id });
+                },
+                onEdit: () => {
+                  setOpenEventId(null);
+                  setEditingEventId(openEvent.post.id);
+                },
+                onCancel: () => {
+                  if (!window.confirm(t("events.confirmCancel"))) return;
+                  setOpenEventId(null);
+                  void board.cancelRide(openEvent.post.id);
+                },
+              }
+            : {})}
+          onClose={() => setOpenEventId(null)}
+        />
+      )}
+
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
+
+      {editingEvent && (
+        <EditRideSheet
+          post={editingEvent.post}
+          onSave={(input) => board.updateRide(editingEvent.post.id, input)}
+          onClose={() => setEditingEventId(null)}
+        />
+      )}
     </>
   );
 }

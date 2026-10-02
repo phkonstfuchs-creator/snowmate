@@ -7,30 +7,9 @@ import type {
 } from "leaflet";
 
 import type { ResortStatus } from "@/lib/types";
+import { resortCoordinates } from "@/lib/resorts";
 import { createMarkerContent } from "@/features/resorts/marker-content";
 
-const RESORT_COORDS: Record<string, [number, number]> = {
-  Nordkette: [47.3247, 11.3867],
-  "Axamer Lizum": [47.1717, 11.2333],
-  Patscherkofel: [47.214, 11.47],
-  "Mutterer Alm": [47.209, 11.376],
-  "Rangger Köpfl": [47.198, 11.2],
-  "Schlick 2000": [47.233, 11.198],
-  "Serlesbahnen Mieders": [47.162, 11.317],
-  Bergeralm: [47.211, 11.501],
-  Glungezer: [47.239, 11.482],
-  Hochoetz: [47.2, 10.918],
-  Kühtai: [47.208, 11.017],
-  "Stubai Glacier": [47.083, 11.152],
-  Sölden: [46.967, 11],
-  "Zell am See": [47.3247, 12.7969],
-  Kitzsteinhorn: [47.2242, 12.692],
-  "Saalbach-Hinterglemm": [47.3917, 12.6333],
-  Flachau: [47.333, 13.383],
-  Wagrain: [47.35, 13.3],
-  "Bad Gastein": [47.117, 13.133],
-  Hochkönig: [47.4167, 13.0667],
-};
 
 const CITY_VIEWS = {
   innsbruck: { center: [47.22, 11.32] as [number, number], zoom: 10 },
@@ -114,7 +93,7 @@ export default function LeafletMap({
     )[0];
 
     markersRef.current = resorts.flatMap((resort) => {
-      const coordinates = RESORT_COORDS[resort.name];
+      const coordinates = resortCoordinates(resort.name);
       if (!coordinates) return [];
 
       const isHot = resort.name === hotResort?.name;

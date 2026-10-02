@@ -12,6 +12,14 @@ describe("parseSupabasePublicConfig", () => {
     expect(parseSupabasePublicConfig(validConfig)).toEqual(validConfig);
   });
 
+  it("names the broken variable instead of throwing a bare Invalid URL", () => {
+    for (const url of ["", "not a url", '"https://project-ref.supabase.co"']) {
+      expect(() => parseSupabasePublicConfig({ ...validConfig, url })).toThrow(
+        /Supabase public configuration is invalid: url: .*\.env\.local/,
+      );
+    }
+  });
+
   it("rejects missing values", () => {
     expect(() =>
       parseSupabasePublicConfig({

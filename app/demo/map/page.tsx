@@ -1,5 +1,5 @@
-import Screen from "@/app/(app)/map/page";
+import MapScreen from "@/features/resorts/MapScreen";
 
 export default function DemoScreen() {
-  return <Screen />;
+  return <MapScreen />;
 }

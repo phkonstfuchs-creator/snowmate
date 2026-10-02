@@ -28,10 +28,8 @@ describe("validateLoginCredentials", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.fieldErrors.email).toContain(
-        "Enter a valid email address.",
-      );
-      expect(result.fieldErrors.password).toContain("Password is too long.");
+      expect(result.fieldErrors.email).toContain("v.emailInvalid");
+      expect(result.fieldErrors.password).toContain("v.passwordTooLong");
     }
   });
 });
@@ -77,13 +75,10 @@ describe("validateSignupCredentials", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.fieldErrors.password).toContain(
-        "Use at least 12 characters.",
-      );
-      expect(result.fieldErrors.password).toContain(
-        "Add an uppercase letter.",
-      );
-      expect(result.fieldErrors.password).toContain("Add a number.");
+      /* Rule modules return message keys; the action translates them. */
+      expect(result.fieldErrors.password).toContain("v.min|12");
+      expect(result.fieldErrors.password).toContain("v.passwordUpper");
+      expect(result.fieldErrors.password).toContain("v.passwordNumber");
     }
   });
 });

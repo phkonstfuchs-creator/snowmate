@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import BottomNav from "@/components/BottomNav";
+import { getT } from "@/lib/i18n/server";
 
 /* Clickable prototype outside the login. Shows the same screens as
    the app but runs on sample data. The banner stays visible at all
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default function DemoLayout({ children }: { children: React.ReactNode }) {
+export default async function DemoLayout({ children }: { children: React.ReactNode }) {
+  const t = await getT();
   return (
     <div className="app-shell">
       <div
@@ -24,9 +26,9 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
           borderBottom: "var(--rule-thick)",
         }}
       >
-        <span>Demo · sample data · nothing is saved</span>
+        <span>{t("demo.banner")}</span>
         <Link href="/" className="-my-2 flex min-h-11 items-center whitespace-nowrap px-3 underline">
-          Back
+          {t("common.back")}
         </Link>
       </div>
       <main className="page-content">{children}</main>

@@ -5,20 +5,27 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
+import { useT } from "@/lib/i18n/client";
+import { isFull, openSpots } from "@/features/rides/capacity";
 
 interface RideCardProps {
   post: RidePost;
   author: User;
   joinedUsers: User[];
   isJoined: boolean;
+  isPending?: boolean;
+  isHost?: boolean;
+  /* Host only: how many are asking to join */
+  requestCount?: number;
   onClick: () => void;
   onJoin?: (e: React.MouseEvent) => void;
   index?: number;
 }
 
-export default function RideCard({ post, author, joinedUsers, isJoined, onClick, onJoin, index = 0 }: RideCardProps) {
-  const openSpots = post.totalSpots - post.takenSpots;
-  const isFull = openSpots <= 0;
+export default function RideCard({ post, author, joinedUsers, isJoined, isPending = false, isHost = false, requestCount = 0, onClick, onJoin, index = 0 }: RideCardProps) {
+  const t = useT();
+  const open = openSpots(post);
+  const full = isFull(post);
 
   return (
     <article
@@ -96,31 +103,37 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
               </div>
             ))}
             {joinedUsers.length > 0 && (
-              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{post.takenSpots} in</span>
+              <span className="ml-2.5 text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>{t("card.in", { n: post.takenSpots })}</span>
             )}
           </div>
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <span
               className="text-[0.7rem] font-bold font-mono"
-              style={{ color: isFull ? "var(--ink-3)" : openSpots === 1 ? "var(--rust)" : "var(--ink-2)" }}
+              style={{ color: full ? "var(--ink-3)" : open === 1 ? "var(--rust)" : "var(--ink-2)" }}
             >
-              {isFull ? "full" : `${openSpots} open`}
+              {full ? t("card.full") : t("card.open", { n: open })}
             </span>
+            {isHost ? (
+              <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
+                {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
+              </span>
+            ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
-              disabled={isFull && !isJoined}
+              disabled={full && !isJoined && !isPending}
               className="text-mono-label min-h-11 px-3.5 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
               style={
-                isJoined
+                isJoined || isPending
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", border: "1px solid var(--ink-0)" }
-                  : isFull
+                  : full
                   ? { background: "var(--paper-2)", color: "var(--ink-3)", border: "1px solid var(--paper-3)" }
                   : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
               }
             >
-              {isJoined ? "Joined" : "Join"}
+              {isJoined ? t("card.joined") : isPending ? t("card.asked") : t("card.join")}
             </button>
+            )}
           </div>
         </div>
       </div>
@@ -130,7 +143,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, onClick,
         className="text-mono-label flex items-center justify-center gap-1.5 py-2"
         style={{ borderTop: "1px solid var(--border-hairline)", color: "var(--ink-2)" }}
       >
-        Details &amp; profile
+        {t("card.details")}
         <Icon name="chevron-right" size={11} color="var(--ink-2)" strokeWidth={2} />
       </div>
     </article>

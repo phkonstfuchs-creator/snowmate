@@ -1,5 +1,5 @@
-import Screen from "@/app/(app)/crew/page";
+import CrewScreen from "@/features/crew/CrewScreen";
 
 export default function DemoScreen() {
-  return <Screen />;
+  return <CrewScreen />;
 }

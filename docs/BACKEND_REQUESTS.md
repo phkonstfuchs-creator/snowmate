@@ -14,7 +14,11 @@ Status: `OPEN` · `IN PROGRESS` · `DONE`
 
 ## 1. Feed, Map, Carpool, Crew and Events run on fixtures
 
-**Status:** OPEN
+**Status:** IN PROGRESS — Feed, Events, Carpool and Crew (friends and
+requests) run on real data (see *Done*). The Map counts people on today's
+visible rides; snow depth, lifts and conditions have no source yet and are
+hidden in the app (shown only in `/demo`). Squads, conversations and profile
+numbers remain fixtures.
 **Affects:** new tables plus read access; today `lib/data/mock-data.ts`
 
 Only sign-in, sign-up and sign-out actually talk to Supabase. Every content
@@ -46,7 +50,7 @@ translation layer everywhere.
 
 ## 2. Friend-graph visibility is text, not enforcement
 
-**Status:** OPEN
+**Status:** DONE — see *Done*.
 **Affects:** RLS rules
 
 The crew screen promises: *"Friends of friends see rides at resort level.
@@ -68,7 +72,8 @@ strangers are reading along.
 
 ## 3. Public events need server-side visibility
 
-**Status:** OPEN — **highest priority of everything on this page**
+**Status:** DONE in the migration, pending `supabase db push` to
+`snowmate-dev` — see *Done*.
 **Affects:** schema for `rides`, RLS rules, read DTO
 
 With the *Events* screen (`/events`) there is content visible **without any
@@ -122,24 +127,6 @@ to 3 must exist as negative pgTAP tests.
 
 ---
 
-## 4. No access to the signed-in account's profile data
-
-**Status:** OPEN
-
-Onboarding collects region, riding style, display name and handle and stores
-them in `localStorage` under `sm_onboarding_draft`. After sign-up the draft
-is **never read back** — the answers are lost.
-
-**Why:** the user enters data that disappears without trace. From their
-point of view, that is a bug.
-
-**Workaround today:** the `localStorage` entry is simply left behind.
-
-**Needed:** a profile table plus a server action to adopt the draft once the
-account is confirmed.
-
----
-
 ## 5. Payments for trips and carpool seats
 
 **Status:** OPEN — not urgent, listed so the shape is known early
@@ -161,6 +148,96 @@ in the UI must start suggesting a payment is possible before this is real.
 ---
 
 ## Done
+
+### Rides, public events and the friend graph in the database (items 2 and 3)
+
+**Resolved:** migration `20260925100000_create_friendships_and_rides.sql`.
+
+- Clients cannot select from `rides`, `ride_participants` or
+  `friendships` at all. The only read path is `list_rides()`, a
+  security-definer function that applies the audience per row and
+  returns `meet_point` as null for anyone who may not see it. That
+  replaces the suggested two-view contract with the same guarantee: the
+  field never leaves the database for the wrong viewer.
+- Audience: host, participants and confirmed friends always; adult
+  hosts' friends rides also reach friends of friends; minors' rides
+  reach confirmed friends only; public rides reach everyone unless the
+  host is a minor (rule 5).
+- Meeting point: host, participants, and on friends rides confirmed
+  friends. Friendship does not unlock a public ride (rules 1 and 2).
+  The participant list follows the same lock; outsiders only get a count.
+- A trigger rejects public rides hosted by minors (rule 3).
+- `join_ride()` checks capacity under a row lock (rule 4);
+  `leave_ride()` and `cancel_ride()` cover the rest.
+- Friend requests go by exact handle (`request_friendship`), no search;
+  asking back accepts. `accept_friendship`, `remove_friendship` and
+  `list_my_friendships` complete the set.
+
+`supabase/tests/database/rides_visibility.test.sql` holds 48 assertions,
+most of them negative. The Feed (`/feed`) and Events (`/events`) routes
+now render `list_rides()` through `features/rides/queries.ts` and write
+through `features/rides/actions.ts`; `/demo` keeps the fixtures via the
+same `useRideBoard` hook.
+
+The signed-in `/crew` screen (`features/crew/LiveCrewScreen.tsx`) adds
+friends by handle, answers and withdraws requests and removes friends.
+Signed-in `/people` redirects there, since people search only exists over
+fixtures; `/demo/crew` and `/demo/people` keep the prototype.
+
+### Carpool board
+
+**Resolved:** migration `20260925110000_create_carpools.sql`, read through
+`list_carpools()`. Stricter than rides because it means getting into a
+car: no public carpools, friends of friends see a post only when both
+sides are adults, and the pickup spot is visible only to the author,
+confirmed friends and riders the author accepted. Requests (a seat on a
+driver post, a lift on a rider post) are confirmed by the author; seats are
+counted under a row lock. `carpools.test.sql` holds 24 assertions.
+`/carpool` runs on it via `features/carpool/`; `/demo/carpool` keeps the
+fixtures.
+
+### Taking part requires a finished profile
+
+Posting a ride or carpool (insert policies), joining a ride, asking for a
+seat and sending friend requests (functions answer `profile_incomplete`)
+all require `onboarding_completed`. Otherwise other riders would meet an
+anonymous "Rider" without a handle. `complete_profile.test.sql` covers it;
+the feed links an unfinished profile to the Profile tab.
+
+### Account rights and navigation badges
+
+Migration `20260927090000_account_rights_and_activity.sql`:
+`delete_my_account()` removes the caller's auth user, which cascades
+through every table (GDPR art. 17); `export_my_data()` returns everything
+stored about the caller as JSON (art. 15 and 20), served as a download at
+`/profile/export`; `my_pending_counts()` feeds the badges on Crew and
+Carpool. `account_rights.test.sql` covers them. The profile tab offers the
+download and a typed-confirmation delete. Worth one manual check after
+applying: the delete relies on the migration owner being allowed to
+delete from `auth.users`, which is the Supabase default.
+
+**Still open:** applying the five new migrations to `snowmate-dev`
+(`npx supabase db push`).
+
+### Onboarding answers were lost after sign-up (was item 4)
+
+**Resolved:** `features/profile/OnboardingDraftSync.tsx` runs inside the
+signed-in app shell, hands the `sm_onboarding_draft` entry to
+`adoptOnboardingDraftAction` once, and clears it. The action validates the
+draft (`features/profile/profile-input.ts`, mirroring the table
+constraints), takes the user id from the session, and writes only to a
+profile that is not yet complete, so an old draft on a shared device
+cannot overwrite later edits. A taken handle keeps the draft so the edit
+sheet can prefill the rest.
+
+Migration `20260925090000_derive_onboarding_completed.sql` derives
+`onboarding_completed` from the four required fields in a trigger. The
+column stays out of the client update grant; the new pgTAP file
+`profile_onboarding.test.sql` covers both.
+
+`/profile` now reads the real account (name, handle, region, bio) and
+offers an edit sheet backed by `updateProfileAction`. The season numbers
+on that screen are still fixtures.
 
 ### Server-side auth messages were German
 

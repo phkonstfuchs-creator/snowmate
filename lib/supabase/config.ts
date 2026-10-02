@@ -5,7 +5,15 @@ const safeUrlSchema = z
   .trim()
   .url()
   .refine((value) => {
-    const url = new URL(value);
+    /* Zod runs this even when .url() already failed, so a malformed or
+       empty value must not throw here: it would replace the readable
+       "which variable is wrong" error with a bare "Invalid URL". */
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      return false;
+    }
     const isLocal =
       url.hostname === "localhost" || url.hostname === "127.0.0.1";
 
@@ -40,7 +48,10 @@ export function parseSupabasePublicConfig(input: {
       .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("; ");
 
-    throw new Error(`Supabase public configuration is invalid: ${details}`);
+    throw new Error(
+      `Supabase public configuration is invalid: ${details}. ` +
+        "Check NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY and NEXT_PUBLIC_SITE_URL in .env.local (see .env.example) and restart the dev server.",
+    );
   }
 
   return result.data;
