@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(13);
+select plan(15);
 
 insert into auth.users (id, email)
 values
@@ -15,6 +15,13 @@ values (gen_random_uuid(), 'c0c0c0c0-0000-4000-8000-000000000002', 'test', 'totp
 -- Anonymous requests pass (sign-in, sign-up checks).
 set local role anon;
 select lives_ok($$select public.check_request()$$, 'anonymous requests are not blocked');
+reset role;
+
+-- The website calls its waitlist function with the service role key;
+-- PostgREST runs the guard for that role as well.
+select ok(has_function_privilege('service_role', 'public.check_request()', 'execute'), 'the service role may run the guard');
+set local role service_role;
+select lives_ok($$select public.check_request()$$, 'service role requests are not blocked');
 reset role;
 
 set local role authenticated;
