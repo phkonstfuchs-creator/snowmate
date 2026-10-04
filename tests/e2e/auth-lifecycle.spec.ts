@@ -127,6 +127,11 @@ test.describe("account lifecycle", () => {
     await page.getByLabel("Password", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Sign in" }).click();
 
+    /* Either the feed opens or the form says why not; a failure then
+       names the message instead of only the URL. */
+    const formError = page.locator("p[role=alert]").filter({ hasText: /\S/ });
+    await Promise.race([page.waitForURL(/\/feed$/), formError.waitFor()]);
+    await expect(formError).toHaveCount(0);
     await expect(page).toHaveURL(/\/feed$/);
   });
 });
