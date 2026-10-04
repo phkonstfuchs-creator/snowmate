@@ -217,7 +217,10 @@ export const de: Record<MessageKey, string> = {
   "onb.nameSub": "Sichtbar für bestätigte Crew-Mitglieder",
   "onb.name": "Name",
   "onb.handle": "Handle",
-  "onb.terms": "Mit dem Erstellen eines Kontos akzeptierst du unsere Nutzungsbedingungen. Unter 18? Dann brauchst du die Zustimmung deiner Eltern.",
+  "onb.terms": "Mit dem Erstellen eines Kontos bestätigst du, dass du die {privacy} gelesen hast. Unter 18? Dann brauchst du die Zustimmung deiner Eltern.",
+  "legal.privacy": "Datenschutzerklärung",
+  "legal.privacyShort": "Datenschutz",
+  "legal.imprint": "Impressum",
 
   // ── Feed ────────────────────────────────────────────────────────
   "feed.postRide": "Ride posten",

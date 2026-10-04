@@ -115,6 +115,12 @@ encrypted; they are in the export and go with the account. See
 
 See [ADR 0013](adr/0013-request-guard-2fa-and-rate-limits.md).
 
+## Imprint and privacy policy
+
+`/impressum` (§ 5 DDG) and `/datenschutz` (Art. 13 GDPR) are public pages;
+operator data lives in `features/legal/operator.ts`. The privacy policy
+must change with every new kind of data, processor or audience rule.
+
 ## Account rights (GDPR)
 
 - Art. 15 and 20: `/profile/export` downloads everything stored about the

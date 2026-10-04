@@ -218,7 +218,10 @@ export const en = {
   "onb.nameSub": "Visible to confirmed crew members",
   "onb.name": "Name",
   "onb.handle": "Handle",
-  "onb.terms": "By creating an account you accept our terms of use. Under 18? You need your parents’ consent.",
+  "onb.terms": "By creating an account you confirm that you have read the {privacy}. Under 18? You need your parents’ consent.",
+  "legal.privacy": "privacy policy",
+  "legal.privacyShort": "Privacy",
+  "legal.imprint": "Legal notice",
 
   // ── Feed ────────────────────────────────────────────────────────
   "feed.postRide": "Post a ride",
