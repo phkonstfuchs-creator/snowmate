@@ -29,6 +29,8 @@ Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entg
 
 ## Vercel
 
+Domains: die Website läuft auf `pistl.app` (und `www.pistl.app`), die App im selben Repository auf `app.pistl.app`. Frühere App-Links auf `pistl.app` (Bestätigungs- und Einladungsmails, Homescreen-Icons) leitet `next.config.mjs` vorübergehend (307) an `app.pistl.app` weiter; abweichend per `PISTL_APP_URL`.
+
 - Eigenes Vercel-Projekt mit **Root Directory `website`**, Framework Next.js, Node 24. Funktionen laufen in Frankfurt (`vercel.json`).
 - Umgebungsvariablen wie oben; `PISTL_LAUNCH_READY=true` erst setzen, wenn die Seite indexiert werden soll (sonst `noindex`).
 - `npm run check:launch` zeigt fehlende Konfiguration, ohne Werte auszugeben.
