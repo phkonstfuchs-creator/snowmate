@@ -140,6 +140,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Third-party MapLibre worker copied in by scripts/copy-maplibre-worker.mjs.
     "public/vendor/**",
+    // The marketing website is its own Next.js project with its own lint
+    // config and CI job (website/eslint.config.mjs, ci.yml "website").
+    "website/**",
   ]),
 ]);
 
