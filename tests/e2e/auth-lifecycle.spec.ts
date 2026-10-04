@@ -119,6 +119,14 @@ test.describe("account lifecycle", () => {
     await expect(page).toHaveURL(/\/feed$/);
     await expect(page.getByText("Pistl").first()).toBeVisible();
 
+    /* Every list loads through the real PostgREST and its request guard
+       (a regression: the guard once broke all read-only functions). */
+    for (const path of ["/feed", "/carpool", "/crew", "/map"]) {
+      await page.goto(new URL(path, page.url()).toString());
+      await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+      await expect(page.getByText(/could not be loaded/i)).toHaveCount(0);
+    }
+
     await page.goto(new URL("/profile", page.url()).toString());
     /* The answers from the sign-up are the profile. */
     await expect(page.getByText(`@${handle}`)).toBeVisible();

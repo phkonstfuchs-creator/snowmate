@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(12);
+select plan(13);
 
 insert into auth.users (id, email)
 values
@@ -57,6 +57,27 @@ select lives_ok($$select public.check_request()$$, 'reads are not rate limited')
 -- Clients cannot see or reset the counter.
 select throws_ok($$select count(*) from private.request_log$$, '42501', null, 'the request log is not readable');
 select throws_ok($$delete from private.request_log$$, '42501', null, 'the request log cannot be cleared');
+
+-- PostgREST runs STABLE functions in a read-only transaction even when
+-- they are called with POST (/rpc). The guard must not try to log then,
+-- or every list_* call fails. The check runs in a subtransaction that is
+-- rolled back, which also restores read-write mode for pgTAP.
+reset role;
+create temp table read_only_result (error text);
+set local request.method = 'POST';
+set local request.jwt.claims = '{"sub":"c0c0c0c0-0000-4000-8000-000000000001","aal":"aal1"}';
+do $$
+begin
+  begin
+    set local transaction_read_only = on;
+    perform public.check_request();
+    raise exception 'passed';
+  exception when others then
+    insert into read_only_result values (sqlerrm);
+  end;
+end;
+$$;
+select is((select error from read_only_result), 'passed', 'a POST to a read-only function is not blocked by the guard');
 
 select * from finish();
 rollback;
