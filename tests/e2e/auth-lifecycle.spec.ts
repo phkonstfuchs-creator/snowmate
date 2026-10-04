@@ -131,7 +131,7 @@ test.describe("account lifecycle", () => {
        names the message instead of only the URL. */
     const formError = page.locator("p[role=alert]").filter({ hasText: /\S/ });
     await Promise.race([page.waitForURL(/\/feed$/), formError.waitFor()]);
-    await expect(formError).toHaveCount(0);
+    await expect(formError).toHaveText([]);
     await expect(page).toHaveURL(/\/feed$/);
   });
 });
