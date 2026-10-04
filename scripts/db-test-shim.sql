@@ -25,3 +25,9 @@ create function auth.uid() returns uuid language sql stable as $$
 $$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 alter database :"dbname" set search_path = "$user", public, extensions;
+create table auth.mfa_factors (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  factor_type text not null default 'totp',
+  status text not null default 'unverified'
+);
