@@ -34,10 +34,10 @@ test("a new user answers everything before the account step", async ({
   await page.getByRole("button", { name: /Innsbruck/ }).click();
   await page.getByRole("button", { name: /Chill/ }).click();
   await page.getByRole("button", { name: /Park/ }).click();
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByPlaceholder("Alex Rider").fill("Alex Rider");
   await page.getByLabel("Birth date").fill("2004-02-14");
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
 
   await expect(page.getByLabel("Email")).toBeVisible();
   await expect(page.getByRole("button", { name: "Create account" })).toBeVisible();

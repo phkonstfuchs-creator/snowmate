@@ -19,11 +19,11 @@ async function signUp(page: Page, email: string, password: string, handle: strin
   await page.goto("/signup");
   await page.getByRole("button", { name: /Innsbruck/ }).click();
   await page.getByRole("button", { name: /Chill/ }).click();
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByPlaceholder("Alex Rider").fill("E2E Rider");
   await page.getByLabel("Handle").fill(handle);
   await page.getByLabel("Birth date").fill("2000-01-15");
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Confirm password").fill(password);
