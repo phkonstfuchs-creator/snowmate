@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  parseEmailCode,
   validateLoginCredentials,
   validateSignupCredentials,
 } from "./credentials";
@@ -80,5 +81,14 @@ describe("validateSignupCredentials", () => {
       expect(result.fieldErrors.password).toContain("v.passwordUpper");
       expect(result.fieldErrors.password).toContain("v.passwordNumber");
     }
+  });
+});
+
+describe("parseEmailCode", () => {
+  it.each([["123456", "123456"], ["12 34 56", "123456"], ["1234567890", "1234567890"]])("accepts %s", (input, code) => {
+    expect(parseEmailCode(input)).toBe(code);
+  });
+  it.each(["12345", "12345678901", "12a456", ""])("refuses %s", (input) => {
+    expect(parseEmailCode(input)).toBeNull();
   });
 });

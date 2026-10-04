@@ -78,8 +78,9 @@ describe("SignupFlow", () => {
     expect(screen.getByText("Handles are 3 to 20 letters, numbers or underscores.")).toBeInTheDocument();
   });
 
-  it("sends every answer with the account and shows the confirmation", async () => {
-    mocks.signUpAction.mockResolvedValue({ status: "success", message: "Check your email.", email: "lena@example.com" });
+  /* On success the server redirects to the code screen. */
+  it("sends every answer with the account", async () => {
+    mocks.signUpAction.mockResolvedValue({ status: "idle", message: "" });
     render(<SignupFlow startAtTitle={false} />);
     await toAccountStep();
 
@@ -89,7 +90,7 @@ describe("SignupFlow", () => {
     fireEvent.change(screen.getByLabelText("Confirm password"), { target: { value: "Fresh-Powder-2026" } });
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    await waitFor(() => expect(screen.getByText("Check your email.")).toBeInTheDocument());
+    await waitFor(() => expect(mocks.signUpAction).toHaveBeenCalled());
     const sent = mocks.signUpAction.mock.calls[0]?.[1] as FormData;
     expect(sent.get("city")).toBe("innsbruck");
     expect(sent.getAll("ridingStyles")).toEqual(["park", "chill"]);

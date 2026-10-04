@@ -9,6 +9,11 @@
   live availability check), birth date, then email and password, and
   creates the account with all of it at once.
 - Profile editing allows several riding styles.
+- The email is confirmed with a code typed into the app
+  (`/signup/verify`, owner asked for it on 2026-10-05); the link in the
+  same email still works. The address waits in an httpOnly cookie for an
+  hour, never in the URL. A new address and one that already has an
+  account see the same screen.
 
 ## Acceptance criteria
 
@@ -18,3 +23,6 @@
    before the account is created. `features/auth/actions.test.ts`
 3. Metadata can never set `is_minor`, `account_type` or
    `onboarding_completed`. `signup_profile.test.sql`, `account_profiles.test.sql`
+4. The code signs the person in; a wrong code says so without more; eight
+   wrong codes per address in 15 minutes stop further tries.
+   `features/auth/actions.test.ts`, `tests/e2e/auth-lifecycle.spec.ts`

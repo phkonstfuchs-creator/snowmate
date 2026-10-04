@@ -35,7 +35,7 @@ describe("getAuthRedirect", () => {
     },
   );
 
-  it.each(["/login", "/signup"])(
+  it.each(["/login", "/signup", "/signup/verify"])(
     "keeps signed-in users out of %s",
     (pathname) => {
       expect(getAuthRedirect(pathname, true)).toBe("/feed");
