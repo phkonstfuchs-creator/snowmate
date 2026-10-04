@@ -87,7 +87,7 @@ test.describe("account lifecycle", () => {
     await signUp(page, email, password, handle);
 
     await expect(page).toHaveURL(/\/signup\/verify$/);
-    await expect(page.getByText("Check your inbox")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
 
     const code = await waitForConfirmationCode(request, mailpitUrl, email);
     await page.getByLabel("Code from the email").fill("000000");
@@ -120,7 +120,7 @@ test.describe("account lifecycle", () => {
 
     /* An address that already has an account gets the same screen. */
     await expect(page).toHaveURL(/\/signup\/verify$/);
-    await expect(page.getByText("Check your inbox")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await page.getByRole("link", { name: "Back to sign in" }).click();
 
     await page.getByLabel("Email").fill(email);
