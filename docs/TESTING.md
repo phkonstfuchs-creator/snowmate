@@ -36,6 +36,14 @@ PGURL=postgresql://postgres@localhost:5432/postgres scripts/test-db-local.sh
 
 It is a fast local check, not a replacement for `npm run test:db` in CI.
 
+## Concurrency
+
+pgTAP runs inside one rolled-back transaction, so it cannot race two
+sessions. `scripts/test-join-race.sh` commits a ride with three spots
+and lets twelve riders call `join_ride()` at the same moment, each in its
+own session; exactly three may get in. It runs in CI after the pgTAP
+suite and at the end of `scripts/test-db-local.sh`.
+
 ## What coverage means here
 
 `vitest.config.mts` enforces 80% on `features/**` and a short list of

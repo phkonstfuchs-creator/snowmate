@@ -25,6 +25,7 @@ describe("architecture rules", () => {
     ["a business rule importing React", "features/rides/capacity.ts", 'import { useState } from "react";', "independent of UI and framework"],
     ["a business rule querying the database", "features/rides/visibility.ts", 'import { createClient } from "@/lib/supabase/server";', "do not talk to the database"],
     ["a business rule importing a screen", "features/profile/account-stats.ts", 'import type { X } from "./ProfileScreen";', "must not depend on UI components"],
+    ["a reusable component reading fixtures", "components/feed/RideDetailSheet.tsx", 'import { ME } from "@/lib/data";', "get their data as props"],
   ])("rejects %s", async (_label, filePath, code, expected) => {
     const messages = await violations(filePath, code);
     expect(messages.join("\n")).toContain(expected);

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { User } from "@/lib/types";
 import { BADGES, ME } from "@/lib/data";
 import clsx from "clsx";
-import ConversationThread from "@/components/ConversationThread";
+import ConversationThread from "./ConversationThread";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";

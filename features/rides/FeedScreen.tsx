@@ -18,7 +18,7 @@ import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
 import PenguinMascot from "@/components/PenguinMascot";
-import UserProfileSheet from "@/components/UserProfileSheet";
+import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
@@ -257,7 +257,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       )}
 
       {/* Ride Detail Sheet */}
-      {selectedRide && (
+      {selectedRide && !storyUser && (
         <RideDetailSheet
           post={selectedRide.post}
           author={selectedRide.host}
@@ -267,7 +267,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           requests={selectedRide.requests}
           onRespond={(userId, accept) => { void board.respondRequest(selectedRide.post.id, userId, accept); }}
           isHost={selectedRide.isHost}
-          profilesEnabled={!board.isLive}
+          onOpenProfile={board.isLive ? undefined : setStoryUser}
           {...(board.isLive
             ? {
                 onSafety: (user: User) => {

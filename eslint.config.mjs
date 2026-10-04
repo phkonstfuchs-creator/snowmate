@@ -83,6 +83,26 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    /* Reusable components receive data as props; they never load sample
+       data themselves. Demo-only UI lives in features/demo. */
+    files: ["components/**/*.{ts,tsx}"],
+    ignores: ["components/**/*.test.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            routesAreEntryPoints,
+            {
+              ...noFixtures,
+              message: `Reusable components get their data as props and never read prototype fixtures. ${SEE}`,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     /* Signed-in routes render real data only; /demo is where fixtures live. */
     files: ["app/(app)/**/*.{ts,tsx}"],
     rules: {
