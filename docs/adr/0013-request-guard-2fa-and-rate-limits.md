@@ -51,6 +51,12 @@ Option 2, layered:
 
 - A bug in `check_request()` would block the whole Data API; it is small,
   tested, and runs as security definer with a fixed search path.
+  That risk happened once: PostgREST runs STABLE functions read-only even
+  when called with POST, and the guard tried to log those calls, so every
+  list failed in production. Fixed in
+  `20261005100000_request_guard_read_only.sql`: only read-write
+  transactions are counted. `request_guard.test.sql` and the E2E lifecycle
+  test (every list page loads without an error) now cover it.
 - The in-memory limits reset when an instance restarts and are per
   instance. Supabase Auth's own limits sit behind them.
 - Recovery codes for a lost authenticator are not offered yet; support
