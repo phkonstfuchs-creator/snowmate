@@ -11,7 +11,7 @@ import {
   CONVERSATIONS,
   ME,
 } from "@/lib/data";
-import ConversationThread from "@/components/ConversationThread";
+import ConversationThread from "@/features/demo/ConversationThread";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 

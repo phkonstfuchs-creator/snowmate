@@ -19,6 +19,7 @@ export default defineConfig({
       include: [
         "features/**/*.{ts,tsx}",
         "lib/collections.ts",
+        "lib/rate-limit.ts",
         "lib/supabase/config.ts",
         "lib/supabase/proxy.ts",
         "app/auth/confirm/route.ts",

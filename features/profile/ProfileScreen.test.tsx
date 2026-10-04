@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import ProfileScreen from "./ProfileScreen";
 import type { OwnProfile } from "./profile-input";
 
-vi.mock("@/features/auth/actions", () => ({ signOutAction: vi.fn() }));
+vi.mock("@/features/auth/actions", () => ({ signOutAction: vi.fn(), updatePasswordAction: vi.fn() }));
+vi.mock("./security-actions", () => ({ enrollMfaAction: vi.fn(), confirmMfaAction: vi.fn(), disableMfaAction: vi.fn() }));
 vi.mock("./actions", () => ({ updateProfileAction: vi.fn(), setBirthDateAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
@@ -12,6 +13,7 @@ const incomplete: OwnProfile = {
   handle: null,
   city: null,
   abilityLevel: null,
+  ridingStyles: [],
   bio: null,
   birthDate: null,
   isMinor: true,
@@ -32,12 +34,12 @@ describe("ProfileScreen", () => {
   it("shows the signed-in account and its region", () => {
     render(
       <ProfileScreen
-        account={{ ...incomplete, displayName: "Lena Moser", handle: "lena_m", city: "salzburg", abilityLevel: "park", onboardingCompleted: true }}
+        account={{ ...incomplete, displayName: "Lena Moser", handle: "lena_m", city: "salzburg", abilityLevel: "park", ridingStyles: ["park", "chill"], onboardingCompleted: true }}
         stats={{ rides: 3, resorts: 2, crew: 5 }}
       />,
     );
 
-    expect(screen.getByText("Salzburg · Park")).toBeInTheDocument();
+    expect(screen.getByText("Salzburg · Park · Chill")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
     expect(screen.queryByText("Stamps")).not.toBeInTheDocument();
     expect(screen.queryByText(/XP to level/)).not.toBeInTheDocument();

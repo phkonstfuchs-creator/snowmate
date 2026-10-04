@@ -25,3 +25,13 @@ create function auth.uid() returns uuid language sql stable as $$
 $$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 alter database :"dbname" set search_path = "$user", public, extensions;
+create table auth.mfa_factors (
+  -- Mirrors the Supabase columns the tests write: no defaults, like the real table.
+  id uuid primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  friendly_name text,
+  factor_type text not null,
+  status text not null,
+  created_at timestamptz not null,
+  updated_at timestamptz not null
+);

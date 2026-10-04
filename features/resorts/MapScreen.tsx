@@ -18,6 +18,11 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import type { MapPerson } from "@/components/LeafletMap";
+import { useLiveLocation } from "@/features/location/useLiveLocation";
+import LocationPanel from "@/features/location/LocationPanel";
+import type { FriendLocation } from "@/features/location/location";
+import { initialsFor } from "@/features/profile/profile-input";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
 
@@ -166,7 +171,13 @@ export interface LiveMap {
   /* null when the backend could not be reached */
   rides: LiveRide[] | null;
   defaultCity: City;
+  /* When my location sharing ends; null when off. */
+  sharingEnd?: string | null;
+  /* Friends sharing right now; null when unreachable. */
+  friends?: FriendLocation[] | null;
 }
+
+type LocationState = ReturnType<typeof useLiveLocation>;
 
 const FIXTURE_RIDES = RIDE_POSTS.map((post) => fixtureToLiveRide(post, false)).filter(
   (ride): ride is LiveRide => ride !== null,
@@ -174,7 +185,39 @@ const FIXTURE_RIDES = RIDE_POSTS.map((post) => fixtureToLiveRide(post, false)).f
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function MapScreen({ live }: { live?: LiveMap }) {
+  return live ? <LiveMapScreen live={live} /> : <MapBody />;
+}
+
+function LiveMapScreen({ live }: { live: LiveMap }) {
+  const location = useLiveLocation({
+    initialSharingEnd: live.sharingEnd ?? null,
+    initialFriends: live.friends ?? [],
+  });
+  return <MapBody live={live} location={location} />;
+}
+
+function MapBody({ live, location }: { live?: LiveMap; location?: LocationState }) {
   const t = useT();
+  const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(null);
+  const people = useMemo<MapPerson[]>(
+    () =>
+      (location?.friends ?? []).map((friend) => ({
+        id: friend.userId,
+        label: friend.name,
+        initials: initialsFor(friend.name, friend.handle),
+        lat: friend.lat,
+        lng: friend.lng,
+      })),
+    [location?.friends],
+  );
+  const focusOn = (lat: number, lng: number) => setFocus({ lat, lng, zoom: 14, key: Date.now() });
+  const locateMe = () => {
+    if (!location) return;
+    if (location.me) focusOn(location.me.lat, location.me.lng);
+    location.locate();
+  };
+  /* Set on "show my location"; the map flies to the first fix after it. */
+  const [locateRequest, setLocateRequest] = useState(0);
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
   const isLive = live !== undefined;
@@ -222,13 +265,56 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
       </header>
 
       {/* Real Leaflet map */}
-      <div style={{ height: 280, position: "relative", overflow: "hidden" }}>
+      <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>
         <LeafletMap
           city={city}
           resorts={resorts}
           onSelect={(resort) => setActiveSheet({ type: "resort", resort })}
+          me={location?.me ?? null}
+          people={people}
+          onPersonSelect={(id) => {
+            const friend = location?.friends?.find((item) => item.userId === id);
+            if (friend) focusOn(friend.lat, friend.lng);
+          }}
+          focus={focus}
+          locateRequest={locateRequest}
         />
+        {location && (
+          <button
+            type="button"
+            onClick={() => {
+              setLocateRequest(Date.now());
+              locateMe();
+            }}
+            aria-label={t("loc.locateMe")}
+            className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center"
+            style={{ zIndex: 500, background: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
+          >
+            <Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} strokeWidth={2.2} />
+          </button>
+        )}
+        {location?.locating && (
+          <p role="status" className="absolute bottom-3 left-3 px-2 py-1 text-xs font-semibold"
+            style={{ zIndex: 500, background: "var(--paper-0)", border: "var(--rule-thin)", color: INK }}>
+            {t("loc.locating")}
+          </p>
+        )}
       </div>
+
+      {location && (
+        <LocationPanel
+          sharingEnd={location.sharingEnd}
+          busy={location.busy}
+          error={location.error ? t(location.error) : null}
+          friends={location.friends}
+          onShare={location.startSharing}
+          onStop={() => void location.stopSharing()}
+          onFocusFriend={(friend) => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            focusOn(friend.lat, friend.lng);
+          }}
+        />
+      )}
 
       {live && live.rides === null && (
         <p role="status" className="mx-4 mt-3 px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>

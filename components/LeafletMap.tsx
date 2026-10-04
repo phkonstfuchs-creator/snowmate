@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type {
+  Circle,
+  CircleMarker,
   Map as LeafletMapInstance,
   Marker,
 } from "leaflet";
@@ -19,10 +21,28 @@ const CITY_VIEWS = {
   { center: [number, number]; zoom: number }
 >;
 
+export interface MapPerson {
+  id: string;
+  label: string;
+  initials: string;
+  lat: number;
+  lng: number;
+}
+
 interface LeafletMapProps {
   city: ResortStatus["city"];
   resorts: readonly ResortStatus[];
   onSelect: (resort: ResortStatus) => void;
+  /* The viewer's own position, shown as a dot with its accuracy. */
+  me?: { lat: number; lng: number; accuracy: number | null } | null;
+  /* Friends who share their position. */
+  people?: readonly MapPerson[];
+  onPersonSelect?: (id: string) => void;
+  /* Changes when the view should jump to a point (e.g. "locate me"). */
+  focus?: { lat: number; lng: number; zoom: number; key: number } | null;
+  /* Changes on "show my location": fly to the next known own position. */
+  locateRequest?: number;
+  ariaLabel?: string;
 }
 
 type LeafletModule = typeof import("leaflet");
@@ -31,10 +51,19 @@ export default function LeafletMap({
   city,
   resorts,
   onSelect,
+  me = null,
+  people = [],
+  onPersonSelect,
+  focus = null,
+  locateRequest = 0,
+  ariaLabel,
 }: LeafletMapProps) {
+  const handledLocate = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMapInstance | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const peopleRef = useRef<Marker[]>([]);
+  const meRef = useRef<{ dot: CircleMarker; ring: Circle } | null>(null);
   const [leaflet, setLeaflet] = useState<LeafletModule | null>(null);
   const [hasLoadError, setHasLoadError] = useState(false);
 
@@ -77,7 +106,7 @@ export default function LeafletMap({
           {
             attribution:
               '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            maxZoom: 14,
+            maxZoom: 17,
           },
         )
         .addTo(map);
@@ -111,8 +140,76 @@ export default function LeafletMap({
     });
   }, [city, leaflet, onSelect, resorts]);
 
+  /* Friends' positions: initials in a pin, name underneath. Text goes in
+     through textContent, never as HTML. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!leaflet || !map) return;
+
+    peopleRef.current.forEach((marker) => marker.remove());
+    peopleRef.current = people.map((person) => {
+      const pin = document.createElement("div");
+      pin.className = "friend-pin";
+      const badge = document.createElement("span");
+      badge.className = "friend-pin-badge";
+      badge.textContent = person.initials;
+      const name = document.createElement("span");
+      name.className = "friend-pin-name";
+      name.textContent = person.label;
+      pin.append(badge, name);
+
+      const marker = leaflet
+        .marker([person.lat, person.lng], {
+          icon: leaflet.divIcon({ className: "", html: pin, iconSize: [40, 40], iconAnchor: [20, 20] }),
+          zIndexOffset: 500,
+          keyboard: true,
+          title: person.label,
+        })
+        .addTo(map);
+      marker.on("click", () => onPersonSelect?.(person.id));
+      return marker;
+    });
+  }, [leaflet, people, onPersonSelect, city]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!leaflet || !map) return;
+
+    if (!me) {
+      meRef.current?.dot.remove();
+      meRef.current?.ring.remove();
+      meRef.current = null;
+      return;
+    }
+
+    const radius = Math.min(Math.max(me.accuracy ?? 0, 5), 2000);
+    if (meRef.current) {
+      meRef.current.dot.setLatLng([me.lat, me.lng]);
+      meRef.current.ring.setLatLng([me.lat, me.lng]).setRadius(radius);
+    } else {
+      meRef.current = {
+        ring: leaflet.circle([me.lat, me.lng], { radius, color: "#2f6fb2", weight: 1, fillOpacity: 0.12 }).addTo(map),
+        dot: leaflet
+          .circleMarker([me.lat, me.lng], { radius: 8, color: "#ffffff", weight: 3, fillColor: "#2f6fb2", fillOpacity: 1 })
+          .addTo(map),
+      };
+    }
+  }, [leaflet, me, city]);
+
+  useEffect(() => {
+    if (!me || !mapRef.current || locateRequest === 0 || handledLocate.current === locateRequest) return;
+    handledLocate.current = locateRequest;
+    mapRef.current.flyTo([me.lat, me.lng], 14, { animate: true, duration: 0.8 });
+  }, [me, locateRequest]);
+
+  useEffect(() => {
+    if (!focus || !mapRef.current) return;
+    mapRef.current.flyTo([focus.lat, focus.lng], focus.zoom, { animate: true, duration: 0.8 });
+  }, [focus]);
+
   useEffect(() => {
     return () => {
+      peopleRef.current.forEach((marker) => marker.remove());
       markersRef.current.forEach((marker) => marker.remove());
       mapRef.current?.remove();
       mapRef.current = null;
@@ -134,7 +231,7 @@ export default function LeafletMap({
   return (
     <div
       ref={containerRef}
-      aria-label={`Map of ski resorts around ${city === "innsbruck" ? "Innsbruck" : "Salzburg"}`}
+      aria-label={ariaLabel ?? `Map of ski resorts around ${city === "innsbruck" ? "Innsbruck" : "Salzburg"}`}
       className="printed-map"
       style={{ width: "100%", height: "100%", minHeight: 260 }}
     />

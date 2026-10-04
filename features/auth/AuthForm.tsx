@@ -110,6 +110,15 @@ export default function AuthForm({ mode }: AuthFormProps) {
         disabled={isPending}
         required
       />
+      {!isSignup ? (
+        <Link
+          href="/forgot-password"
+          className="-mt-2 block w-fit py-1 text-sm font-semibold underline"
+          style={{ color: "var(--ink-2)" }}
+        >
+          {t("auth.forgotPassword")}
+        </Link>
+      ) : null}
       {isSignup ? (
         <Input
           ref={confirmPasswordRef}

@@ -42,11 +42,18 @@ const bioSchema = z
   .max(300, "v.max|300")
   .transform((value) => (value === "" ? null : value));
 
+/* One to three styles, in the order chosen; the first is the primary
+   one (profiles.ability_level). Repeats collapse, as in the database. */
+export const ridingStylesSchema = z
+  .array(z.enum(ABILITY_VALUES, "v.pickStyle"), "v.pickStyle")
+  .transform((styles) => [...new Set(styles)])
+  .pipe(z.array(z.enum(ABILITY_VALUES)).min(1, "v.pickStyle").max(3, "v.pickStyle"));
+
 export const profileInputSchema = z.object({
   displayName: displayNameSchema,
   handle: handleSchema,
   city: z.enum(CITY_VALUES, "v.pickRegion"),
-  abilityLevel: z.enum(ABILITY_VALUES, "v.pickStyle"),
+  ridingStyles: ridingStylesSchema,
   bio: bioSchema.optional(),
 });
 
@@ -90,7 +97,11 @@ export function draftToProfileInput(draft: unknown): Record<string, unknown> | n
     displayName: value.displayName,
     handle: value.handle,
     city: value.city,
-    abilityLevel: value.style,
+    ridingStyles: Array.isArray(value.styles)
+      ? value.styles
+      : typeof value.style === "string"
+        ? [value.style]
+        : [],
   };
 }
 
@@ -100,6 +111,7 @@ export interface OwnProfile {
   handle: string | null;
   city: City | null;
   abilityLevel: AbilityLevel | null;
+  ridingStyles: AbilityLevel[];
   bio: string | null;
   /* ISO date, visible to the owner only; null until they add it. */
   birthDate: string | null;
@@ -112,6 +124,7 @@ export interface ProfileRow {
   handle: string | null;
   city: string | null;
   ability_level: string | null;
+  riding_styles?: string[] | null;
   bio: string | null;
   birth_date?: string | null;
   is_minor: boolean;
@@ -132,6 +145,9 @@ export function toOwnProfile(row: ProfileRow): OwnProfile {
     handle: row.handle,
     city: isCity(row.city) ? row.city : null,
     abilityLevel: isAbility(row.ability_level) ? row.ability_level : null,
+    ridingStyles: (row.riding_styles?.length ? row.riding_styles : [row.ability_level]).filter(
+      (style): style is AbilityLevel => isAbility(style ?? null),
+    ),
     bio: row.bio,
     birthDate: row.birth_date ?? null,
     isMinor: row.is_minor,

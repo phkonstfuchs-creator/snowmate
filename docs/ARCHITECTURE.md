@@ -35,7 +35,8 @@ Browser ◄── feature screens (client components) ◄───────�
 | `features/<f>/queries.ts` | Server-side reads, shaping rows into UI types | Import fixtures, UI or hooks |
 | `features/<f>/actions.ts`, `*-actions.ts` | Server actions: validate input, call the database, revalidate | Import fixtures, UI or hooks |
 | `features/<f>/*.ts` (everything else) | Business rules: validation (`*-input.ts`), mapping (`live-*.ts`), capacity, visibility | Import React, Next, Supabase, fixtures, hooks or UI |
-| `components/` | Reusable presentation; receives data and callbacks as props | Own business rules |
+| `components/` | Reusable presentation; receives data and callbacks as props | Own business rules, read fixtures |
+| `features/demo/` | UI that exists only in the prototype (sample profiles, chats) | Be used by signed-in routes |
 | `lib/resorts.ts` | Reference data: the resorts covered, regions, coordinates | Carry sample conditions |
 | `lib/data/` | Prototype fixtures only | Be read by signed-in routes or the server boundary |
 | `lib/i18n/` | Locale choice, the en/de dictionaries, `getT()` (server) and `useT()` (client) | Hold business rules |
@@ -93,6 +94,7 @@ deliberate violation:
 |---|---|---|
 | Routes are entry points | everywhere | imports from `@/app/…` |
 | Real data stays separate from fixtures | `app/(app)/**`, queries, actions | `@/lib/data` |
+| Components get data as props | `components/**` | `@/lib/data` |
 | Business rules stay independent | `features/**/*.ts` except queries, actions, hooks | React, Next, Supabase, `@/components`, hooks, `*Screen`/`*Sheet`/`*Modal` |
 | The server boundary returns data | queries, actions | React, `@/components`, hooks |
 | Protected data has an audience | database | pgTAP tests in `supabase/tests/database/` |

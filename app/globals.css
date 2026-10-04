@@ -609,3 +609,21 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .xp-toast { animation: fade-in 0.2s ease both; }
 }
+
+/* Friends on the live map */
+.friend-pin { display: flex; flex-direction: column; align-items: center; width: 40px; }
+.friend-pin-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; flex-shrink: 0;
+  border-radius: 9999px; border: 3px solid #ffffff;
+  background: var(--rust); color: var(--paper-0);
+  font-family: var(--font-mono-stack); font-size: 12px; font-weight: 700;
+  box-shadow: 0 1px 4px rgba(28, 24, 21, 0.45);
+}
+.friend-pin-name {
+  margin-top: 2px; max-width: 90px; padding: 0 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--paper-0); color: var(--ink-0);
+  font-size: 10px; font-weight: 800; line-height: 14px;
+  border: 1px solid var(--ink-0);
+}

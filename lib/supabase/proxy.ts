@@ -42,10 +42,16 @@ export async function updateSession(request: NextRequest) {
   });
 
   let isAuthenticated = false;
+  let needsSecondFactor = false;
 
   try {
     const { data } = await supabase.auth.getClaims();
     isAuthenticated = Boolean(data?.claims);
+
+    if (isAuthenticated && data?.claims?.aal !== "aal2") {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      needsSecondFactor = aal?.nextLevel === "aal2";
+    }
   } catch {
     // Fail closed when identity verification is unavailable.
   }
@@ -53,6 +59,7 @@ export async function updateSession(request: NextRequest) {
   const redirectPath = getAuthRedirect(
     request.nextUrl.pathname,
     isAuthenticated,
+    needsSecondFactor,
   );
 
   if (redirectPath) {

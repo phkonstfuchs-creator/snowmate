@@ -48,6 +48,8 @@ jobs:
       - run: npx supabase start
       - run: npx supabase db reset
       - run: npm run test:db
+      - name: Simultaneous joins never overbook a ride
+        run: PGURL=postgresql://postgres:postgres@127.0.0.1:54322/postgres scripts/test-join-race.sh
       - name: Configure the app for local Supabase
         shell: bash
         run: |

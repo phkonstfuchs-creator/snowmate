@@ -16,6 +16,7 @@ const complete: OwnProfile = {
   handle: "lena_m",
   city: "salzburg",
   abilityLevel: "off-piste",
+  ridingStyles: ["off-piste"],
   bio: "Dawn patrol",
   birthDate: null,
   isMinor: true,
@@ -35,7 +36,8 @@ describe("ProfileEditSheet", () => {
     expect(screen.getByLabelText("Name")).toHaveValue("Lena Moser");
     expect(screen.getByLabelText("Handle")).toHaveValue("lena_m");
     expect(screen.getByRole("radio", { name: "Salzburg" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Off-piste" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Off-piste" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Park" })).not.toBeChecked();
   });
 
   it("prefills an incomplete profile from the onboarding draft", () => {
@@ -48,7 +50,7 @@ describe("ProfileEditSheet", () => {
 
     expect(screen.getByLabelText("Name")).toHaveValue("Max");
     expect(screen.getByRole("radio", { name: "Innsbruck" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Park" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Park" })).toBeChecked();
   });
 
   it("shows field errors returned by the server", async () => {

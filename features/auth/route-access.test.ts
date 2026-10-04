@@ -45,4 +45,25 @@ describe("getAuthRedirect", () => {
   it("allows signed-in users to continue onboarding", () => {
     expect(getAuthRedirect("/onboarding", true)).toBeNull();
   });
+
+  it.each(["/feed", "/profile", "/map", "/reset-password", "/login", "/signup", "/forgot-password"])(
+    "sends a session that still owes its second factor from %s to the code screen",
+    (pathname) => {
+      expect(getAuthRedirect(pathname, true, true)).toBe("/login/verify");
+    },
+  );
+
+  it("lets a session that owes its second factor stay on the code screen", () => {
+    expect(getAuthRedirect("/login/verify", true, true)).toBeNull();
+  });
+
+  it("keeps the code screen for signed-in sessions only", () => {
+    expect(getAuthRedirect("/login/verify", false)).toBe("/login");
+    expect(getAuthRedirect("/login/verify", true)).toBe("/feed");
+  });
+
+  it("protects the new-password screen", () => {
+    expect(getAuthRedirect("/reset-password", false)).toBe("/login");
+    expect(getAuthRedirect("/reset-password", true)).toBeNull();
+  });
 });

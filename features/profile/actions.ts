@@ -43,7 +43,8 @@ async function writeProfile(
         display_name: input.displayName,
         handle: input.handle,
         city: input.city,
-        ability_level: input.abilityLevel,
+        riding_styles: input.ridingStyles,
+        ability_level: input.ridingStyles[0],
         ...(input.bio !== undefined ? { bio: input.bio } : {}),
       })
       .eq("id", userId);
@@ -92,7 +93,7 @@ export async function updateProfileAction(
     displayName: stringField(formData, "displayName"),
     handle: stringField(formData, "handle"),
     city: stringField(formData, "city"),
-    abilityLevel: stringField(formData, "abilityLevel"),
+    ridingStyles: formData.getAll("ridingStyles").filter((value): value is string => typeof value === "string"),
     bio: stringField(formData, "bio"),
   });
   const t = await getT();

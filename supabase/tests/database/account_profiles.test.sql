@@ -71,13 +71,13 @@ select results_eq(
   $$,
   $$
     values (
-      null::text,
+      'Injected'::text,
       true,
       'standard'::text,
       false
     )
   $$,
-  'the auth trigger ignores user-controlled signup metadata'
+  'signup metadata fills profile fields but never is_minor, account_type or onboarding_completed'
 );
 
 delete from auth.users

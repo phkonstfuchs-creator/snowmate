@@ -73,6 +73,31 @@ page). Under 14 is refused. The birth date is self-declared, visible only
 to its owner and included in the data export. Without one, the narrower
 rules above apply. See [ADR 0012](adr/0012-age-from-birth-date.md).
 
+## Live location
+
+Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed
+friends see it; friends of friends, strangers and blocked people never
+do. Only the latest position is stored, rounded to about 10 m, no
+history; it is part of the data export and goes with the account. A
+browser only reports the position while the app is open. See
+[ADR 0015](adr/0015-live-location-for-confirmed-friends.md).
+
+## Sign-in and abuse limits
+
+- Passwords: 12+ characters, upper and lower case, a digit; common
+  passwords and the email's own name are refused.
+- Two-factor sign-in with an authenticator app (Profile tab). With it on,
+  a password-only session reaches nothing, enforced in the database
+  (`public.check_request`, the PostgREST pre-request hook).
+- Limits: sign-in 8 tries per account and visitor and 30 per visitor in 15
+  minutes; sign-up, reset, handle checks and codes are limited too; every
+  account at most 300 writes a minute in the database.
+- Free text may not contain control characters or bidi overrides; React
+  escapes all output, nothing renders user text as HTML.
+- Confirmation and reset links only redirect to allow-listed app paths.
+
+See [ADR 0013](adr/0013-request-guard-2fa-and-rate-limits.md).
+
 ## Account rights (GDPR)
 
 - Art. 15 and 20: `/profile/export` downloads everything stored about the
@@ -89,7 +114,7 @@ response headers (CSP, frame, referrer, permissions, HSTS) are set in
 
 ## Not yet covered
 
-Chats, squads and live location have no backend.
+Chats and squads have no backend.
 Do not attach real data to them before they have their own schema,
 audience rules and negative tests. Direct messages involving minors need a
 product decision on consent and moderation first.

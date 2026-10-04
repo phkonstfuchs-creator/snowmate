@@ -36,4 +36,6 @@ for test in supabase/tests/database/*.sql; do
   fi
 done
 
+PGURL="$TEST_URL" scripts/test-join-race.sh || failed=1
+
 exit "$failed"

@@ -1,13 +1,19 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getSupabasePublicConfig } from "@/lib/supabase/config";
+import { getSiteUrl } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
-import type { AuthActionState } from "./action-state";
+import { rateLimiter } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
+import type { AuthActionState, HandleCheck } from "./action-state";
 import {
+  parseOtpCode,
+  validateEmailOnly,
   validateLoginCredentials,
+  validateNewPassword,
   validateSignupCredentials,
 } from "./credentials";
+import { toSignupMetadata, validateSignupProfile, viennaToday } from "./signup-profile";
 import { getT } from "@/lib/i18n/server";
 import { translateFieldErrors, type MessageKey, type Translate } from "@/lib/i18n/translate";
 
@@ -61,6 +67,22 @@ function signUpErrorMessage(t: Translate, code: string | undefined): string {
   return t((code && SIGN_UP_ERROR_MESSAGES[code]) || "auth.signUpFailed");
 }
 
+async function hashKey(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Buffer.from(digest).toString("base64url").slice(0, 24);
+}
+
+/* An account with a verified second factor gets an aal1 session from
+   the password alone; it must pass /login/verify before anything else. */
+async function needsSecondFactor(supabase: Awaited<ReturnType<typeof createClient>>): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    return data?.nextLevel === "aal2" && data.currentLevel !== "aal2";
+  } catch {
+    return false;
+  }
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -76,7 +98,14 @@ export async function signInAction(
     return invalidState(t, input.email, validation.fieldErrors);
   }
 
+  const ip = await getRequestIp();
+  const accountKey = await hashKey(`${ip}|${validation.data.email}`);
+  if (!rateLimiter.hit("loginIp", ip) || !rateLimiter.hit("loginAccount", accountKey)) {
+    return { status: "error", message: t("auth.tooManyAttempts"), email: validation.data.email };
+  }
+
   const supabase = await createClient();
+  let secondFactor = false;
 
   try {
     const { error } = await supabase.auth.signInWithPassword(validation.data);
@@ -88,6 +117,9 @@ export async function signInAction(
         email: validation.data.email,
       };
     }
+
+    rateLimiter.reset("loginAccount", accountKey);
+    secondFactor = await needsSecondFactor(supabase);
   } catch {
     return {
       status: "error",
@@ -96,7 +128,7 @@ export async function signInAction(
     };
   }
 
-  redirect("/feed");
+  redirect(secondFactor ? "/login/verify" : "/feed");
 }
 
 export async function signUpAction(
@@ -108,22 +140,54 @@ export async function signUpAction(
     password: stringField(formData, "password"),
     confirmPassword: stringField(formData, "confirmPassword"),
   };
-  const validation = validateSignupCredentials(input);
+  const profileInput = {
+    displayName: stringField(formData, "displayName"),
+    handle: stringField(formData, "handle"),
+    city: stringField(formData, "city"),
+    ridingStyles: formData.getAll("ridingStyles").filter((value): value is string => typeof value === "string"),
+    birthDate: stringField(formData, "birthDate"),
+  };
   const t = await getT();
 
-  if (!validation.success) {
-    return invalidState(t, input.email, validation.fieldErrors);
+  const validation = validateSignupCredentials(input);
+  const profile = validateSignupProfile(profileInput, viennaToday());
+
+  if (!validation.success || !profile.success) {
+    return {
+      status: "error",
+      message: t("v.checkFields"),
+      email: input.email,
+      fieldErrors: validation.success ? undefined : translateFieldErrors(t, validation.fieldErrors),
+      profileErrors: profile.success ? undefined : translateFieldErrors(t, profile.fieldErrors),
+    };
+  }
+
+  const ip = await getRequestIp();
+  if (!rateLimiter.hit("signupIp", ip)) {
+    return { status: "error", message: t("auth.tooManyAttempts"), email: validation.data.email };
   }
 
   const supabase = await createClient();
-  const { siteUrl } = getSupabasePublicConfig();
 
   try {
+    const { data: available, error: handleError } = await supabase.rpc("handle_available", {
+      candidate: profile.data.handle,
+    });
+    if (!handleError && available === false) {
+      return {
+        status: "error",
+        message: t("v.checkFields"),
+        email: validation.data.email,
+        profileErrors: { handle: t("v.handleTaken") },
+      };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: validation.data.email,
       password: validation.data.password,
       options: {
-        emailRedirectTo: new URL("/auth/confirm", siteUrl).toString(),
+        emailRedirectTo: new URL("/auth/confirm", getSiteUrl()).toString(),
+        data: toSignupMetadata(profile.data),
       },
     });
 
@@ -157,6 +221,23 @@ export async function signUpAction(
   redirect("/feed");
 }
 
+/* Live feedback while typing a handle in the onboarding. */
+export async function checkHandleAction(candidate: string): Promise<HandleCheck> {
+  if (typeof candidate !== "string" || !/^[a-z0-9_]{3,20}$/.test(candidate.trim().toLowerCase())) {
+    return "invalid";
+  }
+  if (!rateLimiter.hit("handleCheckIp", await getRequestIp())) return "unknown";
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("handle_available", { candidate });
+    if (error || typeof data !== "boolean") return "unknown";
+    return data ? "available" : "taken";
+  } catch {
+    return "unknown";
+  }
+}
+
 export async function signOutAction(): Promise<void> {
   const supabase = await createClient();
 
@@ -175,4 +256,127 @@ export async function signOutAction(): Promise<void> {
   }
 
   redirect("/login");
+}
+
+/* Always answers the same, whether or not the address has an account. */
+export async function requestPasswordResetAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const t = await getT();
+  const email = stringField(formData, "email");
+  const validation = validateEmailOnly({ email });
+
+  if (!validation.success) {
+    return invalidState(t, email, validation.fieldErrors);
+  }
+
+  if (!rateLimiter.hit("passwordResetIp", await getRequestIp())) {
+    return { status: "error", message: t("auth.tooManyAttempts"), email };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(validation.data.email, {
+      redirectTo: new URL("/auth/confirm?next=/reset-password", getSiteUrl()).toString(),
+    });
+    if (error && error.code === "over_email_send_rate_limit") {
+      return { status: "error", message: t("auth.emailRateLimit"), email };
+    }
+  } catch {
+    return { status: "error", message: t("auth.signInUnavailable"), email };
+  }
+
+  return { status: "success", message: t("auth.resetSent"), email: validation.data.email };
+}
+
+/* Sets a new password for the signed-in account: after a reset link, or
+   from the Profile tab. */
+export async function updatePasswordAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const t = await getT();
+  const validation = validateNewPassword({
+    password: stringField(formData, "password"),
+    confirmPassword: stringField(formData, "confirmPassword"),
+  });
+
+  if (!validation.success) {
+    return invalidState(t, "", validation.fieldErrors);
+  }
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) {
+    return { status: "error", message: t("profile.sessionEnded") };
+  }
+  if (!rateLimiter.hit("passwordChangeUser", userId)) {
+    return { status: "error", message: t("auth.tooManyAttempts") };
+  }
+
+  try {
+    const { error } = await supabase.auth.updateUser({ password: validation.data.password });
+    if (error) {
+      const key: MessageKey =
+        error.code === "same_password"
+          ? "auth.samePassword"
+          : error.code === "weak_password"
+            ? "auth.weakPassword"
+            : error.code === "insufficient_aal"
+              ? "mfa.required"
+              : "auth.passwordChangeFailed";
+      return { status: "error", message: t(key) };
+    }
+  } catch {
+    return { status: "error", message: t("auth.passwordChangeFailed") };
+  }
+
+  return { status: "success", message: t("auth.passwordChanged") };
+}
+
+/* Second step of signing in when the account has 2FA. */
+export async function verifyLoginMfaAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const t = await getT();
+  const code = parseOtpCode(stringField(formData, "code"));
+  if (!code) {
+    return { status: "error", message: t("mfa.codeFormat") };
+  }
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) {
+    redirect("/login");
+  }
+  if (!rateLimiter.hit("mfaUser", userId)) {
+    return { status: "error", message: t("auth.tooManyAttempts") };
+  }
+
+  try {
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const factor = factors?.totp.find((item) => item.status === "verified");
+    if (!factor) {
+      redirect("/feed");
+    }
+    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    if (error) {
+      return { status: "error", message: t("mfa.wrongCode") };
+    }
+    rateLimiter.reset("mfaUser", userId);
+  } catch (error) {
+    if (isRedirect(error)) throw error;
+    return { status: "error", message: t("auth.signInUnavailable") };
+  }
+
+  redirect("/feed");
+}
+
+function isRedirect(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "digest" in error &&
+    String((error as { digest: unknown }).digest).startsWith("NEXT_REDIRECT");
 }

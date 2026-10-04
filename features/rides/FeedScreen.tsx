@@ -18,7 +18,7 @@ import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
 import PenguinMascot from "@/components/PenguinMascot";
-import UserProfileSheet from "@/components/UserProfileSheet";
+import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
@@ -117,9 +117,20 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           {liveUsers.map((u) => (
             <button
               key={u.id}
-              /* The profile sheet still runs on fixture stats; real
-                 accounts do not share those yet. */
-              onClick={board.isLive ? undefined : () => setStoryUser(u)}
+              /* Live: opens the ride this person is on today. The demo
+                 profile sheet runs on fixture stats, which real accounts
+                 do not have. */
+              onClick={
+                board.isLive
+                  ? () => {
+                      const ride = todaysRides.find(
+                        (item) => item.host.id === u.id || item.participants.some((p) => p.id === u.id),
+                      );
+                      if (ride) setSelectedPostId(ride.post.id);
+                    }
+                  : () => setStoryUser(u)
+              }
+              aria-label={u.name}
               className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform"
             >
               <div className="story-ring">
@@ -246,7 +257,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       )}
 
       {/* Ride Detail Sheet */}
-      {selectedRide && (
+      {selectedRide && !storyUser && (
         <RideDetailSheet
           post={selectedRide.post}
           author={selectedRide.host}
@@ -256,7 +267,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           requests={selectedRide.requests}
           onRespond={(userId, accept) => { void board.respondRequest(selectedRide.post.id, userId, accept); }}
           isHost={selectedRide.isHost}
-          profilesEnabled={!board.isLive}
+          onOpenProfile={board.isLive ? undefined : setStoryUser}
           {...(board.isLive
             ? {
                 onSafety: (user: User) => {

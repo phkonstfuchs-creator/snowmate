@@ -10,7 +10,7 @@ const valid = {
   displayName: "  Lena Moser ",
   handle: "@Lena_M",
   city: "innsbruck",
-  abilityLevel: "park",
+  ridingStyles: ["park", "chill", "park"],
 };
 
 describe("validateProfileInput", () => {
@@ -21,7 +21,7 @@ describe("validateProfileInput", () => {
         displayName: "Lena Moser",
         handle: "lena_m",
         city: "innsbruck",
-        abilityLevel: "park",
+        ridingStyles: ["park", "chill"],
       },
     });
   });
@@ -36,7 +36,7 @@ describe("validateProfileInput", () => {
       displayName: "A",
       handle: "no spaces!",
       city: "vienna",
-      abilityLevel: "",
+      ridingStyles: [],
       bio: "x".repeat(301),
     });
 
@@ -46,7 +46,7 @@ describe("validateProfileInput", () => {
         displayName: "v.min|2",
         handle: "v.handleChars",
         city: "v.pickRegion",
-        abilityLevel: "v.pickStyle",
+        ridingStyles: "v.pickStyle",
         bio: "v.max|300",
       },
     });
@@ -77,7 +77,7 @@ describe("draftToProfileInput", () => {
   it("maps the onboarding draft shape", () => {
     expect(
       draftToProfileInput({ city: "salzburg", style: "chill", displayName: "Max", handle: "max" }),
-    ).toEqual({ displayName: "Max", handle: "max", city: "salzburg", abilityLevel: "chill" });
+    ).toEqual({ displayName: "Max", handle: "max", city: "salzburg", ridingStyles: ["chill"] });
   });
 
   it.each([null, "text", 3, ["a"]])("returns null for %j", (draft) => {
@@ -102,6 +102,7 @@ describe("toOwnProfile", () => {
       handle: "max",
       city: null,
       abilityLevel: null,
+      ridingStyles: [],
       bio: null,
       birthDate: null,
       isMinor: true,

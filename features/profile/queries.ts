@@ -17,7 +17,7 @@ export async function getOwnProfile(): Promise<OwnProfile | null> {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("display_name, handle, city, ability_level, bio, birth_date, is_minor, onboarding_completed")
+      .select("display_name, handle, city, ability_level, riding_styles, bio, birth_date, is_minor, onboarding_completed")
       .eq("id", userId)
       .maybeSingle<ProfileRow>();
 
@@ -41,5 +41,18 @@ export async function refreshOwnAge(): Promise<void> {
     await supabase.rpc("refresh_my_age");
   } catch {
     // Fail closed: the stored flag stays as it is.
+  }
+}
+
+/* Whether the account has a verified authenticator app. null when it
+   could not be checked. */
+export async function getMfaEnabled(): Promise<boolean | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.mfa.listFactors();
+    if (error || !data) return null;
+    return data.totp.some((factor) => factor.status === "verified");
+  } catch {
+    return null;
   }
 }
