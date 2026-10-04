@@ -17,6 +17,9 @@ import InviteLinkCard from "./InviteLinkCard";
 import { useT } from "@/lib/i18n/client";
 import type { Translate } from "@/lib/i18n/translate";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import ChatList from "@/features/chat/ChatList";
+import { openDirectChatAction } from "@/features/chat/actions";
+import type { ChatSummary } from "@/features/chat/message";
 import type { SafetyTarget } from "@/features/safety/reports";
 
 const INK = "var(--ink-0)";
@@ -78,9 +81,9 @@ function Section({ label, count, children }: { label: string; count: number; chi
   );
 }
 
-/* The signed-in crew screen. Squads and chats have no backend yet, so
-   this version only carries what is real: the friend graph. */
-export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null }) {
+/* The signed-in crew screen: requests waiting for you first, then your
+   chats, then adding and managing friends. */
+export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGraph | null; chats?: ChatSummary[] | null }) {
   const t = useT();
   const router = useRouter();
   const [state, formAction, submitting] = useActionState(requestFriendshipAction, initialState);
@@ -119,7 +122,37 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
         </div>
       </header>
 
-      <section className="px-4 pt-4">
+      {incoming.length > 0 && (
+        <Section label={t("crew.waitingSection")} count={incoming.length}>
+          {incoming.map((row) => (
+            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
+              <button
+                type="button"
+                onClick={() => run(row.user_id, acceptFriendshipAction)}
+                disabled={pendingId === row.user_id}
+                className="text-mono-label min-h-11 px-3 disabled:opacity-50"
+                style={{ background: "var(--pine)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }}
+              >
+                {t("crew.accept")}
+              </button>
+              <button
+                type="button"
+                onClick={() => run(row.user_id, removeFriendshipAction)}
+                disabled={pendingId === row.user_id}
+                aria-label={t("common.declineName", { name: row.display_name ?? row.handle ?? t("common.rider") })}
+                className="flex h-11 w-11 items-center justify-center disabled:opacity-50"
+                style={{ border: "var(--rule-thin)" }}
+              >
+                <Icon name="x" size={15} color={INK} strokeWidth={2} />
+              </button>
+            </PersonRow>
+          ))}
+        </Section>
+      )}
+
+      <ChatList chats={chats} />
+
+      <section className="px-4 pt-5">
         <InviteLinkCard />
       </section>
 
@@ -183,37 +216,27 @@ export default function LiveCrewScreen({ graph }: { graph: FriendGraph | null })
         </p>
       )}
 
-      {incoming.length > 0 && (
-        <Section label={t("crew.waitingSection")} count={incoming.length}>
-          {incoming.map((row) => (
-            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
-              <button
-                type="button"
-                onClick={() => run(row.user_id, acceptFriendshipAction)}
-                disabled={pendingId === row.user_id}
-                className="text-mono-label min-h-11 px-3 disabled:opacity-50"
-                style={{ background: "var(--pine)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }}
-              >
-                {t("crew.accept")}
-              </button>
-              <button
-                type="button"
-                onClick={() => run(row.user_id, removeFriendshipAction)}
-                disabled={pendingId === row.user_id}
-                aria-label={t("common.declineName", { name: row.display_name ?? row.handle ?? t("common.rider") })}
-                className="flex h-11 w-11 items-center justify-center disabled:opacity-50"
-                style={{ border: "var(--rule-thin)" }}
-              >
-                <Icon name="x" size={15} color={INK} strokeWidth={2} />
-              </button>
-            </PersonRow>
-          ))}
-        </Section>
-      )}
-
       <Section label={t("crew.friendsSection")} count={friends.length}>
         {friends.map((row) => (
           <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
+            <button
+              type="button"
+              onClick={() => {
+                setPendingId(row.user_id);
+                setRowError(null);
+                void settle<false | null>(openDirectChatAction(row.user_id), null).then((opened) => {
+                  setPendingId(null);
+                  if (opened === false) setRowError(t("chat.openFailed"));
+                });
+              }}
+              disabled={pendingId === row.user_id}
+              aria-label={t("chat.messageTo", { name: row.display_name ?? row.handle ?? t("common.rider") })}
+              className="text-mono-label flex min-h-11 items-center gap-1 px-2.5 disabled:opacity-50"
+              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+            >
+              <Icon name="message-circle" size={14} color="var(--paper-0)" strokeWidth={2} />
+              {t("chat.message")}
+            </button>
             <button
               type="button"
               onClick={() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { openRideChatAction } from "@/features/chat/actions";
 import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
@@ -278,6 +279,9 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
                   setSelectedPostId(null);
                   setEditingPostId(selectedRide.post.id);
                 },
+                ...(selectedRide.isHost || (selectedRide.isJoined && !selectedRide.isPending)
+                  ? { onOpenChat: () => { void openRideChatAction(selectedRide.post.id); } }
+                  : {}),
                 onCancel: () => {
                   /* Cancelling also drops everyone who joined. */
                   if (!window.confirm(t("feed.confirmCancel"))) return;

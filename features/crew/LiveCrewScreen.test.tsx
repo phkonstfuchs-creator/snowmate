@@ -8,7 +8,10 @@ const mocks = vi.hoisted(() => ({
   accept: vi.fn(),
   remove: vi.fn(),
   refresh: vi.fn(),
+  openChat: vi.fn(),
 }));
+
+vi.mock("@/features/chat/actions", () => ({ openDirectChatAction: mocks.openChat }));
 
 vi.mock("./actions", () => ({
   requestFriendshipAction: mocks.request,
@@ -119,5 +122,20 @@ describe("LiveCrewScreen", () => {
 
     rerender(<LiveCrewScreen graph={null} />);
     expect(screen.getByText(/could not be loaded/)).toBeInTheDocument();
+  });
+
+  it("puts requests waiting for you above the chats and opens a chat with a friend", async () => {
+    mocks.openChat.mockResolvedValue(false);
+    render(<LiveCrewScreen graph={graph} chats={[]} />);
+
+    const waiting = screen.getByText("Max Rider");
+    const chats = screen.getByRole("heading", { name: "Chats" });
+    expect(waiting.compareDocumentPosition(chats) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Message Lena Moser" }));
+    });
+    expect(mocks.openChat).toHaveBeenCalledWith("u1");
+    expect(screen.getByRole("alert")).toHaveTextContent("The chat could not be opened.");
   });
 });

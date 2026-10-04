@@ -2,6 +2,7 @@ import BottomNav from "@/components/BottomNav";
 import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
 import PendingInviteSync from "@/features/crew/PendingInviteSync";
 import { getPendingCounts } from "@/features/crew/queries";
+import { getUnreadChatCount } from "@/features/chat/queries";
 import { refreshOwnAge } from "@/features/profile/queries";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -20,7 +21,7 @@ export default async function AppLayout({
 
   /* Layouts persist across navigation; the counts refresh whenever an
      action calls router.refresh(), which every write in the app does. */
-  const [pending] = await Promise.all([getPendingCounts(), refreshOwnAge()]);
+  const [pending, unreadChats] = await Promise.all([getPendingCounts(), getUnreadChatCount(), refreshOwnAge()]);
 
   return (
     <div className="app-shell">
@@ -28,7 +29,7 @@ export default async function AppLayout({
       <BottomNav
         badges={{
           "/feed": pending.rideRequests,
-          "/crew": pending.friendRequests,
+          "/crew": pending.friendRequests + unreadChats,
           "/carpool": pending.carpoolRequests,
         }}
       />

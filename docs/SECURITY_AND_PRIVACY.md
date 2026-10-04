@@ -88,6 +88,15 @@ never the stored position or who is sharing. The browser fetches tiles
 directly; the CSP allows only these two hosts. See
 [ADR 0016](adr/0016-vector-map-and-faster-navigation.md).
 
+## Chat
+
+Direct chats only between confirmed friends; ride chats only for the host
+and accepted riders. A block or unfriending closes a direct chat for both,
+and a block hides that person's messages in shared ride chats. Text only,
+up to 1000 characters, 30 messages a minute. Messages are not end-to-end
+encrypted; they are in the export and go with the account. See
+[ADR 0017](adr/0017-chat-for-friends-and-ride-crews.md).
+
 ## Sign-in and abuse limits
 
 - Passwords: 12+ characters, upper and lower case, a digit; common
