@@ -8,10 +8,10 @@ import { getLocale } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
 
 export const metadata: Metadata = {
-  title: "Snowmate",
+  title: "Pistl",
   description: "Find your crew. Today.",
-  applicationName: "Snowmate",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Snowmate" },
+  applicationName: "Pistl",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Pistl" },
   formatDetection: { telephone: false },
 };
 

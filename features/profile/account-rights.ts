@@ -22,7 +22,7 @@ export async function exportMyDataResponse(now: Date = new Date()): Promise<Resp
       headers: {
         "Cache-Control": NO_STORE,
         "Content-Type": "application/json; charset=utf-8",
-        "Content-Disposition": `attachment; filename="snowmate-data-${day}.json"`,
+        "Content-Disposition": `attachment; filename="pistl-data-${day}.json"`,
       },
     });
   } catch {

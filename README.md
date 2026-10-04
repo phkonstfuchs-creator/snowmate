@@ -1,6 +1,6 @@
-# Snowmate
+# Pistl
 
-Snowmate is a mobile-first coordination app for ski crews around Innsbruck and
+Pistl is a mobile-first coordination app for ski crews around Innsbruck and
 Salzburg. It answers one question: who is riding today, where, and can I join?
 
 **[snowmate-info.vercel.app](https://snowmate-info.vercel.app)** — build

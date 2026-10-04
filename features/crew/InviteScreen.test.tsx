@@ -72,7 +72,7 @@ describe("PendingInviteSync", () => {
 
 describe("InviteLinkCard", () => {
   it("creates a link and copies it when sharing is unavailable", async () => {
-    mocks.create.mockResolvedValue({ ok: true, url: `https://snowmate.app/invite/${TOKEN}` });
+    mocks.create.mockResolvedValue({ ok: true, url: `https://pistl.example/invite/${TOKEN}` });
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
 
@@ -81,15 +81,15 @@ describe("InviteLinkCard", () => {
       fireEvent.click(screen.getByRole("button", { name: /Create invite link/ }));
     });
 
-    expect(writeText).toHaveBeenCalledWith(`https://snowmate.app/invite/${TOKEN}`);
-    expect(screen.getByText(`https://snowmate.app/invite/${TOKEN}`)).toBeInTheDocument();
+    expect(writeText).toHaveBeenCalledWith(`https://pistl.example/invite/${TOKEN}`);
+    expect(screen.getByText(`https://pistl.example/invite/${TOKEN}`)).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Link copied");
   });
 
   it("uses the share sheet when there is one, and shows refusals", async () => {
     const shareFn = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "share", { value: shareFn, configurable: true });
-    mocks.create.mockResolvedValueOnce({ ok: true, url: `https://snowmate.app/invite/${TOKEN}` });
+    mocks.create.mockResolvedValueOnce({ ok: true, url: `https://pistl.example/invite/${TOKEN}` });
     mocks.create.mockResolvedValueOnce({ ok: false, message: "You have 10 open invite links." });
 
     render(<InviteLinkCard />);

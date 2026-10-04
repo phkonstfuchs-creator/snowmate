@@ -34,7 +34,7 @@ describe("exportMyDataResponse", () => {
 
     expect(mocks.rpc).toHaveBeenCalledWith("export_my_data");
     expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Disposition")).toBe('attachment; filename="snowmate-data-2027-01-08.json"');
+    expect(response.headers.get("Content-Disposition")).toBe('attachment; filename="pistl-data-2027-01-08.json"');
     expect(response.headers.get("Cache-Control")).toContain("no-store");
     expect(JSON.parse(await response.text())).toEqual({ profile: { handle: "lena_m" } });
   });

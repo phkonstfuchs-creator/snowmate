@@ -100,8 +100,8 @@ test.describe("account lifecycle", () => {
       throw new Error("MAILPIT_URL is required for the local auth E2E test.");
     }
 
-    const email = `snowmate-e2e-${crypto.randomUUID()}@example.com`;
-    const password = "Snowmate2026Pass";
+    const email = `pistl-e2e-${crypto.randomUUID()}@example.com`;
+    const password = "Pistl2026Pass";
 
     const handle = `e2e_${crypto.randomUUID().slice(0, 8)}`;
     await signUp(page, email, password, handle);
@@ -117,7 +117,7 @@ test.describe("account lifecycle", () => {
 
     await page.goto(confirmationLink);
     await expect(page).toHaveURL(/\/feed$/);
-    await expect(page.getByText("Snowmate").first()).toBeVisible();
+    await expect(page.getByText("Pistl").first()).toBeVisible();
 
     await page.goto(new URL("/profile", page.url()).toString());
     /* The answers from the sign-up are the profile. */

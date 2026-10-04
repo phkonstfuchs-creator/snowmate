@@ -1,6 +1,6 @@
 import type { City } from "./types";
 
-/* Reference data, not fixtures: the ski areas Snowmate covers, where they
+/* Reference data, not fixtures: the ski areas Pistl covers, where they
    are and which region they belong to. Live conditions do not live here;
    the prototype's sample conditions are in lib/data. */
 export interface Resort {

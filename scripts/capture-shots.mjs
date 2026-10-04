@@ -33,7 +33,7 @@ const SHOTS = [
   ["login", "/login"],
 ];
 
-const staging = mkdtempSync(path.join(tmpdir(), "snowmate-shots-"));
+const staging = mkdtempSync(path.join(tmpdir(), "pistl-shots-"));
 
 const browser = await chromium.launch();
 const page = await browser.newPage({

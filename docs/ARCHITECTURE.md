@@ -1,6 +1,6 @@
 # Architecture
 
-How Snowmate is put together, who owns what, and which boundaries are
+How Pistl is put together, who owns what, and which boundaries are
 enforced. Decisions and their reasons live in [adr/](adr/); this page
 describes the result.
 

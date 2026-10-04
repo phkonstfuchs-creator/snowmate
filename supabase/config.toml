@@ -254,7 +254,7 @@ otp_expiry = 3600
 # content_path = "./supabase/templates/invite.html"
 
 [auth.email.template.confirmation]
-subject = "Confirm your Snowmate account"
+subject = "Confirm your Pistl account"
 content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize notification email template

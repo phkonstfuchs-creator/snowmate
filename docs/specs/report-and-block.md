@@ -6,7 +6,7 @@
 
 ## Problem
 
-Snowmate brings young people, some under 18, together with people they
+Pistl brings young people, some under 18, together with people they
 have not met. Without a way to block someone and to tell the operator
 about them, a single bad actor stays in a person's feed and requests.
 

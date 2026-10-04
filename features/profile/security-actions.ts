@@ -35,7 +35,7 @@ export async function enrollMfaAction(): Promise<MfaEnrollment> {
       if (factor.status !== "verified") await supabase.auth.mfa.unenroll({ factorId: factor.id });
     }
 
-    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Snowmate" });
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Pistl" });
     if (error || !data) return { status: "error", message: t("mfa.unavailable") };
 
     /* Only an SVG data URI is ever rendered as an image. */

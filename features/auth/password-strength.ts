@@ -3,11 +3,11 @@
    passwords and variants of the person's own email are refused here. */
 
 /* Lower-cased; checked after stripping digits and symbols from the end,
-   so "Password123!" and "Snowmate2026" are caught too. */
+   so "Password123!" and "Pistl2026" are caught too. */
 const COMMON = new Set([
   "password", "passwort", "qwertz", "qwerty", "qwertzuiop", "qwertyuiop", "asdfghjkl",
   "letmein", "welcome", "willkommen", "iloveyou", "admin", "administrator", "login",
-  "snowmate", "snowboard", "snowboarding", "skifahren", "skiing", "freeride", "powder",
+  "pistl", "snowmate", "snowboard", "snowboarding", "skifahren", "skiing", "freeride", "powder",
   "innsbruck", "salzburg", "tirol", "austria", "oesterreich", "sommer", "winter",
   "football", "fussball", "monkey", "dragon", "master", "sunshine", "princess",
   "abcdefgh", "abcdefghijkl", "abc", "test", "geheim", "hallo", "schatz",

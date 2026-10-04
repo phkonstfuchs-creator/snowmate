@@ -8,7 +8,7 @@ import PenguinMascot from "@/components/PenguinMascot";
    the real app (onboarding, sign-in) sits one quiet line below it. */
 
 export const metadata: Metadata = {
-  title: "Snowmate: coordinating ski days in Innsbruck and Salzburg",
+  title: "Pistl: coordinating ski days in Innsbruck and Salzburg",
   description:
     "A mobile web app that replaces scattered WhatsApp groups for young skiers in Austria. Honest build status included.",
 };
@@ -94,7 +94,7 @@ const REVENUE: { line: string; price: string; body: string; lead?: boolean }[] =
     line: "University ski club trips",
     price: "3% of the volume handled",
     lead: true,
-    body: "Clubs run semester trips for 50 to 300 people on Excel, a WhatsApp group and private bank transfers. Snowmate handles signup, seat allocation, payment, the participant list and cancellations. A trip with 150 people at 300 € is 45,000 € moving through one organiser who is currently doing it by hand.",
+    body: "Clubs run semester trips for 50 to 300 people on Excel, a WhatsApp group and private bank transfers. Pistl handles signup, seat allocation, payment, the participant list and cancellations. A trip with 150 people at 300 € is 45,000 € moving through one organiser who is currently doing it by hand.",
   },
   {
     line: "Carpool fee",
@@ -128,7 +128,7 @@ export default function Home() {
         <header className="flex items-center gap-2 pt-7">
           <PenguinMascot size={26} />
           <span className="text-mono-label" style={{ color: INK }}>
-            Snowmate
+            Pistl
           </span>
         </header>
 
@@ -149,7 +149,7 @@ export default function Home() {
           A mobile web app that answers one question for young skiers in
           Austria: <strong style={{ color: INK }}>who is riding today,
           where, and can I join?</strong> Today that gets negotiated across
-          a dozen WhatsApp groups. Snowmate puts it in one place.
+          a dozen WhatsApp groups. Pistl puts it in one place.
         </p>
 
         <div
@@ -225,10 +225,10 @@ export default function Home() {
           ))}
         </div>
         <p className="mt-6 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-          Snowmate is not a tracking app like Strava, not a location map like
+          Pistl is not a tracking app like Strava, not a location map like
           Snapchat, and not another social feed engineered to hold your
           attention. The big platforms are built to keep you scrolling.
-          Snowmate is built to get you off your phone and onto the mountain
+          Pistl is built to get you off your phone and onto the mountain
           with the right people. It is the coordination layer of the day, and
           it is crew-first.
         </p>
@@ -248,7 +248,7 @@ export default function Home() {
             <figure key={file}>
               <Image
                 src={`/shots/${file}.webp`}
-                alt={`Snowmate ${title} screen`}
+                alt={`Pistl ${title} screen`}
                 width={430}
                 height={880}
                 className="w-full"
@@ -392,7 +392,7 @@ export default function Home() {
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
             At 16, I founded my own business, navigating the extensive legal
             approval process required for minors in Germany. I provide motion
-            design, video editing and web design services. Snowmate is the
+            design, video editing and web design services. Pistl is the
             product I build on the side.
           </p>
 
@@ -414,12 +414,12 @@ export default function Home() {
           </div>
 
           <p className="mt-6 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
-            Snowmate is not the first product I have tried to build.
+            Pistl is not the first product I have tried to build.
             PeakBuddy was an earlier ski-app concept I worked through at the
             Bocconi entrepreneurship lab, and FixItNow was a
             tradesperson-matching platform I dropped once I understood the
             marketplace problem.
-            Snowmate is the first one I have taken far enough to hand someone
+            Pistl is the first one I have taken far enough to hand someone
             a link.
           </p>
           <p className="mt-4 max-w-[58ch] text-sm leading-relaxed" style={{ color: INK_1 }}>
@@ -440,7 +440,7 @@ export default function Home() {
         </div>
 
         <p className="mt-14 text-mono-label" style={{ color: INK_2 }}>
-          Snowmate · Prototype · Not accepting sign-ups yet
+          Pistl · Prototype · Not accepting sign-ups yet
         </p>
       </div>
     </main>

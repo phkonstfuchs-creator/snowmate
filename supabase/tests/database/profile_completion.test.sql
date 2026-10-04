@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(17);
 
 select has_function(
   'public',
@@ -132,6 +132,13 @@ select throws_ok(
   '23514',
   null,
   'reserved handles are rejected'
+);
+
+select throws_ok(
+  $$select public.complete_own_profile('Rider Two', 'pistl', 'salzburg', 'park')$$,
+  '23514',
+  null,
+  'the app name is a reserved handle'
 );
 
 select throws_ok(

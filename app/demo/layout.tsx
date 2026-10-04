@@ -8,9 +8,9 @@ import { getT } from "@/lib/i18n/server";
    times so nobody mistakes this for real user data. */
 
 export const metadata: Metadata = {
-  title: "Snowmate demo: clickable prototype",
+  title: "Pistl demo: clickable prototype",
   description:
-    "Click through the Snowmate screens. Sample data, no real users, nothing is saved.",
+    "Click through the Pistl screens. Sample data, no real users, nothing is saved.",
   robots: { index: false },
 };
 

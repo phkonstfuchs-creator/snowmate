@@ -18,7 +18,7 @@ export default function AuthShell({ eyebrow, title, lead, children }: {
       <div className="paper-grain mx-auto flex min-h-dvh w-full max-w-[430px] flex-col px-5 pb-8" style={{ background: "var(--paper-0)" }}>
         <Link href="/onboarding" aria-label={t("auth.backToStart")} className="-my-2 flex w-fit items-center gap-2 py-2 pt-6">
           <PenguinMascot size={26} />
-          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Snowmate</span>
+          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Pistl</span>
         </Link>
         <div className="flex flex-1 flex-col justify-center py-8">
           <p className="text-mono-label" style={{ color: "var(--rust)" }}>{eyebrow}</p>

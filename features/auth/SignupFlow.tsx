@@ -204,10 +204,10 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
     return (
       <div className={shell} style={shellStyle}>
         <div className="relative" style={{ height: "38%", borderBottom: "var(--rule-heavy)" }}>
-          <ResortScene name="Snowmate" className="h-full w-full" />
+          <ResortScene name="Pistl" className="h-full w-full" />
           <div className="absolute left-4 top-5 flex items-center gap-2">
             <PenguinMascot size={26} />
-            <span className="text-mono-label" style={{ color: INK }}>Snowmate</span>
+            <span className="text-mono-label" style={{ color: INK }}>Pistl</span>
           </div>
         </div>
         <div className="flex flex-1 flex-col px-4 pt-6">

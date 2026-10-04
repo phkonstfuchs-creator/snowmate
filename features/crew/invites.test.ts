@@ -8,7 +8,7 @@ import { previewInvite } from "./queries";
 
 const mocks = vi.hoisted(() => ({ createClient: vi.fn(), rpc: vi.fn(), revalidatePath: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: mocks.createClient }));
-vi.mock("@/lib/supabase/config", () => ({ getSupabasePublicConfig: () => ({ siteUrl: "https://snowmate.app" }) }));
+vi.mock("@/lib/supabase/config", () => ({ getSupabasePublicConfig: () => ({ siteUrl: "https://pistl.example" }) }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 
 const TOKEN = "0123456789abcdef0123456789abcdef";
@@ -26,14 +26,14 @@ describe("invite rules", () => {
     expect(isInviteStatus("used")).toBe(true);
     expect(isInviteStatus("valid")).toBe(true);
     expect(isInviteStatus("weird")).toBe(false);
-    expect(inviteUrl("https://snowmate.app", TOKEN)).toBe(`https://snowmate.app/invite/${TOKEN}`);
+    expect(inviteUrl("https://pistl.example", TOKEN)).toBe(`https://pistl.example/invite/${TOKEN}`);
   });
 });
 
 describe("createInviteAction", () => {
   it("returns the link for a created invite", async () => {
     mocks.rpc.mockResolvedValue({ data: [{ status: "created", token: TOKEN }], error: null });
-    await expect(createInviteAction()).resolves.toEqual({ ok: true, url: `https://snowmate.app/invite/${TOKEN}` });
+    await expect(createInviteAction()).resolves.toEqual({ ok: true, url: `https://pistl.example/invite/${TOKEN}` });
   });
 
   it.each([

@@ -86,7 +86,7 @@ export function profileToUser(profile: {
   };
 }
 
-/* Snowmate's users are in Austria, but the server runs in UTC. Day
+/* Pistl's users are in Austria, but the server runs in UTC. Day
    boundaries follow Vienna time so "Today" flips at local midnight. */
 export const APP_TIME_ZONE = "Europe/Vienna";
 

@@ -61,7 +61,7 @@ describe("setBirthDateAction", () => {
   });
 
   it.each([
-    ["too_young", "Snowmate is for riders aged 14 and over."],
+    ["too_young", "Pistl is for riders aged 14 and over."],
     ["already_set", "Your birth date is already saved."],
     ["invalid", "Enter a valid birth date."],
     ["unauthenticated", "Your session ended. Sign in again."],

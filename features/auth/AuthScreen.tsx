@@ -36,7 +36,7 @@ export default function AuthScreen({
         >
           <PenguinMascot size={26} />
           <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            Snowmate
+            Pistl
           </span>
         </Link>
 

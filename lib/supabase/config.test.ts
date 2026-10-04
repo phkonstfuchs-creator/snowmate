@@ -50,8 +50,8 @@ describe("parseSupabasePublicConfig", () => {
 
 describe("resolveSiteUrl", () => {
   it("keeps a real configured address", () => {
-    expect(resolveSiteUrl("https://snowmate.app", { VERCEL_ENV: "production", VERCEL_PROJECT_PRODUCTION_URL: "x.vercel.app" }))
-      .toBe("https://snowmate.app");
+    expect(resolveSiteUrl("https://pistl.example", { VERCEL_ENV: "production", VERCEL_PROJECT_PRODUCTION_URL: "x.vercel.app" }))
+      .toBe("https://pistl.example");
   });
 
   it("replaces a copied localhost with the production domain on Vercel", () => {

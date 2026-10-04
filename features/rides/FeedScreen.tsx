@@ -90,7 +90,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
             <PenguinMascot size={28} />
-            <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Snowmate</span>
+            <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Pistl</span>
           </div>
           <button
             onClick={() => setShowPostModal(true)}

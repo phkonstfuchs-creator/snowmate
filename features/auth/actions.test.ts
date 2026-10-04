@@ -144,8 +144,8 @@ describe("auth actions", () => {
       initialAuthActionState,
       signupForm({
         email: "new.rider@example.com",
-        password: "Snowmate2026Pass",
-        confirmPassword: "Snowmate2026Pass",
+        password: "Pistl2026Pass",
+        confirmPassword: "Pistl2026Pass",
       }),
     );
 
@@ -170,14 +170,14 @@ describe("auth actions", () => {
       initialAuthActionState,
       signupForm({
         email: "new.rider@example.com",
-        password: "Snowmate2026Pass",
-        confirmPassword: "Snowmate2026Pass",
+        password: "Pistl2026Pass",
+        confirmPassword: "Pistl2026Pass",
       }),
     );
 
     expect(result).toMatchObject({ status: "error", message });
     expect(JSON.stringify(log.mock.calls)).not.toContain("new.rider@example.com");
-    expect(JSON.stringify(log.mock.calls)).not.toContain("Snowmate2026Pass");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("Pistl2026Pass");
     log.mockRestore();
   });
 
@@ -195,8 +195,8 @@ describe("auth actions", () => {
       initialAuthActionState,
       signupForm({
         email: "known.rider@example.com",
-        password: "Snowmate2026Pass",
-        confirmPassword: "Snowmate2026Pass",
+        password: "Pistl2026Pass",
+        confirmPassword: "Pistl2026Pass",
       }),
     );
 
@@ -231,7 +231,7 @@ describe("auth actions", () => {
 
     await signUpAction(
       initialAuthActionState,
-      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass" }),
+      signupForm({ email: "new.rider@example.com", password: "Pistl2026Pass", confirmPassword: "Pistl2026Pass" }),
     );
 
     expect(rpc).toHaveBeenCalledWith("handle_available", { candidate: "new_rider" });
@@ -255,7 +255,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass" }),
+      signupForm({ email: "new.rider@example.com", password: "Pistl2026Pass", confirmPassword: "Pistl2026Pass" }),
     );
 
     expect(result.profileErrors).toEqual({ handle: "That handle is taken." });
@@ -263,7 +263,7 @@ describe("auth actions", () => {
   });
 
   it.each([
-    [{ birthDate: "2020-01-01" }, ["chill"], "birthDate", "Snowmate is for riders aged 14 and over."],
+    [{ birthDate: "2020-01-01" }, ["chill"], "birthDate", "Pistl is for riders aged 14 and over."],
     [{ birthDate: "not-a-date" }, ["chill"], "birthDate", "Enter a valid birth date."],
     [{}, [], "ridingStyles", "Pick a riding style."],
     [{ city: "vienna" }, ["chill"], "city", "Pick a region."],
@@ -271,7 +271,7 @@ describe("auth actions", () => {
   ])("refuses invalid onboarding answers %j", async (override, styles, field, message) => {
     const result = await signUpAction(
       initialAuthActionState,
-      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass", ...override }, styles),
+      signupForm({ email: "new.rider@example.com", password: "Pistl2026Pass", confirmPassword: "Pistl2026Pass", ...override }, styles),
     );
 
     expect(result.status).toBe("error");
