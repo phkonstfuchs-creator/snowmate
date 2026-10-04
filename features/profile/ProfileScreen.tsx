@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { heroNameFontSize } from "./hero-name";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
 import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -234,7 +235,10 @@ export default function ProfileScreen({
 
         {/* Space between the lines, otherwise the block break makes the
             name read as "FelixGruber" to a screen reader */}
-        <h1 className="text-display-hero relative mt-2" style={{ color: INK }}>
+        <h1
+          className="text-display-hero relative mt-2"
+          style={{ color: INK, fontSize: heroNameFontSize(displayName), overflowWrap: "anywhere" }}
+        >
           {displayName.split(" ").map((word, i) => (
             <span key={`${word}-${i}`} className="block">
               {i > 0 ? " " : null}

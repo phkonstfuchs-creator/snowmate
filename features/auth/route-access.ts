@@ -10,7 +10,7 @@ const protectedRouteRoots = [
   "/login/verify",
 ] as const;
 
-const signedOutOnlyRoutes = new Set(["/login", "/signup", "/forgot-password"]);
+const signedOutOnlyRoutes = new Set(["/login", "/signup", "/signup/verify", "/forgot-password"]);
 
 const MFA_ROUTE = "/login/verify";
 

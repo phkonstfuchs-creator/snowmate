@@ -2,7 +2,6 @@ import {
   expect,
   test,
   type APIRequestContext,
-  type BrowserContext,
   type Page,
 } from "@playwright/test";
 
@@ -30,54 +29,36 @@ async function signUp(page: Page, email: string, password: string, handle: strin
   await page.getByRole("button", { name: "Create account" }).click();
 }
 
-async function waitForConfirmationLink(
+/* The confirmation email carries a code (typed into the app) and a link
+   (fallback). Returns the code. */
+async function waitForConfirmationCode(
   request: APIRequestContext,
-  context: BrowserContext,
   mailpitUrl: string,
   email: string,
 ): Promise<string> {
   const deadline = Date.now() + 20_000;
-  const messagePage = await context.newPage();
 
-  try {
-    while (Date.now() < deadline) {
-      const searchResponse = await request.get(
-        `${mailpitUrl}/api/v1/search`,
-        {
-          params: {
-            query: `to:"${email}"`,
-            limit: 1,
-          },
-        },
-      );
+  while (Date.now() < deadline) {
+    const searchResponse = await request.get(`${mailpitUrl}/api/v1/search`, {
+      params: { query: `to:"${email}"`, limit: 1 },
+    });
 
-      if (searchResponse.ok()) {
-        const result = (await searchResponse.json()) as MailpitSearchResult;
-        const messageId = result.messages?.[0]?.ID;
+    if (searchResponse.ok()) {
+      const result = (await searchResponse.json()) as MailpitSearchResult;
+      const messageId = result.messages?.[0]?.ID;
 
-        if (messageId) {
-          const emailResponse = await request.get(
-            `${mailpitUrl}/view/${encodeURIComponent(messageId)}.html`,
-          );
-
-          if (emailResponse.ok()) {
-            await messagePage.setContent(await emailResponse.text());
-            const confirmationLink = await messagePage
-              .locator('a[href*="/auth/confirm"]')
-              .first()
-              .getAttribute("href");
-
-            if (confirmationLink) {
-              return confirmationLink;
-            }
-          }
-        }
+      if (messageId) {
+        const emailResponse = await request.get(
+          `${mailpitUrl}/view/${encodeURIComponent(messageId)}.html`,
+        );
+        const code = emailResponse.ok()
+          ? />\s*(\d{6,10})\s*</u.exec(await emailResponse.text())?.[1]
+          : undefined;
+        if (code) return code;
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
     }
-  } finally {
-    await messagePage.close();
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   throw new Error(`No confirmation email arrived for ${email}.`);
@@ -92,7 +73,6 @@ test.describe("account lifecycle", () => {
   test("signs up, confirms, signs out and signs back in", async ({
     page,
     request,
-    context,
   }) => {
     const mailpitUrl = process.env.MAILPIT_URL;
 
@@ -106,16 +86,16 @@ test.describe("account lifecycle", () => {
     const handle = `e2e_${crypto.randomUUID().slice(0, 8)}`;
     await signUp(page, email, password, handle);
 
-    await expect(page.getByText("Request received")).toBeVisible();
+    await expect(page).toHaveURL(/\/signup\/verify$/);
+    await expect(page.getByText("Check your inbox")).toBeVisible();
 
-    const confirmationLink = await waitForConfirmationLink(
-      request,
-      context,
-      mailpitUrl,
-      email,
-    );
+    const code = await waitForConfirmationCode(request, mailpitUrl, email);
+    await page.getByLabel("Code from the email").fill("000000");
+    await page.getByRole("button", { name: "Confirm" }).click();
+    await expect(page.getByRole("alert")).toContainText("wrong or has expired");
 
-    await page.goto(confirmationLink);
+    await page.getByLabel("Code from the email").fill(code);
+    await page.getByRole("button", { name: "Confirm" }).click();
     await expect(page).toHaveURL(/\/feed$/);
     await expect(page.getByText("Pistl").first()).toBeVisible();
 
@@ -138,12 +118,9 @@ test.describe("account lifecycle", () => {
 
     await signUp(page, email, password, `e2e_${crypto.randomUUID().slice(0, 8)}`);
 
-    await expect(page.getByText("Request received")).toBeVisible();
-    await expect(
-      page.getByText(
-        "If this address can be used, you will receive a confirmation email shortly.",
-      ),
-    ).toBeVisible();
+    /* An address that already has an account gets the same screen. */
+    await expect(page).toHaveURL(/\/signup\/verify$/);
+    await expect(page.getByText("Check your inbox")).toBeVisible();
     await page.getByRole("link", { name: "Back to sign in" }).click();
 
     await page.getByLabel("Email").fill(email);

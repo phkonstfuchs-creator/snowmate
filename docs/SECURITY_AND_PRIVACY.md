@@ -101,6 +101,8 @@ directly; the CSP allows only these two hosts. See
 - Free text may not contain control characters or bidi overrides; React
   escapes all output, nothing renders user text as HTML.
 - Confirmation and reset links only redirect to allow-listed app paths.
+- Sign-up is confirmed with the emailed code (or its link). Codes are
+  limited to 8 tries per address and 20 per visitor in 15 minutes.
 
 See [ADR 0013](adr/0013-request-guard-2fa-and-rate-limits.md).
 

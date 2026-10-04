@@ -1,7 +1,9 @@
-<h2>Confirm your Pistl account</h2>
-<p>Follow the link below to confirm your email address and finish signing up.</p>
-<p>
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
-    Confirm email address
-  </a>
+<h2>Dein Pistl-Code / Your Pistl code</h2>
+<p>Gib diesen Code in der App ein, um deine Registrierung abzuschließen.<br>
+Enter this code in the app to finish signing up.</p>
+<p style="font-size:32px;font-weight:700;letter-spacing:6px;font-family:monospace">{{ .Token }}</p>
+<p>Oder bestätige über diesen Link / Or confirm with this link:<br>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">E-Mail bestätigen / Confirm email</a>
 </p>
+<p style="color:#666;font-size:12px">Du hast dich nicht bei Pistl registriert? Dann ignoriere diese Mail.<br>
+Did not sign up for Pistl? Ignore this email.</p>

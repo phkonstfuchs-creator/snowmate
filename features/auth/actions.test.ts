@@ -3,11 +3,13 @@ import { initialAuthActionState } from "./action-state";
 import {
   checkHandleAction,
   requestPasswordResetAction,
+  resendSignupCodeAction,
   signInAction,
   signOutAction,
   signUpAction,
   updatePasswordAction,
   verifyLoginMfaAction,
+  verifySignupCodeAction,
 } from "./actions";
 
 const mocks = vi.hoisted(() => ({
@@ -42,6 +44,16 @@ vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
 }));
 
+/* The pending sign-up lives in an httpOnly cookie. */
+const jar = vi.hoisted(() => new Map<string, { value: string; options?: Record<string, unknown> }>());
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: (name: string) => jar.get(name),
+    set: (name: string, value: string, options?: Record<string, unknown>) => jar.set(name, { value, options }),
+    delete: (name: string) => jar.delete(name),
+  }),
+}));
+
 const auth = {
   signInWithPassword: vi.fn(),
   signUp: vi.fn(),
@@ -49,6 +61,8 @@ const auth = {
   getClaims: vi.fn(),
   updateUser: vi.fn(),
   resetPasswordForEmail: vi.fn(),
+  verifyOtp: vi.fn(),
+  resend: vi.fn(),
   mfa: {
     getAuthenticatorAssuranceLevel: vi.fn(),
     listFactors: vi.fn(),
@@ -134,26 +148,24 @@ describe("auth actions", () => {
     });
   });
 
-  it("returns a confirmation state when signup has no session", async () => {
+  it("asks for the emailed code when signup has no session", async () => {
     auth.signUp.mockResolvedValue({
       data: { session: null },
       error: null,
     });
 
-    const result = await signUpAction(
+    await expect(signUpAction(
       initialAuthActionState,
       signupForm({
         email: "new.rider@example.com",
         password: "Pistl2026Pass",
         confirmPassword: "Pistl2026Pass",
       }),
-    );
+    )).rejects.toThrow("redirect:/signup/verify");
 
-    expect(result).toEqual({
-      status: "success",
-      message:
-        "If this address can be used, you will receive a confirmation email shortly.",
-      email: "new.rider@example.com",
+    expect(jar.get("pistl_pending_signup")).toEqual({
+      value: "new.rider@example.com",
+      options: expect.objectContaining({ httpOnly: true, sameSite: "lax", maxAge: 3600 }),
     });
   });
 
@@ -191,21 +203,16 @@ describe("auth actions", () => {
       error: { code },
     });
 
-    const result = await signUpAction(
+    /* Exactly the same next step as for a new address. */
+    await expect(signUpAction(
       initialAuthActionState,
       signupForm({
         email: "known.rider@example.com",
         password: "Pistl2026Pass",
         confirmPassword: "Pistl2026Pass",
       }),
-    );
-
-    expect(result).toEqual({
-      status: "success",
-      message:
-        "If this address can be used, you will receive a confirmation email shortly.",
-      email: "known.rider@example.com",
-    });
+    )).rejects.toThrow("redirect:/signup/verify");
+    expect(jar.get("pistl_pending_signup")?.value).toBe("known.rider@example.com");
   });
 
   it("signs out before redirecting to login", async () => {
@@ -229,10 +236,10 @@ describe("auth actions", () => {
   it("sends the onboarding answers with the account, after checking the handle", async () => {
     auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
 
-    await signUpAction(
+    await expect(signUpAction(
       initialAuthActionState,
       signupForm({ email: "new.rider@example.com", password: "Pistl2026Pass", confirmPassword: "Pistl2026Pass" }),
-    );
+    )).rejects.toThrow("redirect:/signup/verify");
 
     expect(rpc).toHaveBeenCalledWith("handle_available", { candidate: "new_rider" });
     expect(auth.signUp).toHaveBeenCalledWith(expect.objectContaining({
@@ -364,5 +371,91 @@ describe("auth actions", () => {
     auth.mfa.challengeAndVerify.mockResolvedValue({ error: null });
     await expect(verifyLoginMfaAction(initialAuthActionState, formData({ code: "123456" }))).rejects.toThrow("redirect:/feed");
     expect(auth.mfa.challengeAndVerify).toHaveBeenLastCalledWith({ factorId: "factor-1", code: "123456" });
+  });
+});
+
+describe("sign-up code", () => {
+  beforeEach(() => {
+    jar.clear();
+    vi.clearAllMocks();
+    mocks.createClient.mockResolvedValue({ auth, rpc });
+  });
+
+  function codeForm(code: string) {
+    const data = new FormData();
+    data.set("code", code);
+    return data;
+  }
+
+  it("signs in with the emailed code and forgets the pending sign-up", async () => {
+    jar.set("pistl_pending_signup", { value: "new.rider@example.com" });
+    auth.verifyOtp.mockResolvedValue({ data: { session: { access_token: "x" } }, error: null });
+
+    await expect(verifySignupCodeAction(initialAuthActionState, codeForm("123 456"))).rejects.toThrow("redirect:/feed");
+
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ email: "new.rider@example.com", token: "123456", type: "email" });
+    expect(jar.has("pistl_pending_signup")).toBe(false);
+  });
+
+  it("refuses a wrong code without saying more", async () => {
+    jar.set("pistl_pending_signup", { value: "new.rider@example.com" });
+    auth.verifyOtp.mockResolvedValue({ data: { session: null }, error: { code: "otp_expired" } });
+
+    await expect(verifySignupCodeAction(initialAuthActionState, codeForm("654321"))).resolves.toMatchObject({
+      status: "error",
+      message: expect.stringContaining("wrong or has expired"),
+    });
+    expect(jar.has("pistl_pending_signup")).toBe(true);
+  });
+
+  it("checks the format before asking Supabase", async () => {
+    jar.set("pistl_pending_signup", { value: "new.rider@example.com" });
+
+    await expect(verifySignupCodeAction(initialAuthActionState, codeForm("12ab"))).resolves.toMatchObject({ status: "error" });
+    expect(auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it("needs a sign-up in progress", async () => {
+    await expect(verifySignupCodeAction(initialAuthActionState, codeForm("123456"))).resolves.toMatchObject({
+      status: "error",
+      message: expect.stringContaining("expired"),
+    });
+    expect(auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it("stops guessing after eight wrong codes for one address", async () => {
+    jar.set("pistl_pending_signup", { value: "guessed@example.com" });
+    auth.verifyOtp.mockResolvedValue({ data: { session: null }, error: { code: "otp_expired" } });
+
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      await verifySignupCodeAction(initialAuthActionState, codeForm("000000"));
+    }
+    await expect(verifySignupCodeAction(initialAuthActionState, codeForm("111111"))).resolves.toMatchObject({
+      message: expect.stringContaining("Too many"),
+    });
+    expect(auth.verifyOtp).toHaveBeenCalledTimes(8);
+  });
+
+  it("sends a new code and answers the same either way", async () => {
+    jar.set("pistl_pending_signup", { value: "new.rider@example.com" });
+    auth.resend.mockResolvedValue({ error: null });
+
+    await expect(resendSignupCodeAction()).resolves.toMatchObject({ status: "success" });
+    expect(auth.resend).toHaveBeenCalledWith({
+      type: "signup",
+      email: "new.rider@example.com",
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
+    });
+
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    auth.resend.mockResolvedValue({ error: { code: "over_email_send_rate_limit" } });
+    await expect(resendSignupCodeAction()).resolves.toMatchObject({ status: "success" });
+    expect(JSON.stringify(log.mock.calls)).not.toContain("new.rider@example.com");
+    log.mockRestore();
+  });
+
+  it("cannot resend without a sign-up in progress", async () => {
+    await expect(resendSignupCodeAction()).resolves.toMatchObject({ status: "error" });
+    expect(auth.resend).not.toHaveBeenCalled();
   });
 });

@@ -7,6 +7,7 @@ import { rateLimiter } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import type { AuthActionState, HandleCheck } from "./action-state";
 import {
+  parseEmailCode,
   parseOtpCode,
   validateEmailOnly,
   validateLoginCredentials,
@@ -15,6 +16,9 @@ import {
 } from "./credentials";
 import { toSignupMetadata, validateSignupProfile, viennaToday } from "./signup-profile";
 import { getT } from "@/lib/i18n/server";
+import { cookies } from "next/headers";
+import { PENDING_SIGNUP_COOKIE, pendingSignupCookieOptions } from "./pending-signup";
+import { getPendingSignupEmail } from "./queries";
 import { translateFieldErrors, type MessageKey, type Translate } from "@/lib/i18n/translate";
 
 function stringField(formData: FormData, name: string): string {
@@ -32,14 +36,6 @@ function invalidState(
     message: t("v.checkFields"),
     email,
     fieldErrors: translateFieldErrors(t, fieldErrors),
-  };
-}
-
-function confirmationPendingState(t: Translate, email: string): AuthActionState {
-  return {
-    status: "success",
-    message: t("auth.confirmationPending"),
-    email,
   };
 }
 
@@ -168,6 +164,7 @@ export async function signUpAction(
   }
 
   const supabase = await createClient();
+  let signedIn = false;
 
   try {
     const { data: available, error: handleError } = await supabase.rpc("handle_available", {
@@ -191,11 +188,7 @@ export async function signUpAction(
       },
     });
 
-    if (error) {
-      if (isExistingAccountError(error.code)) {
-        return confirmationPendingState(t, validation.data.email);
-      }
-
+    if (error && !isExistingAccountError(error.code)) {
       /* The code only, never the email or password: enough to see in the
          server log why Supabase refused (rate limit, auth settings). */
       console.error("[auth] sign-up refused by Supabase:", error.code ?? error.status ?? "unknown");
@@ -207,9 +200,7 @@ export async function signUpAction(
       };
     }
 
-    if (!data.session) {
-      return confirmationPendingState(t, validation.data.email);
-    }
+    signedIn = Boolean(data?.session) && !error;
   } catch {
     return {
       status: "error",
@@ -218,7 +209,79 @@ export async function signUpAction(
     };
   }
 
+  if (signedIn) redirect("/feed");
+
+  /* New or already registered: the same next screen either way, so the
+     form never tells whether an address has an account. */
+  (await cookies()).set(
+    PENDING_SIGNUP_COOKIE,
+    validation.data.email,
+    pendingSignupCookieOptions(process.env.NODE_ENV === "production"),
+  );
+  redirect("/signup/verify");
+}
+
+/* The code from the confirmation email. */
+export async function verifySignupCodeAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const t = await getT();
+  const email = await getPendingSignupEmail();
+  if (!email) {
+    return { status: "error", message: t("signupCode.expiredSession") };
+  }
+  const code = parseEmailCode(stringField(formData, "code"));
+  if (!code) {
+    return { status: "error", message: t("signupCode.format") };
+  }
+
+  const ip = await getRequestIp();
+  if (!rateLimiter.hit("signupCodeIp", ip) || !rateLimiter.hit("signupCodeEmail", email.toLowerCase())) {
+    return { status: "error", message: t("auth.tooManyAttempts") };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
+    if (error || !data.session) {
+      return { status: "error", message: t("signupCode.wrong") };
+    }
+  } catch {
+    return { status: "error", message: t("auth.signUpUnavailable") };
+  }
+
+  rateLimiter.reset("signupCodeEmail", email.toLowerCase());
+  (await cookies()).delete(PENDING_SIGNUP_COOKIE);
   redirect("/feed");
+}
+
+/* Sends the confirmation email again. Always answers the same way. */
+export async function resendSignupCodeAction(): Promise<AuthActionState> {
+  const t = await getT();
+  const email = await getPendingSignupEmail();
+  if (!email) {
+    return { status: "error", message: t("signupCode.expiredSession") };
+  }
+  if (!rateLimiter.hit("signupResendIp", await getRequestIp())) {
+    return { status: "error", message: t("auth.tooManyAttempts") };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: new URL("/auth/confirm", getSiteUrl()).toString() },
+    });
+    if (error) {
+      console.error("[auth] resend refused by Supabase:", error.code ?? error.status ?? "unknown");
+    }
+  } catch {
+    /* Same answer: nothing about the address is revealed. */
+  }
+
+  return { status: "success", message: t("signupCode.resent") };
 }
 
 /* Live feedback while typing a handle in the onboarding. */

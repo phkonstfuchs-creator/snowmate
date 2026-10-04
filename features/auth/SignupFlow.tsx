@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
@@ -178,26 +177,6 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
   };
 
   const profileComplete = name.trim().length >= 2 && HANDLE_RE.test(handle) && handleStatus !== "taken" && Boolean(birthDate);
-
-  // ── Done: confirmation mail on its way ─────────────────────
-  if (state.status === "success") {
-    return (
-      <div className={shell} style={shellStyle}>
-        <div className="flex flex-1 flex-col justify-center px-4">
-          <div className="flex items-start gap-3 px-4 py-4" style={{ background: PAPER_1, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}>
-            <Icon name="mail-check" size={20} color={RUST} className="mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-mono-label" style={{ color: INK }}>{t("auth.requestReceived")}</p>
-              <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>{state.message}</p>
-            </div>
-          </div>
-          <Link href="/login" className="mt-5 block text-center text-sm font-semibold underline" style={{ color: "var(--ink-1)" }}>
-            {t("auth.backToSignIn")}
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   // ── Step 0: title page ─────────────────────────────────────
   if (step === 0) {

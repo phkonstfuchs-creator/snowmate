@@ -95,6 +95,13 @@ export function validateEmailOnly(input: unknown): ValidationResult<{ email: str
 }
 
 /* A six-digit authenticator code. */
+/* The code in the confirmation email: 6 to 10 digits, depending on the
+   project's OTP length setting. */
+export function parseEmailCode(value: string): string | null {
+  const digits = value.replace(/\s+/g, "");
+  return /^\d{6,10}$/.test(digits) ? digits : null;
+}
+
 export function parseOtpCode(value: string): string | null {
   const digits = value.replace(/\s+/g, "");
   return /^\d{6}$/.test(digits) ? digits : null;
