@@ -531,6 +531,8 @@ export const en = {
   "mfa.unknown": "Status could not be loaded.",
   "mfa.useOtherAccount": "Sign in with another account",
   "mfa.verify": "Confirm",
+  "chat.newChat": "New chat",
+  "chat.pickFriend": "Write to a friend, whether or not you share a ride:",
   "chat.title": "Chats",
   "chat.empty": "No chats yet. Message a friend or open the chat of a ride you are in.",
   "chat.message": "Message",

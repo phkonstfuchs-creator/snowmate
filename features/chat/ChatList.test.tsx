@@ -1,8 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import ChatList from "./ChatList";
 import ChatUnavailable from "./ChatUnavailable";
 import type { ChatSummary } from "./message";
+
+const openChat = vi.hoisted(() => vi.fn());
+vi.mock("./actions", () => ({ openDirectChatAction: openChat }));
 
 const direct: ChatSummary = {
   id: "c1", kind: "direct", otherUserId: "u2", otherName: "Lena Moser", otherHandle: "lena_m",
@@ -32,5 +35,18 @@ describe("ChatList", () => {
   it("says when a chat is not available", () => {
     render(<ChatUnavailable reason="chat.unavailable" />);
     expect(screen.getByRole("alert")).toHaveTextContent("only chat with friends");
+  });
+
+  it("starts a chat with any friend, ride or not", async () => {
+    openChat.mockResolvedValue(false);
+    render(<ChatList chats={[]} friends={[{ id: "u9", name: "Max Rider", handle: "max_r" }]} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "New chat" }));
+    expect(screen.getByText(/whether or not you share a ride/)).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Message Max Rider" }));
+    });
+    expect(openChat).toHaveBeenCalledWith("u9");
+    expect(screen.getByRole("alert")).toHaveTextContent("The chat could not be opened.");
   });
 });

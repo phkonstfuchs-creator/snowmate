@@ -150,7 +150,10 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
         </Section>
       )}
 
-      <ChatList chats={chats} />
+      <ChatList
+        chats={chats}
+        friends={friends.map((row) => ({ id: row.user_id, name: row.display_name ?? row.handle ?? t("common.rider"), handle: row.handle }))}
+      />
 
       <section className="px-4 pt-5">
         <InviteLinkCard />

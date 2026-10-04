@@ -530,6 +530,8 @@ export const de: Record<MessageKey, string> = {
   "mfa.unknown": "Der Status konnte nicht geladen werden.",
   "mfa.useOtherAccount": "Mit einem anderen Konto anmelden",
   "mfa.verify": "Bestätigen",
+  "chat.newChat": "Neuer Chat",
+  "chat.pickFriend": "Schreib einem Freund, egal ob ihr im selben Ride seid:",
   "chat.title": "Chats",
   "chat.empty": "Noch keine Chats. Schreib einem Freund oder öffne den Chat eines Rides, bei dem du dabei bist.",
   "chat.message": "Nachricht",

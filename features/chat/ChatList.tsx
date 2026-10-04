@@ -1,26 +1,88 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { settle } from "@/lib/settle";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { initialsFor } from "@/features/profile/profile-input";
+import { openDirectChatAction } from "./actions";
 import { chatTitle } from "./chat-title";
 import type { ChatSummary } from "./message";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
 
-export default function ChatList({ chats }: { chats: ChatSummary[] | null }) {
+export interface ChatFriend {
+  id: string;
+  name: string;
+  handle: string | null;
+}
+
+/* friends: confirmed friends, for "New chat". A direct chat does not
+   depend on rides; any friend can be messaged at any time. */
+export default function ChatList({ chats, friends = [] }: { chats: ChatSummary[] | null; friends?: ChatFriend[] }) {
   const t = useT();
   const locale = useLocale();
+  const [picking, setPicking] = useState(false);
+  const [opening, setOpening] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  const open = (friend: ChatFriend) => {
+    setOpening(friend.id);
+    setFailed(false);
+    void settle<false | null>(openDirectChatAction(friend.id), null).then((result) => {
+      setOpening(null);
+      if (result === false) setFailed(true);
+    });
+  };
 
   return (
     <section className="px-4 pt-5" aria-labelledby="chat-list-title">
       <div className="section-rule">
         <h2 id="chat-list-title" className="text-mono-label" style={{ color: INK }}>{t("chat.title")}</h2>
-        <span className="text-mono-label" style={{ color: INK_2 }}>{chats?.length ?? 0}</span>
+        {friends.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setPicking((value) => !value)}
+            aria-expanded={picking}
+            className="text-mono-label flex min-h-9 items-center gap-1 px-2.5"
+            style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+          >
+            <Icon name={picking ? "x" : "plus"} size={13} color="var(--paper-0)" strokeWidth={2.4} />
+            {t("chat.newChat")}
+          </button>
+        ) : (
+          <span className="text-mono-label" style={{ color: INK_2 }}>{chats?.length ?? 0}</span>
+        )}
       </div>
+      {picking && (
+        <div className="mt-2 p-2" style={{ border: "var(--rule-thick)", background: "var(--paper-0)" }}>
+          <p className="px-1 pb-1.5 text-xs font-semibold" style={{ color: INK_2 }}>{t("chat.pickFriend")}</p>
+          <ul className="space-y-1">
+            {friends.map((friend) => (
+              <li key={friend.id}>
+                <button
+                  type="button"
+                  onClick={() => open(friend)}
+                  disabled={opening !== null}
+                  className="card-tap flex min-h-12 w-full items-center gap-3 px-2 text-left disabled:opacity-50"
+                  aria-label={t("chat.messageTo", { name: friend.name })}
+                >
+                  <Avatar id={friend.id} initials={initialsFor(friend.name, friend.handle)} size={32} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold" style={{ color: INK }}>{friend.name}</span>
+                    {friend.handle && <span className="block truncate text-xs" style={{ color: INK_2 }}>@{friend.handle}</span>}
+                  </span>
+                  <Icon name="message-circle" size={16} color={INK_2} />
+                </button>
+              </li>
+            ))}
+          </ul>
+          {failed && <p role="alert" className="px-1 pt-1.5 text-sm" style={{ color: "var(--crimson)" }}>{t("chat.openFailed")}</p>}
+        </div>
+      )}
       {chats === null ? (
         <p className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t("chat.loadFailed")}</p>
       ) : chats.length === 0 ? (
