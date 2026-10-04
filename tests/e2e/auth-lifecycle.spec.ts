@@ -122,9 +122,12 @@ test.describe("account lifecycle", () => {
     await expect(page).toHaveURL(/\/signup\/verify$/);
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await page.getByRole("link", { name: "Back to sign in" }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await page.waitForLoadState("networkidle");
 
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
+    await expect(page.getByLabel("Email")).toHaveValue(email);
     await page.getByRole("button", { name: "Sign in" }).click();
 
     /* Either the feed opens or the form says why not; a failure then
