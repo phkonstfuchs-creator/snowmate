@@ -9,8 +9,8 @@ values
   ('c0c0c0c0-0000-4000-8000-000000000001', 'plain@example.com'),
   ('c0c0c0c0-0000-4000-8000-000000000002', 'mfa@example.com');
 
-insert into auth.mfa_factors (user_id, status)
-values ('c0c0c0c0-0000-4000-8000-000000000002', 'verified');
+insert into auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at)
+values (gen_random_uuid(), 'c0c0c0c0-0000-4000-8000-000000000002', 'test', 'totp', 'verified', now(), now());
 
 -- Anonymous requests pass (sign-in, sign-up checks).
 set local role anon;
