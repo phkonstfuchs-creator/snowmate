@@ -57,6 +57,11 @@ Option 2, layered:
   `20261005100000_request_guard_read_only.sql`: only read-write
   transactions are counted. `request_guard.test.sql` and the E2E lifecycle
   test (every list page loads without an error) now cover it.
+  A second time, the guard was executable only by `anon` and
+  `authenticated`, so every request with the service role key (the
+  website waitlist) failed with 403. Fixed in
+  `20261008090000_request_guard_service_role.sql`; covered by
+  `request_guard.test.sql`.
 - The in-memory limits reset when an instance restarts and are per
   instance. Supabase Auth's own limits sit behind them.
 - Recovery codes for a lost authenticator are not offered yet; support
