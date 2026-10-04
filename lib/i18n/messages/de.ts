@@ -456,6 +456,8 @@ export const de: Record<MessageKey, string> = {
   "map.rideLine": "{time} · {n} frei",
   "map.summary": "{n} {riding} · {resorts} Skigebiete",
   "map.deepestSnow": "höchste Schneelage",
+  "map.noWebgl": "Die Karte braucht WebGL, das auf diesem Gerät nicht verfügbar ist.",
+  "map.region": "Karte der Skigebiete rund um {city}",
   "map.unavailable": "Die Rides von heute konnten nicht geladen werden. Versuch es gleich nochmal.",
   "map.hotToday": "{n} heute unterwegs",
   "map.hotNow": "{n} gerade unterwegs · {cm} cm Schnee",

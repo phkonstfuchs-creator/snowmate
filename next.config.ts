@@ -13,9 +13,11 @@ const SECURITY_HEADERS = [
       "default-src 'self'",
       scriptPolicy,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com",
+      "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self'",
+      /* Map style, vector tiles, fonts and sprites; CARTO raster tiles
+         are the fallback when the vector style cannot load. */
+      "connect-src 'self' https://tiles.openfreemap.org https://*.basemaps.cartocdn.com",
       "form-action 'self'",
       "base-uri 'self'",
       "object-src 'none'",
@@ -43,6 +45,13 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    /* Keep a visited tab's server render for 30 s, so switching back and
+       forth between tabs is instant. Every write in the app ends in
+       router.refresh() or revalidatePath(), which clear this cache, so
+       nobody sees their own change late. */
+    staleTimes: { dynamic: 30 },
+  },
   turbopack: {
     root: path.resolve(__dirname),
   },
