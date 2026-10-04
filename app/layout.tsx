@@ -10,12 +10,15 @@ import { I18nProvider } from "@/lib/i18n/client";
 export const metadata: Metadata = {
   title: "Snowmate",
   description: "Find your crew. Today.",
+  applicationName: "Snowmate",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Snowmate" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#F2EADB",
 };
 

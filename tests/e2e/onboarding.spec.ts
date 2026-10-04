@@ -25,7 +25,7 @@ test("onboarding actions stay reachable on compact screens", async ({
   await expect(existingAccountButton).toBeInViewport({ ratio: 1 });
 });
 
-test("a new user can finish onboarding and continue to account creation", async ({
+test("a new user answers everything before the account step", async ({
   page,
 }) => {
   await page.goto("/onboarding");
@@ -33,13 +33,14 @@ test("a new user can finish onboarding and continue to account creation", async 
   await page.getByRole("button", { name: "Get started" }).click();
   await page.getByRole("button", { name: /Innsbruck/ }).click();
   await page.getByRole("button", { name: /Chill/ }).click();
+  await page.getByRole("button", { name: /Park/ }).click();
+  await page.getByRole("button", { name: "Next" }).click();
   await page.getByPlaceholder("Alex Rider").fill("Alex Rider");
-  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByLabel("Birth date").fill("2004-02-14");
+  await page.getByRole("button", { name: "Next" }).click();
 
-  await expect(page).toHaveURL(/\/signup$/);
-  await expect(
-    page.getByRole("heading", { name: "Create account" }),
-  ).toBeVisible();
+  await expect(page.getByLabel("Email")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Create account" })).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Main navigation" }),
   ).toHaveCount(0);
@@ -58,9 +59,9 @@ test("app responses include the baseline security headers", async ({ page }) => 
     "default-src 'self'",
   );
   expect(response?.headers()["permissions-policy"]).toBe(
-    "camera=(), microphone=(), geolocation=()",
+    "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), interest-cohort=()",
   );
   expect(response?.headers()["strict-transport-security"]).toBe(
-    "max-age=31536000",
+    "max-age=63072000; includeSubDomains",
   );
 });

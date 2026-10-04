@@ -94,7 +94,11 @@ export default function ProfileEditSheet({
 
   const errors = state.fieldErrors ?? {};
   const defaultCity = profile?.city ?? draft.city ?? "";
-  const defaultAbility = profile?.abilityLevel ?? draft.style ?? "";
+  const defaultStyles: string[] = profile?.ridingStyles?.length
+    ? profile.ridingStyles
+    : draft.style
+      ? [draft.style]
+      : [];
 
   return (
     <>
@@ -187,17 +191,17 @@ export default function ProfileEditSheet({
             <FieldError id={errorId("city")} message={errors.city} />
           </fieldset>
 
-          <fieldset aria-describedby={errors.abilityLevel ? errorId("abilityLevel") : undefined}>
-            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>{t("post.style")}</legend>
+          <fieldset aria-describedby={errors.ridingStyles ? errorId("ridingStyles") : undefined}>
+            <legend className="text-mono-label mb-1.5" style={{ color: INK }}>{t("profile.styles")}</legend>
             <div className="grid grid-cols-3 gap-2">
               {ABILITY_OPTIONS.map((option) => (
                 <label key={option.id} className="flex min-h-11 items-center gap-2 px-3" style={{ border: "var(--rule-thin)" }}>
-                  <input type="radio" name="abilityLevel" value={option.id} defaultChecked={defaultAbility === option.id} />
+                  <input type="checkbox" name="ridingStyles" value={option.id} defaultChecked={defaultStyles.includes(option.id)} />
                   <span className="text-sm font-semibold" style={{ color: INK }}>{t(option.label)}</span>
                 </label>
               ))}
             </div>
-            <FieldError id={errorId("abilityLevel")} message={errors.abilityLevel} />
+            <FieldError id={errorId("ridingStyles")} message={errors.ridingStyles} />
           </fieldset>
 
           <div>

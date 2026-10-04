@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { initialAuthActionState } from "./action-state";
 import {
+  checkHandleAction,
+  requestPasswordResetAction,
   signInAction,
   signOutAction,
   signUpAction,
+  updatePasswordAction,
+  verifyLoginMfaAction,
 } from "./actions";
 
 const mocks = vi.hoisted(() => ({
@@ -24,6 +28,14 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/supabase/config", () => ({
   getSupabasePublicConfig: mocks.getSupabasePublicConfig,
+  getSiteUrl: () => "http://localhost:3000",
+}));
+
+/* Every test is its own visitor, so the per-IP limits do not leak
+   between tests; the limit tests below reuse one address on purpose. */
+const ip = vi.hoisted(() => ({ next: 0, fixed: null as string | null }));
+vi.mock("@/lib/request-ip", () => ({
+  getRequestIp: async () => ip.fixed ?? `10.0.0.${++ip.next}`,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -34,7 +46,30 @@ const auth = {
   signInWithPassword: vi.fn(),
   signUp: vi.fn(),
   signOut: vi.fn(),
+  getClaims: vi.fn(),
+  updateUser: vi.fn(),
+  resetPasswordForEmail: vi.fn(),
+  mfa: {
+    getAuthenticatorAssuranceLevel: vi.fn(),
+    listFactors: vi.fn(),
+    challengeAndVerify: vi.fn(),
+  },
 };
+const rpc = vi.fn();
+
+/* The onboarding answers that travel with every sign-up. */
+const PROFILE = {
+  displayName: "New Rider",
+  handle: "new_rider",
+  city: "innsbruck",
+  birthDate: "2004-02-14",
+};
+
+function signupForm(values: Record<string, string>, styles: string[] = ["park", "chill"]): FormData {
+  const fields = formData({ ...PROFILE, ...values });
+  styles.forEach((style) => fields.append("ridingStyles", style));
+  return fields;
+}
 
 function formData(values: Record<string, string>): FormData {
   const fields = new FormData();
@@ -45,7 +80,10 @@ function formData(values: Record<string, string>): FormData {
 describe("auth actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.createClient.mockResolvedValue({ auth });
+    ip.fixed = null;
+    mocks.createClient.mockResolvedValue({ auth, rpc });
+    rpc.mockResolvedValue({ data: true, error: null });
+    auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: "aal1", nextLevel: "aal1" } });
   });
 
   it("does not call Supabase when login input is invalid", async () => {
@@ -104,7 +142,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      formData({
+      signupForm({
         email: "new.rider@example.com",
         password: "Snowmate2026Pass",
         confirmPassword: "Snowmate2026Pass",
@@ -130,7 +168,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      formData({
+      signupForm({
         email: "new.rider@example.com",
         password: "Snowmate2026Pass",
         confirmPassword: "Snowmate2026Pass",
@@ -155,7 +193,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      formData({
+      signupForm({
         email: "known.rider@example.com",
         password: "Snowmate2026Pass",
         confirmPassword: "Snowmate2026Pass",
@@ -186,5 +224,145 @@ describe("auth actions", () => {
     await expect(signOutAction()).rejects.toThrow("redirect:/login");
 
     expect(auth.signOut).toHaveBeenNthCalledWith(2, { scope: "local" });
+  });
+
+  it("sends the onboarding answers with the account, after checking the handle", async () => {
+    auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
+
+    await signUpAction(
+      initialAuthActionState,
+      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass" }),
+    );
+
+    expect(rpc).toHaveBeenCalledWith("handle_available", { candidate: "new_rider" });
+    expect(auth.signUp).toHaveBeenCalledWith(expect.objectContaining({
+      email: "new.rider@example.com",
+      options: expect.objectContaining({
+        emailRedirectTo: "http://localhost:3000/auth/confirm",
+        data: {
+          display_name: "New Rider",
+          handle: "new_rider",
+          city: "innsbruck",
+          riding_styles: ["park", "chill"],
+          birth_date: "2004-02-14",
+        },
+      }),
+    }));
+  });
+
+  it("stops at a taken handle before creating anything", async () => {
+    rpc.mockResolvedValue({ data: false, error: null });
+
+    const result = await signUpAction(
+      initialAuthActionState,
+      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass" }),
+    );
+
+    expect(result.profileErrors).toEqual({ handle: "That handle is taken." });
+    expect(auth.signUp).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [{ birthDate: "2020-01-01" }, ["chill"], "birthDate", "Snowmate is for riders aged 14 and over."],
+    [{ birthDate: "not-a-date" }, ["chill"], "birthDate", "Enter a valid birth date."],
+    [{}, [], "ridingStyles", "Pick a riding style."],
+    [{ city: "vienna" }, ["chill"], "city", "Pick a region."],
+    [{ handle: "a" }, ["chill"], "handle", "Use at least 3 characters."],
+  ])("refuses invalid onboarding answers %j", async (override, styles, field, message) => {
+    const result = await signUpAction(
+      initialAuthActionState,
+      signupForm({ email: "new.rider@example.com", password: "Snowmate2026Pass", confirmPassword: "Snowmate2026Pass", ...override }, styles),
+    );
+
+    expect(result.status).toBe("error");
+    expect(result.profileErrors?.[field as keyof NonNullable<typeof result.profileErrors>]).toBe(message);
+    expect(auth.signUp).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["Password12345", "This password is too common. Choose something less guessable."],
+    ["Newrider2026xyz", "Do not use your email address in the password."],
+  ])("refuses the weak password %s", async (password, message) => {
+    const result = await signUpAction(
+      initialAuthActionState,
+      signupForm({ email: "newrider@example.com", password, confirmPassword: password }),
+    );
+
+    expect(result.fieldErrors?.password).toEqual([message]);
+    expect(auth.signUp).not.toHaveBeenCalled();
+  });
+
+  it("sends an account with two-factor sign-in to the code screen", async () => {
+    auth.signInWithPassword.mockResolvedValue({ error: null });
+    auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: "aal1", nextLevel: "aal2" } });
+
+    await expect(
+      signInAction(initialAuthActionState, formData({ email: "rider@example.com", password: "existing-password" })),
+    ).rejects.toThrow("redirect:/login/verify");
+  });
+
+  it("limits password guessing on one account", async () => {
+    ip.fixed = "203.0.113.7";
+    auth.signInWithPassword.mockResolvedValue({ error: { code: "invalid_credentials" } });
+    const attempt = () =>
+      signInAction(initialAuthActionState, formData({ email: "target@example.com", password: "guess-password" }));
+
+    for (let i = 0; i < 8; i += 1) {
+      expect((await attempt()).message).toBe("Email or password is incorrect.");
+    }
+    expect((await attempt()).message).toBe("Too many attempts. Wait a few minutes and try again.");
+    expect(auth.signInWithPassword).toHaveBeenCalledTimes(8);
+  });
+
+  it("checks a handle only when it is well-formed", async () => {
+    expect(await checkHandleAction("A!")).toBe("invalid");
+    expect(rpc).not.toHaveBeenCalled();
+    expect(await checkHandleAction("free_one")).toBe("available");
+    rpc.mockResolvedValue({ data: false, error: null });
+    expect(await checkHandleAction("taken_one")).toBe("taken");
+  });
+
+  it("answers a reset request the same way whether or not the account exists", async () => {
+    auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+    const known = await requestPasswordResetAction(initialAuthActionState, formData({ email: "rider@example.com" }));
+    auth.resetPasswordForEmail.mockResolvedValue({ data: {}, error: { code: "user_not_found" } });
+    const unknown = await requestPasswordResetAction(initialAuthActionState, formData({ email: "nobody@example.com" }));
+
+    expect(known.message).toBe(unknown.message);
+    expect(known.status).toBe("success");
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith("rider@example.com", {
+      redirectTo: "http://localhost:3000/auth/confirm?next=/reset-password",
+    });
+  });
+
+  it("changes the password only for a signed-in account and with a strong password", async () => {
+    auth.getClaims.mockResolvedValue({ data: null });
+    const signedOut = await updatePasswordAction(initialAuthActionState, formData({ password: "Fresh-Powder-2026", confirmPassword: "Fresh-Powder-2026" }));
+    expect(signedOut.message).toBe("Your session ended. Sign in again.");
+
+    auth.getClaims.mockResolvedValue({ data: { claims: { sub: "user-1" } } });
+    const weak = await updatePasswordAction(initialAuthActionState, formData({ password: "short", confirmPassword: "short" }));
+    expect(weak.status).toBe("error");
+    expect(auth.updateUser).not.toHaveBeenCalled();
+
+    auth.updateUser.mockResolvedValue({ error: null });
+    const ok = await updatePasswordAction(initialAuthActionState, formData({ password: "Fresh-Powder-2026", confirmPassword: "Fresh-Powder-2026" }));
+    expect(ok).toMatchObject({ status: "success", message: "Password changed." });
+    expect(auth.updateUser).toHaveBeenCalledWith({ password: "Fresh-Powder-2026" });
+  });
+
+  it("verifies the second factor before opening the app", async () => {
+    auth.getClaims.mockResolvedValue({ data: { claims: { sub: "user-2" } } });
+    auth.mfa.listFactors.mockResolvedValue({ data: { totp: [{ id: "factor-1", status: "verified" }] } });
+
+    expect((await verifyLoginMfaAction(initialAuthActionState, formData({ code: "12" }))).message)
+      .toBe("Enter the 6-digit code from your authenticator app.");
+
+    auth.mfa.challengeAndVerify.mockResolvedValue({ error: { code: "mfa_verification_failed" } });
+    expect((await verifyLoginMfaAction(initialAuthActionState, formData({ code: "123 456" }))).status).toBe("error");
+
+    auth.mfa.challengeAndVerify.mockResolvedValue({ error: null });
+    await expect(verifyLoginMfaAction(initialAuthActionState, formData({ code: "123456" }))).rejects.toThrow("redirect:/feed");
+    expect(auth.mfa.challengeAndVerify).toHaveBeenLastCalledWith({ factorId: "factor-1", code: "123456" });
   });
 });

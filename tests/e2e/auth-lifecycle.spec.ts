@@ -3,6 +3,7 @@ import {
   test,
   type APIRequestContext,
   type BrowserContext,
+  type Page,
 } from "@playwright/test";
 
 interface MailpitSearchResult {
@@ -12,6 +13,22 @@ interface MailpitSearchResult {
 }
 
 const localSupabaseEnabled = process.env.LOCAL_SUPABASE_E2E === "1";
+
+/* The sign-up asks for the profile first, then the account. */
+async function signUp(page: Page, email: string, password: string, handle: string) {
+  await page.goto("/signup");
+  await page.getByRole("button", { name: /Innsbruck/ }).click();
+  await page.getByRole("button", { name: /Chill/ }).click();
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByPlaceholder("Alex Rider").fill("E2E Rider");
+  await page.getByLabel("Handle").fill(handle);
+  await page.getByLabel("Birth date").fill("2000-01-15");
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Create account" }).click();
+}
 
 async function waitForConfirmationLink(
   request: APIRequestContext,
@@ -86,11 +103,8 @@ test.describe("account lifecycle", () => {
     const email = `snowmate-e2e-${crypto.randomUUID()}@example.com`;
     const password = "Snowmate2026Pass";
 
-    await page.goto("/signup");
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password", { exact: true }).fill(password);
-    await page.getByLabel("Confirm password").fill(password);
-    await page.getByRole("button", { name: "Create account" }).click();
+    const handle = `e2e_${crypto.randomUUID().slice(0, 8)}`;
+    await signUp(page, email, password, handle);
 
     await expect(page.getByText("Request received")).toBeVisible();
 
@@ -106,17 +120,15 @@ test.describe("account lifecycle", () => {
     await expect(page.getByText("Snowmate").first()).toBeVisible();
 
     await page.goto(new URL("/profile", page.url()).toString());
+    /* The answers from the sign-up are the profile. */
+    await expect(page.getByText(`@${handle}`)).toBeVisible();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login$/);
 
     await page.goto(new URL("/feed", page.url()).toString());
     await expect(page).toHaveURL(/\/login$/);
 
-    await page.goto(new URL("/signup", page.url()).toString());
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password", { exact: true }).fill(password);
-    await page.getByLabel("Confirm password").fill(password);
-    await page.getByRole("button", { name: "Create account" }).click();
+    await signUp(page, email, password, `e2e_${crypto.randomUUID().slice(0, 8)}`);
 
     await expect(page.getByText("Request received")).toBeVisible();
     await expect(

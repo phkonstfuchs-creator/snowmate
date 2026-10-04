@@ -1,0 +1,25 @@
+import type { MetadataRoute } from "next";
+
+/* Makes Snowmate installable: "Add to Home Screen" on iPhone, "Install
+   app" on Android. It then opens full screen, without browser bars. */
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Snowmate",
+    short_name: "Snowmate",
+    description: "Find your crew. Who rides where today, live.",
+    id: "/",
+    start_url: "/feed",
+    scope: "/",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#F2EADB",
+    theme_color: "#F2EADB",
+    lang: "de",
+    categories: ["sports", "social", "travel"],
+    icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
+  };
+}

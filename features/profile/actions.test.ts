@@ -56,7 +56,7 @@ const validForm = {
   displayName: "Lena Moser",
   handle: "lena_m",
   city: "salzburg",
-  abilityLevel: "chill",
+  ridingStyles: "chill",
   bio: "Dawn patrol",
 };
 
@@ -71,6 +71,7 @@ describe("adoptOnboardingDraftAction", () => {
       display_name: "Lena Moser",
       handle: "lena_m",
       city: "innsbruck",
+      riding_styles: ["park"],
       ability_level: "park",
     });
     expect(calls.eq).toEqual([
@@ -116,7 +117,7 @@ describe("updateProfileAction", () => {
     const state = await updateProfileAction(initialProfileActionState, form(validForm));
 
     expect(state).toEqual({ status: "success", message: "Profile saved." });
-    expect(calls.update).toMatchObject({ bio: "Dawn patrol", city: "salzburg" });
+    expect(calls.update).toMatchObject({ bio: "Dawn patrol", city: "salzburg", riding_styles: ["chill"], ability_level: "chill" });
     expect(calls.eq).toEqual([["id", USER_ID]]);
   });
 

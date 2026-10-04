@@ -13,6 +13,7 @@ import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
 import LanguageSwitch from "./LanguageSwitch";
 import AgeSection from "./AgeSection";
+import SecuritySection from "./SecuritySection";
 import { useT } from "@/lib/i18n/client";
 import { initialsFor, type OwnProfile } from "./profile-input";
 import type { AccountStats } from "./account-stats";
@@ -179,10 +180,12 @@ export default function ProfileScreen({
   account,
   stats = null,
   blocked = [],
+  mfaEnabled = null,
 }: {
   account?: OwnProfile | null;
   stats?: AccountStats | null;
   blocked?: BlockedPerson[];
+  mfaEnabled?: boolean | null;
 }) {
   const isLive = account !== undefined;
   const t = useT();
@@ -250,7 +253,7 @@ export default function ProfileScreen({
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
               {isLive
-                ? [account?.city ? t(CITY_LABEL[account.city]) : null, account?.abilityLevel ? t(ABILITY_LABEL[account.abilityLevel]) : null]
+                ? [account?.city ? t(CITY_LABEL[account.city]) : null, ...(account?.ridingStyles ?? []).map((style) => t(ABILITY_LABEL[style]))]
                     .filter(Boolean)
                     .join(" · ") || t("common.rider")
                 : `Level ${ME.level} · ${ME.levelTitle}`}
@@ -337,7 +340,9 @@ export default function ProfileScreen({
       )}
 
       {/* ── Season Pass: ochre block, hard offset ──────────── */}
-      {!ME.isPremium && (
+      {/* Prototype only: there is no payment yet, so the real app does
+          not offer a button that cannot do anything. */}
+      {!isLive && !ME.isPremium && (
         <section className="px-4 pt-5">
           <button
             onClick={() => setShowSeasonPass(true)}
@@ -524,6 +529,7 @@ export default function ProfileScreen({
 
       {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
       <LanguageSwitch />
+      {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
       {isLive && <AccountSection blocked={blocked} />}
 
       {/* ── Sign out ───────────────────────────────────────── */}

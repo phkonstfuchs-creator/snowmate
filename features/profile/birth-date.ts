@@ -26,3 +26,14 @@ export function parseBirthDate(value: string): string | null {
   const valid = date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
   return valid ? value.trim() : null;
 }
+
+/* Whole years between a YYYY-MM-DD birth date and a day, the way an
+   age is counted on a birthday. */
+export function ageOn(birthDate: string, today: string): number {
+  const [by, bm, bd] = birthDate.split("-").map(Number) as [number, number, number];
+  const [ty, tm, td] = today.split("-").map(Number) as [number, number, number];
+  return ty - by - (tm < bm || (tm === bm && td < bd) ? 1 : 0);
+}
+
+export const MIN_AGE = 14;
+export const MAX_AGE = 100;

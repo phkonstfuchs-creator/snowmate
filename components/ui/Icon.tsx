@@ -7,12 +7,16 @@ import {
   BadgeCheck, Lock, ChevronDown, MoreHorizontal, MapPinned, Globe,
   Sunrise, Map, Hammer, LogOut, Eye, EyeOff, AlertCircle, MailCheck,
   CalendarDays, Ticket, SlidersHorizontal, ArrowLeft, UserCheck, UserX, Download, Trash2,
+  LocateFixed, Radio, KeyRound,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
 const REGISTRY: Record<string, ComponentType<LucideProps>> = {
   bell: Bell,
+  locate: LocateFixed,
+  radio: Radio,
+  key: KeyRound,
   "cloud-snow": CloudSnow,
   plus: Plus,
   mail: Mail,

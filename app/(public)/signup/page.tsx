@@ -1,5 +1,5 @@
-import AuthScreen from "@/features/auth/AuthScreen";
+import SignupFlow from "@/features/auth/SignupFlow";
 
 export default function SignupPage() {
-  return <AuthScreen mode="signup" />;
+  return <SignupFlow startAtTitle={false} />;
 }

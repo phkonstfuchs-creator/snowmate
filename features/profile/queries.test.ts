@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getOwnProfile, refreshOwnAge } from "./queries";
+import { getMfaEnabled, getOwnProfile, refreshOwnAge } from "./queries";
 
 const mocks = vi.hoisted(() => ({ createClient: vi.fn() }));
 
@@ -62,5 +62,19 @@ describe("refreshOwnAge", () => {
   it("never throws when the backend is unreachable", async () => {
     mocks.createClient.mockRejectedValue(new Error("offline"));
     await expect(refreshOwnAge()).resolves.toBeUndefined();
+  });
+});
+
+describe("getMfaEnabled", () => {
+  it("reports whether a verified authenticator exists", async () => {
+    const listFactors = vi.fn().mockResolvedValue({ data: { totp: [{ status: "verified" }] }, error: null });
+    mocks.createClient.mockResolvedValue({ auth: { mfa: { listFactors } } });
+    await expect(getMfaEnabled()).resolves.toBe(true);
+
+    listFactors.mockResolvedValue({ data: { totp: [{ status: "unverified" }] }, error: null });
+    await expect(getMfaEnabled()).resolves.toBe(false);
+
+    listFactors.mockResolvedValue({ data: null, error: { code: "x" } });
+    await expect(getMfaEnabled()).resolves.toBeNull();
   });
 });

@@ -13,6 +13,7 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/supabase/config", () => ({
   getSupabasePublicConfig: mocks.getSupabasePublicConfig,
+  getSiteUrl: () => mocks.getSupabasePublicConfig().siteUrl,
 }));
 
 const verifyOtp = vi.fn();
@@ -78,10 +79,10 @@ describe("GET /auth/confirm", () => {
     );
   });
 
-  it("rejects token types outside the signup flow", async () => {
+  it("rejects token types outside the signup and reset flows", async () => {
     const response = await GET(
       new NextRequest(
-        "http://localhost:3000/auth/confirm?token_hash=abc&type=recovery",
+        "http://localhost:3000/auth/confirm?token_hash=abc&type=email_change",
       ),
     );
 
@@ -123,5 +124,39 @@ describe("GET /auth/confirm", () => {
     expect(response.headers.get("location")).toBe(
       "http://localhost:3000/login?confirmation=failed",
     );
+  });
+
+  it("sends a verified reset link to the new-password screen", async () => {
+    verifyOtp.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      new NextRequest("http://localhost:3000/auth/confirm?token_hash=abc&type=recovery"),
+    );
+
+    expect(verifyOtp).toHaveBeenCalledWith({ token_hash: "abc", type: "recovery" });
+    expect(response.headers.get("location")).toBe("http://localhost:3000/reset-password");
+  });
+
+  it.each(["https://evil.example/", "//evil.example", "/admin", "javascript:alert(1)"])(
+    "never follows an unknown next target %s",
+    async (next) => {
+      exchangeCodeForSession.mockResolvedValue({ error: null });
+
+      const response = await GET(
+        new NextRequest(`http://localhost:3000/auth/confirm?code=c&next=${encodeURIComponent(next)}`),
+      );
+
+      expect(response.headers.get("location")).toBe("http://localhost:3000/feed");
+    },
+  );
+
+  it("follows an allowed next target", async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      new NextRequest("http://localhost:3000/auth/confirm?code=c&next=/reset-password"),
+    );
+
+    expect(response.headers.get("location")).toBe("http://localhost:3000/reset-password");
   });
 });

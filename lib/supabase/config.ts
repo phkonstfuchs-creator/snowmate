@@ -64,3 +64,32 @@ export function getSupabasePublicConfig(): SupabasePublicConfig {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
   });
 }
+
+/* Where links in auth emails point. A deployment whose
+   NEXT_PUBLIC_SITE_URL still says localhost (copied from .env.local)
+   would send every confirmation link to the reader's own machine; on
+   Vercel the production domain is known at runtime, so that wins. */
+export function resolveSiteUrl(
+  configured: string,
+  env: { VERCEL_ENV?: string; VERCEL_PROJECT_PRODUCTION_URL?: string; VERCEL_URL?: string },
+): string {
+  let isLocal = false;
+  try {
+    const host = new URL(configured).hostname;
+    isLocal = host === "localhost" || host === "127.0.0.1";
+  } catch {
+    isLocal = true;
+  }
+  if (!isLocal) return configured;
+
+  const host = env.VERCEL_ENV === "production" ? env.VERCEL_PROJECT_PRODUCTION_URL : env.VERCEL_URL;
+  return host && /^[a-z0-9.-]+$/i.test(host) ? `https://${host}` : configured;
+}
+
+export function getSiteUrl(): string {
+  return resolveSiteUrl(getSupabasePublicConfig().siteUrl, {
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    VERCEL_URL: process.env.VERCEL_URL,
+  });
+}
