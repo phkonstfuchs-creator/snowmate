@@ -36,6 +36,8 @@ interface Props {
      not have profile pages yet, so the rows are plain text there instead
      of buttons that do nothing. The sheet itself never loads fixtures. */
   onOpenProfile?: (user: User) => void;
+  /* Live only, for the host and accepted riders: open the ride chat. */
+  onOpenChat?: () => void;
 }
 
 /* A rider: a button when there is a profile to open, otherwise text. */
@@ -47,7 +49,7 @@ function PersonRow({ onOpen, className, children }: { onOpen?: () => void; class
   );
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile, onOpenChat }: Props) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -219,6 +221,17 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Join CTA */}
         <div className="px-5 pt-4">
+          {onOpenChat && (
+            <button
+              type="button"
+              onClick={onOpenChat}
+              className="mb-2 flex w-full items-center justify-center gap-2 py-4 font-black text-base"
+              style={{ background: "var(--paper-1)", color: "var(--ink-0)", border: "var(--rule-thick)" }}
+            >
+              <Icon name="message-circle" size={18} color="var(--ink-0)" strokeWidth={2.2} />
+              {t("chat.rideChat")}
+            </button>
+          )}
           {isHost && onEdit && (
             <button
               type="button"

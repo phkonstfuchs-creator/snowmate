@@ -72,6 +72,7 @@ audience rules row by row and null out fields the caller may not see:
 | `list_carpools()` | Visible carpools; `departure_point` only for friends and confirmed riders |
 | `list_my_friendships()` | The caller's own friend graph |
 | `my_pending_counts()` | Requests waiting for the caller (navigation badges) |
+| `list_my_conversations()`, `list_messages()` | The caller's chats and their messages, members only ([ADR 0017](adr/0017-chat-for-friends-and-ride-crews.md)) |
 | `export_my_data()` | Everything stored about the caller |
 
 Writes that need a rule check are functions too (`join_ride`,

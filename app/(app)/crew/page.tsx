@@ -1,7 +1,8 @@
 import LiveCrewScreen from "@/features/crew/LiveCrewScreen";
 import { getFriendGraph } from "@/features/crew/queries";
+import { listMyChats } from "@/features/chat/queries";
 
 export default async function CrewPage() {
-  const graph = await getFriendGraph();
-  return <LiveCrewScreen graph={graph} />;
+  const [graph, chats] = await Promise.all([getFriendGraph(), listMyChats()]);
+  return <LiveCrewScreen graph={graph} chats={chats} />;
 }

@@ -24,5 +24,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0014](0014-profile-at-sign-up-and-several-styles.md) | Profile at sign-up and several riding styles | Proposed |
 | [0015](0015-live-location-for-confirmed-friends.md) | Live location for confirmed friends | Proposed |
 | [0016](0016-vector-map-and-faster-navigation.md) | Vector map, Frankfurt region and instant tab switches | Proposed |
+| [0017](0017-chat-for-friends-and-ride-crews.md) | Chat for confirmed friends and ride crews | Proposed |
 
 Template: context, options considered, decision, consequences, status.

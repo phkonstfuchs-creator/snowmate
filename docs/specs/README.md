@@ -12,3 +12,4 @@ The workflow is in [../AI_WORKFLOW.md](../AI_WORKFLOW.md).
 | [Age from a birth date](age-from-birth-date.md) | Agreed |
 | [Sign-up with the full profile](signup-with-profile.md) | Agreed |
 | [Live location](live-location.md) | Agreed, details Proposed |
+| [Crew chat](crew-chat.md) | Agreed |
