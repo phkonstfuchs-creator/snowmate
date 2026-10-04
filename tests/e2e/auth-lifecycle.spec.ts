@@ -92,7 +92,7 @@ test.describe("account lifecycle", () => {
     const code = await waitForConfirmationCode(request, mailpitUrl, email);
     await page.getByLabel("Code from the email").fill("000000");
     await page.getByRole("button", { name: "Confirm" }).click();
-    await expect(page.getByRole("alert")).toContainText("wrong or has expired");
+    await expect(page.getByText(/wrong or has expired/)).toBeVisible();
 
     await page.getByLabel("Code from the email").fill(code);
     await page.getByRole("button", { name: "Confirm" }).click();
