@@ -21,7 +21,25 @@ const contentSecurityPolicy = [
   "manifest-src 'self'",
 ].join("; ");
 
+/* Before the split, the app ran on pistl.app. Links from that time
+   (confirmation and invite emails, home-screen icons, bookmarks) keep
+   working by forwarding app paths to the app's own subdomain. Temporary
+   redirects, so they can change later without being cached forever. */
+const appUrl = (process.env.PISTL_APP_URL || "https://app.pistl.app").replace(/\/$/, "");
+const APP_PATHS = [
+  "feed", "events", "map", "carpool", "crew", "people", "profile",
+  "login", "signup", "forgot-password", "reset-password", "onboarding",
+  "auth", "invite", "demo",
+];
+
 const nextConfig = {
+  async redirects() {
+    return APP_PATHS.map((segment) => ({
+      source: `/${segment}/:path*`,
+      destination: `${appUrl}/${segment}/:path*`,
+      permanent: false,
+    }));
+  },
   devIndicators: false,
   allowedDevOrigins: ["127.0.0.1"],
   poweredByHeader: false,
