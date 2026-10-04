@@ -1,0 +1,20 @@
+import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+export const alt = "Pistl — Dein Berg. Deine Leute. Early Access für Innsbruck und Salzburg.";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+
+export default async function OpenGraphImage() {
+  const image = await readFile(path.join(process.cwd(), "public/alpine-panorama.png"));
+  return new ImageResponse(
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#f4efe4", color: "#28271f", padding: "54px 64px", position: "relative" }}>
+      {/* ImageResponse renders this embedded raster directly; next/image is not supported here. */}
+      <img src={`data:image/png;base64,${image.toString("base64")}`} alt="" width={1200} height={400} style={{ position: "absolute", left: 0, bottom: 0 }} />
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", fontSize: 20 }}><span>pistl</span><span>INNSBRUCK — SALZBURG</span></div>
+      <div style={{ display: "flex", flexDirection: "column", fontWeight: 700, fontSize: 100, lineHeight: 1, letterSpacing: "-6px", marginTop: 35 }}><span>DEIN BERG.</span><span>DEINE LEUTE.</span></div>
+      <div style={{ display: "flex", position: "absolute", bottom: 38, left: 64, background: "#a33f28", color: "#f4efe4", padding: "14px 24px", fontSize: 20 }}>Early Access startet bald.</div>
+    </div>, size,
+  );
+}
