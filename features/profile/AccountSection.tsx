@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import LegalLinks from "@/features/legal/LegalLinks";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -155,6 +156,7 @@ export default function AccountSection({ blocked = [] }: { blocked?: BlockedPers
           {t("profile.deleteAccount")}
         </button>
       </div>
+      <LegalLinks className="mt-4" />
       {showDelete && <DeleteAccountSheet onClose={() => setShowDelete(false)} />}
     </section>
   );

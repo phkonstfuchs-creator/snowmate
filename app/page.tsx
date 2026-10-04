@@ -436,6 +436,12 @@ export default function Home() {
             <a href={LINKEDIN} className="text-mono-label underline" style={{ color: RUST }}>
               LinkedIn
             </a>
+            <a href="/impressum" className="text-mono-label underline" style={{ color: RUST }}>
+              Impressum
+            </a>
+            <a href="/datenschutz" className="text-mono-label underline" style={{ color: RUST }}>
+              Datenschutz
+            </a>
           </div>
         </div>
 

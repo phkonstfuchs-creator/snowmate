@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { PrivacyConsent } from "@/features/legal/LegalLinks";
 import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
 import PenguinMascot from "@/components/PenguinMascot";
@@ -402,7 +403,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
           <PrimaryButton type="submit" disabled={pending}>
             {pending ? t("auth.creating") : t("auth.createAccount")}
           </PrimaryButton>
-          <p className="mt-3 text-center text-xs leading-relaxed" style={{ color: INK_2 }}>{t("onb.terms")}</p>
+          <PrivacyConsent className="mt-3 text-center text-xs leading-relaxed" />
         </div>
       </form>
     </div>

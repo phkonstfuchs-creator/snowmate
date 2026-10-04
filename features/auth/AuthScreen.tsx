@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import LegalLinks from "@/features/legal/LegalLinks";
 import { useT } from "@/lib/i18n/client";
 import PenguinMascot from "@/components/PenguinMascot";
 import Icon from "@/components/ui/Icon";
@@ -113,6 +114,7 @@ export default function AuthScreen({
           ) : null}
 
           <AuthForm mode={mode} />
+          <LegalLinks className="mt-8" />
         </div>
       </div>
     </main>
