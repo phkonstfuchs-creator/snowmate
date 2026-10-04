@@ -110,6 +110,7 @@ describe("SignupFlow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => expect(screen.getByRole("heading", { name: "What is your name?" })).toBeInTheDocument());
-    expect(screen.getByText("That handle is taken.")).toBeInTheDocument();
+    /* The step changes before the action state lands; wait for the message. */
+    expect(await screen.findByText("That handle is taken.")).toBeInTheDocument();
   });
 });
