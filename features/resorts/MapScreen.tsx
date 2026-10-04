@@ -18,13 +18,16 @@ import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
-import type { MapPerson } from "@/components/LeafletMap";
+import type { MapPerson } from "@/components/map/SkiMap";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
 import type { FriendLocation } from "@/features/location/location";
 import { initialsFor } from "@/features/profile/profile-input";
 
-const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
+const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
+  ssr: false,
+  loading: () => <div className="ski-map-placeholder" aria-hidden="true" />,
+});
 
 const SURFACE = "var(--bg-surface-1)";
 const BORDER  = "var(--border-subtle)";
@@ -264,9 +267,9 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
         </div>
       </header>
 
-      {/* Real Leaflet map */}
+      {/* Vector map (MapLibre) */}
       <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>
-        <LeafletMap
+        <SkiMap
           city={city}
           resorts={resorts}
           onSelect={(resort) => setActiveSheet({ type: "resort", resort })}

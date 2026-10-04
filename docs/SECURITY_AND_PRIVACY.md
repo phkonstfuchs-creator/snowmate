@@ -82,6 +82,12 @@ history; it is part of the data export and goes with the account. A
 browser only reports the position while the app is open. See
 [ADR 0015](adr/0015-live-location-for-confirmed-friends.md).
 
+Map tiles come from OpenFreeMap (fallback: CARTO). Like any web map, the
+tile server sees the visitor's IP address and which map area is loaded,
+never the stored position or who is sharing. The browser fetches tiles
+directly; the CSP allows only these two hosts. See
+[ADR 0016](adr/0016-vector-map-and-faster-navigation.md).
+
 ## Sign-in and abuse limits
 
 - Passwords: 12+ characters, upper and lower case, a digit; common

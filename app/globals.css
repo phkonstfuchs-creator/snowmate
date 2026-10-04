@@ -180,7 +180,14 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
+}
+
+/* No double-tap zoom on controls: taps register at once instead of
+   the browser waiting to see whether a second tap follows. */
+a, button, label, summary, [role="button"], input, select, textarea {
+  touch-action: manipulation;
 }
 
 body {
@@ -267,6 +274,7 @@ body {
 }
 
 /* ─── Bottom navigation — printed footer bar ────────────────── */
+.bottom-nav a:active { background: var(--paper-1); }
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -459,19 +467,46 @@ body {
   overflow: hidden;
   background: var(--paper-2);
 }
-/* The light map layer is neutral grey. Sepia plus a slight hue
-   rotation pulls it onto the paper tone, so the map reads as a
-   printed plan rather than a foreign web tile. */
-.printed-map .leaflet-tile-pane {
-  filter: sepia(0.42) saturate(0.72) hue-rotate(-8deg) brightness(1.02) contrast(0.94);
-}
-.printed-map .leaflet-container { background: var(--paper-2); }
-.printed-map .leaflet-control-attribution {
-  background: rgba(242, 234, 219, 0.82);
+/* MapLibre vector map. The style is tinted to the paper palette in
+   code (components/map/map-style.ts), so no CSS filter runs over the
+   canvas: filters on a WebGL canvas cost frames on phones. */
+.ski-map { background: var(--paper-2); touch-action: none; }
+.ski-map .maplibregl-ctrl-attrib {
+  background: rgba(242, 234, 219, 0.86);
   color: var(--ink-2);
   font: 500 10px var(--font-body-stack);
 }
-.printed-map .leaflet-control-attribution a { color: var(--rust-ink); }
+.ski-map .maplibregl-ctrl-attrib a { color: var(--rust-ink); }
+.ski-map-placeholder {
+  width: 100%; height: 100%; min-height: 260px;
+  background: linear-gradient(100deg, var(--paper-2) 30%, var(--paper-1) 50%, var(--paper-2) 70%);
+  background-size: 300% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-sweep {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+/* Placeholder blocks while a screen's data loads (app/(app)/loading.tsx). */
+.skeleton {
+  background: linear-gradient(100deg, var(--paper-2) 30%, var(--paper-1) 50%, var(--paper-2) 70%);
+  background-size: 300% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+.me-dot {
+  width: 18px; height: 18px; border-radius: 9999px;
+  background: #2f6fb2; border: 3px solid #ffffff;
+  box-shadow: 0 0 0 0 rgba(47, 111, 178, 0.5), 0 1px 4px rgba(28, 24, 21, 0.4);
+  animation: me-pulse 2s ease-out infinite;
+}
+@keyframes me-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(47, 111, 178, 0.5), 0 1px 4px rgba(28, 24, 21, 0.4); }
+  70% { box-shadow: 0 0 0 14px rgba(47, 111, 178, 0), 0 1px 4px rgba(28, 24, 21, 0.4); }
+  100% { box-shadow: 0 0 0 0 rgba(47, 111, 178, 0), 0 1px 4px rgba(28, 24, 21, 0.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .me-dot, .ski-map-placeholder, .skeleton { animation: none; }
+}
 .map-pin {
   position: absolute;
   transform: translate(-50%, -100%);
@@ -611,7 +646,11 @@ body {
 }
 
 /* Friends on the live map */
-.friend-pin { display: flex; flex-direction: column; align-items: center; width: 40px; }
+.friend-pin {
+  display: flex; flex-direction: column; align-items: center; width: 40px;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
 .friend-pin-badge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; flex-shrink: 0;

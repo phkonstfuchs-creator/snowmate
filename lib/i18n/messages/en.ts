@@ -457,6 +457,8 @@ export const en = {
   "map.rideLine": "{time} · {n} open",
   "map.summary": "{n} {riding} · {resorts} resorts",
   "map.deepestSnow": "deepest snow",
+  "map.noWebgl": "The map needs WebGL, which this device does not offer.",
+  "map.region": "Map of ski resorts around {city}",
   "map.unavailable": "Today’s rides could not be loaded. Try again shortly.",
   "map.hotToday": "{n} riding today",
   "map.hotNow": "{n} riding now · {cm} cm snow",
