@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import { containsEmailName, isCommonPassword, passwordScore } from "./password-strength";
 
 describe("password strength", () => {
-  it.each(["Password123!", "Snowmate2026", "Qwertz123456", "123456789012", "aaaaaaaaaaaa", "abcabcabcabc", "Innsbruck2026!"])(
+  it.each(["Password123!", "Pistl2026", "Qwertz123456", "123456789012", "aaaaaaaaaaaa", "abcabcabcabc", "Innsbruck2026!"])(
     "flags %s as common",
     (password) => {
       expect(isCommonPassword(password)).toBe(true);
     },
   );
 
-  it.each(["Fresh-Powder-2026", "Lift7Queue!Morning", "Snowmate2026Pass"])("accepts %s", (password) => {
+  it.each(["Fresh-Powder-2026", "Lift7Queue!Morning", "Pistl2026Pass"])("accepts %s", (password) => {
     expect(isCommonPassword(password)).toBe(false);
   });
 

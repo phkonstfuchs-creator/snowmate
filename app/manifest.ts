@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 
-/* Makes Snowmate installable: "Add to Home Screen" on iPhone, "Install
+/* Makes Pistl installable: "Add to Home Screen" on iPhone, "Install
    app" on Android. It then opens full screen, without browser bars. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Snowmate",
-    short_name: "Snowmate",
+    name: "Pistl",
+    short_name: "Pistl",
     description: "Find your crew. Who rides where today, live.",
     id: "/",
     start_url: "/feed",

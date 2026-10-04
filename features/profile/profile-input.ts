@@ -13,7 +13,7 @@ export const ABILITY_VALUES = ["chill", "park", "off-piste"] as const satisfies 
 const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/;
 
 /* Mirrors profiles_handle_not_reserved. */
-export const RESERVED_HANDLES: readonly string[] = ["admin", "support", "snowmate"];
+export const RESERVED_HANDLES: readonly string[] = ["admin", "support", "snowmate", "pistl"];
 
 const displayNameSchema = z
   .string()

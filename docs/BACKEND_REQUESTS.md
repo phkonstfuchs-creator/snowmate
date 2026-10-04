@@ -135,11 +135,11 @@ The business model (see `PRODUCT.md`) rests on transactions: 3% on the
 volume of a university ski club trip, 0.99 € per matched carpool ride. None
 of that exists. Before any of it is built, the following need decisions:
 
-- Payment provider and whether Snowmate ever holds funds. Handling other
+- Payment provider and whether Pistl ever holds funds. Handling other
   people's money changes the regulatory picture substantially, and the
   operator is a minor running a registered business
 - Refunds and cancellations for trips, which is the actual hard part
-- Whether the trip organiser is a Snowmate account or a separate role
+- Whether the trip organiser is a Pistl account or a separate role
 
 **Why it is here:** the frontend already names prices on the landing page
 and in the profile. Those are labelled as a hypothesis everywhere. Nothing

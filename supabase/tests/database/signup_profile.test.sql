@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(17);
+select plan(18);
 
 -- A complete sign-up fills the whole profile.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -72,6 +72,7 @@ set local role anon;
 select is(public.handle_available('lena_m'), false, 'a taken handle is not available');
 select is(public.handle_available('LENA_M '), false, 'case and spaces do not get around it');
 select is(public.handle_available('admin'), false, 'reserved handles are not available');
+select is(public.handle_available('pistl'), false, 'the app name is not available as a handle');
 select is(public.handle_available('a!'), false, 'invalid handles are not available');
 select is(public.handle_available('fresh_rider'), true, 'a free handle is available');
 reset role;

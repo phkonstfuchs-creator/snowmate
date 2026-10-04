@@ -21,7 +21,7 @@ export default function InviteLinkCard() {
     const text = t("invite.shareText");
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: "Snowmate", text, url: link });
+        await navigator.share({ title: "Pistl", text, url: link });
         return;
       } catch {
         // Cancelled or unsupported: fall through to copying.

@@ -1,6 +1,6 @@
 # Security and privacy
 
-Snowmate handles the location and plans of young people, some of them
+Pistl handles the location and plans of young people, some of them
 under 18. The rules below are enforced in the database; the UI only
 explains them. Every rule has negative pgTAP tests in
 `supabase/tests/database/`.

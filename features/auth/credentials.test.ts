@@ -38,8 +38,8 @@ describe("validateSignupCredentials", () => {
   it("accepts a strong password that is confirmed", () => {
     const result = validateSignupCredentials({
       email: "new.rider@example.com",
-      password: "Snowmate2026Pass",
-      confirmPassword: "Snowmate2026Pass",
+      password: "Pistl2026Pass",
+      confirmPassword: "Pistl2026Pass",
     });
 
     expect(result.success).toBe(true);
@@ -47,10 +47,10 @@ describe("validateSignupCredentials", () => {
 
   it.each([
     ["too short", "Snow2026", "Snow2026"],
-    ["no uppercase letter", "snowmate2026pass", "snowmate2026pass"],
-    ["no lowercase letter", "SNOWMATE2026PASS", "SNOWMATE2026PASS"],
-    ["no number", "SnowmatePassOnly", "SnowmatePassOnly"],
-    ["different confirmation", "Snowmate2026Pass", "Snowmate2026Other"],
+    ["no uppercase letter", "pistl2026pass", "pistl2026pass"],
+    ["no lowercase letter", "PISTL2026PASS", "PISTL2026PASS"],
+    ["no number", "PistlPassOnly", "PistlPassOnly"],
+    ["different confirmation", "Pistl2026Pass", "Pistl2026Other"],
   ])("rejects %s", (_case, password, confirmPassword) => {
     const result = validateSignupCredentials({
       email: "new.rider@example.com",

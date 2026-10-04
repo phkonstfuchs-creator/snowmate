@@ -57,7 +57,7 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
         data-state={state}
         role="dialog"
         aria-modal="true"
-        aria-label="Snowmate Season Pass"
+        aria-label="Pistl Season Pass"
         tabIndex={-1}
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >

@@ -15,7 +15,7 @@ Three core personas:
 
 ## Product Purpose
 
-Snowmate is the social coordination layer of the mountain: "who's riding today, where, and can I join?" It is explicitly NOT a tracking app (like Strava) and NOT a generic location-sharing app (like Snapchat Map). It's ski-native, real-time, and crew-first. The live feed answers one question: which of the 13 ski areas around Innsbruck is your crew on today, and how do you join them?
+Pistl is the social coordination layer of the mountain: "who's riding today, where, and can I join?" It is explicitly NOT a tracking app (like Strava) and NOT a generic location-sharing app (like Snapchat Map). It's ski-native, real-time, and crew-first. The live feed answers one question: which of the 13 ski areas around Innsbruck is your crew on today, and how do you join them?
 
 Success = a young skier in Innsbruck opens the app on a Saturday morning, sees who's riding, posts a ride or joins one, finds a carpool seat, and is on the mountain with the right people — without sending a single WhatsApp message.
 
@@ -29,7 +29,7 @@ Coordination is free and stays free — feed, map, carpool board, crew, public e
 
 Revenue comes from transactions that already happen today, handled badly:
 
-1. **University ski club trips (main driver)** — clubs run semester trips for 50–300 people on Excel, WhatsApp and private bank transfers. Snowmate handles signup, seat allocation, payment, participant lists and cancellations. **3% of the volume handled.** A 150-person trip at 300 € is 45,000 € currently moving through one overloaded organiser.
+1. **University ski club trips (main driver)** — clubs run semester trips for 50–300 people on Excel, WhatsApp and private bank transfers. Pistl handles signup, seat allocation, payment, participant lists and cancellations. **3% of the volume handled.** A 150-person trip at 300 € is 45,000 € currently moving through one overloaded organiser.
 2. **Carpool transaction fee** — **0.99 € per matched ride**, charged to the passenger, never the driver: offering a seat must stay free or the board empties. It also fixes the trust problem, since a paid seat means fewer no-shows.
 3. **Regional partners (season 2 onward)** — ski areas, rental shops and huts pay for visibility to people going there tomorrow. Delivered as an offer inside the feed tied to a specific ride, never as a banner.
 4. **Season Pass** — **14.99 € once per season** (December–April) for powder alerts and extended stats. A minor line, not the core model, and never presented as the main one.

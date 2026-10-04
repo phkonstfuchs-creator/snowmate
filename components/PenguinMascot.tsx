@@ -14,7 +14,7 @@ export default function PenguinMascot({ size = 40, className = "" }: PenguinMasc
   return (
     <Image
       src="/logo-print.png"
-      alt="Snowmate"
+      alt="Pistl"
       width={size}
       height={size}
       className={className}

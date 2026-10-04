@@ -4,7 +4,7 @@ import { previewInvite } from "@/features/crew/queries";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Crew invite · Snowmate",
+  title: "Crew invite · Pistl",
   robots: { index: false },
 };
 
