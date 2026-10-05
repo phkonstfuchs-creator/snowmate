@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";
 import { translateFieldErrors } from "@/lib/i18n/translate";
@@ -66,7 +67,7 @@ async function writeProfile(
     return "unavailable";
   }
 
-  revalidatePath("/profile");
+  revalidateApp();
   return "saved";
 }
 

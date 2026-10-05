@@ -2,7 +2,7 @@
 
 import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { validateCarpoolInput } from "./carpool-input";
 
@@ -29,7 +29,7 @@ async function rpc(fn: string, args: Record<string, unknown>): Promise<unknown> 
     const supabase = await createClient();
     const { data, error } = await supabase.rpc(fn, args);
     if (error) return UNAVAILABLE_SENTINEL;
-    revalidatePath("/carpool");
+    revalidateApp();
     return data;
   } catch {
     return UNAVAILABLE_SENTINEL;
@@ -67,7 +67,7 @@ async function createCarpoolActionImpl(input: unknown): Promise<CarpoolActionRes
     return UNAVAILABLE;
   }
 
-  revalidatePath("/carpool");
+  revalidateApp();
   return { ok: true, message: "carpool.posted" };
 }
 

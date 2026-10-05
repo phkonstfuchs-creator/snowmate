@@ -59,7 +59,7 @@ describe("acceptInviteAction", () => {
     mocks.rpc.mockResolvedValue({ data: "accepted", error: null });
     await expect(acceptInviteAction(TOKEN)).resolves.toEqual({ ok: true, message: t(INVITE_MESSAGES.accepted) });
     expect(mocks.rpc).toHaveBeenCalledWith("accept_friend_invite", { invite_token: TOKEN });
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/crew");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it.each([

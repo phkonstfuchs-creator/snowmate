@@ -52,6 +52,13 @@ Three causes:
   SECURITY_AND_PRIVACY.md).
 - Data from friends (rides, requests) can appear up to 30 s late on a tab
   you return to; reopening the app or any own action shows it at once.
+  Amended 2026-10-05 after testers saw stale screens until a restart:
+  - Every write calls `revalidateApp()` (`lib/revalidate.ts`), which
+    invalidates all signed-in screens, not just the current one.
+  - `components/RefreshOnResume.tsx` refreshes when the home-screen app
+    returns from the background after more than 10 s, and once a minute
+    while it is visible.
+  - A join or leave shows at once, before the refreshed list arrives.
 - The map needs WebGL; devices without it get a message instead.
 - MapLibre 6 loads its tile worker by URL. `scripts/copy-maplibre-worker.mjs`
   copies it to `public/vendor/maplibre/` before every dev and build run

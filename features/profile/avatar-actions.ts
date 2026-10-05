@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { AVATAR_BUCKET, AVATAR_MAX_BYTES, avatarPath, isOwnAvatarPath, sniffAvatarType } from "./avatar-image";
 import type { AvatarVisibility } from "./profile-input";
@@ -46,7 +46,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<AvatarOutc
     if (before?.avatar_path && isOwnAvatarPath(userId, before.avatar_path) && before.avatar_path !== path) {
       await supabase.storage.from(AVATAR_BUCKET).remove([before.avatar_path]);
     }
-    revalidatePath("/profile");
+    revalidateApp();
     return "saved";
   } catch {
     return "unavailable";
@@ -63,7 +63,7 @@ export async function removeAvatarAction(): Promise<AvatarOutcome> {
     if (before?.avatar_path && isOwnAvatarPath(userId, before.avatar_path)) {
       await supabase.storage.from(AVATAR_BUCKET).remove([before.avatar_path]);
     }
-    revalidatePath("/profile");
+    revalidateApp();
     return "saved";
   } catch {
     return "unavailable";
@@ -77,7 +77,7 @@ export async function setAvatarVisibilityAction(visibility: AvatarVisibility): P
     if (!userId) return "unauthenticated";
     const { error } = await supabase.from("profiles").update({ avatar_visibility: visibility }).eq("id", userId);
     if (error) return "unavailable";
-    revalidatePath("/profile");
+    revalidateApp();
     return "saved";
   } catch {
     return "unavailable";

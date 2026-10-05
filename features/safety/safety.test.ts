@@ -24,8 +24,7 @@ describe("blockUserAction", () => {
     mocks.rpc.mockResolvedValue({ data: "blocked", error: null });
     await expect(blockUserAction("u1")).resolves.toMatchObject({ ok: true });
     expect(mocks.rpc).toHaveBeenCalledWith("block_user", { target: "u1" });
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/feed");
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/carpool");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it("refuses self and failures", async () => {

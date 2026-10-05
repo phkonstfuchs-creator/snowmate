@@ -26,8 +26,7 @@ describe("friend actions", () => {
       message: "Request sent.",
     });
     expect(mocks.rpc).toHaveBeenCalledWith("request_friendship", { target_handle: "lena_m" });
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/crew");
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/feed");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it("rejects a malformed handle locally", async () => {
