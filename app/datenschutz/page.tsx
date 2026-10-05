@@ -42,6 +42,13 @@ export default function DatenschutzPage() {
         Mindestalter zu prüfen und für Minderjährige strengere Sichtbarkeitsregeln anzuwenden. Rechtsgrundlage: Art. 6
         Abs. 1 lit. b DSGVO.
       </p>
+      <h3>Profilbild</h3>
+      <p>
+        Freiwillig. Dein Handy verkleinert das Bild vor dem Hochladen und entfernt dabei Ort und Kameradaten. Du legst
+        fest, wer es sieht: nur Freunde, oder zusätzlich Freunde von Freunden und Leute aus deinen Rides. Unter 18
+        sehen es immer nur bestätigte Freunde. Gespeichert wird es bei Supabase in Frankfurt, bis du es entfernst oder
+        dein Konto löschst. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
       <h3>Rides, Mitfahrgelegenheiten, Freundschaften, Chat</h3>
       <p>
         Was du anlegst oder schreibst, und mit wem du befreundet bist. Sichtbar ist es nur für die Personen, die die

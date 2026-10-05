@@ -73,6 +73,22 @@ page). Under 14 is refused. The birth date is self-declared, visible only
 to its owner and included in the data export. Without one, the narrower
 rules above apply. See [ADR 0012](adr/0012-age-from-birth-date.md).
 
+## Profile pictures
+
+Optional. The browser crops the picture to 512 px and re-encodes it,
+which drops EXIF data such as the GPS position. The server accepts only
+WebP or JPEG by their first bytes, up to 512 KB. Pictures sit in the
+private `avatars` bucket, one folder per account, and only the owner
+writes there.
+
+Who sees a picture is checked by `can_see_avatar()` for every read: the
+owner, confirmed friends, and, if the owner chose "contacts", friends of
+friends and people in the same ride. Minors' pictures are friends-only
+whatever they chose, and a block hides them both ways. The app serves
+pictures from its own `/avatar/<id>` route, so browsers never get a
+storage URL. Deleting the account removes the files. See
+[ADR 0022](adr/0022-profile-pictures.md).
+
 ## Live location
 
 Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed

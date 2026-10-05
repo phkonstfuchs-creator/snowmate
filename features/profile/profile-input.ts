@@ -117,9 +117,19 @@ export interface OwnProfile {
   birthDate: string | null;
   isMinor: boolean;
   onboardingCompleted: boolean;
+  /* The account id, for the own picture at /avatar/<id>. */
+  id?: string;
+  /* Storage path of the picture; changes with every upload. */
+  avatarPath?: string | null;
+  avatarVisibility?: AvatarVisibility;
 }
 
+export type AvatarVisibility = "friends" | "contacts";
+
 export interface ProfileRow {
+  id?: string;
+  avatar_path?: string | null;
+  avatar_visibility?: string | null;
   display_name: string | null;
   handle: string | null;
   city: string | null;
@@ -152,6 +162,11 @@ export function toOwnProfile(row: ProfileRow): OwnProfile {
     birthDate: row.birth_date ?? null,
     isMinor: row.is_minor,
     onboardingCompleted: row.onboarding_completed,
+    ...(row.id ? { id: row.id } : {}),
+    ...(row.avatar_path !== undefined ? { avatarPath: row.avatar_path } : {}),
+    ...(row.avatar_visibility !== undefined
+      ? { avatarVisibility: row.avatar_visibility === "contacts" ? "contacts" : "friends" }
+      : {}),
   };
 }
 

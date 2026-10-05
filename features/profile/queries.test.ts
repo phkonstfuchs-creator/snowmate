@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getMfaEnabled, getOwnProfile, refreshOwnAge } from "./queries";
+import { getMfaEnabled, getOwnProfile, getVisibleAvatar, refreshOwnAge } from "./queries";
 
 const mocks = vi.hoisted(() => ({ createClient: vi.fn() }));
 
@@ -76,5 +76,27 @@ describe("getMfaEnabled", () => {
 
     listFactors.mockResolvedValue({ data: null, error: { code: "x" } });
     await expect(getMfaEnabled()).resolves.toBeNull();
+  });
+});
+
+describe("getVisibleAvatar", () => {
+  const OWNER = "c4a70000-0000-4000-8000-000000000002";
+
+  it("returns the picture only when the database names a path", async () => {
+    const file = new Blob([new Uint8Array([1])], { type: "image/webp" });
+    const download = vi.fn().mockResolvedValue({ data: file, error: null });
+    const rpc = vi.fn().mockResolvedValueOnce({ data: `${OWNER}/a.webp`, error: null }).mockResolvedValueOnce({ data: null, error: null });
+    mocks.createClient.mockResolvedValue({ rpc, storage: { from: () => ({ download }) } });
+
+    await expect(getVisibleAvatar(OWNER)).resolves.toBe(file);
+    expect(rpc).toHaveBeenCalledWith("avatar_path_for", { owner: OWNER });
+    expect(download).toHaveBeenCalledWith(`${OWNER}/a.webp`);
+    await expect(getVisibleAvatar(OWNER)).resolves.toBeNull();
+  });
+
+  it("refuses ids that are not ids and fails closed", async () => {
+    await expect(getVisibleAvatar("../etc")).resolves.toBeNull();
+    mocks.createClient.mockRejectedValue(new Error("down"));
+    await expect(getVisibleAvatar(OWNER)).resolves.toBeNull();
   });
 });
