@@ -447,7 +447,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                       <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
                       <span
                         className="text-mono-label absolute left-0 top-0 px-2 py-1"
-                        style={{ background: "var(--ochre)", color: "var(--ink-0)" }}
+                        style={{ background: "var(--ochre)", color: "var(--on-bright)" }}
                       >
                         {pool.dateLabel}
                       </span>

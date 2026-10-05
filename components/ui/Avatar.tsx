@@ -1,7 +1,6 @@
-/* Spot colours of the sheet — each is checked against paper and
-   against white initials, so avatars never fall out of the
-   palette. */
-const AVATAR_COLORS = ["#a83f1b", "#2a5647", "#3e6e8e", "#8f3415", "#3b7561", "#2f5570"];
+/* Saturated colours that hold white initials (AA) and stand out on
+   the dark surfaces. */
+const AVATAR_COLORS = ["#c2410c", "#0f766e", "#1d4ed8", "#7c3aed", "#be185d", "#0369a1"];
 
 export function avatarColor(id: string) {
   return AVATAR_COLORS[id.charCodeAt(id.length - 1) % AVATAR_COLORS.length];

@@ -162,7 +162,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                  <span className="text-mono-label px-1.5" style={{ background: "var(--ochre)", color: "var(--ink-0)" }}>{t("ride.host")}</span>
+                  <span className="text-mono-label px-1.5" style={{ background: "var(--ochre)", color: "var(--on-bright)" }}>{t("ride.host")}</span>
                 </div>
                 <span className="text-xs font-bold" style={{ color: MUTED }}>{profilesEnabled ? t("ride.levelLine", { level: author.level, title: author.levelTitle }) : author.handle ? `@${author.handle}` : ""}</span>
               </div>

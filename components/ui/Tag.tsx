@@ -18,12 +18,13 @@ export default function Tag({ level, showIcon = true }: { level: AbilityLevel; s
     <span
       className={`inline-flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap ${s.cls}`}
       style={{
-        height: 24,
-        padding: "0 8px",
-        borderRadius: 0,
-        border: "1px solid currentColor",
-        font: "700 11px var(--font-mono)",
-        letterSpacing: 0,
+        height: 26,
+        padding: "0 10px",
+        borderRadius: 999,
+        background: "rgba(13, 17, 23, 0.78)",
+        backdropFilter: "blur(6px)",
+        font: "800 11px var(--font-body-stack)",
+        letterSpacing: "0.04em",
         textTransform: "uppercase",
       }}
     >

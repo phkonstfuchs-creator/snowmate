@@ -1,98 +1,100 @@
 @import "tailwindcss";
 
 /* ─── Pistl design tokens ───────────────────────────────────
-   DNA: 1970s alpine tourism poster, printed on paper.
-   Warm cream instead of screen black, screen-print spot colours
-   (rust, pine, ochre, sky) instead of gradients and glow.
-   Areas and rules carry the structure — no soft shadows, no blur,
-   no stacks of rounded cards.
-   Numbers run in mono like readings on an instrument.
+   DNA: a night on the glacier. Deep blue-black surfaces, one hot
+   orange for action, ice blue for anything live. Big bold numbers,
+   rounded cards, soft depth. Built for phones outdoors: high
+   contrast, large tap targets.
+   The variable names (paper, ink, rust, …) come from the first
+   design and are kept so every screen follows the tokens: "paper" is
+   now the dark surface, "ink" the light text, "rust" the accent.
    Every text pair is checked against WCAG AA (4.5:1).
    ──────────────────────────────────────────────────────────── */
 :root {
+  color-scheme: dark;
   --font-display: "Jost Variable";
   --font-body: "Hanken Grotesk Variable";
-  --font-mono: "Space Mono";
+  --font-mono: "Hanken Grotesk Variable";
 
-  /* Paper — the base. Aged cream, never pure white. */
-  --paper-0: #f2eadb; /* sheet / canvas */
-  --paper-1: #ece2d0; /* card, slightly offset */
-  --paper-2: #e2d6bf; /* recessed area, inputs */
-  --paper-3: #d4c5a9; /* border, divider */
+  /* Surfaces, darkest first */
+  --paper-0: #0d1117; /* canvas */
+  --paper-1: #161c25; /* card */
+  --paper-2: #1f2732; /* recessed area, inputs */
+  --paper-3: #2c3643; /* border, divider */
 
-  /* Ink — warm black-brown, never #000 */
-  --ink-0: #1c1815; /* full ink */
-  --ink-1: #4a4038; /* body text, muted */
-  --ink-2: #62574e; /* labels */
-  --ink-3: #6f6257; /* disabled */
+  /* Text, brightest first */
+  --ink-0: #f2f5f8; /* primary */
+  --ink-1: #c5ced9; /* body */
+  --ink-2: #9ca8b6; /* labels */
+  --ink-3: #8592a2; /* disabled */
 
-  /* Spot colours — four, no more. Like screen printing. */
-  --rust-ink: #8f3415; /* dark variant for text on ochre/paper */
-  --rust: #a83f1b; /* main accent: action, brand */
-  --rust-light: #c0512a; /* areas only, never as text */
+  /* Accents */
+  --rust-ink: #ff9a6b; /* accent as text on dark surfaces */
+  --rust: #ff6a2b; /* main accent: action, brand */
+  --rust-light: #ff8a57; /* areas only */
 
-  --pine: #2a5647; /* structure, success, calm areas */
-  --pine-light: #3b7561;
+  --pine: #3ddc97; /* success, calm */
+  --pine-light: #7ff0bd;
 
-  --ochre: #d9962b; /* reward — areas ONLY, ink on top */
-  --sky: #3e6e8e; /* Live / Info */
-  /* On tinted areas --sky is not enough: against the park
-     background it only reaches 3.76:1. Dark variant like
-     --rust-ink, so 11px bold holds 4.5:1 (5.35:1). */
-  --sky-ink: #2f5670;
-  --crimson: #8e2420; /* error */
+  --ochre: #ffc145; /* reward — areas only, dark text on top */
+  --sky: #4cc3ff; /* live / info */
+  --sky-ink: #8ad8ff;
+  --crimson: #ff6b6b; /* error */
+
+  /* Text on bright fills (accent, reward, sky) */
+  --on-bright: #0d1117;
 
   /* Semantic mapping */
   --bg-canvas: var(--paper-0);
   --bg-surface-1: var(--paper-1);
   --bg-surface-2: var(--paper-2);
   --bg-surface-3: var(--paper-2);
-  --bg-overlay: rgba(28, 24, 21, 0.55);
+  --bg-overlay: rgba(3, 6, 10, 0.66);
 
-  --border-rule: var(--ink-0); /* the printed rule */
+  --border-rule: var(--paper-3);
   --border-subtle: var(--paper-3);
-  --border-hairline: rgba(28, 24, 21, 0.12);
+  --border-hairline: rgba(255, 255, 255, 0.08);
 
   --text-primary: var(--ink-0);
   --text-secondary: var(--ink-1);
   --text-tertiary: var(--ink-2);
   --text-disabled: var(--ink-3);
-  --text-on-accent: var(--paper-0);
+  --text-on-accent: var(--on-bright);
 
   --accent-primary: var(--rust);
-  --accent-primary-hover: var(--rust-ink);
-  --accent-primary-active: var(--rust-ink);
-  --accent-primary-subtle: rgba(168, 63, 27, 0.1);
+  --accent-primary-hover: var(--rust-light);
+  --accent-primary-active: var(--rust-light);
+  --accent-primary-subtle: rgba(255, 106, 43, 0.14);
 
   --accent-warm: var(--ochre);
-  --accent-warm-subtle: rgba(217, 150, 43, 0.16);
+  --accent-warm-subtle: rgba(255, 193, 69, 0.14);
 
   --status-success: var(--pine);
   --status-danger: var(--crimson);
   --status-warning: var(--rust);
-  --live-dot: var(--rust);
+  --live-dot: var(--sky);
 
   /* Spacing — 4px base */
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
   --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
 
-  /* Radii — print has no soft corners. Almost everything is sharp. */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 2px;
-  --radius-xl: 2px;
-  --radius-2xl: 2px;
-  --radius-pill: 999px; /* brand and stamp moments only */
+  /* Radii — soft, sporty */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
 
-  /* Depth comes from rules and hard offset, not from blur */
+  /* Depth from soft shadows and hairlines */
   --rule-thin: 1px solid var(--border-rule);
-  --rule-thick: 2px solid var(--border-rule);
-  --rule-heavy: 4px solid var(--border-rule);
-  --shadow-card: none;
-  --shadow-print: 3px 3px 0 var(--ink-0);
-  --shadow-sheet: 0 -2px 0 var(--ink-0);
-  --glow-focus: 0 0 0 3px rgba(168, 63, 27, 0.3);
+  --rule-thick: 1px solid var(--border-rule);
+  --rule-heavy: 1px solid var(--border-rule);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 6px 18px rgba(0, 0, 0, 0.28);
+  --shadow-print: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-sheet: 0 -16px 40px rgba(0, 0, 0, 0.5);
+  --glow-focus: 0 0 0 3px rgba(255, 106, 43, 0.35);
 
   /* Motion — print does not move softly. Short and dry.
      Two real curves instead of one: things entering and leaving run
@@ -115,12 +117,12 @@
      Jost (geometric, Futura heritage) for poster headlines,
      Hanken Grotesk for body text, Space Mono for all numbers. */
   --font-display-stack: var(--font-display), "Futura", "Century Gothic", sans-serif;
-  --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", monospace;
+  --font-mono-stack: var(--font-mono), -apple-system, "Segoe UI", sans-serif;
   --font-body-stack: var(--font-body), -apple-system, "Segoe UI", sans-serif;
 
-  --text-display-hero: 700 56px / 0.88 var(--font-display-stack);
-  --text-display-lg: 700 40px / 0.9 var(--font-display-stack);
-  --text-display-md: 700 28px / 0.95 var(--font-display-stack);
+  --text-display-hero: 800 52px / 1 var(--font-display-stack);
+  --text-display-lg: 800 38px / 1.05 var(--font-display-stack);
+  --text-display-md: 800 26px / 1.1 var(--font-display-stack);
 
   --text-heading-lg: 700 24px / 1.15 var(--font-display-stack);
   --text-heading-md: 600 19px / 1.25 var(--font-body-stack);
@@ -132,13 +134,13 @@
   --text-caption: 500 13px / 1.4 var(--font-body-stack);
 
   /* Generous line height, otherwise capital umlauts (Ä/Ö/Ü) clip */
-  --text-mono-label: 700 11px / 1.5 var(--font-mono-stack);
-  --text-mono-data: 700 20px / 1.1 var(--font-mono-stack);
-  --text-mono-data-lg: 700 34px / 1 var(--font-mono-stack);
+  --text-mono-label: 700 11px / 1.5 var(--font-body-stack);
+  --text-mono-data: 800 22px / 1.1 var(--font-body-stack);
+  --text-mono-data-lg: 800 36px / 1 var(--font-body-stack);
 
   /* Poster type runs tight and in capitals */
-  --tracking-display: 0;
-  --tracking-mono-label: 0;
+  --tracking-display: -0.02em;
+  --tracking-mono-label: 0.06em;
 
   --z-dropdown: 100;
   --z-sticky: 200;
@@ -149,9 +151,9 @@
 
   /* Still used by components */
   --border-strong: var(--ink-3);
-  --accent-warm-hover: #e3a63f;
+  --accent-warm-hover: #ffd27a;
   --flame: var(--rust-ink);
-  --glow-live: 0 0 0 3px rgba(168, 63, 27, 0.18);
+  --glow-live: 0 0 0 3px rgba(76, 195, 255, 0.22);
 }
 
 @theme inline {
@@ -191,6 +193,7 @@ a, button, label, summary, [role="button"], input, select, textarea {
 }
 
 body {
+  font-variant-numeric: tabular-nums;
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   font: var(--text-body);
@@ -206,15 +209,14 @@ body {
    print. :focus-visible rather than :focus, so the ring does not
    flash on mouse clicks. */
 :focus-visible {
-  outline: 2px solid var(--ink-0);
+  outline: 2px solid var(--rust);
   outline-offset: 2px;
-  border-radius: 0;
 }
 /* On coloured areas (rust, pine) ink would disappear */
 .sm-btn-primary:focus-visible,
 .city-toggle-btn.active:focus-visible {
-  outline-color: var(--paper-0);
-  outline-offset: -5px;
+  outline-color: var(--ink-0);
+  outline-offset: 2px;
 }
 
 /* ─── App frame ──────────────────────────────────────────────── */
@@ -231,8 +233,8 @@ body {
 
 /* Outside the sheet: the dark workbench it rests on */
 @media (min-width: 640px) {
-  body { background: var(--ink-0); }
-  .app-shell { box-shadow: 0 0 0 1px var(--ink-0); }
+  body { background: #06080b; }
+  .app-shell { box-shadow: 0 0 0 1px var(--paper-3); }
 }
 
 .app-shell header { background: var(--bg-canvas) !important; }
@@ -257,6 +259,7 @@ body {
   .paper-grain { position: relative; }
 }
 .paper-grain::after {
+  display: none;
   content: '';
   position: absolute;
   inset: 0;
@@ -270,11 +273,11 @@ body {
 .halftone {
   background-image: radial-gradient(var(--ink-0) 1px, transparent 1px);
   background-size: 6px 6px;
-  opacity: 0.14;
+  opacity: 0;
 }
 
 /* ─── Bottom navigation — printed footer bar ────────────────── */
-.bottom-nav a:active { background: var(--paper-1); }
+.bottom-nav a:active { background: var(--paper-2); }
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -282,8 +285,10 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  background: var(--paper-0);
-  border-top: var(--rule-thick);
+  background: rgba(13, 17, 23, 0.92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--paper-3);
   z-index: var(--z-sticky);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -291,9 +296,9 @@ body {
 /* ─── Typography helpers ────────────────────────────────────── */
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }
-.text-display-hero { font: var(--text-display-hero); letter-spacing: var(--tracking-display); text-transform: uppercase; }
-.text-display-lg { font: var(--text-display-lg); letter-spacing: var(--tracking-display); text-transform: uppercase; }
-.text-display-md { font: var(--text-display-md); letter-spacing: var(--tracking-display); text-transform: uppercase; }
+.text-display-hero { font: var(--text-display-hero); letter-spacing: var(--tracking-display); }
+.text-display-lg { font: var(--text-display-lg); letter-spacing: var(--tracking-display); }
+.text-display-md { font: var(--text-display-md); letter-spacing: var(--tracking-display); }
 .text-mono-label {
   font: var(--text-mono-label);
   letter-spacing: var(--tracking-mono-label);
@@ -317,12 +322,13 @@ body {
 .print-card {
   background: var(--paper-1);
   border: var(--rule-thin);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
 }
 .print-card-raised {
   background: var(--paper-1);
   border: var(--rule-thick);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-print);
 }
 
@@ -337,16 +343,17 @@ body {
   letter-spacing: 0;
   user-select: none;
   flex-shrink: 0;
-  border: 1.5px solid var(--ink-0);
+  border: 2px solid var(--paper-0);
+  color: #ffffff;
 }
 
 /* ─── Riding style badges ───────────────────────────────────── */
-.badge-chill    { background: var(--accent-warm-subtle); color: var(--rust-ink); }
-.badge-park     { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
-.badge-offpiste { background: rgba(42, 86, 71, 0.16); color: var(--pine); }
+.badge-chill    { background: var(--accent-warm-subtle); color: var(--ochre); border-radius: var(--radius-pill); }
+.badge-park     { background: rgba(76, 195, 255, 0.14); color: var(--sky-ink); border-radius: var(--radius-pill); }
+.badge-offpiste { background: rgba(61, 220, 151, 0.14); color: var(--pine); border-radius: var(--radius-pill); }
 
 /* ─── Snow condition badges ─────────────────────────────────── */
-.cond-fresh   { background: rgba(62, 110, 142, 0.16); color: var(--sky-ink); }
+.cond-fresh   { background: rgba(76, 195, 255, 0.14); color: var(--sky-ink); }
 .cond-groomed { background: var(--paper-2); color: var(--ink-1); }
 .cond-icy     { background: var(--paper-2); color: var(--ink-2); }
 .cond-slushy  { background: var(--accent-warm-subtle); color: var(--rust-ink); }
@@ -354,16 +361,16 @@ body {
 /* ─── XP bar — an instrument scale, not a progress pill ─────── */
 .xp-bar-track {
   background: var(--paper-2);
-  border: var(--rule-thin);
-  border-radius: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
   overflow: hidden;
-  height: 12px;
+  height: 10px;
 }
 .xp-bar-fill {
-  background: var(--rust);
+  background: linear-gradient(90deg, var(--rust), var(--ochre));
   height: 100%;
   width: 100%;
-  border-radius: 0;
+  border-radius: var(--radius-pill);
   transform-origin: left;
   transition: transform 0.26s var(--ease-out);
 }
@@ -390,9 +397,9 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  background: var(--paper-0);
-  border-radius: 0;
-  border-top: var(--rule-heavy);
+  background: var(--paper-1);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--paper-3);
   box-shadow: var(--shadow-sheet);
   z-index: var(--z-modal);
   padding-bottom: env(safe-area-inset-bottom, 16px);
@@ -457,8 +464,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .card-tap:active {
-  transform: translate(2px, 2px);
-  box-shadow: none !important;
+  transform: scale(0.985);
 }
 
 /* ─── Map ───────────────────────────────────────────────────── */
@@ -472,11 +478,11 @@ body {
    canvas: filters on a WebGL canvas cost frames on phones. */
 .ski-map { background: var(--paper-2); touch-action: none; }
 .ski-map .maplibregl-ctrl-attrib {
-  background: rgba(242, 234, 219, 0.86);
-  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.86);
+  color: #3a3f47;
   font: 500 10px var(--font-body-stack);
 }
-.ski-map .maplibregl-ctrl-attrib a { color: var(--rust-ink); }
+.ski-map .maplibregl-ctrl-attrib a { color: #b4410f; }
 .ski-map-placeholder {
   width: 100%; height: 100%; min-height: 260px;
   background: linear-gradient(100deg, var(--paper-2) 30%, var(--paper-1) 50%, var(--paper-2) 70%);
@@ -517,19 +523,19 @@ body {
 /* ─── Messages ──────────────────────────────────────────────── */
 .msg-bubble-me {
   background: var(--rust);
-  color: var(--paper-0);
-  border: 1.5px solid var(--ink-0);
-  border-radius: 2px;
+  color: var(--on-bright);
+  border: 0;
+  border-radius: 18px 18px 4px 18px;
   padding: 9px 13px;
   font-size: 0.9375rem;
   line-height: 1.45;
   word-break: break-word;
 }
 .msg-bubble-them {
-  background: var(--paper-1);
+  background: var(--paper-2);
   color: var(--ink-0);
-  border: 1.5px solid var(--ink-0);
-  border-radius: 2px;
+  border: 0;
+  border-radius: 18px 18px 18px 4px;
   padding: 9px 13px;
   font-size: 0.9375rem;
   line-height: 1.45;
@@ -539,9 +545,9 @@ body {
 /* ─── Forms — an entry field on a printed form ──────────────── */
 .form-input {
   width: 100%;
-  background: var(--paper-0);
-  border: var(--rule-thin);
-  border-radius: 0;
+  background: var(--paper-2);
+  border: 1px solid var(--paper-3);
+  border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 0.9375rem;
   color: var(--text-primary);
@@ -569,7 +575,7 @@ body {
   position: absolute;
   inset: -3px;
   border-radius: 9999px;
-  background: rgba(168, 63, 27, 0.3);
+  background: rgba(76, 195, 255, 0.35);
   animation: pulse-ring 1.8s linear infinite;
 }
 @keyframes pulse-ring {
@@ -583,13 +589,13 @@ body {
 /* ─── Buttons — printed blocks with a hard offset ───────────── */
 .sm-btn-primary {
   background: var(--rust);
-  color: var(--paper-0);
-  border: var(--rule-thick) !important;
-  box-shadow: var(--shadow-print);
+  color: var(--on-bright);
+  border: 0 !important;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 6px 20px rgba(255, 106, 43, 0.3);
 }
 .sm-btn-primary:active:not(:disabled) {
-  transform: translate(3px, 3px);
-  box-shadow: none;
+  transform: scale(0.97);
 }
 
 
@@ -597,23 +603,23 @@ body {
    triggers the hover state and leaves it stuck afterwards — the
    normal case on a mobile-first app. */
 @media (hover: hover) and (pointer: fine) {
-  .sm-btn-primary:hover:not(:disabled) { background: var(--rust-ink); }
+  .sm-btn-primary:hover:not(:disabled) { background: var(--rust-light); }
 }
 
 /* ─── Toggle — tabs on a printed index ─────────────────────── */
 .city-toggle-track {
   display: flex;
-  background: var(--paper-0);
-  border: var(--rule-thin);
-  border-radius: 0;
-  padding: 0;
-  gap: 0;
+  background: var(--paper-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  gap: 4px;
 }
 .city-toggle-btn {
   flex: 1;
   min-height: 44px;
   padding: 9px 12px;
-  border-radius: 0;
+  border-radius: var(--radius-pill);
   font: var(--text-mono-label);
   letter-spacing: var(--tracking-mono-label);
   text-transform: uppercase;
@@ -628,8 +634,8 @@ body {
 .story-ring {
   padding: 3px;
   border-radius: 9999px;
-  background: var(--ochre);
-  border: 1.5px solid var(--ink-0);
+  background: linear-gradient(135deg, var(--rust), var(--ochre));
+  border: 0;
 }
 
 /* ─── XP toast ──────────────────────────────────────────────── */
@@ -655,8 +661,8 @@ body {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; flex-shrink: 0;
   border-radius: 9999px; border: 3px solid #ffffff;
-  background: var(--rust); color: var(--paper-0);
-  font-family: var(--font-mono-stack); font-size: 12px; font-weight: 700;
+  background: var(--rust); color: var(--on-bright);
+  font-family: var(--font-mono-stack); font-size: 12px; font-weight: 800;
   box-shadow: 0 1px 4px rgba(28, 24, 21, 0.45);
 }
 .friend-pin-name {
@@ -664,7 +670,7 @@ body {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   background: var(--paper-0); color: var(--ink-0);
   font-size: 10px; font-weight: 800; line-height: 14px;
-  border: 1px solid var(--ink-0);
+  border: 0; border-radius: 6px;
 }
 
 /* A position sent in a chat: a teardrop pin with the sender's name */
@@ -683,7 +689,7 @@ body {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   background: var(--paper-0); color: var(--ink-0);
   font-size: 11px; font-weight: 800; line-height: 16px;
-  border: 1px solid var(--ink-0);
+  border: 0; border-radius: 6px;
 }
 
 /* ─── Legal pages (imprint, privacy) ───────────────────────── */
@@ -694,3 +700,29 @@ body {
 .legal-text ul { padding-left: 1.2rem; list-style: disc; }
 .legal-text li { margin-top: 0.25rem; }
 .legal-text a { color: var(--rust-ink); text-decoration: underline; overflow-wrap: anywhere; }
+
+/* ─── Shape layer for the dark design ─────────────────────────
+   Screens set borders inline from the tokens (border: var(--rule-…)).
+   Instead of touching every block, bordered blocks and accent buttons
+   get their radius here. Lines that are only top or bottom rules
+   (border-top / border-bottom) do not match and stay straight. */
+body .rounded-none,
+body [style*="border:var(--rule-"],
+body [style*="border: var(--rule-"],
+body [style*="border:1px solid var(--border-"],
+body [style*="border: 1px solid var(--border-"] {
+  border-radius: var(--radius-lg);
+}
+/* Cards with pictures: the picture follows the rounded corner. */
+body [style*="border:var(--rule-thick)"],
+body [style*="border: var(--rule-thick)"] {
+  overflow: hidden;
+}
+body :is(button, a)[style*="background:var(--rust)"],
+body :is(button, a)[style*="background: var(--rust)"],
+body :is(button, a)[style*="background:var(--ink-0)"],
+body :is(button, a)[style*="background: var(--ink-0)"] {
+  border-radius: var(--radius-pill);
+  border: 0 !important;
+  box-shadow: none !important;
+}

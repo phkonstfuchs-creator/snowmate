@@ -45,9 +45,9 @@ export default function Input({
         style={{
           height: 52,
           padding: "0 4px 0 14px",
-          borderRadius: 0,
-          background: "var(--paper-0)",
-          border: `1px solid ${error ? "var(--crimson)" : "var(--ink-0)"}`,
+          borderRadius: 14,
+          background: "var(--paper-2)",
+          border: `1px solid ${error ? "var(--crimson)" : "var(--paper-3)"}`,
           boxShadow: focused && !error ? "var(--glow-focus)" : "none",
           transition: "box-shadow var(--duration-fast) var(--ease-standard)",
           opacity: disabled ? 0.5 : 1,

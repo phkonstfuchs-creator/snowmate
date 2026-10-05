@@ -2,19 +2,18 @@
 
 import React, { useId } from "react";
 
-/* Screen-print mountain scene: flat spot colours, hard edges, no
-   gradients. Each resort gets its own colour edition via a hash of
-   its name — like different print runs of the same series. */
+/* Mountain scene for a resort: a sky gradient by time of day, a glowing
+   sun or moon, layered ridges and snowfields. Each resort gets its own
+   light via a hash of its name. */
 
-const PAPER = "#f2eadb";
-const INK = "#1c1815";
+const SNOW = "#f2f5f8";
 
-/* Vier Auflagen. Reihenfolge: fern, mitte, nah. */
+/* Sky top, sky bottom, sun, far, mid, near ridge. */
 const EDITIONS = [
-  { sky: "#e2d6bf", sun: "#d9962b", far: "#3e6e8e", mid: "#2a5647", near: "#1c1815" },
-  { sky: "#ece2d0", sun: "#a83f1b", far: "#2a5647", mid: "#3b7561", near: "#1c1815" },
-  { sky: "#e6dcc6", sun: "#d9962b", far: "#8f3415", mid: "#a83f1b", near: "#1c1815" },
-  { sky: "#dfd3ba", sun: "#a83f1b", far: "#3b7561", mid: "#2a5647", near: "#1c1815" },
+  { skyTop: "#1b2a4a", skyBottom: "#ff8a57", sun: "#ffc145", far: "#4a5f80", mid: "#26374f", near: "#0d1117" },
+  { skyTop: "#0f3b6b", skyBottom: "#4cc3ff", sun: "#fff1c2", far: "#3d6a92", mid: "#1f4466", near: "#0d1117" },
+  { skyTop: "#2a1b4a", skyBottom: "#ff6a2b", sun: "#ffc145", far: "#57476e", mid: "#2b2440", near: "#0d1117" },
+  { skyTop: "#0b1630", skyBottom: "#2c4a7c", sun: "#e8eef7", far: "#34507a", mid: "#1b2c48", near: "#0d1117" },
 ] as const;
 
 // 6 Bergkompositionen (400×180 viewBox)
@@ -94,27 +93,28 @@ export default function ResortScene({
       aria-hidden="true"
     >
       <defs>
-        {/* Halftone grid — the screen-print dot over the sky */}
-        <pattern id={dotId} width="6" height="6" patternUnits="userSpaceOnUse">
-          <circle cx="1.5" cy="1.5" r="1.1" fill={INK} opacity="0.16" />
-        </pattern>
+        <linearGradient id={`${dotId}-sky`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={ed.skyTop} />
+          <stop offset="1" stopColor={ed.skyBottom} />
+        </linearGradient>
+        <radialGradient id={`${dotId}-glow`}>
+          <stop offset="0" stopColor={ed.sun} stopOpacity="0.55" />
+          <stop offset="1" stopColor={ed.sun} stopOpacity="0" />
+        </radialGradient>
       </defs>
 
-      {/* Sky as a flat area */}
-      <rect width="400" height="180" fill={ed.sky} />
+      <rect width="400" height="180" fill={`url(#${dotId}-sky)`} />
 
-      {/* Sonnenscheibe */}
-      <circle cx={sunX} cy="46" r="26" fill={ed.sun} />
-
-      {/* Rasterverlauf im oberen Himmel, hart abgeschnitten */}
-      <rect width="400" height="74" fill={`url(#${dotId})`} />
+      {/* Sun or moon with a soft glow */}
+      <circle cx={sunX} cy="46" r="62" fill={`url(#${dotId}-glow)`} />
+      <circle cx={sunX} cy="46" r="18" fill={ed.sun} />
 
       {/* Ferne Kette */}
       <path d={scene.far} fill={ed.far} />
 
       {/* Snowfields — knocked-out paper */}
       {scene.snow.map((d, i) => (
-        <path key={i} d={d} fill={PAPER} />
+        <path key={i} d={d} fill={SNOW} opacity="0.92" />
       ))}
 
       {/* Mittlere Kette */}

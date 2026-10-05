@@ -22,7 +22,7 @@ export default async function DemoLayout({ children }: { children: React.ReactNo
         className="text-mono-label flex items-center justify-between gap-3 px-3 py-2"
         style={{
           background: "var(--ochre)",
-          color: "var(--ink-0)",
+          color: "var(--on-bright)",
           borderBottom: "var(--rule-thick)",
         }}
       >

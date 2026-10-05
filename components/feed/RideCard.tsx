@@ -115,7 +115,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               {full ? t("card.full") : t("card.open", { n: open })}
             </span>
             {isHost ? (
-              <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
+              <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--on-bright)", border: "1px solid var(--ink-0)" }}>
                 {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
               </span>
             ) : (
