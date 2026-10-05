@@ -58,6 +58,9 @@ const nextConfig: NextConfig = {
        router.refresh() or revalidatePath(), which clear this cache, so
        nobody sees their own change late. */
     staleTimes: { dynamic: 30 },
+    /* Ski-day post photos are re-encoded in the browser to at most 1.5 MB;
+       the default 1 MB would refuse some of them. */
+    serverActions: { bodySizeLimit: "2mb" },
   },
   turbopack: {
     root: path.resolve(__dirname),

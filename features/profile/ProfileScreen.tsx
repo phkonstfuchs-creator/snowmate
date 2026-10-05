@@ -10,6 +10,10 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import Avatar from "@/components/ui/Avatar";
+import MyRides from "./MyRides";
+import PostList from "@/features/posts/PostList";
+import type { Post } from "@/features/posts/post";
+import type { LiveRide } from "@/features/rides/live-ride";
 import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
@@ -183,11 +187,15 @@ export default function ProfileScreen({
   stats = null,
   blocked = [],
   mfaEnabled = null,
+  myRides,
+  myPosts,
 }: {
   account?: OwnProfile | null;
   stats?: AccountStats | null;
   blocked?: BlockedPerson[];
   mfaEnabled?: boolean | null;
+  myRides?: { upcoming: LiveRide[]; past: LiveRide[] };
+  myPosts?: Post[] | null;
 }) {
   const isLive = account !== undefined;
   const t = useT();
@@ -533,6 +541,9 @@ export default function ProfileScreen({
       </section>
         </>
       )}
+
+      {isLive && myRides && <MyRides upcoming={myRides.upcoming} past={myRides.past} />}
+      {isLive && myPosts !== undefined && <PostList posts={myPosts} title={t("posts.mine")} />}
 
       {/* Settings are needed rarely: one row that opens them. */}
       <details className="settings-disclosure mx-4 mt-6 mb-4" style={{ borderTop: "var(--rule-thin)" }}>

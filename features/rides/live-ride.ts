@@ -40,6 +40,8 @@ export interface LiveRide {
   participants: User[];
   isHost: boolean;
   isJoined: boolean;
+  /* ISO day of the ride (Vienna); absent in the prototype's fixtures. */
+  rideDate?: string;
   /* On the viewer's calendar day (Vienna); independent of the label's language. */
   isToday: boolean;
   /* Asked to join and waiting for the host. */
@@ -159,6 +161,7 @@ export function toLiveRide(row: RideRow, now: Date, locale: Locale = DEFAULT_LOC
     isHost: row.is_host,
     isJoined: row.is_joined,
     isToday: row.ride_date === toIsoDay(now),
+    rideDate: row.ride_date,
     isPending: row.my_status === "pending",
     requests: (row.requests ?? []).map((p) => profileToUser({ ...p, city: row.city })),
     meetPointLocked: row.meet_point_locked,

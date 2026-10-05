@@ -17,6 +17,9 @@ import type { SafetyTarget } from "@/features/safety/reports";
 import RideCard from "@/components/feed/RideCard";
 import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
+import PostComposer from "@/features/posts/PostComposer";
+import PostList from "@/features/posts/PostList";
+import type { Post } from "@/features/posts/post";
 import PenguinMascot from "@/components/PenguinMascot";
 import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -29,6 +32,8 @@ export interface LiveFeed {
   defaultCity: City;
   /* Posting and joining need a finished profile (enforced in the database). */
   profileComplete?: boolean;
+  /* Ski-day posts from the viewer and their friends; null when unreachable. */
+  posts?: Post[] | null;
 }
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
@@ -37,6 +42,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
@@ -87,6 +93,17 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Pistl</span>
           </div>
           <div className="flex items-center gap-2">
+            {live && (
+              <button
+                type="button"
+                onClick={() => setShowComposer(true)}
+                aria-label={t("posts.shareDay")}
+                className="flex h-11 w-11 items-center justify-center"
+                style={{ border: "var(--rule-thin)" }}
+              >
+                <Icon name="sparkles" size={18} color="var(--ink-0)" strokeWidth={1.8} />
+              </button>
+            )}
             <Link
               href={`${basePath}/events`}
               aria-label={t("nav.events")}
@@ -198,6 +215,11 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       </div>
 
       {/* Post Modal */}
+      {live && <PostList posts={live.posts ?? []} title={t("posts.fromCrew")} />}
+      {live && <div className="pb-4" />}
+
+      {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
+
       {showPostModal && (
         <PostRideModal
           city={city}
