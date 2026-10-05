@@ -8,7 +8,8 @@ export const siteUrl = configuredUrl && /^https?:\/\//.test(configuredUrl)
 export const operatorName = process.env.PISTL_OPERATOR_NAME || "Philipp Fuchs";
 export const operatorBusiness = process.env.PISTL_OPERATOR_BUSINESS || "Einzelunternehmen, digitale Dienstleistungen";
 export const operatorAddress = process.env.PISTL_OPERATOR_ADDRESS || "In den Kiefern 3, 66271 Kleinblittersdorf, Deutschland";
-export const contactEmail = process.env.PISTL_CONTACT_EMAIL || "Vfxphilipp@outlook.com";
+export const contactEmail = process.env.PISTL_CONTACT_EMAIL || "vfxphilipp@outlook.com";
+export const contactPhone = "+49 1511 6477 919";
 
 /* Data protection authority for the operator's seat (Saarland). */
 export const supervisoryAuthority = {
