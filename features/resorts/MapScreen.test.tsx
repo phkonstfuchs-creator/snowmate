@@ -89,4 +89,19 @@ describe("MapScreen", () => {
     fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
     expect(within(screen.getByRole("dialog")).getByText("Snow and weather are not available right now.")).toBeInTheDocument();
   });
+
+  it("shows a resort photo with its credit when one is free to use", () => {
+    const photo = {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/x/xy/Nordkette.jpg/1200px-Nordkette.jpg",
+      width: 1200, height: 800, author: "Anna K.", license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Nordkette.jpg",
+    };
+    render(<MapScreen live={{ rides: [liveRide], defaultCity: "innsbruck", photos: { Nordkette: photo } }} />);
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByRole("img", { name: "Nordkette" })).toBeInTheDocument();
+    expect(within(dialog).getByText(/Photo: Anna K\./)).toBeInTheDocument();
+    expect(within(dialog).getByRole("link", { name: "CC BY-SA 4.0" })).toHaveAttribute("href", photo.licenseUrl);
+    expect(within(dialog).getByRole("link", { name: "Wikimedia Commons" })).toHaveAttribute("href", photo.sourceUrl);
+  });
 });

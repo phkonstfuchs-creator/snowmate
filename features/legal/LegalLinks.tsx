@@ -10,6 +10,7 @@ export default function LegalLinks({ className = "" }: { className?: string }) {
     <nav aria-label={t("legal.imprint")} className={`flex justify-center gap-4 text-xs font-semibold underline ${className}`} style={{ color: "var(--ink-2)" }}>
       <Link href="/impressum">{t("legal.imprint")}</Link>
       <Link href="/datenschutz">{t("legal.privacyShort")}</Link>
+      <Link href="/lizenzen">{t("legal.licenses")}</Link>
     </nav>
   );
 }

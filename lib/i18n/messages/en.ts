@@ -220,6 +220,7 @@ export const en = {
   "onb.handle": "Handle",
   "onb.terms": "By creating an account you confirm that you have read the {privacy}. Under 18? You need your parents’ consent.",
   "legal.privacy": "privacy policy",
+  "legal.licenses": "Licences",
   "legal.privacyShort": "Privacy",
   "legal.imprint": "Legal notice",
 
@@ -476,6 +477,9 @@ export const en = {
   "avatar.contacts": "Also friends of friends and people in your rides",
   "avatar.minorNote": "Under 18, only confirmed friends see your picture.",
   "avatar.exifNote": "We shrink the picture and remove its location and camera data.",
+  "photo.by": "Photo: {author}",
+  "photo.source": "Wikimedia Commons",
+  "photo.cropped": "cropped",
   "map.title": "Map",
   "map.ridingToday": "riding today",
   "map.ridingNow": "riding now",

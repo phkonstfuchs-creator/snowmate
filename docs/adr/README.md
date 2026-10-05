@@ -30,5 +30,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0020](0020-piste-map-conditions-and-chat-pins.md) | Piste map, open weather data and chat pins | Accepted |
 | [0021](0021-calm-design-matching-the-website.md) | Calm design that matches the website | Accepted |
 | [0022](0022-profile-pictures.md) | Profile pictures in private storage, served by the app | Accepted |
+| [0023](0023-resort-photos-from-wikimedia.md) | Resort photos from Wikimedia, with automatic credits | Accepted |
 
 Template: context, options considered, decision, consequences, status.

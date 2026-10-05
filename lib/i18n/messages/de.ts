@@ -219,6 +219,7 @@ export const de: Record<MessageKey, string> = {
   "onb.handle": "Handle",
   "onb.terms": "Mit dem Erstellen eines Kontos bestätigst du, dass du die {privacy} gelesen hast. Unter 18? Dann brauchst du die Zustimmung deiner Eltern.",
   "legal.privacy": "Datenschutzerklärung",
+  "legal.licenses": "Lizenzen",
   "legal.privacyShort": "Datenschutz",
   "legal.imprint": "Impressum",
 
@@ -475,6 +476,9 @@ export const de: Record<MessageKey, string> = {
   "avatar.contacts": "Auch Freunde von Freunden und Leute aus deinen Rides",
   "avatar.minorNote": "Unter 18 sehen dein Bild nur bestätigte Freunde.",
   "avatar.exifNote": "Wir verkleinern das Bild und entfernen dabei Ort und Kameradaten.",
+  "photo.by": "Foto: {author}",
+  "photo.source": "Wikimedia Commons",
+  "photo.cropped": "zugeschnitten",
   "map.title": "Karte",
   "map.ridingToday": "heute unterwegs",
   "map.ridingNow": "gerade unterwegs",

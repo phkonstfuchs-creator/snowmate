@@ -10,6 +10,7 @@ export default function LegalPage({ title, children }: { title: string; children
         <Link href="/">Pistl</Link>
         <Link href="/impressum">Impressum</Link>
         <Link href="/datenschutz">Datenschutz</Link>
+        <Link href="/lizenzen">Lizenzen</Link>
       </nav>
       <h1 className="text-display-lg mt-6">{title}</h1>
       <div className="legal-text mt-6">{children}</div>
