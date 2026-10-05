@@ -1,18 +1,39 @@
 import LegalShell from "../../components/LegalShell";
-import { contactEmail, operatorName, operatorAddress } from "../../lib/site";
+import {
+  contactEmail, operatorCountry, operatorName, operatorPostalCity, operatorStreet,
+} from "../../lib/site";
 
 export const metadata = { title: "Datenschutz", robots: { index: false, follow: false } };
 export default function Privacy() {
   return <LegalShell title="Datenschutz">
-    <p className="draft-note">Entwurf für die Website: Vor dem öffentlichen Start werden Verantwortlicher, Kontakt, eingesetzte Hosting-Regionen und konkrete Löschfristen abschließend ergänzt und geprüft.</p>
-    <h2>Wer ist verantwortlich?</h2><p>{operatorName || "Die Angaben zum Verantwortlichen werden noch ergänzt."}</p>{operatorAddress && <address>{operatorAddress}</address>}{contactEmail && <p><a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>}
-    <h2>Warteliste und Early Access</h2><p>Bei deiner Anmeldung speichern wir deine E-Mail-Adresse, ob du am Early Access interessiert bist, sowie Zeitpunkt und Version deiner Einwilligung. Wir verwenden diese Angaben, um dich über den Start von Pistl zu informieren und gegebenenfalls zum Testen einzuladen. Grundlage ist deine ausdrückliche Einwilligung im Formular.</p>
-    <p>Early Access ist optional. Die Anmeldung erstellt noch kein Konto in der App. Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen und die Löschung deiner Anmeldung verlangen.</p>
-    <h2>Technischer Betrieb und Schutz vor Missbrauch</h2><p>Die Website ist für Hosting bei Vercel vorgesehen; die Warteliste verwendet Supabase als Speicher. Beim Aufruf können diese Anbieter technische Verbindungsdaten verarbeiten. Die konkreten Vertrags- und Regionseinstellungen werden vor dem Start dokumentiert.</p>
-    <p>Zum Schutz des Formulars verwenden wir einen serverseitig pseudonymisierten Prüfwert deiner IP-Adresse für ein zeitlich begrenztes Anfragelimit. Die Wartelisten-Tabelle speichert keine rohe IP-Adresse. Technische Protokolle beim Hosting sind davon getrennt.</p>
-    <h2>Cookies und lokale Speicherung</h2><p>Diese Website setzt keine Analyse- oder Werbe-Cookies und verwendet kein Besuchertracking. Schriftarten und Bilder werden von der Website selbst ausgeliefert. Formulareingaben werden nicht im Browser dauerhaft gespeichert.</p>
-    <h2>Speicherung und Löschung</h2><p>Wartelistendaten sollen nur so lange gespeichert werden, wie sie für die angekündigten Startinformationen und Einladungen benötigt werden. Die verbindliche Aufbewahrungsfrist und der Löschablauf werden vor Aktivierung der öffentlichen Warteliste festgelegt. Technische Werte für die Anfragelimits, deren Zeitfenster älter als 24 Stunden ist, werden bei der nächsten angenommenen Anmeldung bereinigt.</p>
-    <h2>Deine Anliegen</h2><p>Du kannst Auskunft, Berichtigung und Löschung deiner Daten sowie den Widerruf deiner Einwilligung anfragen. Du kannst dich außerdem an die zuständige Datenschutzaufsicht wenden.</p>{contactEmail ? <p>Schreibe dafür an <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p> : <p>Die hierfür notwendige Kontaktadresse ist noch offen. Sie wird vor dem öffentlichen Start ergänzt.</p>}
-    <h2>Website und App</h2><p>Diese Informationen betreffen die öffentliche Website und ihre Warteliste. Für die spätere Nutzung der App werden eigene, auf deren Funktionen abgestimmte Datenschutzinformationen bereitgestellt.</p>
+    <p>Diese Hinweise gelten für pistl.app und die Anmeldung zur Pistl-Warteliste. Stand: Oktober 2026.</p>
+
+    <h2>Verantwortlicher</h2>
+    <p>{operatorName}, Einzelunternehmen</p>
+    <address>{operatorStreet}<br/>{operatorPostalCity}<br/>{operatorCountry}</address>
+    <p>E-Mail: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
+
+    <h2>Aufruf der Website</h2>
+    <p>Beim Aufruf übermittelt dein Browser technische Daten, insbesondere IP-Adresse, aufgerufene Seite, Zeitpunkt sowie Browser- und Geräteinformationen. Unser Hostinganbieter Vercel verarbeitet diese Daten, um die Website auszuliefern, Fehler zu erkennen und Angriffe abzuwehren. Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren und funktionierenden Webangebot (Art. 6 Abs. 1 lit. f DSGVO).</p>
+
+    <h2>Warteliste und Early Access</h2>
+    <p>Wenn du dich anmeldest, speichern wir deine E-Mail-Adresse, deine optionale Auswahl für Early Access, den Zeitpunkt der Einwilligung und deren Version. Wir verwenden die Daten nur für Informationen zum Pistl-Start und, bei gewähltem Early Access, für mögliche Testeinladungen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die E-Mail-Adresse ist für die Anmeldung nötig; Early Access ist freiwillig. Deine Anmeldung erstellt kein App-Konto und garantiert keine Einladung.</p>
+    <p>Du kannst die Einwilligung jederzeit mit Wirkung für die Zukunft per E-Mail an <a href={`mailto:${contactEmail}`}>{contactEmail}</a> widerrufen. Wir löschen deine Wartelistenangaben dann, soweit keine gesetzliche Pflicht entgegensteht. Ohne Widerruf speichern wir sie bis zum Abschluss der Startinformationen und Testeinladungen und löschen sie danach.</p>
+
+    <h2>Schutz des Formulars</h2>
+    <p>Um automatisierte Anmeldungen zu begrenzen, bildet der Server aus der beim Hosting übermittelten IP-Adresse einen geheimnisbasierten Prüfwert. In einer separaten Tabelle speichern wir diesen Wert, den Beginn eines einstündigen Zeitfensters und die Zahl der Versuche. Die Wartelistentabelle enthält keine rohe IP-Adresse. Der Prüfwert dient ausschließlich der Missbrauchsabwehr (Art. 6 Abs. 1 lit. f DSGVO); Einträge mit einem Zeitfenster älter als 24 Stunden werden bei weiteren angenommenen Anmeldungen bereinigt.</p>
+
+    <h2>Dienstleister und Übermittlungen</h2>
+    <p>Die Website läuft bei <a href="https://vercel.com/legal/privacy-notice">Vercel</a>. Wartelistenangaben werden über unseren Server an <a href="https://supabase.com/privacy">Supabase</a> als Datenbankanbieter übertragen. Eine Verarbeitung durch diese Dienstleister oder ihre Unterauftragnehmer außerhalb des Europäischen Wirtschaftsraums ist möglich. Für solche Übermittlungen sehen ihre Vertragsunterlagen EU-Standardvertragsklauseln vor. Informationen dazu findest du in den <a href="https://vercel.com/legal/dpa">Datenschutzbedingungen von Vercel</a> und im <a href="https://supabase.com/legal/customer-resources/data-processing-addendum">Datenverarbeitungszusatz von Supabase</a>.</p>
+
+    <h2>Cookies und Tracking</h2>
+    <p>Diese Website verwendet keine Analyse- oder Werbe-Cookies und kein Besuchertracking. Schriften und Bilder werden von der Website selbst geladen. Formulareingaben speichern wir nicht dauerhaft in deinem Browser.</p>
+
+    <h2>Deine Rechte</h2>
+    <p>Du kannst Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit verlangen sowie einer Verarbeitung auf Grundlage berechtigter Interessen widersprechen. Eine erteilte Einwilligung kannst du jederzeit widerrufen. Schreibe an <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. Es findet keine automatisierte Entscheidung über dich statt.</p>
+    <p>Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren. Für uns ist das <a href="https://www.datenschutz.saarland.de/">Unabhängige Datenschutzzentrum Saarland</a>, Fritz-Dobisch-Straße 12, 66111 Saarbrücken.</p>
+
+    <h2>Website und App</h2>
+    <p>Die spätere Pistl-App erhält eigene Datenschutzinformationen für ihre Funktionen. Diese Seite beschreibt die öffentliche Website und die Warteliste.</p>
   </LegalShell>;
 }

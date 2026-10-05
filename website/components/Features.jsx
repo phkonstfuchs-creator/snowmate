@@ -1,16 +1,40 @@
-import { CarFront, CircleUserRound, Snowflake } from "lucide-react";
-
-const capabilities = [
-  { number: "01", icon: Snowflake, title: "Rides finden und posten", description: "Sieh, wer aus deiner Crew heute Ski fährt oder snowboardet. Teile dein Gebiet, dein Tempo und wann du loswillst.", detail: "Treffpunkte bleiben den Mitfahrenden vorbehalten." },
-  { number: "02", icon: CarFront, title: "Freie Autoplätze teilen", description: "Biete einen Platz an oder frag bei einer Mitfahrt aus deinem vertrauten Kreis an.", detail: "Abfahrtsort, Ziel und freie Plätze auf einen Blick." },
-  { number: "03", icon: CircleUserRound, title: "Mit deiner Crew planen", description: "Verabredet euch privat. Wenn ihr euch am Berg finden wollt, schaltest du deinen Standort freiwillig und zeitlich begrenzt frei.", detail: "Du entscheidest, wer deinen Standort sieht." },
+const features = [
+  {
+    name: "Ride planen",
+    title: "Skigebiet, Startzeit und Tempo festlegen.",
+    description: "Erstell einen Ride mit Skigebiet, Startzeit und Tempo. Deine Crew sieht den Plan und kann direkt mitfahren.",
+  },
+  {
+    name: "Platz teilen",
+    title: "Freie Plätze finden oder anbieten.",
+    description: "Biete freie Sitze an oder steig bei jemandem ein. So wird aus der Anfahrt schon ein Teil vom Skitag.",
+  },
+  {
+    name: "Crew treffen",
+    title: "Finde deine Crew im Skigebiet.",
+    description: "Teilt euren Live-Standort, wenn ihr euch am Berg treffen wollt. Ihr bestimmt selbst, wann die Freigabe endet.",
+  },
 ];
 
 export default function Features() {
-  return <section id="entdecken" className="product-section section-space"><div className="container">
-    <div className="product-heading"><h2 className="focus-reveal">Rides, Mitfahrplätze<br/><span>und private Crew.</span></h2><p>Rides, Mitfahrplätze und deine Crew. An einem Ort – für Ski und Snowboard rund um Innsbruck und Salzburg.</p></div>
-    <div className="capability-list">{capabilities.map(({number,icon:Icon,title,description,detail})=><article className="capability-row" key={number}>
-      <span className="capability-number">{number}</span><Icon className="capability-icon" size={25} strokeWidth={1.6}/><div className="capability-copy"><h3>{title}</h3><p>{description}</p><span>{detail}</span></div>
-    </article>)}</div>
-  </div></section>;
+  return <section id="entdecken" className="product-section section-space" aria-labelledby="features-heading">
+    <div className="container">
+      <div className="product-heading" data-scroll-reveal>
+        <div>
+          <p className="eyebrow">DREI WEGE ZUM SKITAG</p>
+          <h2 id="features-heading">Was du mit Pistl machst</h2>
+        </div>
+        <p>Erstell einen Ride, teil freie Plätze im Auto und triff deine Crew am Berg – direkt im Browser.</p>
+      </div>
+      <div className="feature-list">
+        {features.map((feature) => <article className="feature-row" key={feature.name} data-scroll-reveal>
+          <div className="feature-row-copy">
+            <p className="feature-label">{feature.name}</p>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+          </div>
+        </article>)}
+      </div>
+    </div>
+  </section>;
 }

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Check, LoaderCircle, Copy } from "lucide-react";
+import { Check, LoaderCircle, Copy } from "lucide-react";
 import ActionButton from "./ui/ActionButton";
 
 export default function WaitlistForm() {
@@ -54,12 +54,12 @@ export default function WaitlistForm() {
     <label htmlFor="waitlist-email" className="input-label">Deine E-Mail-Adresse</label>
     <div className="signup-row">
       <input id="waitlist-email" name="email" type="email" placeholder="du@beispiel.at" autoComplete="email" maxLength={254} required aria-describedby={error ? "signup-error" : "signup-note"} />
-      <ActionButton type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" /> Wird eingetragen …</> : <>Auf die Warteliste <ArrowUpRight size={19} /></>}</ActionButton>
+      <ActionButton type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" /> Wird eingetragen …</> : "Auf die Warteliste"}</ActionButton>
     </div>
     <div className="honeypot" aria-hidden="true"><label htmlFor="website-field">Website</label><input id="website-field" name="website" tabIndex={-1} autoComplete="off" /></div>
     <label className="checkbox-row"><input type="checkbox" name="earlyAccess" /><span>Ich möchte auch am Early Access teilnehmen.</span></label>
     <label className="checkbox-row consent-row"><input type="checkbox" name="consent" required /><span>Ich möchte per E-Mail über den Pistl-Start und ggf. Early Access informiert werden. Meine Einwilligung kann ich jederzeit widerrufen. <Link href="/datenschutz">Datenschutz</Link></span></label>
-    <p id="signup-note" className="form-note">Für Bergmenschen ab 14. Early Access startet bald.</p>
+    <p id="signup-note" className="form-note">Pistl startet zuerst im Browser.</p>
     {error && <p id="signup-error" role="alert" className="form-error">{error}</p>}
   </form>;
 }

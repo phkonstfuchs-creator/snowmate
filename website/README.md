@@ -17,9 +17,9 @@ Website: http://localhost:3001. Ohne Supabase-Konfiguration funktionieren alle I
 
 1. Die isolierte SQL-Migration `supabase/migrations/202610040001_pistl_website_waitlist.sql` im bestehenden Supabase-Projekt prüfen und ausführen. Sie legt zwei neue Tabellen und eine serverseitige Funktion an, verändert aber keine App-Tabellen.
 2. `SUPABASE_URL` und `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` bzw. serverseitig in Vercel setzen. Den Service-Key niemals mit `NEXT_PUBLIC_` benennen, in Git speichern oder im Browser ausliefern. Optional einen eigenen `WAITLIST_RATE_LIMIT_SECRET` setzen.
-3. Anbietername, Anschrift und Kontakt-E-Mail konfigurieren. Die rechtlichen Entwürfe mit tatsächlicher Hosting-Region, Verantwortlichem und Löschablauf vervollständigen. Eine passende Aufbewahrungsfrist festlegen und die regelmäßige Löschung organisatorisch oder technisch umsetzen.
+3. Die übernommenen Angaben des Einzelunternehmens in `lib/site.js` mit dem eigenen Impressum abgleichen. Vor Aktivierung die tatsächlichen Hosting- und Datenbankregionen, die Vertragsunterlagen von Vercel und Supabase sowie den organisatorischen Löschablauf für Widerruf und Ende der Startphase prüfen.
 4. Mit einer eigenen Testadresse prüfen, dass eine Zeile in `pistl_website_waitlist` entsteht. Das Formular versendet derzeit keine automatischen Bestätigungsmails. Die Erfolgsmeldung bestätigt allein die gespeicherte Anmeldung.
-5. Für Einladungen nur Datensätze mit `early_access = true` verwenden. Abmeldung/Widerruf wird vorerst manuell über die konfigurierte Kontaktadresse verarbeitet. Kein allgemeiner Newsletter ist Teil dieser Einwilligung. Double-Opt-in und eine Versandlösung sind vor automatisierten Marketingkampagnen separat einzurichten.
+5. Vor jeder Startnachricht oder Testeinladung den Besitz der Adresse per Bestätigungslink (Double-Opt-in) nachweisen und nur bestätigte Datensätze anschreiben. Bis dieser Ablauf eingerichtet ist, keine Wartelisten-E-Mails versenden. Für Testeinladungen außerdem nur Datensätze mit `early_access = true` verwenden. Abmeldung/Widerruf wird vorerst manuell über die öffentliche Kontaktadresse verarbeitet. Kein allgemeiner Newsletter ist Teil dieser Einwilligung.
 
 Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entgegen. Validierung, Honeypot, 2-KB-Bodylimit, Same-Origin-Prüfung, Timeout und Datenbank-Anfragelimit sind enthalten. RLS sperrt öffentliche Zugriffe; nur die serverseitige Rolle darf die RPC ausführen. E-Mail-Duplikate werden ohne Offenlegung vorhandener Anmeldungen behandelt. Nachträgliches Early-Access-Interesse bekommt einen eigenen Einwilligungszeitpunkt.
 
@@ -30,7 +30,7 @@ Auf Vercel wird der vom Hosting gesetzte Client-IP-Header gehasht; außerhalb Ve
 - Neues Vercel-Projekt mit **Root Directory `website`** und Framework **Next.js**.
 - Node-Version 24, Build `npm run build`, Standard-Ausgabeverzeichnis.
 - Server-Umgebungsvariablen wie oben; `NEXT_PUBLIC_SITE_URL` auf die echte HTTPS-Domain setzen.
-- `PISTL_LAUNCH_READY=true` erst nach Abschluss der offenen Betreiber-/Datenschutzangaben setzen und neu bauen. Bis dahin bleiben Robots/Metadaten auf `noindex`.
+- `PISTL_LAUNCH_READY=true` erst nach Prüfung der Betreiberangaben, Dienstleisterkonfiguration und Löschabläufe setzen und neu bauen. Bis dahin bleiben Robots/Metadaten auf `noindex`.
 - `npm run check:launch` zeigt fehlende Konfiguration, ohne Geheimnisse auszugeben.
 
 Es wurde kein Deployment und keine Änderung an einer entfernten Datenbank durchgeführt.
@@ -52,7 +52,7 @@ Die End-to-End-Tests simulieren Antworten der Wartelisten-API und senden keine A
 website/
   app/
     api/waitlist/route.js     API zur Supabase-Warteliste
-    datenschutz/page.jsx     Datenschutzentwurf
+    datenschutz/page.jsx     Datenschutzinformationen für Website und Warteliste
     impressum/page.jsx       Anbieterkennzeichnung
     kontakt/page.jsx         Kontakt
     globals.css              Layout, mobile Ansichten, Animation
@@ -63,10 +63,10 @@ website/
     opengraph-image.jsx       Teilbares Vorschaubild
     page.jsx                 Öffentliche Landingpage
     robots.js / sitemap.js   Suchmaschinen-Konfiguration
-  components/                Hero, bewegte Bergszene, App-Vorschau, Tabs, Formular, Navigation
-  components/ui/             ActionButton
+  components/                Hero, scroll reveal, Featureliste, Formular, Navigation
+  components/ui/             ActionButton, JadeSky-Verlauf
   lib/                       Website-Konfiguration und Wartelistenlogik
-  public/                    Lokale Marke und optimierte Bergillustration
+  public/                    Optimierte Bergillustration und Schriftlizenzen
   supabase/migrations/       Isolierte SQL-Migration
   tests/                     API-/Validierungs- und Browser-Tests
   scripts/check-launch.mjs   Konfigurationsprüfung vor dem Start
