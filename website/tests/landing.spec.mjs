@@ -78,50 +78,63 @@ test('HTTP success with an unsuccessful response does not claim signup', async (
   await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toHaveCount(0);
 });
 
-test('product features are clear, factual, and contain no pretend booking controls', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('.feature-row')).toHaveCount(3);
-  await expect(page.getByRole('heading', { name: 'Skigebiet, Startzeit und Tempo festlegen.' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Freie Plätze finden oder anbieten.' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Finde deine Crew im Skigebiet.' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Beispiel|Anfrage|Standortfreigabe im Beispiel/ })).toHaveCount(0);
+test('feature explorer changes the entire panel and supports keyboard navigation', async ({ page }) => {
+  await page.goto('/#entdecken');
+  const names = ['Ride planen', 'Mitfahren', 'Crew treffen', 'Events finden'];
+  const headings = ['Ein Ride. Alle wissen Bescheid.', 'Ein freier Sitz ist ein guter Anfang.', 'Andere Piste. Gleiche Crew.', 'Ein Anlass, gemeinsam rauszukommen.'];
+  for (const [index, name] of names.entries()) {
+    await page.getByRole('tab', { name, exact: true }).click();
+    await expect(page.getByRole('tabpanel')).toHaveAccessibleName(name);
+    await expect(page.getByRole('tabpanel').getByRole('heading')).toHaveText(headings[index]);
+    await expect(page.getByRole('tabpanel').locator('li')).toHaveCount(3);
+    await expect(page.locator('.feature-art')).toHaveCount(1);
+  }
+  await page.getByRole('tab', { name: 'Events finden' }).press('Home');
+  await expect(page.getByRole('tab', { name: 'Ride planen' })).toBeFocused();
+  await page.getByRole('tab', { name: 'Ride planen' }).press('ArrowRight');
+  await expect(page.getByRole('tab', { name: 'Mitfahren' })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('tab', { name: 'Mitfahren' }).press('Tab');
+  await expect(page.getByRole('tabpanel')).toBeFocused();
 });
 
-test('rejected decorative sections are removed and reduced motion works', async ({ page }) => {
+test('reduced motion disables decorative transforms', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await expect(page.locator('.panorama-image--distant')).toBeVisible();
-  await expect(page.locator('.mountain-foreground')).toBeVisible();
   expect(await page.locator('.panorama-image--distant').evaluate((image) => getComputedStyle(image).transform)).toBe('none');
-  await expect(page.locator('.mountain-riders, .map-sample, .bergtag-steps, .crew-poster')).toHaveCount(0);
-  await expect(page.locator('.footer-wordmark')).not.toContainText('✳');
-  await expect(page.getByRole('heading', { name: 'Was du mit Pistl machst' })).toBeVisible();
+  expect(await page.locator('.feature-art').evaluate((art) => getComputedStyle(art).transform)).toBe('none');
+  await expect(page.locator('.mountain-riders, .map-sample, .bergtag-steps')).toHaveCount(0);
 });
 
-test('mobile navigation and feature content fit narrow screens', async ({ page }) => {
+test('mobile menu closes on Escape and selection; every feature fits narrow screens', async ({ page }) => {
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await page.getByRole('button', { name: 'Menü öffnen', exact: true }).click();
-    await page.getByRole('link', { name: 'Funktionen', exact: true }).filter({ visible: true }).first().click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button', { name: 'Menü öffnen' })).toBeFocused();
+    await expect(page.getByRole('navigation', { name: 'Mobile Navigation' })).toBeHidden();
+    await page.getByRole('button', { name: 'Menü öffnen', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Mobile Navigation' }).getByRole('link', { name: 'Entdecken' }).click();
     await expect(page).toHaveURL(/\/#entdecken$/);
-    for (const name of ['Skigebiet, Startzeit und Tempo festlegen.', 'Freie Plätze finden oder anbieten.', 'Finde deine Crew im Skigebiet.']) {
-      await page.getByRole('heading', { name, exact: true }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('navigation', { name: 'Mobile Navigation' })).toBeHidden();
+    for (const tab of await page.getByRole('tab').all()) {
+      await tab.click();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      expect(await page.getByRole('tabpanel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     }
-    const radii = await page.locator('.action-button, .hero-scroll, .menu-toggle').evaluateAll((elements) => elements.map((element) => getComputedStyle(element).borderRadius));
-    expect(radii.every((radius) => radius === '999px')).toBe(true);
   }
 });
 
-test('feature headlines fit on tablet screens', async ({ page }) => {
+test('feature headlines fit tablet screens and signup follows consent', async ({ page }) => {
   await page.setViewportSize({ width: 761, height: 950 });
   await page.goto('/');
-  for (const row of await page.locator('.feature-row').all()) {
-    const heading = row.getByRole('heading');
-    expect(await heading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  for (const tab of await page.getByRole('tab').all()) {
+    await tab.click();
+    expect(await page.getByRole('tabpanel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
   }
+  const order = await page.getByRole('form').locator('input:not([tabindex="-1"]), button[type="submit"]').evaluateAll((elements) => elements.map((element) => element.getAttribute('name') || element.getAttribute('type')));
+  expect(order).toEqual(['email', 'earlyAccess', 'consent', 'submit']);
 });
 
 test('metadata, footer destinations, logo and custom 404 are usable', async ({ page }) => {
@@ -174,4 +187,28 @@ test('a used or broken confirmation link explains what to do', async ({ page }) 
   }
   await page.goto('/warteliste/bestaetigen?fehler=2');
   await expect(page.getByRole('heading', { name: 'Das hat gerade nicht geklappt.' })).toBeVisible();
+});
+
+test('automated accessibility checks pass on landing and legal routes', async ({ page }) => {
+  const { default: AxeBuilder } = await import('@axe-core/playwright');
+  // Audit settled visual states; motion behavior is exercised separately.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const path of ['/', '/impressum', '/datenschutz', '/kontakt']) {
+    await page.goto(path);
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) })), path).toEqual([]);
+  }
+});
+
+
+test('every feature state passes mobile accessibility checks', async ({ page }) => {
+  const { default: AxeBuilder } = await import('@axe-core/playwright');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#entdecken');
+  for (const tab of await page.getByRole('tab').all()) {
+    await tab.click();
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
+  }
 });

@@ -14,7 +14,7 @@ export const CONFIRMED_PATH = '/warteliste/bestaetigt';
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 export const tokenDigest = (token) => createHash('sha256').update(token).digest('hex');
 
-async function readBody(request) {
+async function readBodyText(request) {
   if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) throw new Error('body');
   if (!request.body) throw new Error('body');
   const reader = request.body.getReader();
@@ -29,7 +29,7 @@ async function readBody(request) {
       if (size > MAX_BODY_BYTES) { await reader.cancel(); throw new Error('body'); }
       body += decoder.decode(value, { stream: true });
     }
-    return JSON.parse(body + decoder.decode());
+    return body + decoder.decode();
   } finally { reader.releaseLock(); }
 }
 
@@ -78,7 +78,7 @@ export async function handleWaitlist(request, { env = process.env, fetchImpl = f
     return reply(400, 'Diese Anfrage konnte nicht verarbeitet werden.');
   }
   let data;
-  try { data = validateWaitlist(await readBody(request)); }
+  try { data = validateWaitlist(JSON.parse(await readBodyText(request))); }
   catch { return reply(400, 'Bitte prüfe deine E-Mail-Adresse und bestätige die Anmeldung.'); }
   if (data.website) return reply(200);
   const config = supabaseConfiguration(env);
@@ -126,8 +126,13 @@ export async function handleConfirm(request, { env = process.env, fetchImpl = fe
     || request.headers.get('sec-fetch-site') === 'cross-site') return back(invalid);
   let token;
   try {
-    if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) return back(invalid);
-    token = (await request.formData()).get('t');
+    // Bound the actual stream before parsing; Content-Length may be absent
+    // or understate the size of a chunked request.
+    const body = await readBodyText(request);
+    const form = await new Response(body, {
+      headers: { 'Content-Type': request.headers.get('content-type') || '' },
+    }).formData();
+    token = form.get('t');
   } catch { return back(invalid); }
   if (typeof token !== 'string' || !TOKEN_PATTERN.test(token)) return back(invalid);
   const config = supabaseConfiguration(env);

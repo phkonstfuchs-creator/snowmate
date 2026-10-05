@@ -22,20 +22,37 @@ export default function MountainScene() {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
 
+    const pointer = (event) => {
+      if (event.pointerType !== "mouse" || motionPreference.matches) return;
+      const bounds = element.getBoundingClientRect();
+      element.style.setProperty("--look-x", `${((event.clientX - bounds.left) / bounds.width - .5) * 12}px`);
+      element.style.setProperty("--look-y", `${((event.clientY - bounds.top) / bounds.height - .5) * 8}px`);
+    };
+    const reset = () => {
+      element.style.setProperty("--look-x", "0px");
+      element.style.setProperty("--look-y", "0px");
+    };
+    const hero = element.parentElement;
+    hero.addEventListener("pointermove", pointer);
+    hero.addEventListener("pointerleave", reset);
     update();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
+      hero.removeEventListener("pointermove", pointer);
+      hero.removeEventListener("pointerleave", reset);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
 
+  // The 224 KB WebP is already optimized. Covering a tall phone viewport needs
+  // its full width; a 100vw responsive candidate would blur the cropped mountain.
   return <div className="mountain-scene" ref={scene} aria-hidden="true">
-    <Image src="/alpine-panorama.webp" alt="" fill priority sizes="100vw" className="panorama-image panorama-image--distant" />
+    <Image src="/alpine-panorama.webp" alt="" fill unoptimized preload sizes="100vw" className="panorama-image panorama-image--distant" />
     <div className="mountain-foreground">
-      <Image src="/alpine-panorama.webp" alt="" fill sizes="100vw" className="panorama-image panorama-image--near" />
+      <Image src="/alpine-panorama.webp" alt="" fill unoptimized sizes="100vw" className="panorama-image panorama-image--near" />
     </div>
   </div>;
 }

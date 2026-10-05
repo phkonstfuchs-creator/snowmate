@@ -163,6 +163,44 @@ test('a storage failure during confirmation says so', async () => {
   assert.equal((await handleConfirm(confirmRequest(), { env: {}, fetchImpl: unavailable })).headers.get('location'), '/warteliste/bestaetigen?fehler=2');
 });
 
+test('oversized confirmation streams are cancelled before contacting storage', { timeout: 1000 }, async () => {
+  for (const headers of [{}, { 'content-length': '45' }]) {
+    let cancelled = false;
+    let upstreamCalls = 0;
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(`t=${token}&padding=`));
+        controller.enqueue(new TextEncoder().encode('x'.repeat(2048)));
+      },
+      cancel() { cancelled = true; },
+    });
+    const req = new Request('https://pistl.example/api/waitlist/confirm', {
+      method: 'POST', duplex: 'half', body,
+      headers: { origin: 'https://pistl.example', 'content-type': 'application/x-www-form-urlencoded', ...headers },
+    });
+    const response = await handleConfirm(req, { env, fetchImpl: async () => {
+      upstreamCalls += 1;
+      return Response.json('confirmed');
+    } });
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get('location'), '/warteliste/bestaetigen?fehler=1');
+    assert.equal(upstreamCalls, 0);
+    assert.equal(cancelled, true);
+  }
+});
+
+test('confirmation body limit accepts exactly 2048 bytes and rejects 2049 bytes', async () => {
+  for (const size of [2048, 2049]) {
+    let upstreamCalls = 0;
+    const prefix = `t=${token}&padding=`;
+    const response = await handleConfirm(confirmRequest(prefix + 'x'.repeat(size - prefix.length)), {
+      env, fetchImpl: async () => { upstreamCalls += 1; return Response.json('confirmed'); },
+    });
+    assert.equal(upstreamCalls, size === 2048 ? 1 : 0);
+    assert.equal(response.headers.get('location'), size === 2048 ? '/warteliste/bestaetigt' : '/warteliste/bestaetigen?fehler=1');
+  }
+});
+
 test('the confirmation email escapes the link and names the sender', () => {
   const message = confirmationEmail('https://pistl.example/x?t=a"><script>');
   assert.equal(message.html.includes('<script>'), false);

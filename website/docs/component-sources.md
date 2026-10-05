@@ -5,7 +5,7 @@
 Am 5. Oktober 2026 wurden die Bibliothek sowie die Detailvorschau dieser Scrolltide-Komponente im Browser geöffnet und visuell geprüft:
 
 - [Focus Reveal](https://www.scrolltide.co/#c-focus-reveal): Geprüft, aber die scrollgebundene Reveal-Animation der Überschrift wurde nach Nutzerfeedback entfernt. Die reduzierte Scroll-Reveal der Inhaltsabschnitte nutzt Intersection Observer, bleibt bei `prefers-reduced-motion` aus und zeigt den Inhalt ohne JavaScript weiterhin normal.
-- [Wordmark Bleed](https://www.scrolltide.co/#s-wordmark-bleed): Reduzierter dunkler Footer, kompakte Links und eine große, unten angeschnittene Wortmarke. `components/Footer.jsx` interpretiert diesen Aufbau mit Pistl, den tatsächlichen Kontakt-/Rechtsseiten und dynamischem Jahr.
+- [Wordmark Bleed](https://www.scrolltide.co/#s-wordmark-bleed): Reduzierter Footer, kompakte Links und eine große, unten angeschnittene Wortmarke. `components/Footer.jsx` interpretiert diesen Aufbau mit Pistl, den tatsächlichen Kontakt-/Rechtsseiten und dynamischem Jahr.
 
 Die Focus-Reveal-Komponente ist kostenpflichtig. Es wurde kein gesperrter Code oder Prompt übernommen; die Implementierung ist selbst geschrieben und von der öffentlich sichtbaren Vorschau inspiriert.
 
@@ -19,7 +19,11 @@ Die Focus-Reveal-Komponente ist kostenpflichtig. Es wurde kein gesperrter Code o
 
 ## Überarbeitung nach Nutzerfeedback
 
-Entfernt: Skifahrer und Pinguin, Zeiger-Parallaxe, Karte und Event-Dekoration, Bergtag-Schritte, Crew-Poster und die vorherigen Funktions-Tabs samt Icon-Artwork. Drei klare Textzeilen zeigen jetzt, wie man Rides plant, Plätze teilt und die Crew am Berg trifft. Auf Wunsch sind alle Aktionsflächen nun rund. Das Panorama trennt dasselbe eigens generierte Motiv in ferne Gipfel und vordere Schneekante; geringe scrollgebundene Verschiebungen erzeugen Tiefe. Bei reduzierter Bewegung bleiben beide Ebenen still. Scroll-Reveals zeigen Inhaltsabschnitte beim Erreichen sanft an und sind bei reduzierter Bewegung ausgeschaltet. Die Anmeldung und E-Mail-Bestätigung nutzen die vorhandene Supabase-/Resend-Anbindung.
+Der UI/UX-Audit ergänzt einen selbst implementierten, tastaturbedienbaren Funktionsüberblick: Ride, Mitfahrt, Crew und Events wechseln jeweils Text und typografische CSS-Illustration gemeinsam. Die Darstellungen zeigen Funktionsideen, keine buchbaren Angebote oder realen Nutzerzahlen. Rundungen, Farben, Abstände und Interaktionszustände sind in einer konsolidierten Stylesheet-Datei definiert. Menü und Tabs unterstützen Tastaturbedienung; das Formular folgt der Reihenfolge E-Mail, Auswahl, Einwilligung, Absenden.
+
+Das Panorama erhält geringe scroll- und zeigerabhängige Versätze zwischen den Ebenen. Alle Bewegungen respektieren reduzierte Bewegung. Die lokal vorhandene, 224 KB große WebP-Datei wird direkt ausgeliefert, damit der stark vergrößerte Ausschnitt auf dem Handy scharf bleibt. Die Anmeldung und E-Mail-Bestätigung nutzen die vorhandene Supabase-/Resend-Anbindung.
+
+Die aktuelle Scrolltide-Bibliothek (u. a. Expanded Cards, Depth Carousel und Wordmark Bleed) sowie die 21st.dev-Übersicht wurden als Referenz gesichtet. Es wurde kein Premium-Code kopiert und keine neue Animationbibliothek eingebunden.
 
 Die sichtbaren Nachweise für den übernommenen Jade-Sky-Verlauf, die lokal ausgelieferten OFL-Schriften und Lucide-Symbole stehen im Impressum. Unter `public/licenses/` liegen die vollständigen Lizenztexte. Keine fremden Vorschaubilder werden eingebunden.
 

@@ -23,7 +23,7 @@ export default function WaitlistForm() {
       const response = await fetch("/api/waitlist", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: values.get("email"), earlyAccess: values.get("earlyAccess") === "on", consent: values.get("consent") === "on", website: values.get("website") || "" }),
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(20000),
       });
       const data = await response.json();
       if (!response.ok || data.ok !== true) throw new Error(data.error || "Die Anmeldung hat gerade nicht geklappt. Bitte versuche es erneut.");
@@ -53,13 +53,14 @@ export default function WaitlistForm() {
   return <form method="post" action="/api/waitlist" onSubmit={submit} aria-label="Pistl Warteliste" className="waitlist-form" aria-busy={status === "pending"}>
     <label htmlFor="waitlist-email" className="input-label">Deine E-Mail-Adresse</label>
     <div className="signup-row">
-      <input id="waitlist-email" name="email" type="email" placeholder="du@beispiel.at" autoComplete="email" maxLength={254} required aria-describedby={error ? "signup-error" : "signup-note"} />
-      <ActionButton type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" /> Wird eingetragen …</> : "Auf die Warteliste"}</ActionButton>
+      <input id="waitlist-email" name="email" type="email" placeholder="du@beispiel.at" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} maxLength={254} required aria-describedby={error ? "signup-error" : "signup-note"} />
     </div>
     <div className="honeypot" aria-hidden="true"><label htmlFor="website-field">Website</label><input id="website-field" name="website" tabIndex={-1} autoComplete="off" /></div>
     <label className="checkbox-row"><input type="checkbox" name="earlyAccess" /><span>Ich möchte auch am Early Access teilnehmen.</span></label>
     <label className="checkbox-row consent-row"><input type="checkbox" name="consent" required /><span>Ich möchte per E-Mail über den Pistl-Start und ggf. Early Access informiert werden. Meine Einwilligung kann ich jederzeit widerrufen. <Link href="/datenschutz">Datenschutz</Link></span></label>
-    <p id="signup-note" className="form-note">Pistl startet zuerst im Browser.</p>
+    <ActionButton className="signup-submit" type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" aria-hidden="true" /> Wird eingetragen …</> : <>Auf die Warteliste <span className="button-arrow" aria-hidden="true">↗</span></>}</ActionButton>
+    <noscript><style>{".signup-submit{display:none!important}"}</style><p>Für die Anmeldung aktiviere bitte JavaScript in deinem Browser.</p></noscript>
+    <p id="signup-note" className="form-note">Du bekommst eine E-Mail, um deine Anmeldung zu bestätigen.</p>
     {error && <p id="signup-error" role="alert" className="form-error">{error}</p>}
   </form>;
 }
