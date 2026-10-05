@@ -1,6 +1,6 @@
 # 0017 Chat for confirmed friends and ride crews
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-05
 - **Spec:** [crew-chat](../specs/crew-chat.md)
 - **Checks:** `supabase/tests/database/messages.test.sql`,

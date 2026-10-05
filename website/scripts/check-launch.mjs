@@ -3,8 +3,9 @@ const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
 /* Operator details have real defaults in lib/site.js; only deployment
-   settings and the server-side Supabase credentials must be provided. */
-const required = ['NEXT_PUBLIC_SITE_URL', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'WAITLIST_RATE_LIMIT_SECRET'];
+   settings and the server-side Supabase and Resend credentials must be
+   provided. */
+const required = ['NEXT_PUBLIC_SITE_URL', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'WAITLIST_RATE_LIMIT_SECRET', 'RESEND_API_KEY', 'WAITLIST_FROM_EMAIL'];
 const missing = required.filter(key => !process.env[key]?.trim());
 if (missing.length) {
   console.error(`Noch einzurichten: ${missing.join(', ')}. Werte werden nicht ausgegeben.`);

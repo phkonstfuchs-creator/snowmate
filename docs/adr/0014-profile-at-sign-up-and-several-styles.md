@@ -1,6 +1,6 @@
 # 0014 Profile at sign-up and several riding styles
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-04
 - **Spec:** [signup-with-profile](../specs/signup-with-profile.md)
 - **Checks:** `supabase/tests/database/signup_profile.test.sql`,

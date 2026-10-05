@@ -1,6 +1,6 @@
 # 0015 Live location for confirmed friends
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-04
 - **Spec:** [live-location](../specs/live-location.md)
 - **Checks:** `supabase/tests/database/live_locations.test.sql`,

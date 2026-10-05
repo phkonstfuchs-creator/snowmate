@@ -20,10 +20,11 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0010](0010-blocking-hides-both-ways.md) | Blocking hides both ways and ends every connection | Accepted |
 | [0011](0011-cookie-based-i18n.md) | German and English by cookie, without locale routes | Accepted |
 | [0012](0012-age-from-birth-date.md) | Age from a self-declared birth date | Accepted |
-| [0013](0013-request-guard-2fa-and-rate-limits.md) | Request guard, two-factor sign-in and rate limits | Proposed |
-| [0014](0014-profile-at-sign-up-and-several-styles.md) | Profile at sign-up and several riding styles | Proposed |
-| [0015](0015-live-location-for-confirmed-friends.md) | Live location for confirmed friends | Proposed |
-| [0016](0016-vector-map-and-faster-navigation.md) | Vector map, Frankfurt region and instant tab switches | Proposed |
-| [0017](0017-chat-for-friends-and-ride-crews.md) | Chat for confirmed friends and ride crews | Proposed |
+| [0013](0013-request-guard-2fa-and-rate-limits.md) | Request guard, two-factor sign-in and rate limits | Accepted |
+| [0014](0014-profile-at-sign-up-and-several-styles.md) | Profile at sign-up and several riding styles | Accepted |
+| [0015](0015-live-location-for-confirmed-friends.md) | Live location for confirmed friends | Accepted |
+| [0016](0016-vector-map-and-faster-navigation.md) | Vector map, Frankfurt region and instant tab switches | Accepted |
+| [0017](0017-chat-for-friends-and-ride-crews.md) | Chat for confirmed friends and ride crews | Accepted |
+| [0018](0018-website-waitlist-double-opt-in.md) | Double opt-in for the website waitlist | Accepted |
 
 Template: context, options considered, decision, consequences, status.

@@ -1,6 +1,6 @@
 # 0013 Request guard, two-factor sign-in and rate limits
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-04
 - **Checks:** `supabase/tests/database/request_guard.test.sql`, `safe_text.test.sql`,
   `lib/rate-limit.test.ts`, `features/auth/actions.test.ts`,
