@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes } from "react";
 
-/* Pill button in the accent colour. The press effect comes from
+/* Solid ink button, as on the website. The press effect comes from
    globals.css (:active scales it), not from JS — an inline transform
    would override it. */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -22,11 +22,11 @@ export default function Button({
       disabled={disabled}
       className={`sm-btn-primary inline-flex select-none items-center justify-center ${className}`}
       style={{
-        height: 56,
-        padding: "0 26px",
-        font: "800 17px var(--font-body-stack)",
+        height: 52,
+        padding: "0 22px",
+        font: "600 16px var(--font-body-stack)",
         gap: 10,
-        borderRadius: 999,
+        borderRadius: 5,
         width: fullWidth ? "100%" : undefined,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,

@@ -1,6 +1,6 @@
-/* Saturated colours that hold white initials (AA) and stand out on
-   the dark surfaces. */
-const AVATAR_COLORS = ["#c2410c", "#0f766e", "#1d4ed8", "#7c3aed", "#be185d", "#0369a1"];
+/* Quiet greens and greys from the website palette; each holds white
+   initials (AA). */
+const AVATAR_COLORS = ["#315842", "#4d5948", "#35576a", "#5b5446", "#31705a", "#46524c"];
 
 export function avatarColor(id: string) {
   return AVATAR_COLORS[id.charCodeAt(id.length - 1) % AVATAR_COLORS.length];

@@ -6,14 +6,15 @@ import React, { useId } from "react";
    sun or moon, layered ridges and snowfields. Each resort gets its own
    light via a hash of its name. */
 
-const SNOW = "#f2f5f8";
+const SNOW = "#ffffff";
 
-/* Sky top, sky bottom, sun, far, mid, near ridge. */
+/* Sky top, sky bottom, sun, far, mid, near ridge: the website's quiet
+   greens and greys, one light per resort. */
 const EDITIONS = [
-  { skyTop: "#1b2a4a", skyBottom: "#ff8a57", sun: "#ffc145", far: "#4a5f80", mid: "#26374f", near: "#0d1117" },
-  { skyTop: "#0f3b6b", skyBottom: "#4cc3ff", sun: "#fff1c2", far: "#3d6a92", mid: "#1f4466", near: "#0d1117" },
-  { skyTop: "#2a1b4a", skyBottom: "#ff6a2b", sun: "#ffc145", far: "#57476e", mid: "#2b2440", near: "#0d1117" },
-  { skyTop: "#0b1630", skyBottom: "#2c4a7c", sun: "#e8eef7", far: "#34507a", mid: "#1b2c48", near: "#0d1117" },
+  { skyTop: "#e4ebdf", skyBottom: "#f6f7f4", sun: "#ffffff", far: "#9daa96", mid: "#64705f", near: "#315842" },
+  { skyTop: "#dfe7e9", skyBottom: "#f6f7f4", sun: "#ffffff", far: "#a3b1b4", mid: "#5f6f70", near: "#35576a" },
+  { skyTop: "#e9ece5", skyBottom: "#f8faf6", sun: "#ffffff", far: "#b3bcae", mid: "#6d7768", near: "#4d5948" },
+  { skyTop: "#e1e8de", skyBottom: "#f6f7f4", sun: "#ffffff", far: "#94a39a", mid: "#59645e", near: "#203e2d" },
 ] as const;
 
 // 6 Bergkompositionen (400×180 viewBox)

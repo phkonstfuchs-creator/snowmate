@@ -1,7 +1,6 @@
 "use client";
 
 import { RidePost, User } from "@/lib/types";
-import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
@@ -33,36 +32,19 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
       style={{
         animationDelay: `${index * 60}ms`,
         background: "var(--paper-1)",
-        border: "var(--rule-thick)",
-        boxShadow: "var(--shadow-print)",
+        border: "var(--rule-thin)",
       }}
       onClick={onClick}
     >
-      {/* Resort scene header */}
-      <div className="relative h-32 overflow-hidden" style={{ borderBottom: "var(--rule-thick)" }}>
-        <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
-        {/* Meeting time as a printed stamp */}
-        <div
-          className="text-mono-label absolute left-0 top-0 flex items-center gap-1.5 px-2.5 py-1"
-          style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
-        >
-          <span className="pulse-dot" style={{ width: 6, height: 6, background: "var(--ochre)" }} />
-          {post.meetTime}
+      {/* Resort, meeting time and riding style in one quiet line */}
+      <div className="flex items-center gap-3 px-4 pt-4">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base font-semibold" style={{ color: "var(--ink-0)", letterSpacing: "-0.01em" }}>
+            {post.resort}
+          </p>
+          <p className="text-mono-label mt-0.5" style={{ color: "var(--ink-2)" }}>{post.meetTime}</p>
         </div>
-        <div className="absolute right-2 top-2">
-          <Tag level={post.abilityLevel} />
-        </div>
-      </div>
-
-      {/* Resort as a printed line under the scene */}
-      <div
-        className="flex items-center gap-1.5 px-4 py-2"
-        style={{ background: "var(--paper-0)", borderBottom: "1px solid var(--border-hairline)" }}
-      >
-        <Icon name="mountain" size={13} color="var(--ink-0)" strokeWidth={2.2} />
-        <span className="font-display text-base uppercase" style={{ color: "var(--ink-0)", letterSpacing: 0 }}>
-          {post.resort}
-        </span>
+        <Tag level={post.abilityLevel} />
       </div>
 
       {/* Body */}

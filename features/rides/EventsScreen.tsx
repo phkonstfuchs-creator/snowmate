@@ -270,7 +270,7 @@ function EventCard({
         animationDelay: `${index * 45}ms`,
       }}
     >
-      <div className="relative h-24 overflow-hidden" style={{ borderBottom: "var(--rule-thin)" }}>
+      <div className="relative h-16 overflow-hidden" style={{ borderBottom: "var(--rule-thin)" }}>
         <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
         <span
           className="text-mono-label absolute left-0 top-0 px-2 py-1"

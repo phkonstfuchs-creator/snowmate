@@ -1,100 +1,99 @@
 @import "tailwindcss";
 
 /* ─── Pistl design tokens ───────────────────────────────────
-   DNA: a night on the glacier. Deep blue-black surfaces, one hot
-   orange for action, ice blue for anything live. Big bold numbers,
-   rounded cards, soft depth. Built for phones outdoors: high
-   contrast, large tap targets.
+   DNA: the same calm alpine look as the website (pistl.app). Light
+   paper, dark pine ink, one green accent used sparingly. Few colours,
+   thin lines, generous space; content first, decoration last.
    The variable names (paper, ink, rust, …) come from the first
-   design and are kept so every screen follows the tokens: "paper" is
-   now the dark surface, "ink" the light text, "rust" the accent.
-   Every text pair is checked against WCAG AA (4.5:1).
+   design and are kept so every screen follows the tokens: "rust" is
+   now the pine accent. Every text pair is checked against WCAG AA.
    ──────────────────────────────────────────────────────────── */
 :root {
-  color-scheme: dark;
-  --font-display: "Jost Variable";
+  color-scheme: light;
+  --font-display: "Hanken Grotesk Variable";
   --font-body: "Hanken Grotesk Variable";
-  --font-mono: "Hanken Grotesk Variable";
+  --font-mono: "Space Mono";
 
-  /* Surfaces, darkest first */
-  --paper-0: #0d1117; /* canvas */
-  --paper-1: #161c25; /* card */
-  --paper-2: #1f2732; /* recessed area, inputs */
-  --paper-3: #2c3643; /* border, divider */
+  /* Paper, as on the website */
+  --paper-0: #f6f7f4; /* canvas */
+  --paper-1: #fbfcfa; /* card */
+  --paper-2: #edf0e8; /* recessed area, inputs, chips */
+  --paper-3: #d4dbd3; /* line */
 
-  /* Text, brightest first */
-  --ink-0: #f2f5f8; /* primary */
-  --ink-1: #c5ced9; /* body */
-  --ink-2: #9ca8b6; /* labels */
-  --ink-3: #8592a2; /* disabled */
+  /* Ink, darkest first */
+  --ink-0: #202d27; /* primary */
+  --ink-1: #3f4b45; /* body */
+  --ink-2: #59645e; /* labels */
+  --ink-3: #646f69; /* disabled */
 
-  /* Accents */
-  --rust-ink: #ff9a6b; /* accent as text on dark surfaces */
-  --rust: #ff6a2b; /* main accent: action, brand */
-  --rust-light: #ff8a57; /* areas only */
+  /* One accent: pine */
+  --rust-ink: #203e2d; /* accent as text */
+  --rust: #315842; /* action, brand */
+  --rust-light: #3f6b52; /* areas only */
 
-  --pine: #3ddc97; /* success, calm */
-  --pine-light: #7ff0bd;
+  --pine: #31705a; /* success */
+  --pine-light: #4d8a72;
 
-  --ochre: #ffc145; /* reward — areas only, dark text on top */
-  --sky: #4cc3ff; /* live / info */
-  --sky-ink: #8ad8ff;
-  --crimson: #ff6b6b; /* error */
+  --ochre: #e4ebdf; /* soft highlight area, ink on top */
+  --sky: #4a6f84; /* live / info, muted */
+  --sky-ink: #35576a;
+  --crimson: #912f28; /* error */
 
-  /* Text on bright fills (accent, reward, sky) */
-  --on-bright: #0d1117;
+  /* Text on the accent, and on soft highlight areas */
+  --on-accent: #ffffff;
+  --on-bright: #202d27;
 
   /* Semantic mapping */
   --bg-canvas: var(--paper-0);
   --bg-surface-1: var(--paper-1);
   --bg-surface-2: var(--paper-2);
   --bg-surface-3: var(--paper-2);
-  --bg-overlay: rgba(3, 6, 10, 0.66);
+  --bg-overlay: rgba(32, 45, 39, 0.45);
 
   --border-rule: var(--paper-3);
   --border-subtle: var(--paper-3);
-  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-hairline: rgba(32, 45, 39, 0.08);
 
   --text-primary: var(--ink-0);
   --text-secondary: var(--ink-1);
   --text-tertiary: var(--ink-2);
   --text-disabled: var(--ink-3);
-  --text-on-accent: var(--on-bright);
+  --text-on-accent: var(--on-accent);
 
   --accent-primary: var(--rust);
-  --accent-primary-hover: var(--rust-light);
-  --accent-primary-active: var(--rust-light);
-  --accent-primary-subtle: rgba(255, 106, 43, 0.14);
+  --accent-primary-hover: var(--rust-ink);
+  --accent-primary-active: var(--rust-ink);
+  --accent-primary-subtle: rgba(49, 88, 66, 0.08);
 
   --accent-warm: var(--ochre);
-  --accent-warm-subtle: rgba(255, 193, 69, 0.14);
+  --accent-warm-subtle: var(--paper-2);
 
   --status-success: var(--pine);
   --status-danger: var(--crimson);
   --status-warning: var(--rust);
-  --live-dot: var(--sky);
+  --live-dot: var(--pine);
 
   /* Spacing — 4px base */
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
   --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
 
-  /* Radii — soft, sporty */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  /* Radii — small, like the website */
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
   --radius-pill: 999px;
 
   /* Depth from soft shadows and hairlines */
   --rule-thin: 1px solid var(--border-rule);
   --rule-thick: 1px solid var(--border-rule);
   --rule-heavy: 1px solid var(--border-rule);
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 6px 18px rgba(0, 0, 0, 0.28);
-  --shadow-print: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-sheet: 0 -16px 40px rgba(0, 0, 0, 0.5);
-  --glow-focus: 0 0 0 3px rgba(255, 106, 43, 0.35);
+  --shadow-card: none;
+  --shadow-print: none;
+  --shadow-sheet: 0 -8px 30px rgba(32, 45, 39, 0.12);
+  --glow-focus: 0 0 0 3px rgba(49, 88, 66, 0.2);
 
   /* Motion — print does not move softly. Short and dry.
      Two real curves instead of one: things entering and leaving run
@@ -117,12 +116,12 @@
      Jost (geometric, Futura heritage) for poster headlines,
      Hanken Grotesk for body text, Space Mono for all numbers. */
   --font-display-stack: var(--font-display), "Futura", "Century Gothic", sans-serif;
-  --font-mono-stack: var(--font-mono), -apple-system, "Segoe UI", sans-serif;
+  --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", monospace;
   --font-body-stack: var(--font-body), -apple-system, "Segoe UI", sans-serif;
 
-  --text-display-hero: 800 52px / 1 var(--font-display-stack);
-  --text-display-lg: 800 38px / 1.05 var(--font-display-stack);
-  --text-display-md: 800 26px / 1.1 var(--font-display-stack);
+  --text-display-hero: 650 48px / 1.02 var(--font-display-stack);
+  --text-display-lg: 650 34px / 1.06 var(--font-display-stack);
+  --text-display-md: 650 24px / 1.12 var(--font-display-stack);
 
   --text-heading-lg: 700 24px / 1.15 var(--font-display-stack);
   --text-heading-md: 600 19px / 1.25 var(--font-body-stack);
@@ -134,13 +133,13 @@
   --text-caption: 500 13px / 1.4 var(--font-body-stack);
 
   /* Generous line height, otherwise capital umlauts (Ä/Ö/Ü) clip */
-  --text-mono-label: 700 11px / 1.5 var(--font-body-stack);
-  --text-mono-data: 800 22px / 1.1 var(--font-body-stack);
-  --text-mono-data-lg: 800 36px / 1 var(--font-body-stack);
+  --text-mono-label: 400 11px / 1.5 var(--font-mono-stack);
+  --text-mono-data: 650 22px / 1.1 var(--font-body-stack);
+  --text-mono-data-lg: 650 34px / 1 var(--font-body-stack);
 
   /* Poster type runs tight and in capitals */
-  --tracking-display: -0.02em;
-  --tracking-mono-label: 0.06em;
+  --tracking-display: -0.04em;
+  --tracking-mono-label: 0.02em;
 
   --z-dropdown: 100;
   --z-sticky: 200;
@@ -151,9 +150,9 @@
 
   /* Still used by components */
   --border-strong: var(--ink-3);
-  --accent-warm-hover: #ffd27a;
+  --accent-warm-hover: #d8e2d1;
   --flame: var(--rust-ink);
-  --glow-live: 0 0 0 3px rgba(76, 195, 255, 0.22);
+  --glow-live: 0 0 0 3px rgba(49, 112, 90, 0.18);
 }
 
 @theme inline {
@@ -173,7 +172,9 @@
   --color-ink: var(--text-primary);
   --color-muted: var(--text-tertiary);
   --font-display: var(--font-display-stack);
-  --font-mono: var(--font-mono-stack);
+  /* `font-mono` in screens marks numbers; they run in the body face.
+     The mono face is kept for small labels (.text-mono-label). */
+  --font-mono: var(--font-body-stack);
   --font-sans: var(--font-body-stack);
 }
 
@@ -233,7 +234,7 @@ body {
 
 /* Outside the sheet: the dark workbench it rests on */
 @media (min-width: 640px) {
-  body { background: #06080b; }
+  body { background: #e4ebdf; }
   .app-shell { box-shadow: 0 0 0 1px var(--paper-3); }
 }
 
@@ -285,7 +286,7 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  background: rgba(13, 17, 23, 0.92);
+  background: rgba(246, 247, 244, 0.94);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--paper-3);
@@ -343,17 +344,15 @@ body {
   letter-spacing: 0;
   user-select: none;
   flex-shrink: 0;
-  border: 2px solid var(--paper-0);
+  border: 0;
   color: #ffffff;
 }
 
 /* ─── Riding style badges ───────────────────────────────────── */
-.badge-chill    { background: var(--accent-warm-subtle); color: var(--ochre); border-radius: var(--radius-pill); }
-.badge-park     { background: rgba(76, 195, 255, 0.14); color: var(--sky-ink); border-radius: var(--radius-pill); }
-.badge-offpiste { background: rgba(61, 220, 151, 0.14); color: var(--pine); border-radius: var(--radius-pill); }
+.badge-chill, .badge-park, .badge-offpiste { background: var(--paper-2); color: var(--ink-1); border-radius: var(--radius-pill); }
 
 /* ─── Snow condition badges ─────────────────────────────────── */
-.cond-fresh   { background: rgba(76, 195, 255, 0.14); color: var(--sky-ink); }
+.cond-fresh   { background: var(--paper-2); color: var(--pine); }
 .cond-groomed { background: var(--paper-2); color: var(--ink-1); }
 .cond-icy     { background: var(--paper-2); color: var(--ink-2); }
 .cond-slushy  { background: var(--accent-warm-subtle); color: var(--rust-ink); }
@@ -367,7 +366,7 @@ body {
   height: 10px;
 }
 .xp-bar-fill {
-  background: linear-gradient(90deg, var(--rust), var(--ochre));
+  background: var(--rust);
   height: 100%;
   width: 100%;
   border-radius: var(--radius-pill);
@@ -482,7 +481,7 @@ body {
   color: #3a3f47;
   font: 500 10px var(--font-body-stack);
 }
-.ski-map .maplibregl-ctrl-attrib a { color: #b4410f; }
+.ski-map .maplibregl-ctrl-attrib a { color: var(--rust); }
 .ski-map-placeholder {
   width: 100%; height: 100%; min-height: 260px;
   background: linear-gradient(100deg, var(--paper-2) 30%, var(--paper-1) 50%, var(--paper-2) 70%);
@@ -523,7 +522,7 @@ body {
 /* ─── Messages ──────────────────────────────────────────────── */
 .msg-bubble-me {
   background: var(--rust);
-  color: var(--on-bright);
+  color: var(--on-accent);
   border: 0;
   border-radius: 18px 18px 4px 18px;
   padding: 9px 13px;
@@ -575,7 +574,7 @@ body {
   position: absolute;
   inset: -3px;
   border-radius: 9999px;
-  background: rgba(76, 195, 255, 0.35);
+  background: rgba(49, 112, 90, 0.3);
   animation: pulse-ring 1.8s linear infinite;
 }
 @keyframes pulse-ring {
@@ -588,11 +587,11 @@ body {
 
 /* ─── Buttons — printed blocks with a hard offset ───────────── */
 .sm-btn-primary {
-  background: var(--rust);
-  color: var(--on-bright);
+  background: var(--ink-0);
+  color: var(--on-accent);
   border: 0 !important;
-  border-radius: var(--radius-pill);
-  box-shadow: 0 6px 20px rgba(255, 106, 43, 0.3);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
 }
 .sm-btn-primary:active:not(:disabled) {
   transform: scale(0.97);
@@ -603,7 +602,7 @@ body {
    triggers the hover state and leaves it stuck afterwards — the
    normal case on a mobile-first app. */
 @media (hover: hover) and (pointer: fine) {
-  .sm-btn-primary:hover:not(:disabled) { background: var(--rust-light); }
+  .sm-btn-primary:hover:not(:disabled) { background: var(--rust); }
 }
 
 /* ─── Toggle — tabs on a printed index ─────────────────────── */
@@ -634,7 +633,7 @@ body {
 .story-ring {
   padding: 3px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, var(--rust), var(--ochre));
+  background: var(--paper-3);
   border: 0;
 }
 
@@ -661,8 +660,8 @@ body {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; flex-shrink: 0;
   border-radius: 9999px; border: 3px solid #ffffff;
-  background: var(--rust); color: var(--on-bright);
-  font-family: var(--font-mono-stack); font-size: 12px; font-weight: 800;
+  background: var(--rust); color: var(--on-accent);
+  font-family: var(--font-body-stack); font-size: 12px; font-weight: 700;
   box-shadow: 0 1px 4px rgba(28, 24, 21, 0.45);
 }
 .friend-pin-name {
@@ -722,7 +721,7 @@ body :is(button, a)[style*="background:var(--rust)"],
 body :is(button, a)[style*="background: var(--rust)"],
 body :is(button, a)[style*="background:var(--ink-0)"],
 body :is(button, a)[style*="background: var(--ink-0)"] {
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   border: 0 !important;
   box-shadow: none !important;
 }
