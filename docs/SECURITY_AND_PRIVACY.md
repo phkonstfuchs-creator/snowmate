@@ -103,6 +103,27 @@ posts can be reported through report and block. Posts are in the data
 export, and account deletion removes the photos. See
 [ADR 0024](adr/0024-ski-day-posts.md).
 
+## Push notifications
+
+Opt-in per device, in the profile settings. The device's Web Push
+subscription goes into `push_subscriptions`, which clients cannot read.
+Only endpoints of the browser push services (Google, Apple, Mozilla,
+Microsoft) are accepted, so the sender can never be pointed at another
+host. Database triggers queue a notice when someone writes to you, asks
+to be friends or accepts, or asks for, joins or lets you into a ride. A
+block in either direction stops the notice. The notice carries only its
+kind, the sender's display name and the page to open, never message
+text. It is encrypted for the device (RFC 8291), so the push service
+cannot read it.
+
+The `push-dispatch` edge function takes the queue with the service role,
+which stays inside Supabase; the app holds no secret. The function only
+sends what is queued, so it needs no caller authentication. Notices
+older than an hour are dropped. Devices the push service reports as gone
+are deleted. Each person keeps at most 10 devices. Account deletion
+cascades, and the export lists the devices. See
+[ADR 0025](adr/0025-push-notifications.md).
+
 ## Live location
 
 Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed

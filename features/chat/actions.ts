@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { dispatchPushSoon } from "@/lib/push/dispatch";
 import { isValidPosition } from "@/features/location/location";
 import { isUuid, normalizeMessage, toChatMessage, type ChatMessage, type MessageRow, type SendOutcome } from "./message";
 
@@ -42,6 +43,7 @@ export async function sendMessageAction(conversationId: string, text: string): P
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("send_message", { conv: conversationId, message: body });
     if (error) return "unavailable";
+    if (data === "sent") dispatchPushSoon();
     return SEND_OUTCOMES.includes(data as SendOutcome) ? (data as SendOutcome) : "unavailable";
   } catch {
     return "unavailable";
@@ -58,6 +60,7 @@ export async function sendLocationAction(conversationId: string, lat: number, ln
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("send_location_message", { conv: conversationId, p_lat: lat, p_lng: lng });
     if (error) return "unavailable";
+    if (data === "sent") dispatchPushSoon();
     return SEND_OUTCOMES.includes(data as SendOutcome) ? (data as SendOutcome) : "unavailable";
   } catch {
     return "unavailable";

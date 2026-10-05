@@ -20,7 +20,8 @@ Browser ◄── feature screens (client components) ◄───────�
   onboarding, `app/(app)` for the signed-in product, `app/demo` for the
   clickable prototype. Route groups do not change URLs.
 - **Supabase** provides auth (email and password, SSR cookies via
-  `@supabase/ssr`) and Postgres. There is no other backend.
+  `@supabase/ssr`), Postgres and one edge function that sends push
+  notices (ADR 0025). There is no other backend.
 - Identity always comes from the server session (`auth.getClaims()` or
   `auth.uid()` in SQL), never from a client-supplied id.
 
@@ -41,6 +42,7 @@ Browser ◄── feature screens (client components) ◄───────�
 | `lib/data/` | Prototype fixtures only | Be read by signed-in routes or the server boundary |
 | `lib/i18n/` | Locale choice, the en/de dictionaries, `getT()` (server) and `useT()` (client) | Hold business rules |
 | `supabase/migrations/` | Schema, grants, RLS, security-definer functions | Be edited once applied; add a new migration instead |
+| `supabase/functions/` | Edge functions that need the service role (only `push-dispatch`, ADR 0025); shared code in `_shared/` uses WebCrypto only and is unit-tested | Be called with or return anyone's data to clients |
 
 ## Text and languages
 

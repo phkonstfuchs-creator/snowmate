@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
+import { dispatchPushSoon } from "@/lib/push/dispatch";
 import { validateRideEdit, validateRideInput } from "./ride-input";
 
 /* pending: the viewer asked to join and waits for the host. */
@@ -100,6 +101,7 @@ async function joinRideActionImpl(rideId: string): Promise<RideActionResult> {
   if (!result) return UNAVAILABLE;
 
   revalidateRides();
+  dispatchPushSoon();
   return JOIN_MESSAGES[String(result.data)] ?? UNAVAILABLE;
 }
 
@@ -176,6 +178,7 @@ async function respondRideRequestActionImpl(
     });
     if (error) return UNAVAILABLE;
     revalidateRides();
+    if (accept) dispatchPushSoon();
     return RESPOND_MESSAGES[String(data)] ?? UNAVAILABLE;
   } catch {
     return UNAVAILABLE;

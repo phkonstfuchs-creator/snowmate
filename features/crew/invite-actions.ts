@@ -5,6 +5,7 @@ import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import { dispatchPushSoon } from "@/lib/push/dispatch";
 import { INVITE_MESSAGES, inviteUrl, isInviteStatus, isInviteToken } from "./invites";
 
 export type CreateInviteResult = { ok: true; url: string } | { ok: false; message: string };
@@ -45,6 +46,7 @@ async function acceptInviteActionImpl(token: string): Promise<AcceptInviteResult
     if (error || !isInviteStatus(data) || data === "valid") return { ok: false, message: UNAVAILABLE };
     if (data === "accepted") {
       revalidateApp();
+      dispatchPushSoon();
     }
     return { ok: data === "accepted" || data === "already_friends", message: INVITE_MESSAGES[data] };
   } catch {

@@ -27,6 +27,9 @@ Create `.env.local` from `.env.example`. It needs three browser-safe values:
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The publishable (anon) key |
 | `NEXT_PUBLIC_SITE_URL` | Where the app runs, for email links |
 
+Optional, for push notifications: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, the
+public half of the VAPID key pair (see "Push notifications" below).
+
 Never add a secret or service-role key; nothing in the app needs one.
 `.env.local` and the Supabase project link are ignored by Git.
 
@@ -44,6 +47,21 @@ npx supabase db push     # apply new migrations to the linked project
 Migrations are append-only once applied to a hosted project: fix a
 mistake with a new migration. `supabase/config.toml` configures the local
 stack only; hosted Auth settings are managed in the Supabase Dashboard.
+
+## Push notifications
+
+Push notices are sent by the `push-dispatch` edge function (ADR 0025).
+The private VAPID key lives only in the Supabase function secrets.
+
+```bash
+npx web-push generate-vapid-keys --json        # once; keep the private key to yourself
+npx supabase secrets set VAPID_PUBLIC_KEY=… VAPID_PRIVATE_KEY=… VAPID_SUBJECT=mailto:…
+npx supabase functions deploy push-dispatch    # verify_jwt is off in config.toml
+```
+
+Then set `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (the public key) in the app's
+Vercel project and redeploy. Without it the switch stays hidden and the
+app never calls the function.
 
 ## Commands
 

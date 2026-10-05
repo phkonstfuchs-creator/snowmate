@@ -421,3 +421,8 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# Push notices (ADR 0025): called by the app after a write, without a
+# user token; it only empties the queue the database fills.
+[functions.push-dispatch]
+verify_jwt = false
