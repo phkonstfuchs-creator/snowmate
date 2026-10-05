@@ -24,7 +24,7 @@ test('waitlist sends explicit preferences and confirms only a successful signup'
   await expect(page.getByLabel('Ich möchte auch am Early Access teilnehmen.', { exact: true })).not.toBeChecked();
   const form = await completeWaitlist(page, { earlyAccess: true });
   await form.getByRole('button', { name: 'Auf die Warteliste', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Du stehst auf der Liste.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toBeVisible();
   expect(payload).toEqual({ email: emailAddress, earlyAccess: true, consent: true, website: '' });
 });
 
@@ -44,7 +44,7 @@ test('invalid email and missing consent do not submit personal data', async ({ p
   await email.fill(emailAddress);
   await submit.click();
   await expect(form.getByLabel(/Ich möchte per E-Mail/)).not.toBeChecked();
-  await expect(page.getByRole('heading', { name: 'Du stehst auf der Liste.' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toHaveCount(0);
   expect(submissions).toBe(0);
 });
 
@@ -63,9 +63,9 @@ test('failed signup retains email, allows retry, and keeps Early Access optional
   await submit.click();
   await expect(form.getByRole('alert')).toBeVisible();
   await expect(form.getByLabel('Deine E-Mail-Adresse', { exact: true })).toHaveValue(emailAddress);
-  await expect(page.getByRole('heading', { name: 'Du stehst auf der Liste.' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toHaveCount(0);
   await submit.click();
-  await expect(page.getByRole('heading', { name: 'Du stehst auf der Liste.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toBeVisible();
   expect(attempts).toBe(2);
 });
 
@@ -75,7 +75,7 @@ test('HTTP success with an unsuccessful response does not claim signup', async (
   const form = await completeWaitlist(page);
   await form.getByRole('button', { name: 'Auf die Warteliste', exact: true }).click();
   await expect(form.getByRole('alert')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Du stehst auf der Liste.' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toHaveCount(0);
 });
 
 test('product features are clear, factual, and contain no pretend booking controls', async ({ page }) => {
@@ -139,4 +139,30 @@ test('metadata, footer destinations, logo and custom 404 are usable', async ({ p
   await expect(page.getByRole('heading', { name: 'Hier geht’s zurück.' })).toBeVisible();
   await page.getByRole('link', { name: 'Zur Startseite ↗', exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
+});
+
+test('opening the email link alone confirms nothing; the button does', async ({ page }) => {
+  let confirmations = 0;
+  await page.route('**/api/waitlist/confirm', async (route) => {
+    confirmations += 1;
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postData()).toBe(`t=${'A'.repeat(43)}`);
+    await route.fulfill({ status: 303, headers: { Location: '/warteliste/bestaetigt' } });
+  });
+  await page.goto(`/warteliste/bestaetigen?t=${'A'.repeat(43)}`);
+  await expect(page.getByRole('heading', { name: 'Fast geschafft.' })).toBeVisible();
+  expect(confirmations).toBe(0);
+  await page.getByRole('button', { name: /Ja, ich will auf die Warteliste/ }).click();
+  await expect(page.getByRole('heading', { name: 'Du bist auf der Warteliste.' })).toBeVisible();
+  expect(confirmations).toBe(1);
+});
+
+test('a used or broken confirmation link explains what to do', async ({ page }) => {
+  for (const path of ['/warteliste/bestaetigen', '/warteliste/bestaetigen?fehler=1']) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { name: 'Dieser Link gilt nicht mehr.' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Ja, ich will/ })).toHaveCount(0);
+  }
+  await page.goto('/warteliste/bestaetigen?fehler=2');
+  await expect(page.getByRole('heading', { name: 'Das hat gerade nicht geklappt.' })).toBeVisible();
 });

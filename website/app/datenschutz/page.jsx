@@ -13,16 +13,17 @@ export default function Privacy() {
     <p>E-Mail: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
 
     <h2>Warteliste und Early Access</h2>
-    <p>Bei deiner Anmeldung speichern wir deine E-Mail-Adresse, ob du am Early Access interessiert bist, sowie Zeitpunkt und Version deiner Einwilligung. Wir verwenden diese Angaben ausschließlich, um dich über den Start von Pistl zu informieren und, wenn du es angekreuzt hast, zum Testen einzuladen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).</p>
+    <p>Bei deiner Anmeldung speichern wir deine E-Mail-Adresse, ob du am Early Access interessiert bist, sowie Zeitpunkt und Version deiner Einwilligung. Danach schicken wir dir eine E-Mail mit einem Bestätigungslink (Double-Opt-in). Erst wenn du ihn nutzt, stehst du auf der Warteliste; den Zeitpunkt der Bestätigung speichern wir als Nachweis. Wir verwenden diese Angaben ausschließlich, um dich über den Start von Pistl zu informieren und, wenn du es angekreuzt hast, zum Testen einzuladen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).</p>
     <p>Early Access ist optional. Die Anmeldung erstellt kein Konto in der App und ist kein allgemeiner Newsletter. Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, eine formlose E-Mail an die oben genannte Adresse genügt.</p>
 
     <h2>Speicherdauer</h2>
-    <p>Wir löschen deine Anmeldung, sobald du widerrufst oder die Löschung verlangst, spätestens aber zwölf Monate nach dem öffentlichen Start der App. Technische Prüfwerte für das Anfragelimit werden nach spätestens 24 Stunden gelöscht.</p>
+    <p>Bestätigst du deine Anmeldung nicht, löschen wir sie nach sieben Tagen. Eine bestätigte Anmeldung löschen wir, sobald du widerrufst oder die Löschung verlangst, spätestens aber zwölf Monate nach dem öffentlichen Start der App. Technische Prüfwerte für das Anfragelimit werden nach spätestens 24 Stunden gelöscht.</p>
 
     <h2>Hosting und Speicherung</h2>
     <ul>
       <li><strong>Vercel</strong> (Vercel Inc., USA) betreibt die Website. Die serverseitige Verarbeitung der Warteliste läuft in Frankfurt am Main; Seiten können über weltweite Server ausgeliefert werden. Beim Aufruf verarbeitet Vercel technisch notwendige Verbindungsdaten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO, sicherer Betrieb).</li>
       <li><strong>Supabase</strong> (Supabase Inc., USA) speichert die Warteliste in einem Rechenzentrum in Frankfurt am Main.</li>
+      <li><strong>Resend</strong> (Resend, Inc., USA) verschickt die Bestätigungs-E-Mail über Server in Irland. Dafür erhält Resend deine E-Mail-Adresse und den Inhalt der E-Mail.</li>
     </ul>
     <p>Soweit dabei Daten in die USA gelangen, geschieht das auf Grundlage des EU-US Data Privacy Framework oder von EU-Standardvertragsklauseln (Art. 45, 46 DSGVO).</p>
 

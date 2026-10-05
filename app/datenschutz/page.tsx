@@ -50,7 +50,7 @@ export default function DatenschutzPage() {
       </p>
       <h3>Live-Standort</h3>
       <p>
-        Nur wenn du ihn ausdrücklich einschaltest, für 1, 4 oder 12 Stunden. Gespeichert wird nur die letzte Position,
+        Ab 16 Jahren und nur, wenn du ihn ausdrücklich einschaltest, für 1, 4 oder 12 Stunden. Gespeichert wird nur die letzte Position,
         auf etwa 10 m gerundet, ohne Verlauf; sie ist nur für bestätigte Freunde sichtbar und wird beim Beenden, nach
         Ablauf der Zeit, beim Blockieren oder Entfreunden sofort unsichtbar. Rechtsgrundlage: deine Einwilligung,
         Art. 6 Abs. 1 lit. a DSGVO, die du jederzeit mit „Stopp“ widerrufen kannst.
@@ -127,8 +127,8 @@ export default function DatenschutzPage() {
       <h2>8. Minderjährige</h2>
       <p>
         Pistl ist ab 14 Jahren. Für Minderjährige gelten strengere Regeln: Ihre Rides und ihr Standort sind nur für
-        bestätigte Freunde sichtbar. Wenn du jünger als 16 bist, sprich bitte mit deinen Eltern, bevor du deinen
-        Standort teilst.
+        bestätigte Freunde sichtbar. Den eigenen Standort teilen kann man erst ab 16; jüngere Nutzer sehen nur die
+        Positionen ihrer Freunde. Das Alter ergibt sich aus dem Geburtsdatum, das du bei der Registrierung angibst.
       </p>
 
       <h2>9. Keine automatisierten Entscheidungen</h2>

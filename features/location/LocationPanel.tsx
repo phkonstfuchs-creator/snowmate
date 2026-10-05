@@ -72,6 +72,7 @@ function ShareSheet({ onClose, onShare, busy }: {
 
 export default function LocationPanel({
   sharingEnd,
+  canShare = true,
   busy,
   error,
   friends,
@@ -80,6 +81,8 @@ export default function LocationPanel({
   onFocusFriend,
 }: {
   sharingEnd: string | null;
+  /* false under 16: no share button, a note instead. */
+  canShare?: boolean;
   busy: boolean;
   error: string | null;
   friends: FriendLocation[] | null;
@@ -105,7 +108,7 @@ export default function LocationPanel({
               {sharingEnd ? t("loc.sharingUntil", { time: until ?? "" }) : t("loc.title")}
             </h2>
             <p className="mt-0.5 text-xs" style={{ color: INK_2 }}>
-              {sharingEnd ? t("loc.sharingHint") : t("loc.offHint")}
+              {sharingEnd ? t("loc.sharingHint") : canShare ? t("loc.offHint") : t("loc.from16")}
             </p>
           </div>
           {sharingEnd ? (
@@ -113,7 +116,7 @@ export default function LocationPanel({
               style={{ border: "var(--rule-thin)", color: "var(--crimson)", background: PAPER }}>
               {t("loc.stop")}
             </button>
-          ) : (
+          ) : canShare && (
             <button type="button" onClick={() => setSheetOpen(true)} disabled={busy} className="text-mono-label min-h-11 px-3 disabled:opacity-50"
               style={{ background: INK, color: PAPER }}>
               {t("loc.share")}

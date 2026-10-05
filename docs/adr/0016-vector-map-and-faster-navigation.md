@@ -1,6 +1,6 @@
 # 0016 Vector map, Frankfurt region and instant tab switches
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-04
 - **Spec:** [live-location](../specs/live-location.md)
 - **Checks:** `components/map/map-style.test.ts`, `npm run build`

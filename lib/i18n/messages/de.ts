@@ -493,6 +493,7 @@ export const de: Record<MessageKey, string> = {
   "loc.for1h": "1 Stunde",
   "loc.for4h": "4 Stunden",
   "loc.forDay": "12 Stunden",
+  "loc.from16": "Deinen Standort teilen kannst du ab 16. Die Positionen deiner Freunde siehst du trotzdem.",
   "loc.friendsOnMap": "Freunde auf der Karte ({n})",
   "loc.friendsUnavailable": "Die Positionen deiner Freunde konnten nicht geladen werden.",
   "loc.howLong": "Das Teilen endet von selbst nach der gewählten Zeit, oder wann immer du auf Stopp tippst.",

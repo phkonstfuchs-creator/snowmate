@@ -16,6 +16,11 @@ describe("location actions", () => {
     expect(mocks.rpc).toHaveBeenCalledWith("share_my_location", { p_lat: 47.2, p_lng: 11.3, p_accuracy: 13, p_minutes: 60 });
   });
 
+  it("passes on that sharing is refused under 16", async () => {
+    mocks.rpc.mockResolvedValue({ data: "too_young", error: null });
+    await expect(shareLocationAction({ lat: 47.2, lng: 11.3, accuracy: null }, 60)).resolves.toBe("too_young");
+  });
+
   it("refuses invalid input before calling the database", async () => {
     await expect(shareLocationAction({ lat: 200, lng: 11, accuracy: 1 }, 60)).resolves.toBe("invalid");
     await expect(shareLocationAction({ lat: 47, lng: 11, accuracy: 1 }, 9999)).resolves.toBe("invalid");

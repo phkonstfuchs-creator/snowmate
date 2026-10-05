@@ -12,8 +12,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], ...(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } } : {}) } }],
+  /* CI tests the production build (built in the step before); the dev
+     server recompiles routes on demand and can abort navigations in a
+     parallel test. */
   webServer: {
-    command: 'npm run dev',
+    command: process.env.CI ? 'npm run start' : 'npm run dev',
     url: 'http://127.0.0.1:3001',
     reuseExistingServer: true,
     timeout: 120_000,

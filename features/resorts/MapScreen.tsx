@@ -178,6 +178,8 @@ export interface LiveMap {
   sharingEnd?: string | null;
   /* Friends sharing right now; null when unreachable. */
   friends?: FriendLocation[] | null;
+  /* false under 16: sharing is not offered (ADR 0019). */
+  canShare?: boolean;
 }
 
 type LocationState = ReturnType<typeof useLiveLocation>;
@@ -307,6 +309,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
       {location && (
         <LocationPanel
           sharingEnd={location.sharingEnd}
+          canShare={live?.canShare !== false}
           busy={location.busy}
           error={location.error ? t(location.error) : null}
           friends={location.friends}

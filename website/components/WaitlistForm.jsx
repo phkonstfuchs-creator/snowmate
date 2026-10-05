@@ -44,8 +44,8 @@ export default function WaitlistForm() {
 
   if (status === "success") return <div className="signup-success" role="status">
     <span className="success-check"><Check size={30} /></span>
-    <h3 ref={confirmation} tabIndex={-1}>Du stehst auf der Liste.</h3>
-    <p>Dein Interesse ist gespeichert. Wir melden uns per E-Mail, wenn es Neuigkeiten zum Start gibt. Für Early Access laden wir schrittweise zum Testen ein.</p>
+    <h3 ref={confirmation} tabIndex={-1}>Fast geschafft – schau in dein Postfach.</h3>
+    <p>Mit dem Link in unserer E-Mail bestätigst du deine Anmeldung. Erst dann stehst du auf der Warteliste. Keine Mail da? Schau im Spam-Ordner nach. Bist du schon bestätigt, musst du nichts weiter tun.</p>
     <button type="button" className="text-button" onClick={share}><Copy size={17} /> Mit deiner Crew teilen</button>
     <p className="form-note" aria-live="polite">{shareStatus}</p>
   </div>;

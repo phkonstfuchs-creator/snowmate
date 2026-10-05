@@ -15,17 +15,19 @@ Website: http://localhost:3001. Ohne Supabase-Konfiguration funktionieren alle I
 
 ## Warteliste aktivieren
 
-1. Die Migration liegt in der Migrationskette der App: `supabase/migrations/20261007090000_website_waitlist.sql` (Tests: `supabase/tests/database/website_waitlist.test.sql`). Im Repository-Hauptverzeichnis mit `npx supabase db push` einspielen – nicht von Hand im SQL-Editor. Sie legt zwei Tabellen und eine Funktion an und verändert keine App-Tabellen.
+1. Die Migrationen liegen in der Migrationskette der App: `supabase/migrations/20261007090000_website_waitlist.sql` und `20261009090000_website_waitlist_double_opt_in.sql` (Tests: `supabase/tests/database/website_waitlist.test.sql`). Im Repository-Hauptverzeichnis mit `npx supabase db push` einspielen – nicht von Hand im SQL-Editor. Sie verändern keine App-Tabellen.
 2. Serverseitig in Vercel setzen (nie mit `NEXT_PUBLIC_`, nie in Git):
    - `SUPABASE_URL` – Projekt-URL, z. B. `https://<ref>.supabase.co`
    - `SUPABASE_SERVICE_ROLE_KEY` – der *Secret*/Service-Role-Key aus Supabase → Project Settings → API Keys. Nur im Website-Projekt, nicht im App-Projekt.
    - `WAITLIST_RATE_LIMIT_SECRET` – 32+ zufällige Zeichen (`openssl rand -hex 32`).
-   - `NEXT_PUBLIC_SITE_URL` – die echte HTTPS-Domain der Website.
+   - `NEXT_PUBLIC_SITE_URL` – die echte HTTPS-Domain der Website. Aus ihr entsteht der Bestätigungslink.
+   - `RESEND_API_KEY` – API-Key aus Resend (nur „Sending access“, auf die Domain beschränkt).
+   - `WAITLIST_FROM_EMAIL` – Absender auf der in Resend bestätigten Domain, z. B. `Pistl <hallo@pistl.app>`.
 3. Betreiberangaben stehen in `lib/site.js` (echte Angaben des Betreibers, per Umgebungsvariable überschreibbar).
-4. Mit einer eigenen Adresse testen: Es muss eine Zeile in `pistl_website_waitlist` entstehen. Die Erfolgsmeldung erscheint nur, wenn die Datenbank `accepted` liefert.
-5. Für Einladungen nur Datensätze mit `early_access = true` verwenden. Widerruf und Löschung per E-Mail an die Kontaktadresse; spätestens zwölf Monate nach dem öffentlichen Start der App werden alle Einträge gelöscht (Datenschutzerklärung).
+4. Mit einer eigenen Adresse testen: Es entsteht eine unbestätigte Zeile in `pistl_website_waitlist` und eine E-Mail mit Bestätigungslink. Der Link öffnet `/warteliste/bestaetigen`; erst der Button dort setzt `confirmed_at` (E-Mail-Scanner, die Links öffnen, bestätigen also nicht). Die Datenbank speichert nur den SHA-256-Wert des Links. Unbestätigte Anmeldungen werden nach sieben Tagen gelöscht; pro Adresse geht höchstens alle fünf Minuten eine E-Mail raus.
+5. Für Mails und Einladungen nur Datensätze mit `confirmed_at is not null` verwenden, für Early Access zusätzlich `early_access = true`. Widerruf und Löschung per E-Mail an die Kontaktadresse; spätestens zwölf Monate nach dem öffentlichen Start der App werden alle Einträge gelöscht (Datenschutzerklärung).
 
-Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entgegen. Validierung, Honeypot, 2-KB-Bodylimit, Same-Origin-Prüfung, Timeout und Datenbank-Anfragelimit (fünf pro Stunde und Besucher) sind enthalten. Ohne Supabase-Konfiguration antwortet er ehrlich mit 503.
+Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entgegen. Validierung, Honeypot, 2-KB-Bodylimit, Same-Origin-Prüfung, Timeout und Datenbank-Anfragelimit (fünf pro Stunde und Besucher) sind enthalten. Ohne Supabase- oder Resend-Konfiguration antwortet er ehrlich mit 503, ebenso wenn die Bestätigungs-E-Mail nicht verschickt werden konnte.
 
 ## Vercel
 
@@ -51,7 +53,9 @@ Die End-to-End-Tests simulieren Antworten der Wartelisten-API und senden keine A
 ```text
 website/
   app/
-    api/waitlist/route.js     API zur Supabase-Warteliste
+    api/waitlist/route.js     API zur Supabase-Warteliste (Anmeldung + Bestätigungs-E-Mail)
+    api/waitlist/confirm/     Bestätigung per Button (Double-Opt-in)
+    warteliste/               Bestätigungsseiten
     datenschutz/page.jsx     Datenschutzentwurf
     impressum/page.jsx       Anbieterkennzeichnung
     kontakt/page.jsx         Kontakt
@@ -67,7 +71,6 @@ website/
   components/ui/             ActionButton
   lib/                       Website-Konfiguration und Wartelistenlogik
   public/                    Lokale Marke und optimierte Bergillustration
-  supabase/migrations/       Isolierte SQL-Migration
   tests/                     API-/Validierungs- und Browser-Tests
   scripts/check-launch.mjs   Konfigurationsprüfung vor dem Start
   docs/component-sources.md  Konkrete Komponentenquellen und Bildprompt
