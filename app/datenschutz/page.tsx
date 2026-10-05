@@ -46,7 +46,9 @@ export default function DatenschutzPage() {
       <p>
         Was du anlegst oder schreibst, und mit wem du befreundet bist. Sichtbar ist es nur für die Personen, die die
         Regeln der App vorsehen (zum Beispiel bestätigte Freunde oder Mitglieder eines Rides). Chatnachrichten sind
-        nicht Ende-zu-Ende verschlüsselt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+        nicht Ende-zu-Ende verschlüsselt. Ab 16 kannst du im Chat deinen genauen Standort schicken; ihn sehen nur
+        die Mitglieder dieses Chats, und nach 24 Stunden löschen wir die Koordinaten. Rechtsgrundlage: Art. 6 Abs. 1
+        lit. b DSGVO.
       </p>
       <h3>Live-Standort</h3>
       <p>
@@ -95,6 +97,15 @@ export default function DatenschutzPage() {
           direkt; die Anbieter sehen dabei deine IP-Adresse und den angezeigten Kartenausschnitt, aber nicht deine
           gespeicherte Position und nicht, wer seinen Standort teilt.
         </li>
+        <li>
+          <strong>OpenSnowMap</strong> (Pisten und Lifte) und <strong>Amazon Web Services</strong> (offene
+          Höhendaten für die Geländeschattierung): ebenfalls Kartenkacheln, die dein Browser direkt lädt, mit
+          denselben Daten wie oben.
+        </li>
+        <li>
+          <strong>Open-Meteo</strong>: Schnee- und Wetterdaten der Skigebiete. Die fragt der Pistl-Server ab; dabei
+          werden keine Daten über dich übertragen.
+        </li>
       </ul>
       <p>
         Soweit dabei Daten in die USA gelangen, geschieht das auf Grundlage des EU-US Data Privacy Framework oder von
@@ -106,6 +117,7 @@ export default function DatenschutzPage() {
       <ul>
         <li>Konto, Profil, Rides, Freundschaften und Chatnachrichten: bis du dein Konto löschst.</li>
         <li>Live-Standort: höchstens bis zum Ende der gewählten Zeit (maximal 12 Stunden).</li>
+        <li>Standort, den du im Chat schickst: 24 Stunden, danach löschen wir die Koordinaten.</li>
         <li>Anfragezähler zum Missbrauchsschutz: zwei Minuten.</li>
         <li>Meldungen: so lange, wie es für ihre Prüfung und den Schutz anderer nötig ist.</li>
       </ul>

@@ -8,7 +8,16 @@ import type { ResortStatus } from "@/lib/types";
 import { useT } from "@/lib/i18n/client";
 import { resortCoordinates } from "@/lib/resorts";
 import { createMarkerContent } from "@/features/resorts/marker-content";
-import { RASTER_FALLBACK_STYLE, VECTOR_STYLE_URL, accuracyCircle, clampAccuracy, paperTint } from "./map-style";
+import {
+  PISTE_ATTRIBUTION,
+  PISTE_TILES,
+  RASTER_FALLBACK_STYLE,
+  TERRAIN_TILES,
+  VECTOR_STYLE_URL,
+  accuracyCircle,
+  clampAccuracy,
+  paperTint,
+} from "./map-style";
 
 const CITY_VIEWS = {
   innsbruck: { center: [11.32, 47.22] as [number, number], zoom: 9.4 },
@@ -42,6 +51,8 @@ interface SkiMapProps {
   focus?: { lat: number; lng: number; zoom: number; key: number } | null;
   /* Changes on "show my location": fly to the next known own position. */
   locateRequest?: number;
+  /* A position sent in a chat. */
+  pin?: { lat: number; lng: number; label: string } | null;
   ariaLabel?: string;
 }
 
@@ -62,6 +73,37 @@ function addAccuracyLayer(map: MapLibreMap) {
   });
 }
 
+/* Hill shading under the labels, pistes and lifts on top. Both are
+   extras: if their tiles fail, the base map still works. */
+function addSkiLayers(map: MapLibreMap) {
+  if (map.getSource("pistes")) return;
+  const firstLabel = map.getStyle()?.layers?.find((layer) => layer.type === "symbol")?.id;
+  map.addSource("terrain", {
+    type: "raster-dem",
+    tiles: [TERRAIN_TILES],
+    encoding: "terrarium",
+    tileSize: 256,
+    maxzoom: 14,
+  });
+  map.addLayer(
+    {
+      id: "hillshade",
+      type: "hillshade",
+      source: "terrain",
+      paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#5b5446", "hillshade-highlight-color": "#ffffff" },
+    },
+    firstLabel,
+  );
+  map.addSource("pistes", {
+    type: "raster",
+    tiles: [PISTE_TILES],
+    tileSize: 256,
+    maxzoom: 18,
+    attribution: PISTE_ATTRIBUTION,
+  });
+  map.addLayer({ id: "pistes", type: "raster", source: "pistes", paint: { "raster-opacity": 0.95 } });
+}
+
 function tintStyle(map: MapLibreMap) {
   for (const layer of map.getStyle()?.layers ?? []) {
     const tint = paperTint(layer.id, layer.type);
@@ -78,6 +120,7 @@ export default function SkiMap({
   onPersonSelect,
   focus = null,
   locateRequest = 0,
+  pin = null,
   ariaLabel,
 }: SkiMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +128,7 @@ export default function SkiMap({
   const resortMarkers = useRef<Marker[]>([]);
   const peopleMarkers = useRef<Marker[]>([]);
   const meMarker = useRef<Marker | null>(null);
+  const pinMarker = useRef<Marker | null>(null);
   const handledLocate = useRef(0);
   const shownCity = useRef(city);
   const latestMe = useRef(me);
@@ -136,6 +180,7 @@ export default function SkiMap({
       loaded = true;
       window.clearTimeout(timer);
       if (!fellBack) tintStyle(map);
+      addSkiLayers(map);
       addAccuracyLayer(map);
       setStyleReady(true);
     });
@@ -156,6 +201,7 @@ export default function SkiMap({
       resortMarkers.current = [];
       peopleMarkers.current = [];
       meMarker.current = null;
+      pinMarker.current = null;
     };
   }, []);
 
@@ -223,6 +269,23 @@ export default function SkiMap({
         .addTo(map);
     });
   }, [people, onPersonSelect]);
+
+  /* A pin from a chat: a marker with the sender's name (as text). */
+  useEffect(() => {
+    const map = mapRef.current;
+    pinMarker.current?.remove();
+    pinMarker.current = null;
+    if (!map || !pin) return;
+    const element = document.createElement("div");
+    element.className = "chat-pin";
+    element.setAttribute("role", "img");
+    element.setAttribute("aria-label", `${t("map.sharedPin")}: ${pin.label}`);
+    const name = document.createElement("span");
+    name.className = "chat-pin-name";
+    name.textContent = pin.label;
+    element.append(name);
+    pinMarker.current = new Marker({ element, anchor: "bottom" }).setLngLat([pin.lng, pin.lat]).addTo(map);
+  }, [pin, t]);
 
   /* Own position: a pulsing blue dot plus the accuracy circle. */
   useEffect(() => {

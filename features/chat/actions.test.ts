@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { openDirectChatAction, openRideChatAction, pollMessagesAction, sendMessageAction } from "./actions";
+import { openDirectChatAction, openRideChatAction, pollMessagesAction, sendLocationAction, sendMessageAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(),
@@ -44,6 +44,18 @@ describe("chat actions", () => {
     mocks.rpc.mockResolvedValue({ data: CONV, error: null });
     await expect(openRideChatAction(USER)).rejects.toThrow(`redirect:/crew/chat/${CONV}`);
     expect(mocks.rpc).toHaveBeenCalledWith("open_ride_chat", { target_ride: USER });
+  });
+
+  it("sends a position as a pin; identity comes from the session", async () => {
+    mocks.rpc.mockResolvedValueOnce({ data: "sent", error: null });
+    await expect(sendLocationAction(CONV, 47.2, 11.3)).resolves.toBe("sent");
+    expect(mocks.rpc).toHaveBeenCalledWith("send_location_message", { conv: CONV, p_lat: 47.2, p_lng: 11.3 });
+    mocks.rpc.mockResolvedValueOnce({ data: "too_young", error: null });
+    await expect(sendLocationAction(CONV, 47.2, 11.3)).resolves.toBe("too_young");
+    mocks.rpc.mockClear();
+    await expect(sendLocationAction(CONV, 200, 11.3)).resolves.toBe("invalid");
+    await expect(sendLocationAction("x", 47, 11)).resolves.toBe("forbidden");
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
   it("sends the trimmed text and passes the database's answer on", async () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { RASTER_FALLBACK_STYLE, VECTOR_STYLE_URL, accuracyCircle, clampAccuracy, paperTint } from "./map-style";
+import { readFileSync } from "node:fs";
+import { MAP_TILE_HOSTS, PISTE_TILES, RASTER_FALLBACK_STYLE, TERRAIN_TILES, VECTOR_STYLE_URL, accuracyCircle, clampAccuracy, paperTint } from "./map-style";
 
 describe("map style", () => {
   it("loads vector tiles over https and falls back to raster tiles", () => {
@@ -7,6 +8,14 @@ describe("map style", () => {
     const source = RASTER_FALLBACK_STYLE.sources.carto!;
     expect(source.type).toBe("raster");
     expect("tiles" in source && source.tiles?.every((url) => url.startsWith("https://"))).toBe(true);
+  });
+
+  it("loads pistes and terrain over https from hosts the CSP allows", () => {
+    const config = readFileSync("next.config.ts", "utf8");
+    const connect = config.match(/"connect-src ([^"]+)"/u)?.[1] ?? "";
+    for (const host of MAP_TILE_HOSTS) expect(connect.split(" ")).toContain(host);
+    expect(PISTE_TILES).toMatch(/^https:\/\/tiles\.opensnowmap\.org\/.+\{z\}\/\{x\}\/\{y\}\.png$/u);
+    expect(TERRAIN_TILES).toMatch(/^https:\/\/s3\.amazonaws\.com\/elevation-tiles-prod\/terrarium\//u);
   });
 
   it("tints only background and known fill layers", () => {

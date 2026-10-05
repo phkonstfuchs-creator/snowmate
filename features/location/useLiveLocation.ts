@@ -5,27 +5,15 @@ import type { MessageKey } from "@/lib/i18n/translate";
 import { friendLocationsAction, shareLocationAction, stopSharingAction } from "./actions";
 import {
   SHARE_MESSAGES,
+  geoErrorKey,
   shouldSendUpdate,
+  toPosition,
   type FriendLocation,
   type Position,
   type ShareMinutes,
 } from "./location";
 
 const FRIEND_POLL_MS = 20_000;
-
-function geoErrorKey(error: GeolocationPositionError | null): MessageKey {
-  if (error?.code === 1) return "loc.denied";
-  if (error?.code === 3) return "loc.timeout";
-  return "loc.unavailable";
-}
-
-function toPosition(geo: GeolocationPosition): Position {
-  return {
-    lat: geo.coords.latitude,
-    lng: geo.coords.longitude,
-    accuracy: Number.isFinite(geo.coords.accuracy) ? geo.coords.accuracy : null,
-  };
-}
 
 /* The viewer's own GPS position (stays on the device unless sharing is
    on), their sharing state, and the positions friends share. Browsers

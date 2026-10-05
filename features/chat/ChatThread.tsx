@@ -8,7 +8,8 @@ import { INTL_LOCALE } from "@/lib/i18n/locales";
 import type { MessageKey } from "@/lib/i18n/translate";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
 import type { SafetyTarget } from "@/features/safety/reports";
-import { pollMessagesAction, sendMessageAction } from "./actions";
+import { geoErrorKey, toPosition } from "@/features/location/location";
+import { pollMessagesAction, sendLocationAction, sendMessageAction } from "./actions";
 import { MAX_MESSAGE_LENGTH, POLL_INTERVAL_MS, mergeMessages, normalizeMessage, type ChatMessage } from "./message";
 
 const INK = "var(--ink-0)";
@@ -22,8 +23,29 @@ const SEND_ERRORS: Record<string, MessageKey> = {
   invalid: "chat.invalid",
   rate_limited: "chat.rateLimited",
   profile_incomplete: "chat.profileIncomplete",
+  too_young: "loc.from16",
   unavailable: "chat.sendFailed",
 };
+
+/* A pin in the chat: opens the Pistl map at that point. */
+function LocationBubble({ message }: { message: ChatMessage }) {
+  const t = useT();
+  if (!message.position) {
+    return <span className="flex items-center gap-1.5"><Icon name="map-pin" size={15} /> {t("chat.locationExpired")}</span>;
+  }
+  const params = new URLSearchParams({
+    lat: String(message.position.lat),
+    lng: String(message.position.lng),
+    label: message.isMine ? t("chat.you") : message.senderName,
+  });
+  return (
+    <Link href={`/map?${params.toString()}`} className="flex items-center gap-2 font-bold underline underline-offset-2">
+      <Icon name="map-pin" size={16} />
+      {message.isMine ? t("chat.locationMine") : t("chat.locationTheirs")}{" "}
+      <span className="font-normal no-underline">· {t("chat.showOnMap")}</span>
+    </Link>
+  );
+}
 
 export default function ChatThread({
   conversationId,
@@ -86,6 +108,31 @@ export default function ChatThread({
     }
   };
 
+  /* Asks the browser for the current position and sends it as a pin. */
+  const sendLocation = () => {
+    if (sending) return;
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setError(t("loc.unsupported"));
+      return;
+    }
+    setSending(true);
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (geo) => {
+        const position = toPosition(geo);
+        const outcome = await sendLocationAction(conversationId, position.lat, position.lng);
+        setSending(false);
+        if (outcome === "sent") await poll();
+        else setError(t(SEND_ERRORS[outcome] ?? "chat.sendFailed"));
+      },
+      (geoError) => {
+        setSending(false);
+        setError(t(geoErrorKey(geoError)));
+      },
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
+    );
+  };
+
   const remaining = MAX_MESSAGE_LENGTH - [...draft].length;
 
   return (
@@ -126,7 +173,7 @@ export default function ChatThread({
                     ? { background: INK, color: PAPER }
                     : { background: PAPER_1, color: INK, border: "var(--rule-thin)" }}
                 >
-                  {message.body}
+                  {message.kind === "location" ? <LocationBubble message={message} /> : message.body}
                 </div>
                 <p className={`mt-0.5 text-[0.65rem] ${message.isMine ? "text-right" : ""}`} style={{ color: INK_2 }}>
                   <time dateTime={message.createdAt}>{time.format(new Date(message.createdAt))}</time>
@@ -148,6 +195,16 @@ export default function ChatThread({
       >
         {error && <p role="alert" className="mb-1.5 text-sm font-semibold" style={{ color: "var(--crimson)" }}>{error}</p>}
         <div className="flex items-end gap-2">
+          <button
+            type="button"
+            onClick={sendLocation}
+            disabled={sending}
+            aria-label={t("chat.sendLocation")}
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center disabled:opacity-40"
+            style={{ border: "var(--rule-thin)", background: PAPER_1 }}
+          >
+            <Icon name="map-pin" size={18} color={INK} strokeWidth={2.2} />
+          </button>
           <label htmlFor="chat-input" className="sr-only">{t("chat.placeholder")}</label>
           <textarea
             id="chat-input"

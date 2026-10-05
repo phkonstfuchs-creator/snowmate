@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ChatThread from "./ChatThread";
 import type { ChatMessage } from "./message";
 
-const mocks = vi.hoisted(() => ({ poll: vi.fn(), send: vi.fn() }));
-vi.mock("./actions", () => ({ pollMessagesAction: mocks.poll, sendMessageAction: mocks.send }));
+const mocks = vi.hoisted(() => ({ poll: vi.fn(), send: vi.fn(), sendLocation: vi.fn() }));
+vi.mock("./actions", () => ({ pollMessagesAction: mocks.poll, sendMessageAction: mocks.send, sendLocationAction: mocks.sendLocation }));
 vi.mock("@/features/safety/ReportBlockSheet", () => ({
   default: ({ target }: { target: { name: string } }) => <div role="dialog">Report {target.name}</div>,
 }));
 
 const CONV = "c4a70000-0000-4000-8000-0000000000aa";
-const first: ChatMessage = { id: "m1", senderId: "u2", senderName: "Lena", body: "Morgen Nordkette?", createdAt: "2026-10-05T10:00:00Z", isMine: false };
-const mine: ChatMessage = { id: "m2", senderId: "me", senderName: "Me", body: "Bin dabei", createdAt: "2026-10-05T10:01:00Z", isMine: true };
+const first: ChatMessage = { id: "m1", senderId: "u2", senderName: "Lena", body: "Morgen Nordkette?", createdAt: "2026-10-05T10:00:00Z", isMine: false, kind: "text", position: null };
+const mine: ChatMessage = { id: "m2", senderId: "me", senderName: "Me", body: "Bin dabei", createdAt: "2026-10-05T10:01:00Z", isMine: true, kind: "text", position: null };
 
 describe("ChatThread", () => {
   beforeEach(() => {
@@ -76,5 +76,28 @@ describe("ChatThread", () => {
     render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[]} other={{ id: "u2", name: "Lena" }} />);
     fireEvent.click(screen.getByRole("button", { name: "Report or block Lena" }));
     expect(screen.getByRole("dialog")).toHaveTextContent("Report Lena");
+  });
+
+  it("shows a pin that opens the map, and an expired one without coordinates", () => {
+    const pin: ChatMessage = { ...first, id: "p1", body: "📍", kind: "location", position: { lat: 47.26346, lng: 11.39432 } };
+    const old: ChatMessage = { ...first, id: "p2", body: "📍", kind: "location", position: null, createdAt: "2026-10-05T10:03:00Z" };
+    render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[pin, old]} />);
+    expect(screen.getByRole("link", { name: /Location · show on map/ })).toHaveAttribute("href", "/map?lat=47.26346&lng=11.39432&label=Lena");
+    expect(screen.getByText(/Location \(hidden after 24 h\)/)).toBeInTheDocument();
+  });
+
+  it("sends the current position as a pin, and explains a refusal", async () => {
+    const getCurrentPosition = vi.fn((ok: PositionCallback) =>
+      ok({ coords: { latitude: 47.2, longitude: 11.3, accuracy: 8 } } as GeolocationPosition),
+    );
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition }, configurable: true });
+    mocks.sendLocation.mockResolvedValueOnce("sent").mockResolvedValueOnce("too_young");
+    render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[first]} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
+    await waitFor(() => expect(mocks.sendLocation).toHaveBeenCalledWith(CONV, 47.2, 11.3));
+
+    fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/from 16/);
   });
 });

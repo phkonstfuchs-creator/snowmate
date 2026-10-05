@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isUuid, mergeMessages, normalizeMessage, toChatMessage, toChatSummary, type ChatMessage } from "./message";
 
-const msg = (id: string, createdAt: string): ChatMessage => ({ id, senderId: "s", senderName: "S", body: id, createdAt, isMine: false });
+const msg = (id: string, createdAt: string): ChatMessage => ({ id, senderId: "s", senderName: "S", body: id, createdAt, isMine: false, kind: "text", position: null });
 
 describe("chat messages", () => {
   it("trims and accepts ordinary text, line breaks included", () => {
@@ -21,6 +21,14 @@ describe("chat messages", () => {
     expect(isUuid("c4a70000-0000-4000-8000-000000000001")).toBe(true);
     expect(isUuid("../crew")).toBe(false);
     expect(isUuid(42)).toBe(false);
+  });
+
+  it("maps location rows, and hides a pin without coordinates", () => {
+    const row = { id: "1", sender_id: "u", sender_name: "Lena", sender_handle: "lena", body: "📍", created_at: "t", is_mine: false };
+    expect(toChatMessage({ ...row, kind: "location", lat: 47.1, lng: 11.2 })).toMatchObject({ kind: "location", position: { lat: 47.1, lng: 11.2 } });
+    expect(toChatMessage({ ...row, kind: "location", lat: null, lng: null })).toMatchObject({ kind: "location", position: null });
+    expect(toChatMessage({ ...row, kind: "text", lat: 47.1, lng: 11.2 })).toMatchObject({ kind: "text", position: null });
+    expect(toChatMessage(row)).toMatchObject({ kind: "text", position: null });
   });
 
   it("maps rows from the database", () => {

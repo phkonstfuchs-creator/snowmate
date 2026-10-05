@@ -7,7 +7,7 @@ import {
   BadgeCheck, Lock, ChevronDown, MoreHorizontal, MapPinned, Globe,
   Sunrise, Map, Hammer, LogOut, Eye, EyeOff, AlertCircle, MailCheck,
   CalendarDays, Ticket, SlidersHorizontal, ArrowLeft, UserCheck, UserX, Download, Trash2,
-  LocateFixed, Radio, KeyRound,
+  LocateFixed, Radio, KeyRound, Cloud, CloudSun, CloudFog, CloudRain, CloudLightning,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -18,6 +18,11 @@ const REGISTRY: Record<string, ComponentType<LucideProps>> = {
   radio: Radio,
   key: KeyRound,
   "cloud-snow": CloudSnow,
+  cloud: Cloud,
+  "cloud-sun": CloudSun,
+  "cloud-fog": CloudFog,
+  "cloud-rain": CloudRain,
+  "cloud-lightning": CloudLightning,
   plus: Plus,
   mail: Mail,
   "chevron-left": ChevronLeft,
