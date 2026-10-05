@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { articlesUrl, fileInfoUrl, isFreeLicense, leadImages, photosFrom, plainText } from "./resort-photo";
+import { articleImagesUrl, articlesUrl, fileInfoUrl, isFreeLicense, leadImages, photosFrom, pickArticlePhoto, plainText } from "./resort-photo";
 
 const meta = (overrides: Record<string, string> = {}) =>
   Object.fromEntries(
@@ -78,5 +78,32 @@ describe("resort photos", () => {
   it("turns the author HTML into plain text", () => {
     expect(plainText('<span>Max &amp; <a href="x">Moritz</a></span>')).toBe("Max & Moritz");
     expect(plainText("<script>alert(1)</script>Ok")).toBe("alert(1) Ok");
+  });
+
+  it("falls back to the first wide free photo among the article's images", () => {
+    expect(new URL(articleImagesUrl("Sölden")).searchParams.get("generator")).toBe("images");
+    const sized = (title: string, width: number, height: number, mime = "image/jpeg", metadata = meta()) => {
+      const page = file(title, { mime }, metadata);
+      Object.assign(page.imageinfo[0]!, { width, height });
+      return page;
+    };
+    const photo = pickArticlePhoto({
+      query: {
+        pages: [
+          sized("Datei:Wappen at soelden.png", 600, 700, "image/png"),
+          sized("Datei:Zzz Gaislachkogl.jpg", 4000, 3000),
+          sized("Datei:Hochformat.jpg", 2000, 3000),
+          sized("Datei:Klein.jpg", 640, 480),
+          sized("Datei:Logo Soelden.jpg", 3000, 2000),
+          sized("Datei:Rettenbachferner.jpg", 3000, 2000, "image/jpeg", meta({ LicenseShortName: "GFDL" })),
+        ],
+      },
+    });
+    expect(photo?.src).toContain("Zzz%20Gaislachkogl.jpg");
+    expect(pickArticlePhoto({ query: { pages: [] } })).toBeNull();
+  });
+
+  it("skips a lead image that is a coat of arms", () => {
+    expect(photosFrom({ Flachau: "Wappen_Flachau.jpg" }, { query: { pages: [file("Datei:Wappen Flachau.jpg")] } })).toEqual({});
   });
 });

@@ -60,6 +60,17 @@ export function articlesUrl(titles: readonly string[]): string {
   return `${API}?${params.toString()}`;
 }
 
+/* All images used in one article, with the data needed to choose and
+   credit one: a single request per resort. */
+export function articleImagesUrl(article: string): string {
+  const params = new URLSearchParams({
+    action: "query", format: "json", formatversion: "2", redirects: "1",
+    generator: "images", gimlimit: "50", titles: article,
+    prop: "imageinfo", iiprop: "url|mime|size|extmetadata", iiurlwidth: "1200",
+  });
+  return `${API}?${params.toString()}`;
+}
+
 export function fileInfoUrl(files: readonly string[]): string {
   const params = new URLSearchParams({
     action: "query", format: "json", formatversion: "2",
@@ -126,28 +137,58 @@ export function plainText(html: string): string {
 const SAFE_IMAGE = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/[^?#\s]+$/u;
 const SAFE_PAGE = /^https:\/\/(commons|de)\.wikimedia\.org\/|^https:\/\/de\.wikipedia\.org\//u;
 
+/* Coats of arms, logos, maps and diagrams are not photos of the slopes. */
+const NOT_A_PHOTO = /(wappen|logo|karte|map|lage|plan|panorama-?karte|schema|diagram|flag|signet)/iu;
+
+interface ImageInfo {
+  thumburl?: string; thumbwidth?: number; thumbheight?: number;
+  width?: number; height?: number;
+  descriptionurl?: string; mime?: string;
+  extmetadata?: Record<string, Meta | undefined>;
+}
+
+function toPhoto(info: ImageInfo | undefined): ResortPhoto | null {
+  if (!info?.thumburl || !info.descriptionurl || info.mime !== "image/jpeg") return null;
+  const meta = info.extmetadata ?? {};
+  const license = text(meta.LicenseShortName);
+  if (!isFreeLicense(license) || text(meta.Restrictions).trim() !== "") return null;
+  if (!SAFE_IMAGE.test(info.thumburl) || !SAFE_PAGE.test(info.descriptionurl)) return null;
+  const licenseUrl = text(meta.LicenseUrl);
+  return {
+    src: info.thumburl,
+    width: info.thumbwidth ?? 1200,
+    height: info.thumbheight ?? 800,
+    author: plainText(text(meta.Artist)) || plainText(text(meta.Credit)) || "Wikimedia Commons",
+    license,
+    licenseUrl: /^https?:\/\//u.test(licenseUrl) ? licenseUrl : null,
+    sourceUrl: info.descriptionurl,
+  };
+}
+
+/* From all images of an article: the first wide photo (landscape, at
+   least 800 px) under a free licence that is not a logo, map or coat of
+   arms. */
+export function pickArticlePhoto(answer: unknown): ResortPhoto | null {
+  const pages = (answer as FileAnswer)?.query?.pages ?? [];
+  for (const page of [...pages].sort((a, b) => a.title.localeCompare(b.title))) {
+    if (NOT_A_PHOTO.test(page.title)) continue;
+    const info = page.imageinfo?.[0] as ImageInfo | undefined;
+    if (!info || (info.width ?? 0) < 800 || (info.width ?? 0) <= (info.height ?? 0)) continue;
+    const photo = toPhoto(info);
+    if (photo) return photo;
+  }
+  return null;
+}
+
 /* Resort name → photo, only for JPEG photos under a free licence without
    restrictions (logos and maps are SVG/PNG and drop out). */
 export function photosFrom(images: Record<string, string>, answer: unknown): Record<string, ResortPhoto> {
   const pages = (answer as FileAnswer)?.query?.pages ?? [];
   const result: Record<string, ResortPhoto> = {};
   for (const [resort, file] of Object.entries(images)) {
-    const info = pages.find((page) => fileKey(page.title) === fileKey(file))?.imageinfo?.[0];
-    if (!info?.thumburl || !info.descriptionurl || info.mime !== "image/jpeg") continue;
-    const meta = info.extmetadata ?? {};
-    const license = text(meta.LicenseShortName);
-    if (!isFreeLicense(license) || text(meta.Restrictions).trim() !== "") continue;
-    if (!SAFE_IMAGE.test(info.thumburl) || !SAFE_PAGE.test(info.descriptionurl)) continue;
-    const licenseUrl = text(meta.LicenseUrl);
-    result[resort] = {
-      src: info.thumburl,
-      width: info.thumbwidth ?? 1200,
-      height: info.thumbheight ?? 800,
-      author: plainText(text(meta.Artist)) || plainText(text(meta.Credit)) || "Wikimedia Commons",
-      license,
-      licenseUrl: /^https?:\/\//u.test(licenseUrl) ? licenseUrl : null,
-      sourceUrl: info.descriptionurl,
-    };
+    if (NOT_A_PHOTO.test(file)) continue;
+    const photo = toPhoto(pages.find((page) => fileKey(page.title) === fileKey(file))?.imageinfo?.[0]);
+    if (photo) result[resort] = photo;
   }
   return result;
 }

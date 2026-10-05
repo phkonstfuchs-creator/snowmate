@@ -50,9 +50,9 @@ describe("SignupFlow", () => {
     });
     const next = screen.getByRole("button", { name: "Next" });
     expect(next).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: /Off-piste/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Powder & freeride/ }));
     fireEvent.click(screen.getByRole("button", { name: /Chill/ }));
-    expect(screen.getByRole("button", { name: /Off-piste/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /Powder & freeride/ })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: /Chill/ }));
     expect(screen.getByRole("button", { name: /Chill/ })).toHaveAttribute("aria-pressed", "false");
     expect(next).toBeEnabled();

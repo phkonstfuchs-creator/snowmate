@@ -36,7 +36,8 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
   const t = useT();
   const [step, setStep] = useState<1 | 2>(1);
   const [resort, setResort] = useState("");
-  const [abilityLevel, setAbilityLevel] = useState<AbilityLevel>("chill");
+  /* Chosen per ride, not taken from the profile: today might be park. */
+  const [abilityLevel, setAbilityLevel] = useState<AbilityLevel | null>(null);
   const [meetTime, setMeetTime] = useState("09:00");
   const [meetPoint, setMeetPoint] = useState("");
   const [totalSpots, setTotalSpots] = useState(4);
@@ -53,12 +54,13 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
      a rule. */
   const effectiveVisibility: RideVisibility = mayGoPublic ? visibility : "friends";
   const canPublish =
+    abilityLevel !== null &&
     meetPoint.trim().length >= 2 &&
     (effectiveVisibility === "friends" || title.trim().length >= 3) &&
     !submitting;
 
   const handleSubmit = async () => {
-    if (!canPublish) return;
+    if (!canPublish || !abilityLevel) return;
     setSubmitting(true);
     setError(null);
     const result = await settle<RideActionResult | void>(Promise.resolve(onPost({
@@ -105,10 +107,10 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
           <span className="font-bold text-[0.9375rem]" style={{ color: "var(--text-primary)" }}>{t("feed.postRide")}</span>
           {step === 1 ? (
             <button
-              onClick={() => resort && setStep(2)}
-              disabled={!resort}
+              onClick={() => resort && abilityLevel && setStep(2)}
+              disabled={!resort || !abilityLevel}
               className="text-sm font-semibold"
-              style={{ color: resort ? "var(--sky)" : "var(--text-disabled)" }}
+              style={{ color: resort && abilityLevel ? "var(--sky)" : "var(--text-disabled)" }}
             >
               {t("common.next")}
             </button>

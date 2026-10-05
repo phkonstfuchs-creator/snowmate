@@ -263,6 +263,7 @@ describe("FeedScreen with real data", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
     fireEvent.change(screen.getByLabelText("Resort"), { target: { value: "Nordkette" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.change(screen.getByLabelText("Meeting point"), { target: { value: "Congress station" } });
     await act(async () => {
@@ -281,6 +282,7 @@ describe("FeedScreen with real data", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
     fireEvent.change(screen.getByLabelText("Resort"), { target: { value: "Nordkette" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: /Public/ }));
     fireEvent.change(screen.getByLabelText("Meeting point"), { target: { value: "Congress station" } });
@@ -297,6 +299,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([], true)} />);
     fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
     fireEvent.change(screen.getByLabelText("Resort"), { target: { value: "Nordkette" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByRole("button", { name: /Public/ })).toBeDisabled();
   });
