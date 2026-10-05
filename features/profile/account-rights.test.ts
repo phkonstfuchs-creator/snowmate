@@ -56,6 +56,22 @@ describe("deleteAccountAction", () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
+  it("removes the profile picture files before deleting the account", async () => {
+    const list = vi.fn().mockResolvedValue({ data: [{ name: "a.webp" }], error: null });
+    const remove = vi.fn().mockResolvedValue({ data: [], error: null });
+    mocks.createClient.mockResolvedValue({
+      rpc: mocks.rpc,
+      auth: { signOut: mocks.signOut, getClaims: async () => ({ data: { claims: { sub: "u-1" } } }) },
+      storage: { from: () => ({ list, remove }) },
+    });
+    mocks.rpc.mockResolvedValue({ data: true, error: null });
+
+    await expect(deleteAccountAction(initialDeleteAccountState, form(" Delete "))).rejects.toThrow("redirect:/login?account=deleted");
+    expect(list).toHaveBeenCalledWith("u-1");
+    expect(remove).toHaveBeenCalledWith(["u-1/a.webp"]);
+    expect(remove.mock.invocationCallOrder[0]).toBeLessThan(mocks.rpc.mock.invocationCallOrder[0]!);
+  });
+
   it("deletes, clears the local session and sends the user to sign in", async () => {
     mocks.rpc.mockResolvedValue({ data: true, error: null });
     mocks.signOut.mockRejectedValueOnce(new Error("already gone"));

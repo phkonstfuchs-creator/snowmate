@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { toOwnProfile, type OwnProfile, type ProfileRow } from "./profile-input";
+import { AVATAR_BUCKET } from "./avatar-image";
 
 /* Reads the signed-in account's own profile. RLS only ever returns the
    caller's row; the id filter keeps the intent explicit. Returns null
@@ -17,7 +18,7 @@ export async function getOwnProfile(): Promise<OwnProfile | null> {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("display_name, handle, city, ability_level, riding_styles, bio, birth_date, is_minor, onboarding_completed")
+      .select("id, display_name, handle, city, ability_level, riding_styles, bio, birth_date, is_minor, onboarding_completed, avatar_path, avatar_visibility")
       .eq("id", userId)
       .maybeSingle<ProfileRow>();
 
@@ -52,6 +53,23 @@ export async function getMfaEnabled(): Promise<boolean | null> {
     const { data, error } = await supabase.auth.mfa.listFactors();
     if (error || !data) return null;
     return data.totp.some((factor) => factor.status === "verified");
+  } catch {
+    return null;
+  }
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
+
+/* The owner's picture if the caller may see it, else null. The database
+   decides (avatar_path_for); storage checks the same rule again. */
+export async function getVisibleAvatar(ownerId: string): Promise<Blob | null> {
+  if (!UUID.test(ownerId)) return null;
+  try {
+    const supabase = await createClient();
+    const { data: path, error } = await supabase.rpc("avatar_path_for", { owner: ownerId });
+    if (error || typeof path !== "string") return null;
+    const { data: file, error: downloadError } = await supabase.storage.from(AVATAR_BUCKET).download(path);
+    return downloadError || !file ? null : file;
   } catch {
     return null;
   }

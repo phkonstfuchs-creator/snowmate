@@ -9,6 +9,7 @@ import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor as avatarBg } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
+import Avatar from "@/components/ui/Avatar";
 import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
@@ -248,12 +249,16 @@ export default function ProfileScreen({
         </h1>
 
         <div className="relative mt-4 flex items-center gap-3">
-          <div
-            className="avatar-initials"
-            style={{ width: 46, height: 46, background: avatarBg("me"), color: PAPER, fontSize: 17 }}
-          >
-            {initials}
-          </div>
+          {isLive && account?.id ? (
+            <Avatar id={account.id} version={account.avatarPath ?? null} initials={initials} size={46} />
+          ) : (
+            <div
+              className="avatar-initials"
+              style={{ width: 46, height: 46, background: avatarBg("me"), color: PAPER, fontSize: 17 }}
+            >
+              {initials}
+            </div>
+          )}
           <div>
             <p className="text-mono-label" style={{ color: INK }}>
               {isLive

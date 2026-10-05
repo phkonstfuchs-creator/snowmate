@@ -9,6 +9,7 @@ import Icon from "@/components/ui/Icon";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 import { updateProfileAction } from "./actions";
+import AvatarEditor from "./AvatarEditor";
 import { initialProfileActionState } from "./action-state";
 import {
   ONBOARDING_DRAFT_KEY,
@@ -129,6 +130,8 @@ export default function ProfileEditSheet({
             <Icon name="x" size={18} color={INK} strokeWidth={2} />
           </button>
         </div>
+
+        {profile?.id && <AvatarEditor profile={profile} />}
 
         <form action={formAction} className="space-y-4 px-5 pt-5" noValidate>
           <div>

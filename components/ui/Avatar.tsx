@@ -1,3 +1,8 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
+
 /* Quiet greens and greys from the website palette; each holds white
    initials (AA). */
 const AVATAR_COLORS = ["#315842", "#4d5948", "#35576a", "#5b5446", "#31705a", "#46524c"];
@@ -6,8 +11,12 @@ export function avatarColor(id: string) {
   return AVATAR_COLORS[id.charCodeAt(id.length - 1) % AVATAR_COLORS.length];
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
+
 interface AvatarProps {
   id: string;
+  /* Changes when the picture changes, so the browser fetches it anew. */
+  version?: string | null;
   initials: string;
   size?: number;
   live?: boolean;
@@ -15,7 +24,12 @@ interface AvatarProps {
   className?: string;
 }
 
-export default function Avatar({ id, initials, size = 40, live = false, verified = false, className = "" }: AvatarProps) {
+/* Initials, with the person's picture on top once it has loaded. Real
+   accounts (uuid ids) ask /avatar/<id>; the server answers 404 when there
+   is no picture or the viewer may not see it, and the initials stay. */
+export default function Avatar({ id, version = null, initials, size = 40, live = false, verified = false, className = "" }: AvatarProps) {
+  const [photo, setPhoto] = useState<"loading" | "shown" | "none">("loading");
+  const src = `/avatar/${id}${version ? `?v=${encodeURIComponent(version)}` : ""}`;
   return (
     <div className={`relative flex-shrink-0 ${className}`} style={{ width: size, height: size }}>
       <div
@@ -30,6 +44,21 @@ export default function Avatar({ id, initials, size = 40, live = false, verified
       >
         {initials}
       </div>
+      {UUID.test(id) && photo !== "none" && (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          width={size}
+          height={size}
+          unoptimized
+          loading="lazy"
+          onLoad={() => setPhoto("shown")}
+          onError={() => setPhoto("none")}
+          className="absolute inset-0 rounded-full object-cover"
+          style={{ width: size, height: size, opacity: photo === "shown" ? 1 : 0 }}
+        />
+      )}
       {live && (
         <span
           className="absolute rounded-full"
