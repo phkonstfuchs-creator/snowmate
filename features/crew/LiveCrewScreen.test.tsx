@@ -106,6 +106,9 @@ describe("LiveCrewScreen", () => {
     mocks.request.mockResolvedValue({ status: "success", message: "Request sent." });
     render(<LiveCrewScreen graph={graph} />);
 
+    /* With friends, adding sits behind one button. */
+    expect(screen.queryByLabelText("Add a friend by handle")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Add friend" }));
     fireEvent.change(screen.getByLabelText("Add a friend by handle"), { target: { value: "new_friend" } });
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "Ask" }).closest("form")!);
@@ -119,6 +122,8 @@ describe("LiveCrewScreen", () => {
     const { rerender } = render(<LiveCrewScreen graph={{ friends: [], incoming: [], outgoing: [] }} />);
     expect(screen.getByText(/No friends yet/)).toBeInTheDocument();
     expect(screen.getByText("0 friends")).toBeInTheDocument();
+    /* An empty crew shows how to add someone right away. */
+    expect(screen.getByLabelText("Add a friend by handle")).toBeInTheDocument();
 
     rerender(<LiveCrewScreen graph={null} />);
     expect(screen.getByText(/could not be loaded/)).toBeInTheDocument();

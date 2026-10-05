@@ -17,4 +17,10 @@ describe("BottomNav", () => {
     render(<BottomNav />);
     expect(screen.getByRole("link", { name: "Crew" })).toBeInTheDocument();
   });
+
+  it("keeps to the five core destinations", () => {
+    render(<BottomNav />);
+    expect(screen.getAllByRole("link")).toHaveLength(5);
+    expect(screen.queryByRole("link", { name: "Events" })).not.toBeInTheDocument();
+  });
 });

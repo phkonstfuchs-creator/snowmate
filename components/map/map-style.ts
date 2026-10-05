@@ -1,6 +1,6 @@
 import type { StyleSpecification } from "maplibre-gl";
 
-const PAPER = "#efe7d6";
+const PAPER = "#eef2f5";
 
 /* Vector tiles from OpenFreeMap: free, no API key, no request quota.
    Rendered on the GPU, so zooming and panning stay smooth on a phone. */
@@ -48,7 +48,7 @@ export const MAP_TILE_HOSTS = [
 /* The zoom at which a resort's pistes are readable. */
 export const RESORT_ZOOM = 12.6;
 
-/* Warm the grey positron style towards the app's paper palette. Only
+/* Tint the grey positron style towards a snowy winter palette. Only
    layer types and ids every OpenMapTiles style has are touched. */
 export function paperTint(
   layerId: string,
@@ -56,9 +56,9 @@ export function paperTint(
 ): { property: "background-color" | "fill-color"; value: string } | null {
   if (layerType === "background") return { property: "background-color", value: PAPER };
   if (layerType !== "fill") return null;
-  if (/water/u.test(layerId)) return { property: "fill-color", value: "#c9d6dc" };
-  if (/landcover_wood|park|forest|wood/u.test(layerId)) return { property: "fill-color", value: "#dfe0c8" };
-  if (/landcover_ice|glacier/u.test(layerId)) return { property: "fill-color", value: "#f7f4ee" };
+  if (/water/u.test(layerId)) return { property: "fill-color", value: "#bcd3e0" };
+  if (/landcover_wood|park|forest|wood/u.test(layerId)) return { property: "fill-color", value: "#d3e2d3" };
+  if (/landcover_ice|glacier/u.test(layerId)) return { property: "fill-color", value: "#ffffff" };
   return null;
 }
 

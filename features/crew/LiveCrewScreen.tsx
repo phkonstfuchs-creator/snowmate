@@ -90,6 +90,8 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
+  /* Adding friends is one tap away; it opens by itself while the crew is empty. */
+  const [adding, setAdding] = useState(false);
   const [, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -109,52 +111,35 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
   const friends = graph?.friends ?? [];
   const incoming = graph?.incoming ?? [];
   const outgoing = graph?.outgoing ?? [];
+  const showAdd = adding || (graph !== null && friends.length === 0);
 
   return (
     <>
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
-        <div className="px-4 pt-4 pb-3">
-          <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("crew.title")}</h1>
-          <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
-            {friends.length === 1 ? t("crew.friendCount") : t("crew.friendsCount", { n: friends.length })}
-            {incoming.length > 0 ? t("crew.waitingForYou", { n: incoming.length }) : ""}
-          </p>
+        <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+          <div>
+            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("crew.title")}</h1>
+            <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
+              {friends.length === 1 ? t("crew.friendCount") : t("crew.friendsCount", { n: friends.length })}
+              {incoming.length > 0 ? t("crew.waitingForYou", { n: incoming.length }) : ""}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAdding((open) => !open)}
+            aria-expanded={showAdd}
+            aria-controls="crew-add"
+            className="flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-semibold"
+            style={{ background: "var(--rust)", color: "var(--paper-0)" }}
+          >
+            <Icon name="user-plus" size={15} color="var(--paper-0)" strokeWidth={2} />
+            {t("crew.addFriend")}
+          </button>
         </div>
       </header>
 
-      {incoming.length > 0 && (
-        <Section label={t("crew.waitingSection")} count={incoming.length}>
-          {incoming.map((row) => (
-            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
-              <button
-                type="button"
-                onClick={() => run(row.user_id, acceptFriendshipAction)}
-                disabled={pendingId === row.user_id}
-                className="text-mono-label min-h-11 px-3 disabled:opacity-50"
-                style={{ background: "var(--pine)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }}
-              >
-                {t("crew.accept")}
-              </button>
-              <button
-                type="button"
-                onClick={() => run(row.user_id, removeFriendshipAction)}
-                disabled={pendingId === row.user_id}
-                aria-label={t("common.declineName", { name: row.display_name ?? row.handle ?? t("common.rider") })}
-                className="flex h-11 w-11 items-center justify-center disabled:opacity-50"
-                style={{ border: "var(--rule-thin)" }}
-              >
-                <Icon name="x" size={15} color={INK} strokeWidth={2} />
-              </button>
-            </PersonRow>
-          ))}
-        </Section>
-      )}
-
-      <ChatList
-        chats={chats}
-        friends={friends.map((row) => ({ id: row.user_id, name: row.display_name ?? row.handle ?? t("common.rider"), handle: row.handle }))}
-      />
-
+      {showAdd && (
+        <div id="crew-add">
       <section className="px-4 pt-5">
         <InviteLinkCard />
       </section>
@@ -206,6 +191,50 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
           </p>
         </form>
       </section>
+
+      <section className="px-4 pt-3">
+        <div className="flex items-start gap-3 px-4 py-3" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
+          <Icon name="shield-check" size={16} color="var(--accent-primary)" strokeWidth={1.6} className="mt-0.5 flex-shrink-0" />
+          <p className="text-xs leading-snug" style={{ color: INK_2 }}>
+            {t("crew.visibilityNote")}
+          </p>
+        </div>
+      </section>
+        </div>
+      )}
+
+      {incoming.length > 0 && (
+        <Section label={t("crew.waitingSection")} count={incoming.length}>
+          {incoming.map((row) => (
+            <PersonRow key={row.user_id} row={row} onSafety={setSafetyTarget}>
+              <button
+                type="button"
+                onClick={() => run(row.user_id, acceptFriendshipAction)}
+                disabled={pendingId === row.user_id}
+                className="text-mono-label min-h-11 px-3 disabled:opacity-50"
+                style={{ background: "var(--pine)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }}
+              >
+                {t("crew.accept")}
+              </button>
+              <button
+                type="button"
+                onClick={() => run(row.user_id, removeFriendshipAction)}
+                disabled={pendingId === row.user_id}
+                aria-label={t("common.declineName", { name: row.display_name ?? row.handle ?? t("common.rider") })}
+                className="flex h-11 w-11 items-center justify-center disabled:opacity-50"
+                style={{ border: "var(--rule-thin)" }}
+              >
+                <Icon name="x" size={15} color={INK} strokeWidth={2} />
+              </button>
+            </PersonRow>
+          ))}
+        </Section>
+      )}
+
+      <ChatList
+        chats={chats}
+        friends={friends.map((row) => ({ id: row.user_id, name: row.display_name ?? row.handle ?? t("common.rider"), handle: row.handle }))}
+      />
 
       {graph === null && (
         <p role="status" className="mx-4 mt-4 px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>
@@ -280,14 +309,7 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
         </Section>
       )}
 
-      <section className="px-4 pt-5 pb-8">
-        <div className="flex items-start gap-3 px-4 py-3" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
-          <Icon name="shield-check" size={16} color="var(--accent-primary)" strokeWidth={1.6} className="mt-0.5 flex-shrink-0" />
-          <p className="text-xs leading-snug" style={{ color: INK_2 }}>
-            {t("crew.visibilityNote")}
-          </p>
-        </div>
-      </section>
+      <div className="pb-8" />
       {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
     </>
   );

@@ -7,13 +7,11 @@ import Icon from "@/components/ui/Icon";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 
-/* Events sits far forward on purpose: a new user has an empty feed,
-   and then the way in without friends has to be immediately visible.
-   Six destinations is one above the usual ceiling — the price of
-   keeping carpool its own surface. */
+/* Five destinations: the core features. Open events are reached from
+   the feed (a button in its header, and the empty feed points there),
+   so a new user without friends still finds them. */
 const TABS: { href: string; label: MessageKey; icon: string }[] = [
   { href: "/feed", label: "nav.today", icon: "flame" },
-  { href: "/events", label: "nav.events", icon: "calendar-days" },
   { href: "/map", label: "nav.map", icon: "map-pinned" },
   { href: "/carpool", label: "nav.carpool", icon: "car" },
   { href: "/crew", label: "nav.crew", icon: "users" },
@@ -24,6 +22,7 @@ const TABS: { href: string; label: MessageKey; icon: string }[] = [
    in the bar lights up once you are on /people. */
 const OWNED_BY: Record<string, string> = {
   "/people": "/crew",
+  "/events": "/feed",
 };
 
 /* basePath lets the same bar serve the clickable demo under /demo

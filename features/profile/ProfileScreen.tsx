@@ -92,7 +92,7 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
         <div className="px-5 pt-5 space-y-3">
           <button
             className="w-full py-4 font-display text-lg uppercase"
-            style={{ background: OCHRE, color: INK, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
+            style={{ background: OCHRE, color: "var(--on-bright)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             14.99 € one time
           </button>
@@ -353,18 +353,16 @@ export default function ProfileScreen({
             className="card-tap flex w-full items-center gap-3 px-4 py-3.5 text-left"
             style={{ background: OCHRE, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
-            <Icon name="star" size={20} color={INK} fill={INK} strokeWidth={0} />
+            <Icon name="star" size={20} color="var(--on-bright)" fill="var(--on-bright)" strokeWidth={0} />
             <div className="flex-1">
-              <p className="font-display text-lg uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>
+              <p className="font-display text-lg uppercase leading-none" style={{ color: "var(--on-bright)", letterSpacing: 0 }}>
                 Season Pass
               </p>
-              {/* Full ink, not ink-1: on ochre, ink-1 only reaches
-                  4.01:1 and misses AA. */}
-              <p className="text-sm mt-1" style={{ color: INK }}>
+              <p className="text-sm mt-1" style={{ color: "var(--on-bright)" }}>
                 Powder alerts and season stats · 14.99 € one time
               </p>
             </div>
-            <Icon name="chevron-right" size={18} color={INK} strokeWidth={2} />
+            <Icon name="chevron-right" size={18} color="var(--on-bright)" strokeWidth={2} />
           </button>
         </section>
       )}
@@ -531,10 +529,19 @@ export default function ProfileScreen({
         </>
       )}
 
-      {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
-      <LanguageSwitch />
-      {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
-      {isLive && <AccountSection blocked={blocked} />}
+      {/* Settings are needed rarely: one row that opens them. */}
+      <details className="settings-disclosure mx-4 mt-6 mb-4" style={{ borderTop: "var(--rule-thin)" }}>
+        <summary className="flex min-h-12 cursor-pointer items-center justify-between text-sm font-semibold" style={{ color: INK }}>
+          {t("profile.settings")}
+          <Icon name="chevron-down" size={16} color={INK_2} strokeWidth={2} />
+        </summary>
+        <div className="-mx-4">
+          {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
+          <LanguageSwitch />
+          {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
+          {isLive && <AccountSection blocked={blocked} />}
+        </div>
+      </details>
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">

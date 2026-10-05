@@ -1,7 +1,6 @@
 "use client";
 
 import { RidePost, User } from "@/lib/types";
-import ResortScene from "@/components/ResortScene";
 import Avatar from "@/components/ui/Avatar";
 import Tag from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
@@ -33,36 +32,19 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
       style={{
         animationDelay: `${index * 60}ms`,
         background: "var(--paper-1)",
-        border: "var(--rule-thick)",
-        boxShadow: "var(--shadow-print)",
+        border: "var(--rule-thin)",
       }}
       onClick={onClick}
     >
-      {/* Resort scene header */}
-      <div className="relative h-32 overflow-hidden" style={{ borderBottom: "var(--rule-thick)" }}>
-        <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
-        {/* Meeting time as a printed stamp */}
-        <div
-          className="text-mono-label absolute left-0 top-0 flex items-center gap-1.5 px-2.5 py-1"
-          style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
-        >
-          <span className="pulse-dot" style={{ width: 6, height: 6, background: "var(--ochre)" }} />
-          {post.meetTime}
+      {/* Resort, meeting time and riding style in one quiet line */}
+      <div className="flex items-center gap-3 px-4 pt-4">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base font-semibold" style={{ color: "var(--ink-0)", letterSpacing: "-0.01em" }}>
+            {post.resort}
+          </p>
+          <p className="text-mono-label mt-0.5" style={{ color: "var(--ink-2)" }}>{post.meetTime}</p>
         </div>
-        <div className="absolute right-2 top-2">
-          <Tag level={post.abilityLevel} />
-        </div>
-      </div>
-
-      {/* Resort as a printed line under the scene */}
-      <div
-        className="flex items-center gap-1.5 px-4 py-2"
-        style={{ background: "var(--paper-0)", borderBottom: "1px solid var(--border-hairline)" }}
-      >
-        <Icon name="mountain" size={13} color="var(--ink-0)" strokeWidth={2.2} />
-        <span className="font-display text-base uppercase" style={{ color: "var(--ink-0)", letterSpacing: 0 }}>
-          {post.resort}
-        </span>
+        <Tag level={post.abilityLevel} />
       </div>
 
       {/* Body */}
@@ -74,11 +56,6 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
             <span className="text-sm font-bold" style={{ color: "var(--ink-0)" }}>{author.name}</span>
             <div className="flex items-center gap-1.5">
               <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>{post.postedAt}</span>
-              {author.instagram && (
-                <span className="text-[0.6rem] font-bold px-1.5 py-0.5" style={{ color: "var(--ink-2)", border: "1px solid var(--border-hairline)" }}>
-                  IG
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -115,20 +92,20 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               {full ? t("card.full") : t("card.open", { n: open })}
             </span>
             {isHost ? (
-              <span className="text-mono-label flex min-h-11 items-center px-3.5" style={{ background: "var(--ochre)", color: "var(--ink-0)", border: "1px solid var(--ink-0)" }}>
+              <span className="flex min-h-11 items-center px-3.5 text-sm font-semibold" style={{ background: "var(--ochre)", color: "var(--on-bright)", borderRadius: 5 }}>
                 {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
               </span>
             ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
               disabled={full && !isJoined && !isPending}
-              className="text-mono-label min-h-11 px-3.5 transition-transform active:translate-x-[1px] active:translate-y-[1px]"
+              className="min-h-11 px-4 text-sm font-semibold transition-transform active:scale-[0.98]"
               style={
                 isJoined || isPending
-                  ? { background: "var(--paper-2)", color: "var(--ink-1)", border: "1px solid var(--ink-0)" }
+                  ? { background: "var(--paper-2)", color: "var(--ink-1)", borderRadius: 5 }
                   : full
-                  ? { background: "var(--paper-2)", color: "var(--ink-3)", border: "1px solid var(--paper-3)" }
-                  : { background: "var(--rust)", color: "var(--paper-0)", border: "1px solid var(--ink-0)" }
+                  ? { background: "var(--paper-2)", color: "var(--ink-3)", borderRadius: 5 }
+                  : { background: "var(--rust)", color: "var(--paper-0)", borderRadius: 5 }
               }
             >
               {isJoined ? t("card.joined") : isPending ? t("card.asked") : t("card.join")}
@@ -138,14 +115,6 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
         </div>
       </div>
 
-      {/* Tap hint */}
-      <div
-        className="text-mono-label flex items-center justify-center gap-1.5 py-2"
-        style={{ borderTop: "1px solid var(--border-hairline)", color: "var(--ink-2)" }}
-      >
-        {t("card.details")}
-        <Icon name="chevron-right" size={11} color="var(--ink-2)" strokeWidth={2} />
-      </div>
     </article>
   );
 }

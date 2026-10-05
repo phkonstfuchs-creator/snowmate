@@ -113,7 +113,7 @@ function EventDetailSheet({
           <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
           <span
             className="text-mono-label absolute left-0 top-0 px-2 py-1"
-            style={{ background: OCHRE, color: INK }}
+            style={{ background: OCHRE, color: "var(--on-bright)" }}
           >
             {t("events.public")}
           </span>
@@ -270,11 +270,11 @@ function EventCard({
         animationDelay: `${index * 45}ms`,
       }}
     >
-      <div className="relative h-24 overflow-hidden" style={{ borderBottom: "var(--rule-thin)" }}>
+      <div className="relative h-16 overflow-hidden" style={{ borderBottom: "var(--rule-thin)" }}>
         <ResortScene name={post.resort} className="absolute inset-0 h-full w-full" />
         <span
           className="text-mono-label absolute left-0 top-0 px-2 py-1"
-          style={{ background: OCHRE, color: INK }}
+          style={{ background: OCHRE, color: "var(--on-bright)" }}
         >
           {post.date}
         </span>
@@ -377,18 +377,9 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
       {/* States the visibility rule where it applies. Strangers read
           along here, so the rule belongs on the screen rather than in
           a help page. */}
-      <div
-        className="mx-4 mt-4 flex items-start gap-3 px-4 py-3"
-        style={{ background: PAPER_1, border: "var(--rule-thin)" }}
-      >
-        <Icon name="globe" size={16} color={PINE} strokeWidth={1.7} className="mt-0.5 flex-shrink-0" />
-        <div>
-          <p className="text-mono-label" style={{ color: INK }}>{t("events.openToAll")}</p>
-          <p className="mt-1 text-sm leading-snug" style={{ color: INK_1 }}>
-            {t("events.openToAllHint")}
-          </p>
-        </div>
-      </div>
+      <p className="mx-4 mt-4 text-sm leading-snug" style={{ color: INK_1 }}>
+        {t("events.openToAllHint")}
+      </p>
 
       <div className="space-y-3 px-4 pt-4 pb-6">
         {(board.notice || unavailable) && (

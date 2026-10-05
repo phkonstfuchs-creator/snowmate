@@ -19,12 +19,11 @@ export default function Tag({ level, showIcon = true }: { level: AbilityLevel; s
       className={`inline-flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap ${s.cls}`}
       style={{
         height: 24,
-        padding: "0 8px",
-        borderRadius: 0,
-        border: "1px solid currentColor",
-        font: "700 11px var(--font-mono)",
-        letterSpacing: 0,
-        textTransform: "uppercase",
+        padding: "0 9px",
+        borderRadius: 999,
+        background: "var(--paper-2)",
+        color: "var(--ink-1)",
+        font: "600 12px var(--font-body-stack)",
       }}
     >
       {showIcon && <Icon name={s.icon} size={12} />}

@@ -20,9 +20,9 @@ describe("map style", () => {
 
   it("tints only background and known fill layers", () => {
     expect(paperTint("background", "background")?.property).toBe("background-color");
-    expect(paperTint("water", "fill")).toEqual({ property: "fill-color", value: "#c9d6dc" });
-    expect(paperTint("landcover_wood", "fill")?.value).toBe("#dfe0c8");
-    expect(paperTint("landcover_ice_shelf", "fill")?.value).toBe("#f7f4ee");
+    expect(paperTint("water", "fill")).toEqual({ property: "fill-color", value: "#bcd3e0" });
+    expect(paperTint("landcover_wood", "fill")?.value).toBe("#d3e2d3");
+    expect(paperTint("landcover_ice_shelf", "fill")?.value).toBe("#ffffff");
     expect(paperTint("building", "fill")).toBeNull();
     expect(paperTint("water_name", "symbol")).toBeNull();
   });
