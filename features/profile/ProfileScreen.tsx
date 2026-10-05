@@ -12,6 +12,7 @@ import Icon from "@/components/ui/Icon";
 import Avatar from "@/components/ui/Avatar";
 import MyRides from "./MyRides";
 import PostList from "@/features/posts/PostList";
+import PushSettings from "@/features/notifications/PushSettings";
 import type { Post } from "@/features/posts/post";
 import type { LiveRide } from "@/features/rides/live-ride";
 import { signOutAction } from "@/features/auth/actions";
@@ -553,6 +554,7 @@ export default function ProfileScreen({
         </summary>
         <div className="-mx-4">
           {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
+          {isLive && <PushSettings />}
           <LanguageSwitch />
           {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
           {isLive && <AccountSection blocked={blocked} />}

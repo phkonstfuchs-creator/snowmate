@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
+import { dispatchPushSoon } from "@/lib/push/dispatch";
 import { FRIEND_REQUEST_MESSAGES, type FriendRequestOutcome } from "./friendships";
 
 export interface FriendActionState {
@@ -40,7 +41,10 @@ async function requestFriendshipActionImpl(
     const outcome = FRIEND_REQUEST_MESSAGES[data as FriendRequestOutcome];
     if (!outcome) return { status: "error", message: UNAVAILABLE };
 
-    if (outcome.ok) revalidateGraph();
+    if (outcome.ok) {
+      revalidateGraph();
+      dispatchPushSoon();
+    }
     return { status: outcome.ok ? "success" : "error", message: outcome.message };
   } catch {
     return { status: "error", message: UNAVAILABLE };
@@ -56,6 +60,7 @@ async function callGraphFunction(
     const { data, error } = await supabase.rpc(fn, args);
     if (error || data !== true) return false;
     revalidateGraph();
+    if (fn === "accept_friendship") dispatchPushSoon();
     return true;
   } catch {
     return false;

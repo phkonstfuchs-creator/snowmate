@@ -71,6 +71,17 @@ export default function DatenschutzPage() {
         Ablauf der Zeit, beim Blockieren oder Entfreunden sofort unsichtbar. Rechtsgrundlage: deine Einwilligung,
         Art. 6 Abs. 1 lit. a DSGVO, die du jederzeit mit „Stopp“ widerrufen kannst.
       </p>
+      <h3>Push-Benachrichtigungen</h3>
+      <p>
+        Nur wenn du sie in den Einstellungen einschaltest, und nur für das Gerät, auf dem du das tust. Dann speichern
+        wir die Push-Adresse, die dein Browser dafür erzeugt, und schicken über den Push-Dienst deines Browsers
+        (Apple, Google, Mozilla oder Microsoft) kurze Hinweise: wer dir geschrieben, dich als Freund angefragt oder
+        deinen Ride betreffend etwas getan hat. Der Inhalt ist Ende-zu-Ende verschlüsselt, sodass der Push-Dienst ihn
+        nicht lesen kann, und enthält nie den Text einer Nachricht. Der Push-Dienst sieht nur, dass und wann eine
+        Benachrichtigung an dein Gerät geht. Ausschalten kannst du sie jederzeit in Pistl oder in den
+        Geräte-Einstellungen; wir löschen die Push-Adresse dann bzw. sobald der Push-Dienst sie für ungültig erklärt.
+        Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG.
+      </p>
       <h3>Meldungen und Blockierungen</h3>
       <p>
         Wenn du jemanden meldest oder blockierst, speichern wir das, um Missbrauch zu verhindern und Meldungen zu
