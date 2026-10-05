@@ -89,6 +89,20 @@ pictures from its own `/avatar/<id>` route, so browsers never get a
 storage URL. Deleting the account removes the files. See
 [ADR 0022](adr/0022-profile-pictures.md).
 
+## Ski-day posts
+
+Short text, an optional photo and a resort. Only the author and confirmed
+friends see a post. This applies to minors and adults alike, and a block
+hides posts both ways (`private.can_see_posts_of`). Photos are shrunk and
+re-encoded on the phone, which drops EXIF/GPS. The server accepts only
+WebP/JPEG bytes up to 1.5 MB. Photos are stored in the private
+`post-photos` bucket and served only through `/post-photo/<id>` after
+`post_photo_path_for()` allows it. Posting is limited to 10 a day. The
+author can delete a post, and its photo goes with it. Other people's
+posts can be reported through report and block. Posts are in the data
+export, and account deletion removes the photos. See
+[ADR 0024](adr/0024-ski-day-posts.md).
+
 ## Live location
 
 Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed

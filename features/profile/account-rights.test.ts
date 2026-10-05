@@ -56,20 +56,35 @@ describe("deleteAccountAction", () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
-  it("removes the profile picture files before deleting the account", async () => {
-    const list = vi.fn().mockResolvedValue({ data: [{ name: "a.webp" }], error: null });
-    const remove = vi.fn().mockResolvedValue({ data: [], error: null });
+  it("removes the profile picture and post photo files before deleting the account", async () => {
+    const left: Record<string, string[]> = { avatars: ["a.webp"], "post-photos": ["p1.webp", "p2.jpg"] };
+    const list = vi.fn();
+    const remove = vi.fn();
     mocks.createClient.mockResolvedValue({
       rpc: mocks.rpc,
       auth: { signOut: mocks.signOut, getClaims: async () => ({ data: { claims: { sub: "u-1" } } }) },
-      storage: { from: () => ({ list, remove }) },
+      storage: {
+        from: (bucket: string) => ({
+          list: (folder: string) => {
+            list(bucket, folder);
+            return Promise.resolve({ data: left[bucket]!.map((name) => ({ name })), error: null });
+          },
+          remove: (paths: string[]) => {
+            remove(bucket, paths);
+            left[bucket] = [];
+            return Promise.resolve({ data: [], error: null });
+          },
+        }),
+      },
     });
     mocks.rpc.mockResolvedValue({ data: true, error: null });
 
     await expect(deleteAccountAction(initialDeleteAccountState, form(" Delete "))).rejects.toThrow("redirect:/login?account=deleted");
-    expect(list).toHaveBeenCalledWith("u-1");
-    expect(remove).toHaveBeenCalledWith(["u-1/a.webp"]);
-    expect(remove.mock.invocationCallOrder[0]).toBeLessThan(mocks.rpc.mock.invocationCallOrder[0]!);
+    expect(list).toHaveBeenCalledWith("avatars", "u-1");
+    expect(remove).toHaveBeenCalledWith("avatars", ["u-1/a.webp"]);
+    expect(remove).toHaveBeenCalledWith("post-photos", ["u-1/p1.webp", "u-1/p2.jpg"]);
+    expect(remove).toHaveBeenCalledTimes(2);
+    expect(remove.mock.invocationCallOrder[1]).toBeLessThan(mocks.rpc.mock.invocationCallOrder[0]!);
   });
 
   it("deletes, clears the local session and sends the user to sign in", async () => {

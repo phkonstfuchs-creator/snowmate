@@ -49,6 +49,13 @@ export default function DatenschutzPage() {
         sehen es immer nur bestätigte Freunde. Gespeichert wird es bei Supabase in Frankfurt, bis du es entfernst oder
         dein Konto löschst. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
       </p>
+      <h3>Skitag-Posts</h3>
+      <p>
+        Freiwillig: kurzer Text, optional ein Foto und ein Skigebiet. Sehen können sie nur du und deine bestätigten
+        Freunde, egal wie alt du bist. Dein Handy verkleinert das Foto vor dem Hochladen und entfernt dabei Ort und
+        Kameradaten. Gespeichert wird alles bei Supabase in Frankfurt, bis du den Post oder dein Konto löschst.
+        Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
       <h3>Rides, Mitfahrgelegenheiten, Freundschaften, Chat</h3>
       <p>
         Was du anlegst oder schreibst, und mit wem du befreundet bist. Sichtbar ist es nur für die Personen, die die
