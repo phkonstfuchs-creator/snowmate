@@ -725,3 +725,8 @@ body :is(button, a)[style*="background: var(--ink-0)"] {
   border: 0 !important;
   box-shadow: none !important;
 }
+
+/* A row that opens rarely used settings */
+.settings-disclosure > summary { list-style: none; }
+.settings-disclosure > summary::-webkit-details-marker { display: none; }
+.settings-disclosure[open] > summary svg { transform: rotate(180deg); }

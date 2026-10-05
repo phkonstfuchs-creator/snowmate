@@ -43,23 +43,22 @@ describe("MapScreen", () => {
     expect(screen.getAllByText(/2 riding today/).length).toBeGreaterThan(0);
     expect(screen.queryByText("deepest snow")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
     const dialog = screen.getByRole("dialog", { name: "Details for Nordkette" });
     expect(within(dialog).getByText("spots open")).toBeInTheDocument();
     expect(within(dialog).getByText("Lena Moser")).toBeInTheDocument();
     expect(within(dialog).queryByText("lifts open")).not.toBeInTheDocument();
   });
 
-  it("drops the hotspot when nobody is out and reports load failures", () => {
+  it("reports load failures", () => {
     render(<MapScreen live={{ rides: null, defaultCity: "salzburg" }} />);
-    expect(screen.queryByRole("button", { name: /Hotspot/ })).not.toBeInTheDocument();
     expect(screen.getByText(/could not be loaded/)).toBeInTheDocument();
   });
 
   it("keeps the sample conditions in the demo", () => {
     render(<MapScreen />);
     expect(screen.getByText("deepest snow")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
     expect(within(screen.getByRole("dialog")).getByText("lifts open")).toBeInTheDocument();
   });
 
@@ -78,7 +77,7 @@ describe("MapScreen", () => {
     expect(screen.getByText(/new snow · Nordkette/)).toBeInTheDocument();
     expect(screen.getByText("25 cm new · -7° top")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
     const dialog = screen.getByRole("dialog", { name: "Details for Nordkette" });
     expect(within(dialog).getByText("123 cm")).toBeInTheDocument();
     expect(within(dialog).getByText(/13 cm expected/)).toBeInTheDocument();
@@ -87,7 +86,7 @@ describe("MapScreen", () => {
 
   it("says when snow and weather are unavailable", () => {
     render(<MapScreen live={{ rides: [liveRide], defaultCity: "innsbruck", conditions: null }} />);
-    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
     expect(within(screen.getByRole("dialog")).getByText("Snow and weather are not available right now.")).toBeInTheDocument();
   });
 });

@@ -529,10 +529,19 @@ export default function ProfileScreen({
         </>
       )}
 
-      {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
-      <LanguageSwitch />
-      {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
-      {isLive && <AccountSection blocked={blocked} />}
+      {/* Settings are needed rarely: one row that opens them. */}
+      <details className="settings-disclosure mx-4 mt-6 mb-4" style={{ borderTop: "var(--rule-thin)" }}>
+        <summary className="flex min-h-12 cursor-pointer items-center justify-between text-sm font-semibold" style={{ color: INK }}>
+          {t("profile.settings")}
+          <Icon name="chevron-down" size={16} color={INK_2} strokeWidth={2} />
+        </summary>
+        <div className="-mx-4">
+          {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
+          <LanguageSwitch />
+          {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
+          {isLive && <AccountSection blocked={blocked} />}
+        </div>
+      </details>
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">

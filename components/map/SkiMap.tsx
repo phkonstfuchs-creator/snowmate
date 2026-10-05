@@ -163,6 +163,11 @@ export default function SkiMap({
       queueMicrotask(() => setFailed(true));
       return;
     }
+    /* Attribution stays one tap away (the ⓘ button) instead of covering
+       the bottom of a small map. */
+    map.once("load", () => {
+      container.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
+    });
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
     mapRef.current = map;

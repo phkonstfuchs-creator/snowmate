@@ -37,7 +37,6 @@ const SURFACE = "var(--bg-surface-1)";
 const BORDER  = "var(--border-subtle)";
 const MUTED   = "var(--text-tertiary)";
 const INK     = "var(--text-primary)";
-const BRAND   = "var(--accent-primary)";
 
 const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
   fresh: "map.fresh", groomed: "map.groomed", icy: "map.icy", slushy: "map.slushy",
@@ -255,7 +254,6 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
     return live ? applyRideActivity(inCity, live.rides ?? []) : inCity;
   }, [city, live]);
   const sorted      = [...resorts].sort((a, b) => b.ridersNow - a.ridersNow);
-  const hotResort   = sorted[0];
   const totalRiders = resorts.reduce((s, r) => s + r.ridersNow, 0);
   const deepestSnow = [...resorts].sort((a, b) => b.snowDepth - a.snowDepth)[0];
   const conditionsOf = (name: string) => live?.conditions?.[name] ?? null;
@@ -366,29 +364,6 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
         </p>
       )}
 
-      {/* Hotspot strip: only when someone is actually out */}
-      {hotResort && hotResort.ridersNow > 0 && (
-        <button
-          className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] overflow-hidden card-tap"
-          style={{ background: BRAND }}
-          onClick={() => openResort(hotResort)}
-        >
-          <div className="w-14 h-14 rounded-none overflow-hidden flex-shrink-0">
-            <ResortScene name={hotResort.name} className="w-full h-full" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-black text-sm" style={{ color: "var(--text-on-accent)" }}>{hotResort.name}</p>
-            <p className="text-xs font-semibold" style={{ color: "var(--paper-0)" }}>
-              {isLive ? t("map.hotToday", { n: hotResort.ridersNow }) : t("map.hotNow", { n: hotResort.ridersNow, cm: hotResort.snowDepth })}
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-black" style={{ color: "var(--paper-0)" }}>{t("map.hotspot")}</span>
-            <Icon name="chevron-right" size={14} color="var(--text-on-accent)" strokeWidth={2} />
-          </div>
-        </button>
-      )}
-
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
         <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>{t("map.allResorts")}</p>
@@ -400,10 +375,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
               style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
               onClick={() => openResort(resort)}
             >
-              <div className="w-14 h-14 overflow-hidden flex-shrink-0">
-                <ResortScene name={resort.name} className="w-full h-full" />
-              </div>
-              <div className="flex-1 min-w-0 py-2">
+              <div className="flex-1 min-w-0 py-3 pl-4">
                 <div className="flex items-center gap-2">
                   <span className="font-black text-sm truncate" style={{ color: INK }}>{resort.name}</span>
                   {!isLive && resort.conditions === "fresh" && (

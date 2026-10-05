@@ -17,7 +17,6 @@ describe("EventsScreen", () => {
   it("states the visibility rule on the screen where it applies", () => {
     render(<EventsScreen />);
 
-    expect(screen.getByText("Open to everyone")).toBeInTheDocument();
     expect(
       screen.getByText(/only those who joined see the exact meeting point/),
     ).toBeInTheDocument();

@@ -7,9 +7,8 @@ import { useBasePath } from "@/hooks/useBasePath";
 import { City, User } from "@/lib/types";
 import { ME, RIDE_POSTS } from "@/lib/data";
 import { canPostPublicRide } from "./visibility";
-import { APP_TIME_ZONE, type LiveRide } from "./live-ride";
-import { useLocale, useT } from "@/lib/i18n/client";
-import { INTL_LOCALE } from "@/lib/i18n/locales";
+import type { LiveRide } from "./live-ride";
+import { useT } from "@/lib/i18n/client";
 import { translateText } from "@/lib/i18n/translate";
 import { useRideBoard } from "./useRideBoard";
 import EditRideSheet from "./EditRideSheet";
@@ -20,7 +19,6 @@ import RideDetailSheet from "@/components/feed/RideDetailSheet";
 import PostRideModal from "@/components/feed/PostRideModal";
 import PenguinMascot from "@/components/PenguinMascot";
 import UserProfileSheet from "@/features/demo/UserProfileSheet";
-import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
 
@@ -37,7 +35,6 @@ export interface LiveFeed {
 export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const basePath = useBasePath();
   const t = useT();
-  const locale = useLocale();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -72,10 +69,6 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
     ? todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0)
     : city === "innsbruck" ? 174 : 127;
 
-  const liveUsers = [
-    ...new Map(todaysRides.flatMap((ride) => [ride.host, ...ride.participants]).map((user) => [user.id, user])).values(),
-  ];
-
   const handleJoin = async (postId: string) => {
     if (board.pendingId) return;
     const didJoin = await board.toggleJoin(postId);
@@ -93,14 +86,24 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             <PenguinMascot size={28} />
             <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Pistl</span>
           </div>
-          <button
-            onClick={() => setShowPostModal(true)}
-            className="card-tap text-mono-label flex min-h-11 items-center gap-1.5 px-3"
-            style={{ background: "var(--rust)", color: "var(--paper-0)", border: "var(--rule-thin)", boxShadow: "var(--shadow-print)" }}
-          >
-            <Icon name="plus" size={13} strokeWidth={2.6} />
-            {t("common.post")}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`${basePath}/events`}
+              aria-label={t("nav.events")}
+              className="flex h-11 w-11 items-center justify-center"
+              style={{ border: "var(--rule-thin)" }}
+            >
+              <Icon name="calendar-days" size={18} color="var(--ink-0)" strokeWidth={1.8} />
+            </Link>
+            <button
+              onClick={() => setShowPostModal(true)}
+              className="card-tap flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-semibold"
+              style={{ background: "var(--rust)", color: "var(--paper-0)" }}
+            >
+              <Icon name="plus" size={15} strokeWidth={2.4} />
+              {t("feed.postRide")}
+            </button>
+          </div>
         </div>
         <div className="px-4 pb-3">
           <SegmentedControl
@@ -112,53 +115,15 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         </div>
       </header>
 
-      {/* Story strip */}
-      {liveUsers.length > 0 && (
-        <div className="flex gap-3.5 px-4 pt-4 pb-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          {liveUsers.map((u) => (
-            <button
-              key={u.id}
-              /* Live: opens the ride this person is on today. The demo
-                 profile sheet runs on fixture stats, which real accounts
-                 do not have. */
-              onClick={
-                board.isLive
-                  ? () => {
-                      const ride = todaysRides.find(
-                        (item) => item.host.id === u.id || item.participants.some((p) => p.id === u.id),
-                      );
-                      if (ride) setSelectedPostId(ride.post.id);
-                    }
-                  : () => setStoryUser(u)
-              }
-              aria-label={u.name}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform"
-            >
-              <div className="story-ring">
-                <Avatar id={u.id} initials={u.avatar} size={52} />
-              </div>
-              <span className="text-[0.65rem] font-bold max-w-[60px] truncate" style={{ color: "var(--text-tertiary)" }}>
-                {u.name.split(" ")[0]}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Live strip */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
-        <div className="flex items-center gap-2">
+      {/* Only when someone is actually out today */}
+      {ridersToday > 0 && (
+        <div className="flex items-center gap-2 px-4 pt-4 pb-1">
           <span className="pulse-dot" />
-          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
+          <span className="text-mono-label" style={{ color: "var(--ink-1)" }}>
             {t("feed.outToday", { n: ridersToday })}
           </span>
         </div>
-        <span className="text-mono-label" style={{ color: "var(--ink-2)" }}>
-          {board.isLive
-            ? new Date().toLocaleDateString(INTL_LOCALE[locale], { weekday: "short", day: "numeric", month: "short", timeZone: APP_TIME_ZONE })
-            : "Tue 8 Jan"}
-        </span>
-      </div>
+      )}
 
       {live && live.profileComplete === false && (
         <Link
@@ -187,7 +152,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       )}
 
       {/* Feed */}
-      <div className="px-4 pb-4 space-y-3">
+      <div className="px-4 pt-3 pb-4 space-y-3">
         {rides.map((ride, i) => (
           <RideCard
             key={ride.post.id}
@@ -231,21 +196,6 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           </div>
         )}
       </div>
-
-      {/* FAB */}
-      <button
-        onClick={() => setShowPostModal(true)}
-        aria-label={t("feed.postRide")}
-        className="card-tap fixed bottom-[96px] z-40 flex h-14 w-14 items-center justify-center"
-        style={{
-          right: "max(1rem, calc((100vw - 430px) / 2 + 1rem))",
-          background: "var(--rust)",
-          border: "var(--rule-thick)",
-          boxShadow: "var(--shadow-print)",
-        }}
-      >
-        <Icon name="plus" size={22} color="var(--paper-0)" strokeWidth={2.5} />
-      </button>
 
       {/* Post Modal */}
       {showPostModal && (
