@@ -97,3 +97,18 @@ export const SHARE_MESSAGES: Record<Exclude<ShareResult, "sharing" | "throttled"
   unauthenticated: "profile.sessionEnded",
   unavailable: "common.unavailable",
 };
+
+/* The browser's geolocation error as a message key. */
+export function geoErrorKey(error: GeolocationPositionError | null): MessageKey {
+  if (error?.code === 1) return "loc.denied";
+  if (error?.code === 3) return "loc.timeout";
+  return "loc.unavailable";
+}
+
+export function toPosition(geo: GeolocationPosition): Position {
+  return {
+    lat: geo.coords.latitude,
+    lng: geo.coords.longitude,
+    accuracy: Number.isFinite(geo.coords.accuracy) ? geo.coords.accuracy : null,
+  };
+}

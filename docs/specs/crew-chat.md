@@ -26,6 +26,7 @@ write with.
 ## Not included
 
 - Images, voice, reactions, editing or deleting single messages.
+  (Location pins came later: [ski-map-and-conditions](ski-map-and-conditions.md).)
 - Push notifications (separate feature).
 - Group chats outside a ride, chats with strangers or friends of friends.
 - End-to-end encryption.

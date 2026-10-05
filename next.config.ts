@@ -16,8 +16,10 @@ const SECURITY_HEADERS = [
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
       /* Map style, vector tiles, fonts and sprites; CARTO raster tiles
-         are the fallback when the vector style cannot load. */
-      "connect-src 'self' https://tiles.openfreemap.org https://*.basemaps.cartocdn.com",
+         are the fallback when the vector style cannot load. OpenSnowMap
+         draws pistes and lifts, AWS open elevation tiles the hill
+         shading. Must match MAP_TILE_HOSTS in components/map/map-style. */
+      "connect-src 'self' https://tiles.openfreemap.org https://*.basemaps.cartocdn.com https://tiles.opensnowmap.org https://s3.amazonaws.com",
       "form-action 'self'",
       "base-uri 'self'",
       "object-src 'none'",

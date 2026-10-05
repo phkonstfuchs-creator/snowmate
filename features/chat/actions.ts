@@ -2,9 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isValidPosition } from "@/features/location/location";
 import { isUuid, normalizeMessage, toChatMessage, type ChatMessage, type MessageRow, type SendOutcome } from "./message";
 
-const SEND_OUTCOMES: readonly SendOutcome[] = ["sent", "forbidden", "invalid", "rate_limited", "profile_incomplete"];
+const SEND_OUTCOMES: readonly SendOutcome[] = ["sent", "forbidden", "invalid", "rate_limited", "profile_incomplete", "too_young"];
 
 async function openChat(fn: "open_direct_chat" | "open_ride_chat", args: Record<string, string>): Promise<string | null> {
   try {
@@ -40,6 +41,22 @@ export async function sendMessageAction(conversationId: string, text: string): P
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("send_message", { conv: conversationId, message: body });
+    if (error) return "unavailable";
+    return SEND_OUTCOMES.includes(data as SendOutcome) ? (data as SendOutcome) : "unavailable";
+  } catch {
+    return "unavailable";
+  }
+}
+
+/* Sends the caller's current position as a pin. Who may send and see it
+   is decided in the database (friends or ride members, from 16). */
+export async function sendLocationAction(conversationId: string, lat: number, lng: number): Promise<SendOutcome | "unavailable"> {
+  if (!isUuid(conversationId)) return "forbidden";
+  if (!isValidPosition({ lat, lng, accuracy: null })) return "invalid";
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("send_location_message", { conv: conversationId, p_lat: lat, p_lng: lng });
     if (error) return "unavailable";
     return SEND_OUTCOMES.includes(data as SendOutcome) ? (data as SendOutcome) : "unavailable";
   } catch {

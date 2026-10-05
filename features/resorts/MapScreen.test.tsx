@@ -62,4 +62,32 @@ describe("MapScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
     expect(within(screen.getByRole("dialog")).getByText("lifts open")).toBeInTheDocument();
   });
+
+  it("shows live snow and weather from the provider", () => {
+    const conditions = {
+      topTempC: -7, baseTempC: -1, windKmh: 18, kind: "snow" as const, snowDepthCm: 123,
+      newSnowCm: 25, forecastSnowCm: 13, updatedAt: "2026-12-20T10:00",
+      days: [
+        { date: "2026-12-21", snowCm: 0, kind: "sun" as const, maxC: 2, minC: -6 },
+        { date: "2026-12-22", snowCm: 13, kind: "snow" as const, maxC: -4, minC: -10 },
+        { date: "2026-12-23", snowCm: 0, kind: "cloud" as const, maxC: -7, minC: -7 },
+      ],
+    };
+    render(<MapScreen live={{ rides: [liveRide], defaultCity: "innsbruck", conditions: { Nordkette: conditions, Kühtai: null } }} />);
+
+    expect(screen.getByText(/new snow · Nordkette/)).toBeInTheDocument();
+    expect(screen.getByText("25 cm new · -7° top")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    const dialog = screen.getByRole("dialog", { name: "Details for Nordkette" });
+    expect(within(dialog).getByText("123 cm")).toBeInTheDocument();
+    expect(within(dialog).getByText(/13 cm expected/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Open-Meteo/)).toBeInTheDocument();
+  });
+
+  it("says when snow and weather are unavailable", () => {
+    render(<MapScreen live={{ rides: [liveRide], defaultCity: "innsbruck", conditions: null }} />);
+    fireEvent.click(screen.getByRole("button", { name: /Hotspot/ }));
+    expect(within(screen.getByRole("dialog")).getByText("Snow and weather are not available right now.")).toBeInTheDocument();
+  });
 });

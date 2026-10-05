@@ -13,3 +13,4 @@ The workflow is in [../AI_WORKFLOW.md](../AI_WORKFLOW.md).
 | [Sign-up with the full profile](signup-with-profile.md) | Agreed |
 | [Live location](live-location.md) | Agreed, details Proposed |
 | [Crew chat](crew-chat.md) | Agreed |
+| [Ski map, resort conditions and location pins](ski-map-and-conditions.md) | Agreed |

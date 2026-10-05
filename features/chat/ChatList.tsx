@@ -9,7 +9,7 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import { initialsFor } from "@/features/profile/profile-input";
 import { openDirectChatAction } from "./actions";
 import { chatTitle } from "./chat-title";
-import type { ChatSummary } from "./message";
+import { LOCATION_BODY, type ChatSummary } from "./message";
 
 const INK = "var(--ink-0)";
 const INK_2 = "var(--ink-2)";
@@ -91,7 +91,8 @@ export default function ChatList({ chats, friends = [] }: { chats: ChatSummary[]
         <ul className="mt-2 space-y-2">
           {chats.map((chat) => {
             const { title, subtitle } = chatTitle(chat, t, locale);
-            const preview = chat.lastBody ? `${chat.lastIsMine ? `${t("chat.you")}: ` : ""}${chat.lastBody}` : subtitle ?? "";
+            const lastText = chat.lastBody === LOCATION_BODY ? t("chat.locationPreview") : chat.lastBody;
+            const preview = lastText ? `${chat.lastIsMine ? `${t("chat.you")}: ` : ""}${lastText}` : subtitle ?? "";
             return (
               <li key={chat.id}>
                 <Link

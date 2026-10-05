@@ -19,10 +19,14 @@ import Avatar from "@/components/ui/Avatar";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
 import type { MapPerson } from "@/components/map/SkiMap";
+import { RESORT_ZOOM } from "@/components/map/map-style";
+import { resortCoordinates } from "@/lib/resorts";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
 import type { FriendLocation } from "@/features/location/location";
 import { initialsFor } from "@/features/profile/profile-input";
+import ConditionsPanel, { ConditionsLine } from "@/features/conditions/ConditionsPanel";
+import type { ResortConditions } from "@/features/conditions/conditions";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
@@ -45,11 +49,13 @@ function ResortDetailSheet({
   resort,
   ridesHere,
   isLive,
+  conditions,
   onClose,
 }: {
   resort: ResortStatus;
   ridesHere: LiveRide[];
   isLive: boolean;
+  conditions: ResortConditions | null;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -121,6 +127,8 @@ function ResortDetailSheet({
           ))}
         </div>
 
+        {isLive && <ConditionsPanel conditions={conditions} />}
+
         {/* Ability bars */}
         <div className="px-5 mt-4">
           <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>{t("map.whoRidesWhat")}</p>
@@ -180,6 +188,10 @@ export interface LiveMap {
   friends?: FriendLocation[] | null;
   /* false under 16: sharing is not offered (ADR 0019). */
   canShare?: boolean;
+  /* Snow and weather by resort name; null when the provider is down. */
+  conditions?: Record<string, ResortConditions | null> | null;
+  /* A position someone sent in a chat, opened from there. */
+  pin?: { lat: number; lng: number; label: string } | null;
 }
 
 type LocationState = ReturnType<typeof useLiveLocation>;
@@ -203,7 +215,10 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
 
 function MapBody({ live, location }: { live?: LiveMap; location?: LocationState }) {
   const t = useT();
-  const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(null);
+  const pin = live?.pin ?? null;
+  const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(
+    pin ? { lat: pin.lat, lng: pin.lng, zoom: 15, key: 1 } : null,
+  );
   const people = useMemo<MapPerson[]>(
     () =>
       (location?.friends ?? []).map((friend) => ({
@@ -216,6 +231,13 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
     [location?.friends],
   );
   const focusOn = (lat: number, lng: number) => setFocus({ lat, lng, zoom: 14, key: Date.now() });
+  /* Opening a resort also flies the map there, close enough to read its
+     pistes once the sheet is closed. */
+  const openResort = (resort: ResortStatus) => {
+    const coordinates = resortCoordinates(resort.name);
+    if (coordinates) setFocus((prev) => ({ lat: coordinates[0], lng: coordinates[1], zoom: RESORT_ZOOM, key: (prev?.key ?? 0) + 1 }));
+    setActiveSheet({ type: "resort", resort });
+  };
   const locateMe = () => {
     if (!location) return;
     if (location.me) focusOn(location.me.lat, location.me.lng);
@@ -236,6 +258,11 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
   const hotResort   = sorted[0];
   const totalRiders = resorts.reduce((s, r) => s + r.ridersNow, 0);
   const deepestSnow = [...resorts].sort((a, b) => b.snowDepth - a.snowDepth)[0];
+  const conditionsOf = (name: string) => live?.conditions?.[name] ?? null;
+  const freshest = resorts
+    .map((resort) => ({ resort, conditions: conditionsOf(resort.name) }))
+    .filter((item): item is { resort: ResortStatus; conditions: ResortConditions } => item.conditions !== null)
+    .sort((a, b) => b.conditions.newSnowCm - a.conditions.newSnowCm)[0];
 
   return (
     <>
@@ -258,6 +285,16 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
               </p>
             </div>
           )}
+          {isLive && freshest && (
+            <div className="text-right">
+              <p className="text-mono-data" style={{ color: INK }}>
+                {freshest.conditions.newSnowCm} cm
+              </p>
+              <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>
+                {t("cond.mostNewSnow")} · {freshest.resort.name}
+              </p>
+            </div>
+          )}
         </div>
         <div className="px-4 pb-3">
           <SegmentedControl
@@ -274,7 +311,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
         <SkiMap
           city={city}
           resorts={resorts}
-          onSelect={(resort) => setActiveSheet({ type: "resort", resort })}
+          onSelect={openResort}
           me={location?.me ?? null}
           people={people}
           onPersonSelect={(id) => {
@@ -283,6 +320,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           }}
           focus={focus}
           locateRequest={locateRequest}
+          pin={pin}
         />
         {location && (
           <button
@@ -333,7 +371,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
         <button
           className="flex items-center gap-3 mx-4 mt-3 p-3 rounded-none w-[calc(100%-2rem)] overflow-hidden card-tap"
           style={{ background: BRAND }}
-          onClick={() => setActiveSheet({ type: "resort", resort: hotResort })}
+          onClick={() => openResort(hotResort)}
         >
           <div className="w-14 h-14 rounded-none overflow-hidden flex-shrink-0">
             <ResortScene name={hotResort.name} className="w-full h-full" />
@@ -360,7 +398,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
               key={resort.name}
               className="card-tap w-full flex items-center gap-3 p-0 rounded-none overflow-hidden anim-fade-up text-left"
               style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
-              onClick={() => setActiveSheet({ type: "resort", resort })}
+              onClick={() => openResort(resort)}
             >
               <div className="w-14 h-14 overflow-hidden flex-shrink-0">
                 <ResortScene name={resort.name} className="w-full h-full" />
@@ -375,6 +413,12 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="pulse-dot" style={{ width: 5, height: 5 }} />
                   <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{t("map.riding", { n: resort.ridersNow })}</span>
+                  {isLive && conditionsOf(resort.name) && (
+                    <>
+                      <span style={{ color: "var(--ink-3)" }}>·</span>
+                      <ConditionsLine conditions={conditionsOf(resort.name)!} />
+                    </>
+                  )}
                   {!isLive && (
                     <>
                       <span style={{ color: "var(--ink-3)" }}>·</span>
@@ -398,6 +442,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           resort={activeSheet.resort}
           ridesHere={ridesAt(activeSheet.resort, rides)}
           isLive={isLive}
+          conditions={conditionsOf(activeSheet.resort.name)}
           onClose={() => setActiveSheet(null)}
         />
       )}

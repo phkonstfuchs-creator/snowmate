@@ -88,15 +88,21 @@ users still see their friends' positions. See
 Map tiles come from OpenFreeMap (fallback: CARTO). Like any web map, the
 tile server sees the visitor's IP address and which map area is loaded,
 never the stored position or who is sharing. The browser fetches tiles
-directly; the CSP allows only these two hosts. See
-[ADR 0016](adr/0016-vector-map-and-faster-navigation.md).
+directly; the CSP allows only these hosts. Pistes and lifts come from
+OpenSnowMap and hill shading from AWS open elevation tiles, on the same
+terms. Snow and weather come from Open-Meteo, fetched by the server
+without any user data. See
+[ADR 0016](adr/0016-vector-map-and-faster-navigation.md) and
+[ADR 0020](adr/0020-piste-map-conditions-and-chat-pins.md).
 
 ## Chat
 
 Direct chats only between confirmed friends; ride chats only for the host
 and accepted riders. A block or unfriending closes a direct chat for both,
-and a block hides that person's messages in shared ride chats. Text only,
-up to 1000 characters, 30 messages a minute. Messages are not end-to-end
+and a block hides that person's messages in shared ride chats. Text up to
+1000 characters, 30 messages a minute. A position can be sent as a pin
+from 16 (like live location); its coordinates are readable for 24 hours
+and then deleted. Messages are not end-to-end
 encrypted; they are in the export and go with the account. See
 [ADR 0017](adr/0017-chat-for-friends-and-ride-crews.md).
 

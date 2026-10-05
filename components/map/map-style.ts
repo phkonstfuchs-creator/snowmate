@@ -26,6 +26,28 @@ export const RASTER_FALLBACK_STYLE: StyleSpecification = {
   ],
 };
 
+/* Pistes and lifts from OpenSnowMap (OpenStreetMap data), drawn as a
+   transparent layer over the base map: coloured by difficulty, with lift
+   lines and names. */
+export const PISTE_TILES = "https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png";
+export const PISTE_ATTRIBUTION =
+  'Pisten &copy; <a href="https://www.opensnowmap.org">OpenSnowMap</a>, Daten &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+/* Open elevation tiles (AWS Open Data, Mapzen terrarium encoding) for
+   hill shading, so slopes and ridges are visible. */
+export const TERRAIN_TILES = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
+
+/* Hosts the map loads tiles from; next.config.ts allows exactly these. */
+export const MAP_TILE_HOSTS = [
+  "https://tiles.openfreemap.org",
+  "https://*.basemaps.cartocdn.com",
+  "https://tiles.opensnowmap.org",
+  "https://s3.amazonaws.com",
+] as const;
+
+/* The zoom at which a resort's pistes are readable. */
+export const RESORT_ZOOM = 12.6;
+
 /* Warm the grey positron style towards the app's paper palette. Only
    layer types and ids every OpenMapTiles style has are touched. */
 export function paperTint(

@@ -6,7 +6,10 @@ export const POLL_INTERVAL_MS = 4000;
 const FORBIDDEN_CHARS = /[\u0001-\u0009\u000b\u000c\u000e-\u001f\u007f‪-‮⁦-⁩]/u;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
-export type SendOutcome = "sent" | "forbidden" | "invalid" | "rate_limited" | "profile_incomplete";
+export type SendOutcome = "sent" | "forbidden" | "invalid" | "rate_limited" | "profile_incomplete" | "too_young";
+
+/* The stored text of a location message; the list shows a label instead. */
+export const LOCATION_BODY = "📍";
 
 export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID.test(value);
@@ -27,6 +30,9 @@ export interface ChatMessage {
   body: string;
   createdAt: string;
   isMine: boolean;
+  kind: "text" | "location";
+  /* Location messages: the pin, or null once it is older than 24 h. */
+  position: { lat: number; lng: number } | null;
 }
 
 export interface ChatSummary {
@@ -52,6 +58,9 @@ export interface MessageRow {
   body: string;
   created_at: string;
   is_mine: boolean;
+  kind?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface ConversationRow {
@@ -77,6 +86,11 @@ export function toChatMessage(row: MessageRow): ChatMessage {
     body: row.body,
     createdAt: row.created_at,
     isMine: row.is_mine === true,
+    kind: row.kind === "location" ? "location" : "text",
+    position:
+      row.kind === "location" && Number.isFinite(row.lat) && Number.isFinite(row.lng)
+        ? { lat: row.lat as number, lng: row.lng as number }
+        : null,
   };
 }
 
