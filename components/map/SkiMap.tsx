@@ -12,6 +12,7 @@ import {
   PISTE_ATTRIBUTION,
   PISTE_TILES,
   RASTER_FALLBACK_STYLE,
+  TERRAIN_ATTRIBUTION,
   TERRAIN_TILES,
   VECTOR_STYLE_URL,
   accuracyCircle,
@@ -84,6 +85,7 @@ function addSkiLayers(map: MapLibreMap) {
     encoding: "terrarium",
     tileSize: 256,
     maxzoom: 14,
+    attribution: TERRAIN_ATTRIBUTION,
   });
   map.addLayer(
     {

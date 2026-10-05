@@ -107,7 +107,12 @@ never the stored position or who is sharing. The browser fetches tiles
 directly; the CSP allows only these hosts. Pistes and lifts come from
 OpenSnowMap and hill shading from AWS open elevation tiles, on the same
 terms. Snow and weather come from Open-Meteo, fetched by the server
-without any user data. See
+without any user data. Resort photos come from Wikipedia/Wikimedia
+Commons, fetched and resized by the server (next/image), so browsers
+never contact Wikimedia; only freely licensed JPEGs are used, with the
+author and licence from Wikimedia's metadata shown under each photo
+(ADR 0023). All third-party data, pictures, fonts and software are
+listed with their licences on `/lizenzen`. See
 [ADR 0016](adr/0016-vector-map-and-faster-navigation.md) and
 [ADR 0020](adr/0020-piste-map-conditions-and-chat-pins.md).
 

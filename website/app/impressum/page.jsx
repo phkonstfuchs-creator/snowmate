@@ -18,5 +18,7 @@ export default function Imprint() {
     <p>Pistl wird von {operatorName} entwickelt. Die App befindet sich in Entwicklung und richtet sich an Skifahrer und Snowboarder rund um Innsbruck und Salzburg.</p>
     <h2>Darstellungen auf dieser Website</h2>
     <p>Die gezeigten App-Ansichten enthalten Beispieldaten und zeigen einen möglichen Entwicklungsstand. Funktionen und Gestaltung können sich bis zum Start ändern. Die Bergillustration wurde für diese Website mit KI-Unterstützung erstellt.</p>
+    <h2>Schriften und Symbole</h2>
+    <p>Schriften Hanken Grotesk (Hanken Design Co.), Jost (indestructible type*) und Space Mono (Colophon Foundry) unter der <a href="https://openfontlicense.org">SIL Open Font License 1.1</a>; Symbole von <a href="https://lucide.dev/license">Lucide</a> (ISC-Lizenz). Quellen und Lizenzen der App: <a href="https://app.pistl.app/lizenzen">app.pistl.app/lizenzen</a>.</p>
   </LegalShell>;
 }

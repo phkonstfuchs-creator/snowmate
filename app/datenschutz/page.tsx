@@ -113,6 +113,10 @@ export default function DatenschutzPage() {
           <strong>Open-Meteo</strong>: Schnee- und Wetterdaten der Skigebiete. Die fragt der Pistl-Server ab; dabei
           werden keine Daten über dich übertragen.
         </li>
+        <li>
+          <strong>Wikipedia / Wikimedia Commons</strong>: Fotos der Skigebiete. Der Pistl-Server lädt sie und liefert
+          sie selbst aus; dein Browser hat keinen Kontakt zu Wikimedia.
+        </li>
       </ul>
       <p>
         Soweit dabei Daten in die USA gelangen, geschieht das auf Grundlage des EU-US Data Privacy Framework oder von

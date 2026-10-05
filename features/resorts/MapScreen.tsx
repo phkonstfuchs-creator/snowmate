@@ -27,6 +27,9 @@ import type { FriendLocation } from "@/features/location/location";
 import { initialsFor } from "@/features/profile/profile-input";
 import ConditionsPanel, { ConditionsLine } from "@/features/conditions/ConditionsPanel";
 import type { ResortConditions } from "@/features/conditions/conditions";
+import type { ResortPhoto } from "./resort-photo";
+import ResortPhotoCredit from "./ResortPhotoCredit";
+import Image from "next/image";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
@@ -49,12 +52,14 @@ function ResortDetailSheet({
   ridesHere,
   isLive,
   conditions,
+  photo,
   onClose,
 }: {
   resort: ResortStatus;
   ridesHere: LiveRide[];
   isLive: boolean;
   conditions: ResortConditions | null;
+  photo: ResortPhoto | null;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -89,8 +94,18 @@ function ResortDetailSheet({
 
         {/* Vector scene hero */}
         <div className="mx-5 mt-4" style={{ border: "var(--rule-thin)" }}>
-          <div className="relative overflow-hidden" style={{ height: 118 }}>
-            <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
+          <div className="relative overflow-hidden" style={{ height: photo ? 190 : 118 }}>
+            {photo ? (
+              <Image
+                src={photo.src}
+                alt={resort.name}
+                fill
+                sizes="(max-width: 430px) 100vw, 430px"
+                className="object-cover"
+              />
+            ) : (
+              <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
+            )}
             {!isLive && (
               <span
                 className="text-mono-label absolute right-0 top-0 px-2 py-1"
@@ -125,6 +140,8 @@ function ResortDetailSheet({
             </div>
           ))}
         </div>
+
+        {photo && <ResortPhotoCredit photo={photo} />}
 
         {isLive && <ConditionsPanel conditions={conditions} />}
 
@@ -189,6 +206,8 @@ export interface LiveMap {
   canShare?: boolean;
   /* Snow and weather by resort name; null when the provider is down. */
   conditions?: Record<string, ResortConditions | null> | null;
+  /* Freely licensed photos by resort name, with their credits. */
+  photos?: Record<string, ResortPhoto>;
   /* A position someone sent in a chat, opened from there. */
   pin?: { lat: number; lng: number; label: string } | null;
 }
@@ -415,6 +434,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           ridesHere={ridesAt(activeSheet.resort, rides)}
           isLive={isLive}
           conditions={conditionsOf(activeSheet.resort.name)}
+          photo={live?.photos?.[activeSheet.resort.name] ?? null}
           onClose={() => setActiveSheet(null)}
         />
       )}

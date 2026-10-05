@@ -36,6 +36,8 @@ export const PISTE_ATTRIBUTION =
 /* Open elevation tiles (AWS Open Data, Mapzen terrarium encoding) for
    hill shading, so slopes and ridges are visible. */
 export const TERRAIN_TILES = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
+export const TERRAIN_ATTRIBUTION =
+  'Gelände <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen, USGS, NASA SRTM u. a.</a>';
 
 /* Hosts the map loads tiles from; next.config.ts allows exactly these. */
 export const MAP_TILE_HOSTS = [

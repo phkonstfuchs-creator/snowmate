@@ -2,6 +2,7 @@ import MapScreen from "@/features/resorts/MapScreen";
 import { getOwnProfile } from "@/features/profile/queries";
 import { listRides } from "@/features/rides/queries";
 import { getResortConditions } from "@/features/conditions/queries";
+import { getResortPhotos } from "@/features/resorts/queries";
 import { isValidPosition } from "@/features/location/location";
 import { getCanShareLocation, getFriendLocations, getMySharingEnd } from "@/features/location/queries";
 
@@ -15,13 +16,14 @@ function readPin(params: Record<string, string | string[] | undefined>) {
 
 export default async function MapPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pin = readPin(await searchParams);
-  const [result, profile, sharingEnd, friends, canShare, conditions] = await Promise.all([
+  const [result, profile, sharingEnd, friends, canShare, conditions, photos] = await Promise.all([
     listRides(),
     getOwnProfile(),
     getMySharingEnd(),
     getFriendLocations(),
     getCanShareLocation(),
     getResortConditions(),
+    getResortPhotos(),
   ]);
 
   return (
@@ -33,6 +35,7 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
         friends,
         canShare,
         conditions,
+        photos,
         pin,
       }}
     />

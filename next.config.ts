@@ -47,6 +47,11 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  /* Resort photos from Wikimedia are resized and served by Pistl, so
+     browsers never contact Wikimedia (no IP addresses leave). */
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "upload.wikimedia.org", port: "", pathname: "/wikipedia/**", search: "" }],
+  },
   experimental: {
     /* Keep a visited tab's server render for 30 s, so switching back and
        forth between tabs is instant. Every write in the app ends in
