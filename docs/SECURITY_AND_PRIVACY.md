@@ -79,8 +79,11 @@ Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed
 friends see it; friends of friends, strangers and blocked people never
 do. Only the latest position is stored, rounded to about 10 m, no
 history; it is part of the data export and goes with the account. A
-browser only reports the position while the app is open. See
-[ADR 0015](adr/0015-live-location-for-confirmed-friends.md).
+browser only reports the position while the app is open. Sharing starts
+at 16 (by birth date; without one, only an account marked adult); younger
+users still see their friends' positions. See
+[ADR 0015](adr/0015-live-location-for-confirmed-friends.md) and
+[ADR 0019](adr/0019-live-location-from-16.md).
 
 Map tiles come from OpenFreeMap (fallback: CARTO). Like any web map, the
 tile server sees the visitor's IP address and which map area is loaded,

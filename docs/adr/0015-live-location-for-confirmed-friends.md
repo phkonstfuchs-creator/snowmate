@@ -2,6 +2,7 @@
 
 - **Status:** Accepted (owner, 2026-10-05)
 - **Date:** 2026-10-04
+- **Amended by:** [0019](0019-live-location-from-16.md) (sharing only from 16)
 - **Spec:** [live-location](../specs/live-location.md)
 - **Checks:** `supabase/tests/database/live_locations.test.sql`,
   `features/location/*.test.ts(x)`

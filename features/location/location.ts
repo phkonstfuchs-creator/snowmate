@@ -88,11 +88,12 @@ export function minutesSince(iso: string, now: Date): number {
   return Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 60_000));
 }
 
-export type ShareResult = "sharing" | "throttled" | "invalid" | "profile_incomplete" | "unauthenticated" | "unavailable";
+export type ShareResult = "sharing" | "throttled" | "invalid" | "profile_incomplete" | "too_young" | "unauthenticated" | "unavailable";
 
 export const SHARE_MESSAGES: Record<Exclude<ShareResult, "sharing" | "throttled">, MessageKey> = {
   invalid: "loc.invalid",
   profile_incomplete: "common.profileIncomplete",
+  too_young: "loc.from16",
   unauthenticated: "profile.sessionEnded",
   unavailable: "common.unavailable",
 };

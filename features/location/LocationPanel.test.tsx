@@ -51,4 +51,13 @@ describe("LocationPanel", () => {
     );
     expect(screen.getByText("Friends' positions could not be loaded.")).toBeInTheDocument();
   });
+
+  it("offers no sharing under 16 but still lists friends", () => {
+    render(
+      <LocationPanel sharingEnd={null} canShare={false} busy={false} error={null} friends={[friend]} onShare={vi.fn()} onStop={vi.fn()} onFocusFriend={vi.fn()} />,
+    );
+    expect(screen.queryByRole("button", { name: "Share" })).not.toBeInTheDocument();
+    expect(screen.getByText(/You can share your location from 16/)).toBeInTheDocument();
+    expect(screen.getByText("Friends on the map (1)")).toBeInTheDocument();
+  });
 });

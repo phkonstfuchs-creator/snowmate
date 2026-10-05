@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(33);
 
 -- me (1), friend (2), friend of friend (3), stranger (4), blocked friend (5)
 insert into auth.users (id, email)
@@ -11,7 +11,7 @@ from generate_series(1, 5) n;
 
 update public.profiles
 set display_name = 'Rider ' || right(id::text, 1), handle = 'loc_' || right(id::text, 1),
-    city = 'innsbruck', ability_level = 'chill'
+    city = 'innsbruck', ability_level = 'chill', birth_date = date '1990-01-01'
 where id::text like 'e0e0e0e0-%';
 
 insert into public.friendships (requester_id, addressee_id, status) values
@@ -94,11 +94,58 @@ select is((select count(*)::int from public.list_friend_locations() where handle
 select lives_ok($$select public.stop_sharing_location()$$, 'I can stop sharing');
 select is(public.my_location_sharing(), null, 'after stopping nothing is shared');
 
+-- Only from 16 (ADR 0019): 15-year-old (6), 16 today (7), no birth date (8).
+reset role;
+insert into auth.users (id, email)
+select ('e0e0e0e0-0000-4000-8000-00000000000' || n)::uuid, 'loc' || n || '@example.com'
+from generate_series(6, 8) n;
+update public.profiles
+set display_name = 'Rider ' || right(id::text, 1), handle = 'loc_' || right(id::text, 1),
+    city = 'innsbruck', ability_level = 'chill'
+where id::text like 'e0e0e0e0-%' and right(id::text, 1) in ('6', '7', '8');
+update public.profiles set birth_date = (private.local_today() - interval '16 years' + interval '1 day')::date
+where id = 'e0e0e0e0-0000-4000-8000-000000000006';
+update public.profiles set birth_date = (private.local_today() - interval '16 years')::date
+where id = 'e0e0e0e0-0000-4000-8000-000000000007';
+insert into public.friendships (requester_id, addressee_id, status) values
+  ('e0e0e0e0-0000-4000-8000-000000000006', 'e0e0e0e0-0000-4000-8000-000000000003', 'accepted');
+
+set local role authenticated;
+set local request.jwt.claim.sub = 'e0e0e0e0-0000-4000-8000-000000000006';
+select is(public.can_share_my_location(), false, 'someone under 16 may not share');
+select is(public.share_my_location(47, 11, 15, 60), 'too_young', 'sharing under 16 is refused');
+select results_eq($$select handle from public.list_friend_locations()$$, $$values ('loc_3'::text)$$,
+  'someone under 16 still sees confirmed friends');
+set local request.jwt.claim.sub = 'e0e0e0e0-0000-4000-8000-000000000007';
+select is(public.can_share_my_location(), true, 'from the 16th birthday sharing is allowed');
+select is(public.share_my_location(47, 11, 15, 60), 'sharing', 'a 16-year-old can share');
+set local request.jwt.claim.sub = 'e0e0e0e0-0000-4000-8000-000000000008';
+select is(public.share_my_location(47, 11, 15, 60), 'too_young', 'without a birth date sharing is refused');
+reset role;
+update public.profiles set is_minor = false where id = 'e0e0e0e0-0000-4000-8000-000000000008';
+set local role authenticated;
+select is(public.can_share_my_location(), true, 'an account the operator marked adult may share without a birth date');
+
+-- A position stored for someone under 16 is never shown.
+reset role;
+insert into public.live_locations (user_id, lat, lng, expires_at)
+values ('e0e0e0e0-0000-4000-8000-000000000006', 47.1, 11.2, now() + interval '1 hour');
+set local role authenticated;
+set local request.jwt.claim.sub = 'e0e0e0e0-0000-4000-8000-000000000003';
+select is((select count(*)::int from public.list_friend_locations() where handle = 'loc_6'), 0,
+  'a position of someone under 16 is not shown to friends');
+set local request.jwt.claim.sub = 'e0e0e0e0-0000-4000-8000-000000000006';
+select lives_ok($$select public.share_my_location(47, 11, 15, 60)$$, 'a refused share');
+reset role;
+select is((select count(*)::int from public.live_locations where user_id = 'e0e0e0e0-0000-4000-8000-000000000006'), 0,
+  'a refused share removes any stored position');
+
 -- Anonymous callers.
 reset role;
 set local role anon;
 select throws_ok($$select public.list_friend_locations()$$, '42501', null, 'anon cannot list positions');
 select throws_ok($$select public.share_my_location(47, 11, 10, 60)$$, '42501', null, 'anon cannot share');
+select throws_ok($$select public.can_share_my_location()$$, '42501', null, 'anon cannot ask');
 reset role;
 
 select * from finish();

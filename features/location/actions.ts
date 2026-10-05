@@ -11,7 +11,7 @@ import {
   type ShareResult,
 } from "./location";
 
-const KNOWN: readonly ShareResult[] = ["sharing", "throttled", "invalid", "profile_incomplete", "unauthenticated"];
+const KNOWN: readonly ShareResult[] = ["sharing", "throttled", "invalid", "profile_incomplete", "too_young", "unauthenticated"];
 
 /* Starts sharing (minutes given) or refreshes the position while sharing
    (minutes null). Who may see it is decided in the database. */

@@ -494,6 +494,7 @@ export const en = {
   "loc.for1h": "1 hour",
   "loc.for4h": "4 hours",
   "loc.forDay": "12 hours",
+  "loc.from16": "You can share your location from 16. You still see your friends' positions.",
   "loc.friendsOnMap": "Friends on the map ({n})",
   "loc.friendsUnavailable": "Friends' positions could not be loaded.",
   "loc.howLong": "Sharing stops by itself after the time you choose, or whenever you tap Stop.",

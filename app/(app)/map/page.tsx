@@ -1,14 +1,15 @@
 import MapScreen from "@/features/resorts/MapScreen";
 import { getOwnProfile } from "@/features/profile/queries";
 import { listRides } from "@/features/rides/queries";
-import { getFriendLocations, getMySharingEnd } from "@/features/location/queries";
+import { getCanShareLocation, getFriendLocations, getMySharingEnd } from "@/features/location/queries";
 
 export default async function MapPage() {
-  const [result, profile, sharingEnd, friends] = await Promise.all([
+  const [result, profile, sharingEnd, friends, canShare] = await Promise.all([
     listRides(),
     getOwnProfile(),
     getMySharingEnd(),
     getFriendLocations(),
+    getCanShareLocation(),
   ]);
 
   return (
@@ -18,6 +19,7 @@ export default async function MapPage() {
         defaultCity: profile?.city ?? "innsbruck",
         sharingEnd,
         friends,
+        canShare,
       }}
     />
   );
