@@ -36,7 +36,7 @@ describe("ProfileEditSheet", () => {
     expect(screen.getByLabelText("Name")).toHaveValue("Lena Moser");
     expect(screen.getByLabelText("Handle")).toHaveValue("lena_m");
     expect(screen.getByRole("radio", { name: "Salzburg" })).toBeChecked();
-    expect(screen.getByRole("checkbox", { name: "Off-piste" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Powder & freeride" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "Park" })).not.toBeChecked();
   });
 

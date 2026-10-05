@@ -45,7 +45,7 @@ describe("LiveCrewScreen", () => {
 
     expect(screen.getByText("1 friend · 1 waiting for you")).toBeInTheDocument();
     expect(screen.getByText("Lena Moser")).toBeInTheDocument();
-    expect(screen.getByText("@lena_m · Salzburg · Off-piste")).toBeInTheDocument();
+    expect(screen.getByText("@lena_m · Salzburg · Powder & freeride")).toBeInTheDocument();
     expect(screen.getByText("@max_r · Park")).toBeInTheDocument();
     expect(screen.getByText("@jo_ski · Innsbruck · Chill")).toBeInTheDocument();
   });
