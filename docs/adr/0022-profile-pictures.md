@@ -31,7 +31,7 @@ Option 3.
   file with the viewer's session and returns it.
   - There is no third-party host in the CSP.
   - Picture URLs cannot be shared.
-  - The response is cached privately for 10 minutes.
+  - The response is cached privately for 2 minutes; "no picture" is not cached.
 - **Upload:** the browser crops to 512 px and re-encodes the picture,
   which drops EXIF data. A server action checks the magic bytes and size,
   uploads, and deletes the previous file.

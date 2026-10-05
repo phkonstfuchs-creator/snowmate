@@ -121,7 +121,7 @@ describe("carpool actions", () => {
     mocks.insert.mockResolvedValue({ error: null });
     await expect(createCarpoolAction(input)).resolves.toEqual({ ok: true, message: "Posted." });
     expect(mocks.insert.mock.calls[0]![0]).not.toHaveProperty("author_id");
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/carpool");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it("rejects invalid input and database errors", async () => {

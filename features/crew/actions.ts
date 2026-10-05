@@ -2,7 +2,7 @@
 
 import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { FRIEND_REQUEST_MESSAGES, type FriendRequestOutcome } from "./friendships";
 
@@ -17,7 +17,7 @@ const HANDLE_PATTERN = /^[a-z0-9_]{3,20}$/;
 /* Friendship changes the audience of every ride, so both ride screens
    are revalidated along with the crew screen. */
 function revalidateGraph() {
-  ["/crew", "/feed", "/events"].forEach((path) => revalidatePath(path));
+  revalidateApp();
 }
 
 async function requestFriendshipActionImpl(

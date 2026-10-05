@@ -2,17 +2,15 @@
 
 import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { validateRideEdit, validateRideInput } from "./ride-input";
 
 /* pending: the viewer asked to join and waits for the host. */
 export type RideActionResult = { ok: true; message: string; pending?: boolean } | { ok: false; message: string };
 
-const RIDE_PATHS = ["/feed", "/events"] as const;
-
 function revalidateRides() {
-  RIDE_PATHS.forEach((path) => revalidatePath(path));
+  revalidateApp();
 }
 
 const PROFILE_INCOMPLETE = "common.profileIncomplete";

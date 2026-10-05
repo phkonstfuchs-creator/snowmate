@@ -41,8 +41,7 @@ describe("ride actions", () => {
       const inserted = mocks.insert.mock.calls[0]![0];
       expect(inserted).not.toHaveProperty("host_id");
       expect(inserted).toMatchObject({ title: "Park day", caption: null, visibility: "public" });
-      expect(mocks.revalidatePath).toHaveBeenCalledWith("/feed");
-      expect(mocks.revalidatePath).toHaveBeenCalledWith("/events");
+      expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
     });
 
     it("drops the title on a friends ride", async () => {
@@ -138,7 +137,7 @@ describe("ride actions", () => {
         new_total_spots: 3,
         new_caption: "",
       });
-      expect(mocks.revalidatePath).toHaveBeenCalledWith("/feed");
+      expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
     });
 
     it.each([

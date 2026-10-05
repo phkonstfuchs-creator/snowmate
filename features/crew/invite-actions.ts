@@ -2,7 +2,7 @@
 
 import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { INVITE_MESSAGES, inviteUrl, isInviteStatus, isInviteToken } from "./invites";
@@ -44,7 +44,7 @@ async function acceptInviteActionImpl(token: string): Promise<AcceptInviteResult
 
     if (error || !isInviteStatus(data) || data === "valid") return { ok: false, message: UNAVAILABLE };
     if (data === "accepted") {
-      ["/crew", "/feed", "/events"].forEach((path) => revalidatePath(path));
+      revalidateApp();
     }
     return { ok: data === "accepted" || data === "already_friends", message: INVITE_MESSAGES[data] };
   } catch {

@@ -5,11 +5,12 @@ import { getVisibleAvatar } from "@/features/profile/queries";
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const file = await getVisibleAvatar(id);
-  if (!file) return new Response(null, { status: 404, headers: { "Cache-Control": "private, max-age=300" } });
+  /* "No picture" is never cached: a new upload shows up right away. */
+  if (!file) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
   return new Response(file, {
     headers: {
       "Content-Type": file.type === "image/jpeg" ? "image/jpeg" : "image/webp",
-      "Cache-Control": "private, max-age=600",
+      "Cache-Control": "private, max-age=120",
       "X-Content-Type-Options": "nosniff",
     },
   });

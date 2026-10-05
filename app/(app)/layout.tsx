@@ -1,4 +1,5 @@
 import BottomNav from "@/components/BottomNav";
+import RefreshOnResume from "@/components/RefreshOnResume";
 import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
 import PendingInviteSync from "@/features/crew/PendingInviteSync";
 import { getPendingCounts } from "@/features/crew/queries";
@@ -34,6 +35,7 @@ export default async function AppLayout({
         }}
       />
       <OnboardingDraftSync />
+      <RefreshOnResume />
       <PendingInviteSync />
     </div>
   );

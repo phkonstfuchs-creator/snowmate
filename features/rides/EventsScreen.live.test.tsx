@@ -94,6 +94,20 @@ describe("EventsScreen with real data", () => {
     expect(within(screen.getByRole("dialog")).getByText("4/10")).toBeInTheDocument();
   });
 
+  it("shows the join at once, before the refreshed list arrives", async () => {
+    mocks.join.mockResolvedValue({ ok: true, message: "You are in." });
+    render(<EventsScreen live={live([row({})])} />);
+    fireEvent.click(screen.getByText("Freshers day"));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("3/10")).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Join event" }));
+    });
+    expect(within(screen.getByRole("dialog")).getByText("4/10")).toBeInTheDocument();
+    expect(within(screen.getByRole("dialog")).queryByRole("button", { name: "Join event" })).not.toBeInTheDocument();
+  });
+
   it("shows a refusal from the server", async () => {
     mocks.join.mockResolvedValue({ ok: false, message: "This ride is full." });
     render(<EventsScreen live={live([row({})])} />);

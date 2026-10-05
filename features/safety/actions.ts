@@ -2,7 +2,7 @@
 
 import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { MAX_REPORT_DETAILS, isReportReason } from "./reports";
 
@@ -12,7 +12,7 @@ const UNAVAILABLE: SafetyActionResult = { ok: false, message: "common.unavailabl
 
 /* A block changes what every social screen shows. */
 function revalidateSocial() {
-  ["/feed", "/events", "/map", "/carpool", "/crew", "/profile"].forEach((path) => revalidatePath(path));
+  revalidateApp();
 }
 
 async function rpc(fn: string, args: Record<string, unknown>): Promise<{ data: unknown } | null> {

@@ -78,7 +78,7 @@ describe("adoptOnboardingDraftAction", () => {
       ["id", USER_ID],
       ["onboarding_completed", false],
     ]);
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/profile");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
   });
 
   it("rejects an invalid draft without touching the database", async () => {

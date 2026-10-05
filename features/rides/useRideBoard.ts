@@ -67,6 +67,22 @@ export interface RideBoard {
   respondRequest: (rideId: string, userId: string, accept: boolean) => Promise<void>;
 }
 
+type JoinState = "joined" | "pending" | "left";
+
+/* The viewer's own join state, before the server's list confirms it. */
+function applyJoinState(ride: LiveRide, state: JoinState | undefined): LiveRide {
+  if (!state) return ride;
+  const wasIn = ride.isJoined;
+  const isJoined = state === "joined";
+  const delta = isJoined && !wasIn ? 1 : !isJoined && wasIn ? -1 : 0;
+  return {
+    ...ride,
+    isJoined,
+    isPending: state === "pending",
+    post: { ...ride.post, takenSpots: Math.max(0, ride.post.takenSpots + delta) },
+  };
+}
+
 /* `live` is undefined in the /demo prototype and the list from the
    database in the app. */
 export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly RidePost[]): RideBoard {
@@ -76,15 +92,23 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
   const [notice, setNotice] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const isLive = live !== undefined;
+  /* The answer of a join or leave, shown at once until the refreshed
+     list arrives. Tied to the list it was made for, so fresh data from
+     the server always wins. */
+  const [overrides, setOverrides] = useState<{ base: LiveRide[] | undefined; byRide: Record<string, JoinState> }>({
+    base: live,
+    byRide: {},
+  });
 
-  const rides = useMemo(
-    () =>
-      live ??
-      fixtures
+  const rides = useMemo(() => {
+    if (!live) {
+      return fixtures
         .map((post) => fixtureToLiveRide(post, demoJoined.has(post.id)))
-        .filter((ride): ride is LiveRide => ride !== null),
-    [live, fixtures, demoJoined],
-  );
+        .filter((ride): ride is LiveRide => ride !== null);
+    }
+    if (overrides.base !== live) return live;
+    return live.map((ride) => applyJoinState(ride, overrides.byRide[ride.post.id]));
+  }, [live, fixtures, demoJoined, overrides]);
 
   const toggleJoin = useCallback(
     async (rideId: string) => {
@@ -106,11 +130,15 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
       setPendingId(null);
 
       if (!result.ok) setNotice(result.message);
+      else {
+        const next: JoinState = ride.isJoined || ride.isPending ? "left" : "pending" in result && result.pending ? "pending" : "joined";
+        setOverrides({ base: live, byRide: { ...(overrides.base === live ? overrides.byRide : {}), [rideId]: next } });
+      }
       startTransition(() => router.refresh());
       /* Only a real join counts; asking to join is not being in yet. */
       return !ride.isJoined && !ride.isPending && result.ok && !("pending" in result && result.pending);
     },
-    [rides, isLive, router],
+    [rides, isLive, router, live, overrides],
   );
 
   const postRide = useCallback(
