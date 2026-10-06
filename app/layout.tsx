@@ -10,8 +10,8 @@ import { I18nProvider } from "@/lib/i18n/client";
 export const metadata: Metadata = {
   title: "Pistl",
   description: "Find your crew. Today.",
-  applicationName: "Pistl",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Pistl" },
+  applicationName: "pistl.",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "pistl." },
   formatDetection: { telephone: false },
 };
 
