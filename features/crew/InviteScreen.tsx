@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import PenguinMascot from "@/components/PenguinMascot";
+import Wordmark from "@/components/ui/Wordmark";
 import { settle } from "@/lib/settle";
 import { acceptInviteAction, type AcceptInviteResult } from "./invite-actions";
 import { INVITE_MESSAGES, PENDING_INVITE_KEY } from "./invites";
@@ -66,7 +66,7 @@ export default function InviteScreen({
 
   return (
     <main className="paper-grain flex min-h-dvh flex-col items-center justify-center px-6 text-center" style={{ background: "var(--paper-0)" }}>
-      <PenguinMascot size={72} />
+      <Wordmark size={44} />
       <p className="text-mono-label mt-6" style={{ color: RUST }}>{t("invite.crewInvite")}</p>
 
       {!signedIn && (

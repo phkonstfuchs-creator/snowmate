@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next";
    app" on Android. It then opens full screen, without browser bars. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Pistl",
-    short_name: "Pistl",
+    name: "pistl.",
+    short_name: "pistl.",
     description: "Find your crew. Who rides where today, live.",
     id: "/",
     start_url: "/feed",

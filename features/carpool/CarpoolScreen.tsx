@@ -7,7 +7,6 @@ import type { CarpoolPost, CarpoolRole, City } from "@/lib/types";
 import { CARPOOL_POSTS, getUserById, getUsersByIds } from "@/lib/data";
 import { resortNamesIn } from "@/lib/resorts";
 import ResortScene from "@/components/ResortScene";
-import PenguinMascot from "@/components/PenguinMascot";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -539,7 +538,6 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
 
         {drivers.length === 0 && riders.length === 0 && !unavailable && (
           <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <PenguinMascot size={64} />
             <div>
               <p className="font-black text-lg" style={{ color: INK }}>{t("carpool.empty")}</p>
               <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>{t("carpool.emptyHint")}</p>

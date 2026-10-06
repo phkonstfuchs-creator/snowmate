@@ -20,7 +20,6 @@ import PostRideModal from "@/components/feed/PostRideModal";
 import PostComposer from "@/features/posts/PostComposer";
 import PostList from "@/features/posts/PostList";
 import type { Post } from "@/features/posts/post";
-import PenguinMascot from "@/components/PenguinMascot";
 import Wordmark from "@/components/ui/Wordmark";
 import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -189,7 +188,6 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             something yourself. */}
         {rides.length === 0 && !unavailable && (
           <div className="flex flex-col items-center gap-4 py-14 text-center">
-            <PenguinMascot size={72} />
             <div>
               <p className="font-bold" style={{ color: "var(--text-primary)" }}>{t("feed.empty")}</p>
               <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
