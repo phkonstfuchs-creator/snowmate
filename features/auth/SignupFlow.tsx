@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { PrivacyConsent } from "@/features/legal/LegalLinks";
 import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
-import PenguinMascot from "@/components/PenguinMascot";
+import Wordmark from "@/components/ui/Wordmark";
 import Icon from "@/components/ui/Icon";
 import Input from "@/components/ui/Input";
 import type { AbilityLevel, City } from "@/lib/types";
@@ -186,8 +186,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
         <div className="relative" style={{ height: "38%", borderBottom: "var(--rule-heavy)" }}>
           <ResortScene name="Pistl" className="h-full w-full" />
           <div className="absolute left-4 top-5 flex items-center gap-2">
-            <PenguinMascot size={26} />
-            <span className="text-mono-label" style={{ color: INK }}>Pistl</span>
+            <Wordmark size={28} />
           </div>
         </div>
         <div className="flex flex-1 flex-col px-4 pt-6">

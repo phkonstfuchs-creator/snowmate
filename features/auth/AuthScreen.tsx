@@ -3,7 +3,7 @@
 import Link from "next/link";
 import LegalLinks from "@/features/legal/LegalLinks";
 import { useT } from "@/lib/i18n/client";
-import PenguinMascot from "@/components/PenguinMascot";
+import Wordmark from "@/components/ui/Wordmark";
 import Icon from "@/components/ui/Icon";
 import AuthForm from "./AuthForm";
 
@@ -35,10 +35,7 @@ export default function AuthScreen({
           aria-label={t("auth.backToStart")}
           className="-my-2 flex w-fit items-center gap-2 py-2 pt-6"
         >
-          <PenguinMascot size={26} />
-          <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            Pistl
-          </span>
+          <Wordmark size={28} />
         </Link>
 
         <div className="flex flex-1 flex-col justify-center py-8">
