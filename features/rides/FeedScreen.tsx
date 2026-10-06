@@ -21,6 +21,7 @@ import PostComposer from "@/features/posts/PostComposer";
 import PostList from "@/features/posts/PostList";
 import type { Post } from "@/features/posts/post";
 import PenguinMascot from "@/components/PenguinMascot";
+import Wordmark from "@/components/ui/Wordmark";
 import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
@@ -88,10 +89,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {/* Header */}
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div className="flex items-center gap-2.5">
-            <PenguinMascot size={28} />
-            <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>Pistl</span>
-          </div>
+          <Wordmark size={30} />
           <div className="flex items-center gap-2">
             {live && (
               <button
