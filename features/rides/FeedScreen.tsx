@@ -109,6 +109,14 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
             >
               <Icon name="calendar-days" size={18} color="var(--ink-0)" strokeWidth={1.8} />
             </Link>
+            <Link
+              href={`${basePath}/carpool`}
+              aria-label={t("nav.carpool")}
+              className="flex h-11 w-11 items-center justify-center"
+              style={{ border: "var(--rule-thin)" }}
+            >
+              <Icon name="car" size={18} color="var(--ink-0)" strokeWidth={1.8} />
+            </Link>
             <button
               onClick={() => setShowPostModal(true)}
               className="card-tap flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-semibold"

@@ -19,7 +19,7 @@ describe("chat actions", () => {
 
   it("opens a direct chat and goes there", async () => {
     mocks.rpc.mockResolvedValue({ data: CONV, error: null });
-    await expect(openDirectChatAction(USER)).rejects.toThrow(`redirect:/crew/chat/${CONV}`);
+    await expect(openDirectChatAction(USER)).rejects.toThrow(`redirect:/crew/chat/${CONV}?with=${USER}`);
     expect(mocks.rpc).toHaveBeenCalledWith("open_direct_chat", { other: USER });
   });
 
