@@ -32,6 +32,10 @@ import type { ResortConditions } from "@/features/conditions/conditions";
 import type { ResortPhoto } from "./resort-photo";
 import ResortPhotoCredit from "./ResortPhotoCredit";
 import Image from "next/image";
+import { LIFTS } from "@/lib/lifts";
+import { useLiftMeetups } from "@/features/lift-meetup/useLiftMeetups";
+import LiftMeetupPanel from "@/features/lift-meetup/LiftMeetupPanel";
+import { START_MESSAGES, type LiftMeetup, type StartResult } from "@/features/lift-meetup/meetup";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
@@ -55,6 +59,10 @@ function ResortDetailSheet({
   isLive,
   conditions,
   photo,
+  canShareLift,
+  liftBusy,
+  liftResult,
+  onStartLift,
   onClose,
 }: {
   resort: ResortStatus;
@@ -62,6 +70,10 @@ function ResortDetailSheet({
   isLive: boolean;
   conditions: ResortConditions | null;
   photo: ResortPhoto | null;
+  canShareLift: boolean;
+  liftBusy: boolean;
+  liftResult: StartResult | null;
+  onStartLift: (liftId: string) => Promise<boolean>;
   onClose: () => void;
 }) {
   useScrollLock();
@@ -69,7 +81,9 @@ function ResortDetailSheet({
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const openSpots = totalOpenSpots(ridesHere.map((ride) => ride.post));
-  /* Snow, lifts and conditions have no data source yet. The prototype
+  const resortLifts = LIFTS.filter((lift) => lift.resort === resort.name);
+  const [selectedLift, setSelectedLift] = useState(resortLifts[0]?.id ?? "");
+  /* Live lift opening counts have no data source yet. The prototype
      shows sample values; the app shows what it actually knows. */
   const stats: { label: string; val: string | number; live?: boolean; cond?: ResortStatus["conditions"] }[] = isLive
     ? [
@@ -147,6 +161,27 @@ function ResortDetailSheet({
 
         {isLive && <ConditionsPanel conditions={conditions} />}
 
+        {isLive && (
+          <div className="mx-5 mt-4 p-4" style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
+            <h3 className="text-sm font-black" style={{ color: INK }}>{t("meetup.chooseLift")}</h3>
+            <p className="mt-1 text-xs" style={{ color: MUTED }}>{resortLifts.length === 0 ? t("meetup.noLifts") : canShareLift ? t("meetup.privacy") : t("meetup.from16")}</p>
+            {canShareLift && resortLifts.length > 0 && (
+              <>
+                <label htmlFor="lift-meetup-select" className="text-mono-label mt-3 block" style={{ color: INK }}>{t("meetup.pickLift")}</label>
+                <select id="lift-meetup-select" value={selectedLift} onChange={(event) => setSelectedLift(event.target.value)}
+                  className="mt-1 min-h-11 w-full px-2 text-sm" style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: INK }}>
+                  {resortLifts.map((lift) => <option key={lift.id} value={lift.id}>{lift.name}</option>)}
+                </select>
+                <p className="mt-2 text-xs" style={{ color: MUTED }}>{t("meetup.estimate")}</p>
+                <button type="button" disabled={liftBusy || !selectedLift} onClick={() => void onStartLift(selectedLift).then((ok) => { if (ok) dismiss(); })}
+                  className="card-tap mt-3 min-h-11 w-full font-display text-lg uppercase disabled:opacity-50"
+                  style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>{liftBusy ? t("common.oneMoment") : t("meetup.start")}</button>
+                {liftResult && liftResult !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[liftResult])}</p>}
+              </>
+            )}
+          </div>
+        )}
+
         {/* Ability bars */}
         <div className="px-5 mt-4">
           <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>{t("map.whoRidesWhat")}</p>
@@ -206,6 +241,9 @@ export interface LiveMap {
   friends?: FriendLocation[] | null;
   /* false under 16: sharing is not offered (ADR 0019). */
   canShare?: boolean;
+  canShareLift?: boolean;
+  myLiftMeetup?: LiftMeetup | null;
+  friendLiftMeetups?: LiftMeetup[] | null;
   /* Snow and weather by resort name; null when the provider is down. */
   conditions?: Record<string, ResortConditions | null> | null;
   /* Freely licensed photos by resort name, with their credits. */
@@ -230,10 +268,11 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
     initialSharingEnd: live.sharingEnd ?? null,
     initialFriends: live.friends ?? [],
   });
-  return <MapBody live={live} location={location} />;
+  const meetups = useLiftMeetups(live.myLiftMeetup ?? null, live.friendLiftMeetups === undefined ? [] : live.friendLiftMeetups);
+  return <MapBody live={live} location={location} meetups={meetups} />;
 }
 
-function MapBody({ live, location }: { live?: LiveMap; location?: LocationState }) {
+function MapBody({ live, location, meetups }: { live?: LiveMap; location?: LocationState; meetups?: ReturnType<typeof useLiftMeetups> }) {
   const t = useT();
   const tracking = useTracking();
   const pin = live?.pin ?? null;
@@ -383,6 +422,18 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
         />
       )}
 
+      {location && meetups && (
+        <LiftMeetupPanel
+          mine={meetups.mine}
+          friends={meetups.friends}
+          me={location.me}
+          busy={meetups.busy}
+          result={meetups.result}
+          onStop={() => void meetups.stop()}
+          onLocate={location.locate}
+        />
+      )}
+
       {live && live.rides === null && (
         <p role="status" className="mx-4 mt-3 px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>
           {t("map.unavailable")}
@@ -441,6 +492,10 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           isLive={isLive}
           conditions={conditionsOf(activeSheet.resort.name)}
           photo={live?.photos?.[activeSheet.resort.name] ?? null}
+          canShareLift={live?.canShareLift === true}
+          liftBusy={meetups?.busy ?? false}
+          liftResult={meetups?.result ?? null}
+          onStartLift={(liftId) => meetups?.start(activeSheet.resort.name, liftId) ?? Promise.resolve(false)}
           onClose={() => setActiveSheet(null)}
         />
       )}

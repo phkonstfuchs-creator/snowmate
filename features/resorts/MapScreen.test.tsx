@@ -37,6 +37,22 @@ const liveRide = toLiveRide(
 );
 
 describe("MapScreen", () => {
+  it("only offers lift sharing after an explicit age-eligibility check", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
+    const dialog = screen.getByRole("dialog", { name: "Details for Nordkette" });
+    expect(within(dialog).getByText(/from 16/)).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Tell my crew" })).not.toBeInTheDocument();
+  });
+
+  it("lets an eligible rider choose a referenced lift", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
+    fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
+    const dialog = screen.getByRole("dialog", { name: "Details for Nordkette" });
+    expect(within(dialog).getByRole("combobox", { name: "Choose a lift" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Tell my crew" })).toBeEnabled();
+  });
+
   it("shows real activity and hides unsourced conditions", () => {
     render(<MapScreen live={{ rides: [liveRide], defaultCity: "innsbruck" }} />);
 

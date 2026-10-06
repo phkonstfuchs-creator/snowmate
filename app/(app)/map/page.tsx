@@ -5,6 +5,7 @@ import { getResortConditions } from "@/features/conditions/queries";
 import { getResortPhotos } from "@/features/resorts/queries";
 import { isValidPosition } from "@/features/location/location";
 import { getCanShareLocation, getFriendLocations, getMySharingEnd } from "@/features/location/queries";
+import { getCanShareLiftMeetup, getFriendLiftMeetups, getMyLiftMeetup } from "@/features/lift-meetup/queries";
 
 /* A pin opened from a chat: /map?lat=…&lng=…&label=… */
 function readPin(params: Record<string, string | string[] | undefined>) {
@@ -16,7 +17,7 @@ function readPin(params: Record<string, string | string[] | undefined>) {
 
 export default async function MapPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pin = readPin(await searchParams);
-  const [result, profile, sharingEnd, friends, canShare, conditions, photos] = await Promise.all([
+  const [result, profile, sharingEnd, friends, canShare, conditions, photos, myLiftMeetup, friendLiftMeetups, canShareLift] = await Promise.all([
     listRides(),
     getOwnProfile(),
     getMySharingEnd(),
@@ -24,6 +25,9 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
     getCanShareLocation(),
     getResortConditions(),
     getResortPhotos(),
+    getMyLiftMeetup(),
+    getFriendLiftMeetups(),
+    getCanShareLiftMeetup(),
   ]);
 
   return (
@@ -36,6 +40,9 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
         canShare,
         conditions,
         photos,
+        myLiftMeetup,
+        friendLiftMeetups,
+        canShareLift,
         pin,
       }}
     />

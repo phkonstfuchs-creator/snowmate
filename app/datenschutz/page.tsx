@@ -26,7 +26,7 @@ export default function DatenschutzPage() {
       <h2>2. Was Pistl ist</h2>
       <p>
         Pistl hilft Ski- und Snowboard-Crews rund um Innsbruck und Salzburg, gemeinsame Skitage zu planen: Rides,
-        Mitfahrgelegenheiten, Freunde, Chat und, wenn du es einschaltest, der Live-Standort für Freunde. Pistl ist
+        Mitfahrgelegenheiten, Freunde, Chat und, wenn du es einschaltest, der Live-Standort oder Lift-Treffpunkt für Freunde. Pistl ist
         für Personen ab 14 Jahren.
       </p>
 
@@ -70,6 +70,17 @@ export default function DatenschutzPage() {
         auf etwa 10 m gerundet, ohne Verlauf; sie ist nur für bestätigte Freunde sichtbar und wird beim Beenden, nach
         Ablauf der Zeit, beim Blockieren oder Entfreunden sofort unsichtbar. Rechtsgrundlage: deine Einwilligung,
         Art. 6 Abs. 1 lit. a DSGVO, die du jederzeit mit „Stopp“ widerrufen kannst.
+      </p>
+      <h3>Lift-Treffpunkt</h3>
+      <p>
+        Ab 16 kannst du freiwillig mitteilen, welchen Lift du gerade nimmst. Wir speichern den Lift und die Zeiten
+        für Beginn, geschätzte Ankunft und Ablauf, keine GPS-Spur. Nur du und bestätigte Freunde sehen den Status;
+        Blockieren und Entfreunden beenden die Sichtbarkeit sofort. Mit „Stopp“ beendest du ihn jederzeit, spätestens
+        nach 30 Minuten läuft er automatisch ab und ist nicht mehr sichtbar. Abgelaufene Daten werden beim nächsten
+        Statusabruf oder -start entfernt, spätestens mit der Kontolöschung. Die Ankunft und die Wartezeit sind Schätzungen aus statischen
+        Liftdaten und einer einfachen Heuristik, keine gemessenen Wartezeiten. Wenn dein eigener Standort auf deinem
+        Gerät bekannt ist, berechnet es dort einen Liftvorschlag für dich; deine Position wird dafür nicht an unseren
+        Server oder Dritte gesendet. Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO.
       </p>
       <h3>Skitag-Tracking</h3>
       <p>
@@ -164,6 +175,7 @@ export default function DatenschutzPage() {
       <ul>
         <li>Konto, Profil, Rides, Freundschaften und Chatnachrichten: bis du dein Konto löschst.</li>
         <li>Live-Standort: höchstens bis zum Ende der gewählten Zeit (maximal 12 Stunden).</li>
+        <li>Lift-Treffpunkt: höchstens 30 Minuten sichtbar, jederzeit vorher beendbar; abgelaufene Daten werden beim nächsten Statusabruf oder -start gelöscht.</li>
         <li>Standort, den du im Chat schickst: 24 Stunden, danach löschen wir die Koordinaten.</li>
         <li>Anfragezähler zum Missbrauchsschutz: zwei Minuten.</li>
         <li>Meldungen: so lange, wie es für ihre Prüfung und den Schutz anderer nötig ist.</li>
@@ -187,7 +199,8 @@ export default function DatenschutzPage() {
       <p>
         Pistl ist ab 14 Jahren. Für Minderjährige gelten strengere Regeln: Ihre Rides und ihr Standort sind nur für
         bestätigte Freunde sichtbar. Den eigenen Standort teilen kann man erst ab 16; jüngere Nutzer sehen nur die
-        Positionen ihrer Freunde. Das Alter ergibt sich aus dem Geburtsdatum, das du bei der Registrierung angibst.
+        Positionen ihrer Freunde. Auch einen eigenen Lift-Treffpunkt kann man erst ab 16 teilen. Das Alter ergibt sich
+        aus dem Geburtsdatum, das du bei der Registrierung angibst.
       </p>
 
       <h2>9. Keine automatisierten Entscheidungen</h2>

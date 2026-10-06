@@ -13,5 +13,5 @@ export const OPERATOR = {
     address: "Fritz-Dobisch-Straße 12, 66111 Saarbrücken",
     url: "https://www.datenschutz.saarland.de",
   },
-  updated: "5. Oktober 2026",
+  updated: "6. Oktober 2026",
 } as const;

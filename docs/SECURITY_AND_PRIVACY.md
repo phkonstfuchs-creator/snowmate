@@ -173,6 +173,22 @@ listed with their licences on `/lizenzen`. See
 [ADR 0016](adr/0016-vector-map-and-faster-navigation.md) and
 [ADR 0020](adr/0020-piste-map-conditions-and-chat-pins.md).
 
+## Lift meetup status
+
+Announcing “I'm taking this lift now” reveals the rider's approximate position.
+Sharing starts at 16 under the same age check as live location. Only the
+rider and confirmed friends can see the current lift, destination station and
+estimated arrival; a block in either direction or unfriending hides it
+immediately. A status ends on Stop or after 30 minutes. Expired rows are
+purged on the next status read or start; without another request they remain
+stored until account deletion, while never becoming visible again. The server
+stores the lift identifier and timestamps, not a GPS track. A viewer's own
+position is used only on their device to suggest a lift and is never sent with
+the status request. Lift travel data is an attributed static OpenStreetMap
+snapshot; waiting time is an explicitly labeled heuristic, not a measured
+queue. The status is included in the owner's data export and deleted with the
+account. See [ADR 0028](adr/0028-lift-meetup-estimates.md).
+
 ## Chat
 
 Direct chats only between confirmed friends; ride chats only for the host
