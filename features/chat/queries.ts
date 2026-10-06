@@ -35,6 +35,38 @@ export async function listChatMessages(conversationId: string): Promise<ChatMess
   }
 }
 
+/* A direct chat that has no messages yet, so it is not in the chat list.
+   The database confirms it: open_direct_chat returns this very chat only
+   for two friends who have not blocked each other. null otherwise. */
+export async function getNewDirectChat(conversationId: string, otherUserId: string): Promise<ChatSummary | null> {
+  if (!isUuid(conversationId) || !isUuid(otherUserId)) return null;
+  try {
+    const supabase = await createClient();
+    const { data: id, error } = await supabase.rpc("open_direct_chat", { other: otherUserId });
+    if (error || id !== conversationId) return null;
+    const { data: rows } = await supabase.rpc("list_my_friendships");
+    const friend = Array.isArray(rows)
+      ? (rows as { user_id: string; display_name: string | null; handle: string | null }[]).find((row) => row.user_id === otherUserId)
+      : undefined;
+    return {
+      id: conversationId,
+      kind: "direct",
+      otherUserId,
+      otherName: friend?.display_name ?? null,
+      otherHandle: friend?.handle ?? null,
+      rideId: null,
+      rideResort: null,
+      rideDate: null,
+      lastBody: null,
+      lastAt: null,
+      lastIsMine: false,
+      unread: 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /* For the Crew tab badge; zero on any failure. */
 export async function getUnreadChatCount(): Promise<number> {
   try {

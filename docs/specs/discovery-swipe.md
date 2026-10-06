@@ -11,7 +11,7 @@ have. There is no way to find someone to ride with.
 
 ## Included
 
-- **"Meet riders"**, reached from the crew screen at `/people`:
+- **"Meet riders"** at `/people`, its own "Discover" tab in the bottom bar (owner, 2026-10-06: "mehr im Fokus"; carpools moved into the feed header):
   - one card at a time, showing name, picture, riding styles, bio and
     mutual friends
   - swipe right or tap ♥ to ride together, swipe left or tap ✕ to skip

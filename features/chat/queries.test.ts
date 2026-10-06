@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getUnreadChatCount, listChatMessages, listMyChats } from "./queries";
+import { getNewDirectChat, getUnreadChatCount, listChatMessages, listMyChats } from "./queries";
 
 const rpc = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ rpc }) }));
@@ -36,5 +36,21 @@ describe("chat queries", () => {
   it("counts unread chats", async () => {
     rpc.mockResolvedValue({ data: 3, error: null });
     await expect(getUnreadChatCount()).resolves.toBe(3);
+  });
+
+  it("confirms a brand-new direct chat only through open_direct_chat", async () => {
+    const FRIEND = "c4a70000-0000-4000-8000-000000000002";
+    rpc.mockImplementation(async (fn: string) =>
+      fn === "open_direct_chat"
+        ? { data: CONV, error: null }
+        : { data: [{ user_id: FRIEND, display_name: "Lena", handle: "lena_m", status: "accepted" }], error: null },
+    );
+    await expect(getNewDirectChat(CONV, FRIEND)).resolves.toMatchObject({ id: CONV, kind: "direct", otherUserId: FRIEND, otherName: "Lena" });
+    expect(rpc).toHaveBeenCalledWith("open_direct_chat", { other: FRIEND });
+
+    /* Another chat id (or none: not friends, blocked) is refused. */
+    rpc.mockImplementation(async () => ({ data: null, error: null }));
+    await expect(getNewDirectChat(CONV, FRIEND)).resolves.toBeNull();
+    await expect(getNewDirectChat(CONV, "nope")).resolves.toBeNull();
   });
 });

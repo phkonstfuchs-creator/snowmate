@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { settle } from "@/lib/settle";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -125,14 +124,6 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
               {incoming.length > 0 ? t("crew.waitingForYou", { n: incoming.length }) : ""}
             </p>
           </div>
-          <Link
-            href="/people"
-            className="ml-auto flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold"
-            style={{ border: "var(--rule-thin)", color: INK }}
-          >
-            <Icon name="compass" size={15} strokeWidth={2} />
-            {t("crew.discover")}
-          </Link>
           <button
             type="button"
             onClick={() => setAdding((open) => !open)}

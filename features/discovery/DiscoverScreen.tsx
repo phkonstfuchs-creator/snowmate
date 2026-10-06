@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
@@ -73,9 +72,6 @@ export default function DiscoverScreen({
     <div className="pb-6">
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-          <Link href="/crew" aria-label={t("discover.back")} className="flex h-11 w-11 items-center justify-center">
-            <Icon name="arrow-left" size={18} />
-          </Link>
           <div className="min-w-0 flex-1">
             <h1 className="font-display" style={{ color: "var(--ink-0)", fontSize: 24, fontWeight: 800 }}>{t("discover.title")}</h1>
             <p className="text-xs font-semibold" style={{ color: "var(--ink-2)" }}>{isMinor ? t("discover.subtitleMinor") : t("discover.subtitleAdult")}</p>
