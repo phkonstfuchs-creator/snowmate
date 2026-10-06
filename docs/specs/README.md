@@ -17,3 +17,4 @@ The workflow is in [../AI_WORKFLOW.md](../AI_WORKFLOW.md).
 | [Profile pictures](profile-pictures.md) | Agreed |
 | [Ski-day posts and your rides in the profile](ski-day-posts.md) | Agreed |
 | [Push notifications](push-notifications.md) | Agreed |
+| [Ski-day tracking](ski-day-tracking.md) | Agreed |

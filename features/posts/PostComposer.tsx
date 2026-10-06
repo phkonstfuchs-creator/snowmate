@@ -42,15 +42,26 @@ async function preparePhoto(file: File): Promise<Blob | null> {
   }
 }
 
-export default function PostComposer({ city, onClose }: { city: City; onClose: () => void }) {
+export default function PostComposer({
+  city,
+  onClose,
+  initialBody = "",
+  initialResort = "",
+}: {
+  city: City;
+  onClose: () => void;
+  /* Prefilled when sharing a tracked day; the person can still edit it. */
+  initialBody?: string;
+  initialResort?: string;
+}) {
   useScrollLock();
   const t = useT();
   const router = useRouter();
   const ids = useId();
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
-  const [body, setBody] = useState("");
-  const [resort, setResort] = useState("");
+  const [body, setBody] = useState(initialBody);
+  const [resort, setResort] = useState(initialResort);
   const [photo, setPhoto] = useState<Blob | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

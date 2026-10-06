@@ -33,5 +33,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0023](0023-resort-photos-from-wikimedia.md) | Resort photos from Wikimedia, with automatic credits | Accepted |
 | [0024](0024-ski-day-posts.md) | Ski-day posts: friends only, private photos served by the app | Accepted |
 | [0025](0025-push-notifications.md) | Push notifications: queued in the database, sent by an edge function | Accepted |
+| [0026](0026-ski-day-tracking.md) | Ski-day tracking: on-device track, server keeps only the summary | Accepted |
 
 Template: context, options considered, decision, consequences, status.

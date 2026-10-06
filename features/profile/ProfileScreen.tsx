@@ -13,6 +13,8 @@ import Avatar from "@/components/ui/Avatar";
 import MyRides from "./MyRides";
 import PostList from "@/features/posts/PostList";
 import PushSettings from "@/features/notifications/PushSettings";
+import SkiDays from "@/features/tracking/SkiDays";
+import type { SkiDay } from "@/features/tracking/ski-day";
 import type { Post } from "@/features/posts/post";
 import type { LiveRide } from "@/features/rides/live-ride";
 import { signOutAction } from "@/features/auth/actions";
@@ -190,6 +192,8 @@ export default function ProfileScreen({
   mfaEnabled = null,
   myRides,
   myPosts,
+  skiDays,
+  today,
 }: {
   account?: OwnProfile | null;
   stats?: AccountStats | null;
@@ -197,6 +201,9 @@ export default function ProfileScreen({
   mfaEnabled?: boolean | null;
   myRides?: { upcoming: LiveRide[]; past: LiveRide[] };
   myPosts?: Post[] | null;
+  skiDays?: SkiDay[] | null;
+  /* ISO timestamp from the server, so the season does not depend on render time. */
+  today?: string;
 }) {
   const isLive = account !== undefined;
   const t = useT();
@@ -543,6 +550,7 @@ export default function ProfileScreen({
         </>
       )}
 
+      {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}
       {isLive && myRides && <MyRides upcoming={myRides.upcoming} past={myRides.past} />}
       {isLive && myPosts !== undefined && <PostList posts={myPosts} title={t("posts.mine")} />}
 

@@ -54,7 +54,23 @@ interface SkiMapProps {
   locateRequest?: number;
   /* A position sent in a chat. */
   pin?: { lat: number; lng: number; label: string } | null;
+  /* The ski day being recorded, [lng, lat] points; drawn as a line. */
+  track?: readonly [number, number][] | null;
   ariaLabel?: string;
+}
+
+const TRACK_SOURCE = "ski-day-track";
+
+function addTrackLayer(map: MapLibreMap) {
+  if (map.getSource(TRACK_SOURCE)) return;
+  map.addSource(TRACK_SOURCE, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+  map.addLayer({
+    id: "ski-day-track",
+    type: "line",
+    source: TRACK_SOURCE,
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: { "line-color": "#315842", "line-width": 4, "line-opacity": 0.9 },
+  });
 }
 
 function addAccuracyLayer(map: MapLibreMap) {
@@ -123,6 +139,7 @@ export default function SkiMap({
   focus = null,
   locateRequest = 0,
   pin = null,
+  track = null,
   ariaLabel,
 }: SkiMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -189,6 +206,7 @@ export default function SkiMap({
       if (!fellBack) tintStyle(map);
       addSkiLayers(map);
       addAccuracyLayer(map);
+      addTrackLayer(map);
       setStyleReady(true);
     });
     map.on("error", () => {
@@ -318,6 +336,15 @@ export default function SkiMap({
       features: me ? [accuracyCircle(me.lng, me.lat, clampAccuracy(me.accuracy))] : [],
     });
   }, [me, styleReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady) return;
+    (map.getSource(TRACK_SOURCE) as GeoJSONSource | undefined)?.setData({
+      type: "FeatureCollection",
+      features: track && track.length > 1 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: track.map((point) => [...point]) } }] : [],
+    });
+  }, [track, styleReady]);
 
   useEffect(() => {
     const map = mapRef.current;

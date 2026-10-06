@@ -71,6 +71,14 @@ export default function DatenschutzPage() {
         Ablauf der Zeit, beim Blockieren oder Entfreunden sofort unsichtbar. Rechtsgrundlage: deine Einwilligung,
         Art. 6 Abs. 1 lit. a DSGVO, die du jederzeit mit „Stopp“ widerrufen kannst.
       </p>
+      <h3>Skitag-Tracking</h3>
+      <p>
+        Nur wenn du auf der Karte einen Skitag startest. Dein Handy zeichnet dann deine GPS-Position auf und
+        berechnet daraus Strecke, Höhenmeter, Topspeed und Abfahrten. Die GPS-Spur bleibt auf deinem Gerät (im
+        Speicher dieses Browsers) und wird beim Beenden gelöscht. Wenn du den Tag speicherst, übertragen wir nur diese
+        Zusammenfassung mit Datum, Uhrzeit und Skigebiet; sie siehst nur du. Gespeichert bei Supabase in Frankfurt,
+        bis du den Tag oder dein Konto löschst. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
       <h3>Push-Benachrichtigungen</h3>
       <p>
         Nur wenn du sie in den Einstellungen einschaltest, und nur für das Gerät, auf dem du das tust. Dann speichern

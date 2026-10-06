@@ -23,6 +23,8 @@ import { RESORT_ZOOM } from "@/components/map/map-style";
 import { resortCoordinates } from "@/lib/resorts";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
+import TrackPanel from "@/features/tracking/TrackPanel";
+import { useTracking } from "@/features/tracking/TrackingProvider";
 import type { FriendLocation } from "@/features/location/location";
 import { initialsFor } from "@/features/profile/profile-input";
 import ConditionsPanel, { ConditionsLine } from "@/features/conditions/ConditionsPanel";
@@ -233,6 +235,7 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
 
 function MapBody({ live, location }: { live?: LiveMap; location?: LocationState }) {
   const t = useT();
+  const tracking = useTracking();
   const pin = live?.pin ?? null;
   const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(
     pin ? { lat: pin.lat, lng: pin.lng, zoom: 15, key: 1 } : null,
@@ -338,6 +341,7 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           focus={focus}
           locateRequest={locateRequest}
           pin={pin}
+          track={live ? tracking?.state?.track ?? null : null}
         />
         {location && (
           <button
@@ -360,6 +364,8 @@ function MapBody({ live, location }: { live?: LiveMap; location?: LocationState 
           </p>
         )}
       </div>
+
+      {live && <TrackPanel />}
 
       {location && (
         <LocationPanel
