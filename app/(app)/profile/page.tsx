@@ -8,9 +8,10 @@ import { listPosts } from "@/features/posts/queries";
 import { splitMyRides } from "@/features/rides/my-rides";
 import { toIsoDay } from "@/features/rides/live-ride";
 import { listMySkiDays } from "@/features/tracking/queries";
+import { getLeaderboard, getLeaderboardSettings } from "@/features/gamification/queries";
 
 export default async function ProfilePage() {
-  const [account, rides, graph, blocked, mfaEnabled, myPosts, skiDays] = await Promise.all([
+  const [account, rides, graph, blocked, mfaEnabled, myPosts, skiDays, leaderboard, leaderboardSettings] = await Promise.all([
     getOwnProfile(),
     listRides(new Date(), { includePast: true }),
     getFriendGraph(),
@@ -18,6 +19,8 @@ export default async function ProfilePage() {
     getMfaEnabled(),
     listPosts({ onlyMine: true }),
     listMySkiDays(),
+    getLeaderboard("friends", "vertical"),
+    getLeaderboardSettings(),
   ]);
   const myRides = splitMyRides(rides.status === "ok" ? rides.rides : [], toIsoDay(new Date()));
 
@@ -30,6 +33,8 @@ export default async function ProfilePage() {
       myRides={myRides}
       myPosts={myPosts}
       skiDays={skiDays}
+      seasonBoard={leaderboard}
+      leaderboardSettings={leaderboardSettings}
       today={new Date().toISOString()}
     />
   );

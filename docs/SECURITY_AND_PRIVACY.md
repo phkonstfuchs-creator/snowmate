@@ -113,6 +113,18 @@ runs. The app and the database refuse implausible values, and at most 5
 days can be saved per 24 h. The export lists the days, and account
 deletion removes them. See [ADR 0026](adr/0026-ski-day-tracking.md).
 
+## Leaderboards
+
+Only season totals leave the database, through `public.leaderboard()`:
+vertical, kilometres, days or top speed. Single days and times never do.
+The friends board shows the caller and confirmed friends who did not
+switch "show me to friends" off; a block hides both ways. The regional
+board is opt-in (off by default) and limited to the caller's region.
+People under 18 appear there without name, handle, picture or id,
+except to themselves. Stamps are computed on the owner's own data and
+are not stored or shown to others. See
+[ADR 0027](adr/0027-leaderboards-and-stamps.md).
+
 ## Push notifications
 
 Opt-in per device, in the profile settings. The device's Web Push
