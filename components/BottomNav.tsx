@@ -7,21 +7,21 @@ import Icon from "@/components/ui/Icon";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 
-/* Five destinations: the core features. Open events are reached from
-   the feed (a button in its header, and the empty feed points there),
-   so a new user without friends still finds them. */
+/* Five destinations: the core features. Open events and carpools are
+   reached from the feed (buttons in its header), so a new user without
+   friends still finds them. Meeting riders has its own tab (ADR 0028). */
 const TABS: { href: string; label: MessageKey; icon: string }[] = [
   { href: "/feed", label: "nav.today", icon: "flame" },
   { href: "/map", label: "nav.map", icon: "map-pinned" },
-  { href: "/carpool", label: "nav.carpool", icon: "car" },
+  { href: "/people", label: "nav.discover", icon: "compass" },
   { href: "/crew", label: "nav.crew", icon: "users" },
   { href: "/profile", label: "nav.profile", icon: "user" },
 ];
 
 /* Destinations without their own tab. Without this mapping nothing
-   in the bar lights up once you are on /people. */
+   in the bar lights up once you are on /carpool. */
 const OWNED_BY: Record<string, string> = {
-  "/people": "/crew",
+  "/carpool": "/feed",
   "/events": "/feed",
 };
 

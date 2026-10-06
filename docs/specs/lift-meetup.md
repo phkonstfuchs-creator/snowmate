@@ -2,7 +2,7 @@
 
 - **Status:** Agreed (scope supplied by the owner, 2026-10-06)
 - **Owner:** Pistl product owner
-- **Related:** [ADR 0028](../adr/0028-lift-meetup-estimates.md), [ADR 0015](../adr/0015-live-location-for-confirmed-friends.md), [ADR 0019](../adr/0019-live-location-from-16.md)
+- **Related:** [ADR 0029](../adr/0029-lift-meetup-estimates.md), [ADR 0015](../adr/0015-live-location-for-confirmed-friends.md), [ADR 0019](../adr/0019-live-location-from-16.md)
 
 ## Problem
 

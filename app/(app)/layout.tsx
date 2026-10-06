@@ -32,9 +32,8 @@ export default async function AppLayout({
       </TrackingProvider>
       <BottomNav
         badges={{
-          "/feed": pending.rideRequests,
+          "/feed": pending.rideRequests + pending.carpoolRequests,
           "/crew": pending.friendRequests + unreadChats,
-          "/carpool": pending.carpoolRequests,
         }}
       />
       <OnboardingDraftSync />

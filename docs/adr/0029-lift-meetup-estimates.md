@@ -1,4 +1,4 @@
-# 0028 Lift meetup estimates from static data and short-lived status
+# 0029 Lift meetup estimates from static data and short-lived status
 
 - **Status:** Proposed
 - **Date:** 2026-10-06

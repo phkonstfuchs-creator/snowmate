@@ -241,7 +241,7 @@ grant execute on function public.stop_my_lift_meetup() to authenticated;
 grant execute on function public.my_lift_meetup() to authenticated;
 grant execute on function public.list_friend_lift_meetups() to authenticated;
 
--- The export follows the latest version (ski-day tracking) and adds this status.
+-- The export follows the latest version (discovery swipes) and adds this status.
 create or replace function public.export_my_data()
 returns jsonb
 language plpgsql
@@ -362,6 +362,16 @@ begin
       ) order by d.started_at)
       from public.ski_days d
       where d.user_id = me
+    ), '[]'::jsonb),
+    'discovery_swipes', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'handle', p.handle,
+        'liked', s.liked,
+        'created_at', s.created_at
+      ) order by s.created_at)
+      from public.swipes s
+      join public.profiles p on p.id = s.target_id
+      where s.swiper_id = me
     ), '[]'::jsonb),
     'push_subscriptions', coalesce((
       select jsonb_agg(jsonb_build_object(

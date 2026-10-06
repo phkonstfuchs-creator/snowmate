@@ -24,7 +24,9 @@ export async function openDirectChatAction(otherUserId: string): Promise<false> 
   if (!isUuid(otherUserId)) return false;
   const id = await openChat("open_direct_chat", { other: otherUserId });
   if (!id) return false;
-  redirect(`/crew/chat/${id}`);
+  /* A new chat has no messages yet and is not in the chat list; the page
+     uses "with" to confirm it through open_direct_chat. */
+  redirect(`/crew/chat/${id}?with=${otherUserId}`);
 }
 
 export async function openRideChatAction(rideId: string): Promise<false> {

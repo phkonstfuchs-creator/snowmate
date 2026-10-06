@@ -90,6 +90,16 @@ export default function DatenschutzPage() {
         Zusammenfassung mit Datum, Uhrzeit und Skigebiet; sie siehst nur du. Gespeichert bei Supabase in Frankfurt,
         bis du den Tag oder dein Konto löschst. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
       </p>
+      <h3>Leute kennenlernen (Swipen)</h3>
+      <p>
+        Nur wenn du es einschaltest und dein Geburtsdatum hinterlegt ist. Dann zeigen wir dich anderen, die
+        ebenfalls mitmachen: Name, Profilbild (nach deiner Bild-Einstellung), Fahrstile, Bio und die Zahl gemeinsamer
+        Freunde. Erwachsene sehen nur Erwachsene aus ihrer Region. Unter 18 siehst und triffst du nur Freunde deiner
+        Freunde aus deiner Altersgruppe (14–15 oder 16–17). Ob du jemanden magst oder überspringst, sieht niemand;
+        mögt ihr euch gegenseitig, werdet ihr Freunde. Wir speichern deine Entscheidungen, damit niemand doppelt
+        erscheint, bis du dein Konto löschst. Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO, die du
+        jederzeit mit dem Schalter widerrufen kannst.
+      </p>
       <h3>Ranglisten und Abzeichen</h3>
       <p>
         Aus deinen gespeicherten Skitagen berechnen wir Saisonwerte (Höhenmeter, Kilometer, Tage, Topspeed). Deine
