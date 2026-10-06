@@ -1,25 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
+import GondolaCarousel from "./GondolaCarousel";
 
 const features = [
-  { id: "ride", label: "Ride planen", word: "Zusammen\nlos.", title: "Ein Ride. Alle wissen Bescheid.", description: "Skigebiet, Startzeit und Tempo festlegen. Deine Crew sieht, was du vorhast, und kann sich anschließen. Der Plan steht an einem Ort.", details: ["Gebiet auswählen", "Zeit & Tempo festlegen", "Mit der Crew losfahren"], caption: "Aus einer Idee wird euer nächster Skitag." },
-  { id: "carpool", label: "Mitfahren", word: "Platz für\nmehr.", title: "Ein freier Sitz ist ein guter Anfang.", description: "Du hast noch Platz im Auto? Biete ihn an. Du brauchst eine Mitfahrt? Finde Abfahrt, Ziel und freie Plätze zusammen an einem Ort.", details: ["Fahrt anbieten oder suchen", "Abfahrt gemeinsam klären", "Zusammen zum Skigebiet"], caption: "Die gemeinsame Fahrt beginnt vor der ersten Abfahrt." },
-  { id: "crew", label: "Crew treffen", word: "Da seid\nihr ja.", title: "Andere Piste. Gleiche Crew.", description: "Bleibt in eurer privaten Crew verbunden. Wenn ihr euch am Berg treffen wollt, teilt ihr euren Standort miteinander – genau so lange, wie ihr möchtet.", details: ["Freunde in die Crew holen", "Standort bei Bedarf teilen", "Am Berg wieder zusammenfinden"], caption: "Weniger suchen. Mehr zusammen fahren." },
-  { id: "events", label: "Events finden", word: "Noch eine\nRunde?", title: "Ein Anlass, gemeinsam rauszukommen.", description: "Entdecke öffentliche Events und sieh, wann und wo etwas geplant ist. Volljährige können selbst ein Event hosten und andere zum Mitfahren einladen.", details: ["Öffentliche Events entdecken", "Gebiet & Termin ansehen", "Beim passenden Event dabei sein"], caption: "Für Tage, die ihr noch nicht geplant habt." },
+  { id: "ride", label: "Ride planen", title: "Ein Ride. Alle wissen Bescheid.", description: "Skigebiet, Startzeit und Tempo festlegen. Deine Crew sieht, was du vorhast, und kann sich anschließen. Der Plan steht an einem Ort.", details: ["Gebiet auswählen", "Zeit & Tempo festlegen", "Mit der Crew losfahren"] },
+  { id: "carpool", label: "Mitfahren", title: "Ein freier Sitz ist ein guter Anfang.", description: "Du hast noch Platz im Auto? Biete ihn an. Du brauchst eine Mitfahrt? Finde Abfahrt, Ziel und freie Plätze zusammen an einem Ort.", details: ["Fahrt anbieten oder suchen", "Abfahrt gemeinsam klären", "Zusammen zum Skigebiet"] },
+  { id: "crew", label: "Crew treffen", title: "Andere Piste. Gleiche Crew.", description: "Bleibt in eurer privaten Crew verbunden. Wenn ihr euch am Berg treffen wollt, teilt ihr euren Standort miteinander – genau so lange, wie ihr möchtet.", details: ["Freunde in die Crew holen", "Standort bei Bedarf teilen", "Am Berg wieder zusammenfinden"] },
+  { id: "events", label: "Events finden", title: "Ein Anlass, gemeinsam rauszukommen.", description: "Entdecke öffentliche Events und sieh, wann und wo etwas geplant ist. Volljährige können selbst ein Event hosten und andere zum Mitfahren einladen.", details: ["Öffentliche Events entdecken", "Gebiet & Termin ansehen", "Beim passenden Event dabei sein"] },
 ];
-
-function FeatureArtwork({ feature }) {
-  return <div className={`feature-art feature-art--${feature.id}`} aria-hidden="true">
-    <span className="art-label">pistl / {feature.label}</span>
-    <span className="art-word">{feature.word}</span>
-    {feature.id === "ride" && <div className="ride-ribbons"><span>Dein Gebiet</span><span>Dein Tempo</span><span>Deine Leute</span></div>}
-    {feature.id === "carpool" && <div className="seat-grid"><span className="seat seat-driver">Du</span><span className="seat">+1</span><span className="seat">+1</span><span className="seat">+1</span></div>}
-    {feature.id === "crew" && <div className="crew-orbit"><span>Du</span><span>Deine</span><span>Crew</span></div>}
-    {feature.id === "events" && <div className="event-stamp"><span>Nächster Halt</span><strong>Bergtag</strong><span>Mit guten Leuten</span></div>}
-    <span className="art-bottom">{feature.caption}</span>
-  </div>;
-}
 
 export default function Features() {
   const [active, setActive] = useState(0);
@@ -43,7 +32,7 @@ export default function Features() {
         {features.map((item, index) => <button key={item.id} ref={(element) => { tabs.current[index] = element; }} type="button" role="tab" id={`tab-${item.id}`} aria-selected={active === index} aria-controls="feature-panel" tabIndex={active === index ? 0 : -1} onClick={() => setActive(index)} onKeyDown={(event) => navigate(event, index)}>{item.label}</button>)}
       </div>
       <div className="feature-panel" id="feature-panel" role="tabpanel" aria-labelledby={`tab-${feature.id}`} tabIndex={0}>
-        <div className="feature-stage" key={feature.id}><FeatureArtwork feature={feature}/></div>
+        <GondolaCarousel items={features} active={active} onChange={setActive}/>
         <div className="feature-copy" key={`${feature.id}-copy`}>
           <h3>{feature.title}</h3>
           <p>{feature.description}</p>
