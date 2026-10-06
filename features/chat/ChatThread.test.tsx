@@ -96,6 +96,9 @@ describe("ChatThread", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
     await waitFor(() => expect(mocks.sendLocation).toHaveBeenCalledWith(CONV, 47.2, 11.3));
+    /* The button is disabled while the first pin is sending; a click
+       before it is enabled again would be ignored. */
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send my location" })).toBeEnabled());
 
     fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/from 16/);
