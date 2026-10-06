@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
 import { useId, useRef } from "react";
 
 const finishes = [
@@ -91,7 +93,7 @@ export default function GondolaCarousel({ items, active, onChange }) {
     </div>
     <div className="gondola-navigation">
       <span className="gondola-hint">Ziehen & entdecken</span>
-      <div className="gondola-arrows"><button type="button" aria-label="Vorherige Funktion" onClick={() => move(-1)}>←</button><button type="button" aria-label="Nächste Funktion" onClick={() => move(1)}>→</button></div>
+      <div className="gondola-arrows"><button type="button" aria-label="Vorherige Funktion" onClick={() => move(-1)}><ArrowLeft size={22} aria-hidden="true" /></button><button type="button" aria-label="Nächste Funktion" onClick={() => move(1)}><ArrowRight size={22} aria-hidden="true" /></button></div>
     </div>
     <span className="sr-only" aria-live="polite" aria-atomic="true">{items[featureIndex(active)].label}, {featureIndex(active) + 1} von {items.length}</span>
   </div>;

@@ -20,7 +20,7 @@ test('waitlist sends explicit preferences and confirms only a successful signup'
     await route.fulfill({ json: { ok: true } });
   });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Wer fährt heute wohin?');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ab auf den Berg.');
   await expect(page.getByLabel('Ich möchte auch am Early Access teilnehmen.', { exact: true })).not.toBeChecked();
   const form = await completeWaitlist(page, { earlyAccess: true });
   await form.getByRole('button', { name: 'Auf die Warteliste', exact: true }).click();
@@ -155,7 +155,7 @@ test('metadata, footer destinations, logo and custom 404 are usable', async ({ p
     }
   }
   await page.getByRole('link', { name: 'Pistl – Startseite' }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Wer fährt heute wohin?');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ab auf den Berg.');
   const response = await page.goto('/diese-piste-gibt-es-nicht');
   expect(response.status()).toBe(404);
   await expect(page.getByRole('heading', { name: 'Hier geht’s zurück.' })).toBeVisible();
@@ -225,6 +225,8 @@ test('gondola carousel supports drag, arrows, infinite wrapping and keyboard', a
   await stage.focus();
   await stage.press('ArrowRight');
   await expect(page.locator('#feature-panel')).toHaveAccessibleName('Crew treffen');
+  // Place the drag surface below the sticky header before using coordinates.
+  await stage.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
   const box = await stage.boundingBox();
   await page.mouse.move(box.x + box.width * .7, box.y + 150);
   await page.mouse.down();
@@ -243,4 +245,20 @@ test('gondola carousel supports drag, arrows, infinite wrapping and keyboard', a
   for (let index = 0; index < 10; index++) await page.keyboard.press('ArrowRight');
   await expect(stage).toBeFocused();
   await expect(page.locator('#feature-panel')).toHaveAccessibleName('Ride planen');
+});
+
+
+test('mobile hero keeps readable copy and uses vector arrows with scroll depth', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.hero-description')).toHaveText('Plane deinen nächsten Skitag mit Freunden. Finde eine Mitfahrt und los geht’s.');
+  await expect(page.locator('.panorama-hero .button-arrow')).toHaveJSProperty('tagName', 'svg');
+  expect(await page.locator('body').innerText()).not.toMatch(/[↗↓←→]/);
+  const paragraph = page.locator('.hero-description');
+  expect(await paragraph.evaluate((element) => ({ color: getComputedStyle(element).color, width: element.scrollWidth <= element.clientWidth }))).toEqual({ color: 'rgb(30, 48, 43)', width: true });
+  await page.evaluate(() => window.scrollTo(0, 240));
+  await expect.poll(() => page.locator('.mountain-scene').evaluate((element) => Number(element.style.getPropertyValue('--scene-progress')))).toBeGreaterThan(0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(() => page.locator('.mountain-scene').evaluate((element) => Number(element.style.getPropertyValue('--scene-progress')))).toBe(0);
+  expect(await page.locator('.mountain-world').evaluate((element) => getComputedStyle(element).transform)).toBe('none');
 });

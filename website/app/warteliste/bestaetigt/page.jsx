@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import ActionButton from "../../../components/ui/ActionButton";
@@ -9,6 +10,6 @@ export default function ConfirmedPage() {
     <p className="eyebrow">WARTELISTE / BESTÄTIGT.</p>
     <h1>Du bist auf der Warteliste.</h1>
     <p>Danke! Wir melden uns per E-Mail, sobald Pistl startet. Hast du Early Access angekreuzt, laden wir dich schrittweise zum Testen ein.</p>
-    <ActionButton href="/">Zur Startseite ↗</ActionButton>
+    <ActionButton href="/">Zur Startseite <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></ActionButton>
   </main><Footer landscape={false} /></>;
 }

@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import ActionButton from "../../../components/ui/ActionButton";
@@ -17,8 +18,8 @@ export default async function ConfirmPage({ searchParams }) {
   return <><Header /><main id="main" className="container not-found">
     <p className="eyebrow">WARTELISTE / EIN KLICK NOCH.</p>
     {problem
-      ? <><h1>{problem.title}</h1><p>{problem.text}</p><ActionButton href="/#waitlist">Zur Warteliste ↗</ActionButton></>
+      ? <><h1>{problem.title}</h1><p>{problem.text}</p><ActionButton href="/#waitlist">Zur Warteliste <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></ActionButton></>
       : <><h1>Fast geschafft.</h1><p>Bestätige deine Anmeldung, dann bist du auf der Pistl-Warteliste.</p>
-        <form method="post" action="/api/waitlist/confirm"><input type="hidden" name="t" value={t} /><ActionButton type="submit">Ja, ich will auf die Warteliste ↗</ActionButton></form></>}
+        <form method="post" action="/api/waitlist/confirm"><input type="hidden" name="t" value={t} /><ActionButton type="submit">Ja, ich will auf die Warteliste <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></ActionButton></form></>}
   </main><Footer landscape={false} /></>;
 }

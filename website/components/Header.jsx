@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import ActionButton from "./ui/ActionButton";
 
 const links = [["Entdecken", "/#entdecken"], ["Fragen", "/#faq"]];
@@ -26,7 +26,7 @@ export default function Header() {
       <button ref={toggle} type="button" className="menu-toggle" aria-label={open ? "Menü schließen" : "Menü öffnen"} aria-expanded={open} aria-controls="mobile-nav" onClick={() => setOpen(!open)}>{open ? <X aria-hidden="true"/> : <Menu aria-hidden="true"/>}</button>
     </div>
     <nav id="mobile-nav" aria-label="Mobile Navigation" className="mobile-nav" hidden={!open}>
-      {[...links, ["Früh dabei sein", "/#waitlist"]].map(([text, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{text}<span aria-hidden="true">↗</span></Link>)}
+      {[...links, ["Früh dabei sein", "/#waitlist"]].map(([text, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{text}<span aria-hidden="true"><ArrowUpRight size={18} /></span></Link>)}
     </nav>
   </header>;
 }

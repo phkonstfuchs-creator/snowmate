@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowUpRight } from "lucide-react";
+
 import { useState } from "react";
 import GondolaCarousel from "./GondolaCarousel";
 
@@ -26,7 +28,7 @@ export default function Features() {
           <h3>{feature.title}</h3>
           <p>{feature.description}</p>
           <ol>{feature.details.map((detail, index) => <li key={detail}><span aria-hidden="true">{index + 1}</span>{detail}</li>)}</ol>
-          <a className="feature-link" href="#waitlist">Beim Start dabei sein <span aria-hidden="true">↗</span></a>
+          <a className="feature-link" href="#waitlist">Beim Start dabei sein <span aria-hidden="true"><ArrowUpRight size={18} /></span></a>
         </div>
       </div>
     </div>

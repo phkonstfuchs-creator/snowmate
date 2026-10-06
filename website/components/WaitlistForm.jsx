@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Check, LoaderCircle, Copy } from "lucide-react";
+import { Check, LoaderCircle, Copy, ArrowUpRight } from "lucide-react";
 import ActionButton from "./ui/ActionButton";
 
 export default function WaitlistForm() {
@@ -58,7 +58,7 @@ export default function WaitlistForm() {
     <div className="honeypot" aria-hidden="true"><label htmlFor="website-field">Website</label><input id="website-field" name="website" tabIndex={-1} autoComplete="off" /></div>
     <label className="checkbox-row"><input type="checkbox" name="earlyAccess" /><span>Ich möchte auch am Early Access teilnehmen.</span></label>
     <label className="checkbox-row consent-row"><input type="checkbox" name="consent" required /><span>Ich möchte per E-Mail über den Pistl-Start und ggf. Early Access informiert werden. Meine Einwilligung kann ich jederzeit widerrufen. <Link href="/datenschutz">Datenschutz</Link></span></label>
-    <ActionButton className="signup-submit" type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" aria-hidden="true" /> Wird eingetragen …</> : <>Auf die Warteliste <span className="button-arrow" aria-hidden="true">↗</span></>}</ActionButton>
+    <ActionButton className="signup-submit" type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" aria-hidden="true" /> Wird eingetragen …</> : <>Auf die Warteliste <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></>}</ActionButton>
     <noscript><style>{".signup-submit{display:none!important}"}</style><p>Für die Anmeldung aktiviere bitte JavaScript in deinem Browser.</p></noscript>
     <p id="signup-note" className="form-note">Du bekommst eine E-Mail, um deine Anmeldung zu bestätigen.</p>
     {error && <p id="signup-error" role="alert" className="form-error">{error}</p>}
