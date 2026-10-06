@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import GondolaCarousel from "./GondolaCarousel";
 
 const features = [
@@ -12,15 +12,7 @@ const features = [
 
 export default function Features() {
   const [active, setActive] = useState(0);
-  const tabs = useRef([]);
   const feature = features[active];
-  function navigate(event, index) {
-    const keys = { ArrowRight: (index + 1) % features.length, ArrowLeft: (index + features.length - 1) % features.length, Home: 0, End: features.length - 1 };
-    if (!(event.key in keys)) return;
-    event.preventDefault();
-    setActive(keys[event.key]);
-    tabs.current[keys[event.key]]?.focus();
-  }
   return <section id="entdecken" className="product-section section-space" aria-labelledby="features-heading">
     <div className="container">
       <div className="product-heading" data-scroll-reveal>
@@ -28,10 +20,7 @@ export default function Features() {
         <h2 id="features-heading">Gut, wenn alle<br/><span>denselben Plan haben.</span></h2>
         <p>Wer kommt mit? Wie kommen wir hin? Wo treffen wir uns?<br className="desktop-break"/> Genau dafür gibt es Pistl.</p>
       </div>
-      <div className="feature-tabs" role="tablist" aria-label="Pistl Funktionen">
-        {features.map((item, index) => <button key={item.id} ref={(element) => { tabs.current[index] = element; }} type="button" role="tab" id={`tab-${item.id}`} aria-selected={active === index} aria-controls="feature-panel" tabIndex={active === index ? 0 : -1} onClick={() => setActive(index)} onKeyDown={(event) => navigate(event, index)}>{item.label}</button>)}
-      </div>
-      <div className="feature-panel" id="feature-panel" role="tabpanel" aria-labelledby={`tab-${feature.id}`} tabIndex={0}>
+      <div className="feature-panel" id="feature-panel" role="region" aria-label={feature.label}>
         <GondolaCarousel items={features} active={active} onChange={setActive}/>
         <div className="feature-copy" key={`${feature.id}-copy`}>
           <h3>{feature.title}</h3>

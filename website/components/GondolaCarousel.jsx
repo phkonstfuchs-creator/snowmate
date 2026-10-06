@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 
 const finishes = [
   { body: "#d9ee8b", side: "#9dad5b", ink: "#253525" },
@@ -35,12 +35,44 @@ function Cabin({ index, label, uid }) {
   </svg>;
 }
 
+/* Where each cabin hangs relative to the one in front: 0 centre, ±1 the
+   neighbours, ±2 out of sight. The line runs in a loop, so after the last
+   function comes the first again. A cabin that leaves on one side and
+   has to come in on the other jumps there while out of sight. */
+function placeCabins(count, active, direction) {
+  return Array.from({ length: count }, (_, index) => {
+    const ahead = (((index - active) % count) + count) % count;
+    if (ahead === 0) return 0;
+    if (ahead < count / 2) return ahead;
+    if (ahead > count / 2) return ahead - count;
+    return direction > 0 ? -ahead : ahead;
+  });
+}
+
 export default function GondolaCarousel({ items, active, onChange }) {
   const uid = useId().replaceAll(":", "");
   const stage = useRef(null);
   const gesture = useRef(null);
   const dragged = useRef(false);
-  const move = (direction) => onChange(Math.max(0, Math.min(items.length - 1, active + direction)));
+  const [offsets, setOffsets] = useState(() => placeCabins(items.length, active, 1));
+  const [jumping, setJumping] = useState([]);
+  function go(next, direction) {
+    const target = placeCabins(items.length, next, direction);
+    /* Cabins that would cross the whole stage go round out of sight first. */
+    const crossing = target.flatMap((offset, index) => (Math.abs(offset - offsets[index]) > 1 ? [index] : []));
+    if (crossing.length) {
+      setJumping(crossing);
+      setOffsets(offsets.map((offset, index) => (crossing.includes(index) ? Math.sign(target[index]) * 2 : offset)));
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        setJumping([]);
+        setOffsets(target);
+      }));
+    } else {
+      setOffsets(target);
+    }
+    onChange(next);
+  }
+  const move = (direction) => go((active + direction + items.length) % items.length, direction);
   function start(event) {
     if (!event.isPrimary || event.button !== 0) return;
     gesture.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
@@ -77,17 +109,18 @@ export default function GondolaCarousel({ items, active, onChange }) {
       <div className="gondola-cable" aria-hidden="true"/>
       <div className="gondola-ground" aria-hidden="true"/>
       {items.map((item, index) => {
-        const offset = index - active;
+        const offset = offsets[index];
         return <button type="button" key={item.id} className="gondola" tabIndex={-1} aria-label={item.label} aria-pressed={index === active}
+          data-hidden={Math.abs(offset) > 1 ? "true" : undefined} data-jumping={jumping.includes(index) ? "true" : undefined}
           style={{ "--offset": offset, "--scale": Math.max(.5, 1 - Math.abs(offset) * .24), zIndex: 10 - Math.abs(offset) }}
-          onClick={() => { if (!dragged.current) onChange(index); }}>
+          onClick={() => { if (!dragged.current && index !== active) go(index, Math.sign(offset)); }}>
           <Cabin index={index} label={item.label} uid={`${uid}-${index}`}/>
         </button>;
       })}
     </div>
     <div className="gondola-navigation">
       <span className="gondola-hint">Ziehen & entdecken</span>
-      <div className="gondola-arrows"><button type="button" aria-label="Vorherige Funktion" onClick={() => move(-1)} disabled={active === 0}>←</button><button type="button" aria-label="Nächste Funktion" onClick={() => move(1)} disabled={active === items.length - 1}>→</button></div>
+      <div className="gondola-arrows"><button type="button" aria-label="Vorherige Funktion" onClick={() => move(-1)}>←</button><button type="button" aria-label="Nächste Funktion" onClick={() => move(1)}>→</button></div>
     </div>
     <span className="sr-only" aria-live="polite" aria-atomic="true">{items[active].label}, {active + 1} von {items.length}</span>
   </div>;

@@ -78,23 +78,19 @@ test('HTTP success with an unsuccessful response does not claim signup', async (
   await expect(page.getByRole('heading', { name: 'Fast geschafft – schau in dein Postfach.' })).toHaveCount(0);
 });
 
-test('feature explorer changes the entire panel and supports keyboard navigation', async ({ page }) => {
+test('feature explorer changes the entire panel through the gondolas, in a loop', async ({ page }) => {
   await page.goto('/#entdecken');
+  await expect(page.getByRole('tab')).toHaveCount(0);
   const names = ['Ride planen', 'Mitfahren', 'Crew treffen', 'Events finden'];
   const headings = ['Ein Ride. Alle wissen Bescheid.', 'Ein freier Sitz ist ein guter Anfang.', 'Andere Piste. Gleiche Crew.', 'Ein Anlass, gemeinsam rauszukommen.'];
-  for (const [index, name] of names.entries()) {
-    await page.getByRole('tab', { name, exact: true }).click();
-    await expect(page.getByRole('tabpanel')).toHaveAccessibleName(name);
-    await expect(page.getByRole('tabpanel').getByRole('heading')).toHaveText(headings[index]);
-    await expect(page.getByRole('tabpanel').locator('li')).toHaveCount(3);
+  const next = page.getByRole('button', { name: 'Nächste Funktion' });
+  for (const [index, name] of [...names, names[0]].entries()) {
+    const panel = page.getByRole('region', { name, exact: true });
+    await expect(panel.getByRole('heading')).toHaveText(headings[index % names.length]);
+    await expect(panel.locator('li')).toHaveCount(3);
     await expect(page.locator('.gondola[aria-pressed="true"]')).toHaveAccessibleName(name);
+    if (index < names.length) await next.click();
   }
-  await page.getByRole('tab', { name: 'Events finden' }).press('Home');
-  await expect(page.getByRole('tab', { name: 'Ride planen' })).toBeFocused();
-  await page.getByRole('tab', { name: 'Ride planen' }).press('ArrowRight');
-  await expect(page.getByRole('tab', { name: 'Mitfahren' })).toHaveAttribute('aria-selected', 'true');
-  await page.getByRole('tab', { name: 'Mitfahren' }).press('Tab');
-  await expect(page.getByRole('tabpanel')).toBeFocused();
 });
 
 test('reduced motion disables decorative transforms', async ({ page }) => {
@@ -118,10 +114,10 @@ test('mobile menu closes on Escape and selection; every feature fits narrow scre
     await page.getByRole('navigation', { name: 'Mobile Navigation' }).getByRole('link', { name: 'Entdecken' }).click();
     await expect(page).toHaveURL(/\/#entdecken$/);
     await expect(page.getByRole('navigation', { name: 'Mobile Navigation' })).toBeHidden();
-    for (const tab of await page.getByRole('tab').all()) {
-      await tab.click();
+    for (let step = 0; step < 4; step += 1) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-      expect(await page.getByRole('tabpanel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+      expect(await page.locator('#feature-panel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+      await page.getByRole('button', { name: 'Nächste Funktion' }).click();
     }
   }
 });
@@ -129,9 +125,9 @@ test('mobile menu closes on Escape and selection; every feature fits narrow scre
 test('feature headlines fit tablet screens and signup follows consent', async ({ page }) => {
   await page.setViewportSize({ width: 761, height: 950 });
   await page.goto('/');
-  for (const tab of await page.getByRole('tab').all()) {
-    await tab.click();
-    expect(await page.getByRole('tabpanel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  for (let step = 0; step < 4; step += 1) {
+    expect(await page.locator('#feature-panel').getByRole('heading').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    await page.getByRole('button', { name: 'Nächste Funktion' }).click();
   }
   const order = await page.getByRole('form').locator('input:not([tabindex="-1"]), button[type="submit"]').evaluateAll((elements) => elements.map((element) => element.getAttribute('name') || element.getAttribute('type')));
   expect(order).toEqual(['email', 'earlyAccess', 'consent', 'submit']);
@@ -206,33 +202,39 @@ test('every feature state passes mobile accessibility checks', async ({ page }) 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#entdecken');
-  for (const tab of await page.getByRole('tab').all()) {
-    await tab.click();
+  for (let step = 0; step < 4; step += 1) {
+    if (step > 0) await page.getByRole('button', { name: 'Nächste Funktion' }).click();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
   }
 });
 
 
-test('gondola carousel supports drag, arrows, boundaries and keyboard', async ({ page }) => {
+test('gondola carousel supports drag, arrows and keyboard, and runs in a loop', async ({ page }) => {
   await page.goto('/#entdecken');
+  const panel = page.locator('#feature-panel');
   const next = page.getByRole('button', { name: 'Nächste Funktion' });
   const previous = page.getByRole('button', { name: 'Vorherige Funktion' });
-  await expect(previous).toBeDisabled();
+  await expect(previous).toBeEnabled();
+  await previous.click();
+  await expect(panel).toHaveAccessibleName('Events finden');
   await next.click();
-  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Mitfahren');
+  await expect(panel).toHaveAccessibleName('Ride planen');
+  await next.click();
+  await expect(panel).toHaveAccessibleName('Mitfahren');
   const stage = page.getByRole('group', { name: /Gondeln mit Pistl/ });
   await stage.focus();
   await stage.press('ArrowRight');
-  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Crew treffen');
+  await expect(panel).toHaveAccessibleName('Crew treffen');
   const box = await stage.boundingBox();
   await page.mouse.move(box.x + box.width * .7, box.y + 150);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width * .7, box.y + 151);
   await page.mouse.move(box.x + box.width * .7 - 110, box.y + 155, { steps: 8 });
   await page.mouse.up();
-  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Events finden');
-  await expect(next).toBeDisabled();
-  await previous.click();
-  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Crew treffen');
+  await expect(panel).toHaveAccessibleName('Events finden');
+  await expect(next).toBeEnabled();
+  await stage.press('ArrowRight');
+  await expect(panel).toHaveAccessibleName('Ride planen');
+  await expect(page.locator('.gondola:not([data-hidden])')).toHaveCount(3);
 });
