@@ -79,6 +79,16 @@ export default function DatenschutzPage() {
         Zusammenfassung mit Datum, Uhrzeit und Skigebiet; sie siehst nur du. Gespeichert bei Supabase in Frankfurt,
         bis du den Tag oder dein Konto löschst. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
       </p>
+      <h3>Ranglisten und Abzeichen</h3>
+      <p>
+        Aus deinen gespeicherten Skitagen berechnen wir Saisonwerte (Höhenmeter, Kilometer, Tage, Topspeed). Deine
+        bestätigten Freunde sehen sie in ihrer Rangliste, solange du das in den Einstellungen nicht ausschaltest.
+        In der Regions-Rangliste erscheinst du nur, wenn du sie selbst einschaltest. Dann sehen alle aus deiner
+        Region auf Pistl deinen Namen und deine Saisonwerte. Unter 18 erscheinst du dort immer anonym, ohne Namen
+        und Bild. Einzelne Tage oder Uhrzeiten sieht niemand. Abzeichen berechnet nur dein Gerät; sie siehst nur du.
+        Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO, für die Regions-Rangliste deine Einwilligung (Art. 6 Abs. 1
+        lit. a DSGVO), die du jederzeit in den Einstellungen widerrufen kannst.
+      </p>
       <h3>Push-Benachrichtigungen</h3>
       <p>
         Nur wenn du sie in den Einstellungen einschaltest, und nur für das Gerät, auf dem du das tust. Dann speichern

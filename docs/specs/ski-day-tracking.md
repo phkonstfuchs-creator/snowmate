@@ -30,7 +30,8 @@ how fast and how many runs, and to look back over the season.
 - **The GPS track never leaves the phone.** It stays in memory and in
   this browser's storage while recording, and is deleted on finish. Only
   the summary is stored.
-- **Visibility:** for now only the owner sees saved days. This is the
+- **Visibility:** only the owner sees saved days. Season totals can
+  appear on leaderboards ([leaderboards](leaderboards.md)). This is the
   same for minors and adults.
 - **Plausibility:** values no skier reaches are refused (over 150 km/h,
   250 km, 25,000 m vertical, 16 h, or a start more than 36 h ago), so

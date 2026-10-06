@@ -14,6 +14,11 @@ import MyRides from "./MyRides";
 import PostList from "@/features/posts/PostList";
 import PushSettings from "@/features/notifications/PushSettings";
 import SkiDays from "@/features/tracking/SkiDays";
+import Badges from "@/features/gamification/Badges";
+import Leaderboard from "@/features/gamification/Leaderboard";
+import LeaderboardSettings from "@/features/gamification/LeaderboardSettings";
+import { earnedBadges } from "@/features/gamification/badges";
+import type { LeaderboardRow, LeaderboardSettings as LeaderboardSettingsValue } from "@/features/gamification/leaderboard";
 import type { SkiDay } from "@/features/tracking/ski-day";
 import type { Post } from "@/features/posts/post";
 import type { LiveRide } from "@/features/rides/live-ride";
@@ -194,6 +199,8 @@ export default function ProfileScreen({
   myPosts,
   skiDays,
   today,
+  seasonBoard,
+  leaderboardSettings,
 }: {
   account?: OwnProfile | null;
   stats?: AccountStats | null;
@@ -202,6 +209,8 @@ export default function ProfileScreen({
   myRides?: { upcoming: LiveRide[]; past: LiveRide[] };
   myPosts?: Post[] | null;
   skiDays?: SkiDay[] | null;
+  seasonBoard?: LeaderboardRow[] | null;
+  leaderboardSettings?: LeaderboardSettingsValue | null;
   /* ISO timestamp from the server, so the season does not depend on render time. */
   today?: string;
 }) {
@@ -551,6 +560,17 @@ export default function ProfileScreen({
       )}
 
       {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}
+      {isLive && skiDays !== undefined && (
+        <Badges
+          earned={earnedBadges({
+            days: skiDays ?? [],
+            ridesHosted: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => ride.isHost).length,
+            ridesJoined: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => !ride.isHost).length,
+            friends: stats?.crew ?? 0,
+          })}
+        />
+      )}
+      {isLive && seasonBoard !== undefined && <Leaderboard initial={seasonBoard} inRegion={leaderboardSettings?.region === true} />}
       {isLive && myRides && <MyRides upcoming={myRides.upcoming} past={myRides.past} />}
       {isLive && myPosts !== undefined && <PostList posts={myPosts} title={t("posts.mine")} />}
 
@@ -563,6 +583,7 @@ export default function ProfileScreen({
         <div className="-mx-4">
           {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
           {isLive && <PushSettings />}
+          {isLive && account && leaderboardSettings !== undefined && <LeaderboardSettings initial={leaderboardSettings} isMinor={account.isMinor} />}
           <LanguageSwitch />
           {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}
           {isLive && <AccountSection blocked={blocked} />}
