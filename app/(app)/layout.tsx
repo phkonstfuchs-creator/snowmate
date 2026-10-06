@@ -2,6 +2,7 @@ import BottomNav from "@/components/BottomNav";
 import RefreshOnResume from "@/components/RefreshOnResume";
 import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
 import PendingInviteSync from "@/features/crew/PendingInviteSync";
+import TrackingProvider from "@/features/tracking/TrackingProvider";
 import { getPendingCounts } from "@/features/crew/queries";
 import { getUnreadChatCount } from "@/features/chat/queries";
 import { refreshOwnAge } from "@/features/profile/queries";
@@ -26,7 +27,9 @@ export default async function AppLayout({
 
   return (
     <div className="app-shell">
-      <main className="page-content">{children}</main>
+      <TrackingProvider>
+        <main className="page-content">{children}</main>
+      </TrackingProvider>
       <BottomNav
         badges={{
           "/feed": pending.rideRequests,

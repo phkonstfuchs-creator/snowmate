@@ -7,15 +7,17 @@ import { listMyBlocks } from "@/features/safety/queries";
 import { listPosts } from "@/features/posts/queries";
 import { splitMyRides } from "@/features/rides/my-rides";
 import { toIsoDay } from "@/features/rides/live-ride";
+import { listMySkiDays } from "@/features/tracking/queries";
 
 export default async function ProfilePage() {
-  const [account, rides, graph, blocked, mfaEnabled, myPosts] = await Promise.all([
+  const [account, rides, graph, blocked, mfaEnabled, myPosts, skiDays] = await Promise.all([
     getOwnProfile(),
     listRides(new Date(), { includePast: true }),
     getFriendGraph(),
     listMyBlocks(),
     getMfaEnabled(),
     listPosts({ onlyMine: true }),
+    listMySkiDays(),
   ]);
   const myRides = splitMyRides(rides.status === "ok" ? rides.rides : [], toIsoDay(new Date()));
 
@@ -27,6 +29,8 @@ export default async function ProfilePage() {
       mfaEnabled={mfaEnabled}
       myRides={myRides}
       myPosts={myPosts}
+      skiDays={skiDays}
+      today={new Date().toISOString()}
     />
   );
 }

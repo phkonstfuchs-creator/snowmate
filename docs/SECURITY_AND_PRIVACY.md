@@ -103,6 +103,16 @@ posts can be reported through report and block. Posts are in the data
 export, and account deletion removes the photos. See
 [ADR 0024](adr/0024-ski-day-posts.md).
 
+## Ski-day tracking
+
+Started and finished by the person on the map. The GPS track stays on the
+device: it is held in memory and, while recording, in this browser's
+storage, and is deleted on finish. Only the summary is saved, and only
+the owner sees it: times, resort, distance, vertical, top speed and
+runs. The app and the database refuse implausible values, and at most 5
+days can be saved per 24 h. The export lists the days, and account
+deletion removes them. See [ADR 0026](adr/0026-ski-day-tracking.md).
+
 ## Push notifications
 
 Opt-in per device, in the profile settings. The device's Web Push
