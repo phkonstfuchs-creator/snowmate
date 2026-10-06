@@ -12,7 +12,7 @@ const features = [
 
 export default function Features() {
   const [active, setActive] = useState(0);
-  const feature = features[active];
+  const feature = features[((active % features.length) + features.length) % features.length];
   return <section id="entdecken" className="product-section section-space" aria-labelledby="features-heading">
     <div className="container">
       <div className="product-heading" data-scroll-reveal>
