@@ -10,7 +10,9 @@ export default defineConfig({
   outputDir: './test-results',
   fullyParallel: true,
   workers: 2,
-  reporter: 'list',
+  /* In CI also as GitHub annotations, so a failing test shows its name
+     and error on the check without opening the raw log. */
+  reporter: process.env.CI ? [['list'], ['github']] : 'list',
   use: {
     baseURL,
     trace: 'retain-on-failure',
