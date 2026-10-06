@@ -36,5 +36,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0026](0026-ski-day-tracking.md) | Ski-day tracking: on-device track, server keeps only the summary | Accepted |
 | [0027](0027-leaderboards-and-stamps.md) | Leaderboards from season totals; region opt-in, minors anonymous | Accepted |
 | [0028](0028-swipe-discovery.md) | Swipe discovery: opt-in, age bands, minors only among friends of friends | Accepted |
+| [0029](0029-lift-meetup-estimates.md) | Short-lived lift meetup estimates from static data | Proposed |
 
 Template: context, options considered, decision, consequences, status.

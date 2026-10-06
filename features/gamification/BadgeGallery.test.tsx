@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Badges from "./Badges";
+import Badges from "./BadgeGallery";
 
 describe("Badges", () => {
   it("shows earned and locked stamps and explains one on tap", () => {

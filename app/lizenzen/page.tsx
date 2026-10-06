@@ -30,6 +30,13 @@ export default function LizenzenPage() {
           Pisten und Lifte: <A href="https://www.opensnowmap.org">OpenSnowMap</A>, Daten © OpenStreetMap-Mitwirkende (ODbL).
         </li>
         <li>
+          Lift-Treffpunkte und Fahrzeiten: statische Liftdaten © <A href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</A>,
+          unter der <A href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</A>. Fehlende Fahrzeiten werden
+          aus der erfassten Liftlänge und einer typischen Geschwindigkeit des Lifttyps geschätzt. Die Richtung der
+          Stationen wurde einmalig mit offenen Höhendaten von <A href="https://open-meteo.com/en/docs/elevation-api">Open-Meteo</A>
+          geprüft; dabei wurden nur feste OSM-Stationskoordinaten abgefragt.
+        </li>
+        <li>
           Geländeschattierung: Terrain Tiles von Mapzen über AWS Open Data, aus Quellen wie USGS, NASA SRTM und EU-DEM;
           vollständige Quellenangabe <A href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">hier</A>.
         </li>

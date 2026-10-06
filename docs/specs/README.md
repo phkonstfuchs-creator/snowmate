@@ -20,3 +20,4 @@ The workflow is in [../AI_WORKFLOW.md](../AI_WORKFLOW.md).
 | [Ski-day tracking](ski-day-tracking.md) | Agreed |
 | [Leaderboards and stamps](leaderboards.md) | Agreed |
 | [Swipe to meet riders](discovery-swipe.md) | Agreed |
+| [Lift meetup estimate](lift-meetup.md) | Implemented, awaiting acceptance |

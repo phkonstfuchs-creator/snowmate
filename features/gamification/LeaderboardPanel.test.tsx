@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import Leaderboard from "./Leaderboard";
+import Leaderboard from "./LeaderboardPanel";
 import type { LeaderboardRow } from "./leaderboard";
 
 const mocks = vi.hoisted(() => ({ leaderboardAction: vi.fn() }));
