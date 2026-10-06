@@ -19,7 +19,7 @@ Pistl is the social coordination layer of the mountain: "who's riding today, whe
 
 Success = a young skier in Innsbruck opens the app on a Saturday morning, sees who's riding, posts a ride or joins one, finds a carpool seat, and is on the mountain with the right people — without sending a single WhatsApp message.
 
-Safety by design: no open 1:1 stranger matching for minors. The product is built on a friend-graph model where discovery happens within your crew and friends-of-friends.
+Safety by design: no open 1:1 stranger matching for minors. The product is built on a friend-graph model where discovery happens within your crew and friends-of-friends. Swiping to meet riders follows this: under 18 it shows only friends of friends in the same age band; open regional swiping is for adults only, and opt-in (ADR 0028).
 
 The one deliberate exception is **public events**: group rides a host opens to everyone, because a new arrival with an empty friend graph otherwise has nowhere to start. They are group-shaped, never 1:1, and they carry a stricter rule than the friend feed — a minor can never host one, the resort is public but the exact meeting point unlocks only on joining, and friendship alone does not unlock it. Every ride is friends-only unless the host explicitly opens it.
 

@@ -1,8 +1,19 @@
-import { redirect } from "next/navigation";
+import DiscoverScreen from "@/features/discovery/DiscoverScreen";
+import { getDeck, getDiscoverable } from "@/features/discovery/queries";
+import { getOwnProfile } from "@/features/profile/queries";
 
-/* People search runs on fixtures and stays in /demo. Signed-in users add
-   friends by handle on the crew screen instead: there is deliberately no
-   open search over real accounts. */
-export default function PeoplePage() {
-  redirect("/crew");
+/* Swipe to meet riders (ADR 0028). Who appears is decided in the
+   database: opt-in, same age band and region, under 18 only friends of
+   friends. */
+export default async function PeoplePage() {
+  const [profile, discoverable] = await Promise.all([getOwnProfile(), getDiscoverable()]);
+  const deck = discoverable ? await getDeck() : [];
+  return (
+    <DiscoverScreen
+      initialDeck={deck}
+      discoverable={discoverable}
+      hasBirthDate={Boolean(profile?.birthDate)}
+      isMinor={profile?.isMinor !== false}
+    />
+  );
 }

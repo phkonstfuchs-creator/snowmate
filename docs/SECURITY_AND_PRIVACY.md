@@ -40,6 +40,13 @@ See [ADR 0002](adr/0002-stricter-carpool-visibility.md).
 
 - Friend requests go by exact handle. There is no search over real
   accounts, so minors are not listed for strangers.
+- Swipe discovery (ADR 0028) is opt-in and needs a birth date. Age
+  bands 14–15, 16–17 and adults never see each other. Under 18 the deck
+  holds only friends of friends, so minors are never shown to strangers.
+  Adults see opted-in adults of their region. Likes stay secret; a
+  mutual like makes a friendship. Blocks, existing friendships and
+  requests keep people out; a pass hides someone for 30 days; 100
+  swipes a day.
 - Twenty unanswered outgoing requests stop further ones.
 - Posting, joining and asking require a finished profile, so nobody meets
   an anonymous account. See [ADR 0005](adr/0005-require-finished-profile.md).

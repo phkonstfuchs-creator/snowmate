@@ -1,6 +1,6 @@
 # 0006 Friend requests by exact handle, capped
 
-- **Status:** Accepted (2026-10-01)
+- **Status:** Accepted (2026-10-01); amended by [ADR 0028](0028-swipe-discovery.md): opt-in swipe discovery for adults in their region and, under 18, among friends of friends. Search over real accounts stays excluded.
 - **Date:** 2026-09-25
 
 ## Context
