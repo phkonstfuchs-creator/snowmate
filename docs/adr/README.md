@@ -35,5 +35,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0025](0025-push-notifications.md) | Push notifications: queued in the database, sent by an edge function | Accepted |
 | [0026](0026-ski-day-tracking.md) | Ski-day tracking: on-device track, server keeps only the summary | Accepted |
 | [0027](0027-leaderboards-and-stamps.md) | Leaderboards from season totals; region opt-in, minors anonymous | Accepted |
+| [0028](0028-swipe-discovery.md) | Swipe discovery: opt-in, age bands, minors only among friends of friends | Accepted |
 
 Template: context, options considered, decision, consequences, status.
