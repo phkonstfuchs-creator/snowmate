@@ -22,6 +22,7 @@ type Listener = (event: BackgroundEvent) => void;
 let watch: PositionWatch | null = null;
 let endTimer: ReturnType<typeof setTimeout> | null = null;
 let lastSent: { position: Position; at: number } | null = null;
+let generation = 0;
 const listeners = new Set<Listener>();
 
 function emit(event: BackgroundEvent) {
@@ -47,6 +48,7 @@ export function isBackgroundSharing(): boolean {
 }
 
 export function stopBackgroundSharing(): void {
+  generation += 1;
   watch?.stop();
   watch = null;
   if (endTimer) clearTimeout(endTimer);
@@ -71,6 +73,8 @@ export function startBackgroundSharing(end: string, texts: { title: string; mess
   }, remaining);
   if (watch) return true;
 
+  /* Answers that arrive after Stop belong to an old share: ignore them. */
+  const current = ++generation;
   watch = watchPositions(
     (fix) => {
       const position: Position = { lat: fix.lat, lng: fix.lng, accuracy: fix.accuracy };
@@ -78,10 +82,15 @@ export function startBackgroundSharing(end: string, texts: { title: string; mess
       if (!shouldSendUpdate(lastSent, position, Date.now())) return;
       lastSent = { position, at: Date.now() };
       void shareLocationAction(position, null).then((result) => {
+        if (current !== generation) return;
         if (result === "invalid") {
           // Ended elsewhere or expired on the server.
           stopBackgroundSharing();
           emit({ type: "ended" });
+        } else if (result === "unavailable") {
+          // Not sent: let the next fix try again right away, and say so.
+          lastSent = null;
+          emit({ type: "error", error: "unavailable" });
         }
       });
     },

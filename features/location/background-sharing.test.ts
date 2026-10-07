@@ -65,6 +65,30 @@ describe("background sharing", () => {
     expect(events).toContainEqual({ type: "error", error: "denied" });
   });
 
+  it("retries and reports a failed send", async () => {
+    const events: unknown[] = [];
+    onBackgroundSharing((event) => events.push(event));
+    mocks.share.mockResolvedValueOnce("unavailable");
+    startBackgroundSharing(inOneHour(), TEXTS);
+    mocks.onFix!({ lat: 47.31, lng: 11.38, accuracy: 9 });
+    await vi.waitFor(() => expect(events).toContainEqual({ type: "error", error: "unavailable" }));
+    mocks.onFix!({ lat: 47.31, lng: 11.38, accuracy: 9 });
+    expect(mocks.share).toHaveBeenCalledTimes(2);
+    expect(isBackgroundSharing()).toBe(true);
+  });
+
+  it("ignores an answer that belongs to a share already stopped", async () => {
+    let answer: (value: string) => void = () => undefined;
+    mocks.share.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
+    startBackgroundSharing(inOneHour(), TEXTS);
+    mocks.onFix!({ lat: 47.31, lng: 11.38, accuracy: 9 });
+    stopBackgroundSharing();
+    startBackgroundSharing(inOneHour(), TEXTS);
+    answer("invalid");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(isBackgroundSharing()).toBe(true);
+  });
+
   it("ends by itself at the chosen time and resumes after a restart", () => {
     vi.useFakeTimers();
     const events: unknown[] = [];
