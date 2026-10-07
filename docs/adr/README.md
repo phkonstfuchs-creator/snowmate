@@ -38,5 +38,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0028](0028-swipe-discovery.md) | Swipe discovery: opt-in, age bands, minors only among friends of friends | Accepted |
 | [0029](0029-lift-meetup-estimates.md) | Short-lived lift meetup estimates from static data | Proposed |
 | [0030](0030-session-and-media-security.md) | Session revocation, private media and browser scripts | Proposed |
+| [0031](0031-native-apps-with-capacitor.md) | Native iOS and Android apps: a Capacitor shell around app.pistl.app | Proposed |
 
 Template: context, options considered, decision, consequences, status.
