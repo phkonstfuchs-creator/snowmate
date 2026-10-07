@@ -66,6 +66,11 @@ Then:
 
 ## Consequences
 
+- Capacitor documents `server.url` as meant for live reload. Pistl uses it
+  on purpose and covers the gaps itself: `errorPath` for the offline screen,
+  `WKAppBoundDomains` together with `allowNavigation` restricted to Pistl's
+  origins, and no secrets on the device.
+
 - Each new device-token or native-location path needs its own spec, and
   pgTAP tests where it touches the database.
 - Web and native release together, because the native app shows the
