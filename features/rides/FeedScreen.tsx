@@ -24,6 +24,10 @@ import Wordmark from "@/components/ui/Wordmark";
 import UserProfileSheet from "@/features/demo/UserProfileSheet";
 import SegmentedControl from "@/components/ui/SegmentedControl";
 import Icon from "@/components/ui/Icon";
+import Avatar from "@/components/ui/Avatar";
+import NextStep from "@/components/ui/NextStep";
+import { initialsFor } from "@/features/profile/profile-input";
+import CreateMenu from "./CreateMenu";
 
 export interface LiveFeed {
   /* null when the backend could not be reached */
@@ -42,6 +46,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
@@ -71,6 +76,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   /* "Out today" means today: a ride next Saturday is in the list, but
      its riders are not on the mountain yet. */
   const todaysRides = rides.filter((ride) => ride.isToday);
+  const facesToday = [...new Map(todaysRides.flatMap((ride) => [ride.host, ...ride.participants]).map((user) => [user.id, user])).values()];
   const ridersToday = board.isLive
     ? todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0)
     : city === "innsbruck" ? 174 : 127;
@@ -89,43 +95,15 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <Wordmark size={30} />
-          <div className="flex items-center gap-2">
-            {live && (
-              <button
-                type="button"
-                onClick={() => setShowComposer(true)}
-                aria-label={t("posts.shareDay")}
-                className="flex h-11 w-11 items-center justify-center"
-                style={{ border: "var(--rule-thin)" }}
-              >
-                <Icon name="sparkles" size={18} color="var(--ink-0)" strokeWidth={1.8} />
-              </button>
-            )}
-            <Link
-              href={`${basePath}/events`}
-              aria-label={t("nav.events")}
-              className="flex h-11 w-11 items-center justify-center"
-              style={{ border: "var(--rule-thin)" }}
-            >
-              <Icon name="calendar-days" size={18} color="var(--ink-0)" strokeWidth={1.8} />
-            </Link>
-            <Link
-              href={`${basePath}/carpool`}
-              aria-label={t("nav.carpool")}
-              className="flex h-11 w-11 items-center justify-center"
-              style={{ border: "var(--rule-thin)" }}
-            >
-              <Icon name="car" size={18} color="var(--ink-0)" strokeWidth={1.8} />
-            </Link>
-            <button
-              onClick={() => setShowPostModal(true)}
-              className="card-tap flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-semibold"
-              style={{ background: "var(--rust)", color: "var(--paper-0)" }}
-            >
-              <Icon name="plus" size={15} strokeWidth={2.4} />
-              {t("feed.postRide")}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            aria-label={t("create.open")}
+            className="card-tap flex h-12 w-12 items-center justify-center"
+            style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 999 }}
+          >
+            <Icon name="plus" size={22} strokeWidth={2.4} />
+          </button>
         </div>
         <div className="px-4 pb-3">
           <SegmentedControl
@@ -137,14 +115,18 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         </div>
       </header>
 
-      {/* Only when someone is actually out today */}
+      {/* "Who's out today?" first: faces, not just a number. */}
       {ridersToday > 0 && (
-        <div className="flex items-center gap-2 px-4 pt-4 pb-1">
-          <span className="pulse-dot" />
-          <span className="text-mono-label" style={{ color: "var(--ink-1)" }}>
+        <section aria-label={t("feed.outToday", { n: ridersToday })} className="flex items-center gap-3 px-4 pt-4 pb-1">
+          <div className="flex -space-x-2">
+            {facesToday.slice(0, 5).map((user) => (
+              <Avatar key={user.id} id={user.id} initials={initialsFor(user.name, user.handle)} size={32} className="ring-2 ring-[var(--paper-0)]" />
+            ))}
+          </div>
+          <span className="text-sm font-semibold" style={{ color: "var(--ink-0)" }}>
             {t("feed.outToday", { n: ridersToday })}
           </span>
-        </div>
+        </section>
       )}
 
       {live && live.profileComplete === false && (
@@ -173,6 +155,11 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
         </div>
       )}
 
+      {/* Nothing today: say what to do instead of an empty screen. */}
+      {rides.length === 0 && !unavailable && (
+        <NextStep icon="plus" text={t("next.feed")} action={t("feed.postRide")} onAction={() => setShowPostModal(true)} />
+      )}
+
       {/* Feed */}
       <div className="px-4 pt-3 pb-4 space-y-3">
         {rides.map((ride, i) => (
@@ -191,30 +178,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           />
         ))}
 
-        {/* An empty feed usually means no friends yet. That is exactly
-            when the answer is the open events, not a prompt to post
-            something yourself. */}
         {rides.length === 0 && !unavailable && (
-          <div className="flex flex-col items-center gap-4 py-14 text-center">
-            <div>
-              <p className="font-bold" style={{ color: "var(--text-primary)" }}>{t("feed.empty")}</p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
-                {t("feed.emptyHint")}
-              </p>
-            </div>
-            <Link
-              href={`${basePath}/events`}
-              className="card-tap font-display px-5 py-3 text-base uppercase"
-              style={{
-                background: "var(--rust)",
-                color: "var(--paper-0)",
-                border: "var(--rule-thick)",
-                boxShadow: "var(--shadow-print)",
-              }}
-            >
-              {t("feed.browseEvents")}
-            </Link>
-          </div>
+          <p className="py-6 text-center text-sm" style={{ color: "var(--ink-2)" }}>
+            {t("feed.empty")} · <Link href={`${basePath}/events`} className="font-semibold underline">{t("feed.browseEvents")}</Link>
+          </p>
         )}
       </div>
 
@@ -223,6 +190,15 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {live && <div className="pb-4" />}
 
       {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
+
+      {showCreate && (
+        <CreateMenu
+          basePath={basePath}
+          onPostRide={() => setShowPostModal(true)}
+          onShareDay={live ? () => setShowComposer(true) : undefined}
+          onClose={() => setShowCreate(false)}
+        />
+      )}
 
       {showPostModal && (
         <PostRideModal

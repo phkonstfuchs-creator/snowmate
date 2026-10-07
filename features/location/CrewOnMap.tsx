@@ -37,7 +37,8 @@ export default function CrewOnMap({ friends, onFocus }: { friends: FriendLocatio
     <section aria-labelledby="crew-on-map" className="px-4 pt-4">
       <h2 id="crew-on-map" className="text-mono-label" style={{ color: "var(--ink-2)" }}>{t("crewmap.title")}</h2>
       {items.length === 0 ? (
-        <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>{t("crewmap.none")}</p>
+        /* The big lift button follows right below: point to it, no copy of it. */
+        <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>{t("next.map")}</p>
       ) : (
         <ul className="-mx-4 mt-2 flex snap-x gap-2 overflow-x-auto px-4 pb-1">
           {items.map((item) => (

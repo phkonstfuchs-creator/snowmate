@@ -28,7 +28,7 @@ test.describe("signed-in journeys against local Supabase", () => {
     await createRide(a.page, caption);
     await b.page.goto("/feed");
     const card = b.page.getByRole("article").filter({ hasText: caption });
-    await card.getByRole("button", { name: "Mitfahren", exact: true }).click();
+    await card.getByRole("button", { name: "Bin dabei", exact: true }).click();
     await expect(card.getByRole("button", { name: "Dabei", exact: true })).toBeVisible();
     for (const actor of [a, b]) {
       await actor.page.reload();
@@ -38,7 +38,7 @@ test.describe("signed-in journeys against local Supabase", () => {
       await expect(detail).toHaveCount(0);
     }
     await card.getByRole("button", { name: "Dabei", exact: true }).click();
-    await expect(card.getByRole("button", { name: "Mitfahren", exact: true })).toBeVisible();
+    await expect(card.getByRole("button", { name: "Bin dabei", exact: true })).toBeVisible();
     for (const actor of [a, b]) {
       await actor.page.reload();
       const detail = await openRide(actor.page, caption);
@@ -81,7 +81,7 @@ test.describe("signed-in journeys against local Supabase", () => {
       await expect(b.page.getByRole("article").getByText(body, { exact: true })).toBeVisible();
       await cPage.goto("/feed");
       await cPage.reload();
-      await expect(cPage.getByRole("button", { name: "Ride posten", exact: true })).toBeVisible();
+      await expect(cPage.getByRole("button", { name: "Neu", exact: true })).toBeVisible();
       await expect(cPage.getByText("Die Posts konnten nicht geladen werden.")).toHaveCount(0);
       await expect(cPage.getByRole("article").getByText(body, { exact: true })).toHaveCount(0);
       expect(await postBodies(b.account)).toContain(body);

@@ -122,7 +122,7 @@ export default function PostComposer({
             {preview ? (
               <div className="relative overflow-hidden" style={{ borderRadius: 10 }}>
                 <Image src={preview} alt={t("posts.photoPreview")} width={800} height={600} unoptimized className="w-full object-cover" style={{ maxHeight: 260, height: "auto" }} />
-                <button type="button" onClick={() => { setPhoto(null); setPreview(null); }} className="absolute right-2 top-2 flex h-9 items-center px-3 text-sm font-semibold" style={{ background: "var(--paper-1)", borderRadius: 5 }}>
+                <button type="button" onClick={() => { setPhoto(null); setPreview(null); }} className="absolute right-2 top-2 flex h-9 items-center px-3 text-sm font-semibold" style={{ background: "var(--paper-1)", borderRadius: 12 }}>
                   {t("avatar.remove")}
                 </button>
               </div>
@@ -140,7 +140,7 @@ export default function PostComposer({
             onClick={() => void submit(close)}
             disabled={busy || normalizePostBody(body) === null}
             className="flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
-            style={{ background: "var(--rust)", color: "var(--paper-0)", borderRadius: 5 }}
+            style={{ background: "var(--rust)", color: "var(--paper-0)", borderRadius: 12 }}
           >
             {busy ? t("common.publishing") : t("posts.share")}
           </button>

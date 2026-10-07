@@ -89,7 +89,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
     });
 
     expect(mocks.join).toHaveBeenCalledWith("ride-1");
@@ -112,11 +112,11 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
     });
 
     expect(screen.getByText("No connection. Try again in a moment.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Join" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "I'm in" })).toBeEnabled();
   });
 
   it("asks to join as a friend of a friend without the joined toast", async () => {
@@ -124,7 +124,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
     });
 
     expect(mocks.join).toHaveBeenCalledWith("ride-1");
@@ -184,7 +184,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Join" }));
+      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
     });
 
     expect(screen.getByText("This ride is full.")).toBeInTheDocument();
@@ -252,6 +252,18 @@ describe("FeedScreen with real data", () => {
     expect(screen.queryByText("No rides today yet")).not.toBeInTheDocument();
   });
 
+  it("starts everything from one + button, and suggests a ride when today is empty", async () => {
+    render(<FeedScreen live={live([])} />);
+    expect(screen.getByRole("note")).toHaveTextContent("No ride today yet");
+    fireEvent.click(screen.getByRole("button", { name: "New" }));
+    const menu = screen.getByRole("dialog", { name: "What do you want to start?" });
+    expect(within(menu).getByRole("link", { name: /Carpool/ })).toHaveAttribute("href", "/carpool");
+    expect(within(menu).getByRole("link", { name: /Events/ })).toHaveAttribute("href", "/events");
+    expect(within(menu).getByRole("button", { name: /Share your ski day/ })).toBeInTheDocument();
+    fireEvent.click(within(menu).getByRole("button", { name: /Post a ride/ }));
+    expect(await screen.findByLabelText("Resort")).toBeInTheDocument();
+  });
+
   it("points an empty feed to the open events", () => {
     render(<FeedScreen live={live([])} />);
     expect(screen.getByRole("link", { name: "Browse open events" })).toHaveAttribute("href", "/events");
@@ -308,7 +320,7 @@ describe("FeedScreen with real data", () => {
 describe("FeedScreen demo", () => {
   it("still runs on fixtures and joins locally", () => {
     render(<FeedScreen />);
-    const joinButtons = screen.getAllByRole("button", { name: "Join" });
+    const joinButtons = screen.getAllByRole("button", { name: "I'm in" });
     fireEvent.click(joinButtons[0]!);
     expect(mocks.join).not.toHaveBeenCalled();
     expect(screen.getAllByRole("button", { name: "Joined" }).length).toBeGreaterThan(0);

@@ -16,7 +16,7 @@ describe("CrewOnMap", () => {
 
   it("says when nobody shares, and stays hidden before the first load", () => {
     const { rerender } = render(<CrewOnMap onFocus={vi.fn()} friends={[]} />);
-    expect(screen.getByText("Nobody in your crew is sharing their location right now.")).toBeInTheDocument();
+    expect(screen.getByText(/Nobody in your crew is sharing right now/)).toBeInTheDocument();
     rerender(<CrewOnMap onFocus={vi.fn()} friends={null} />);
     expect(screen.queryByText(/crew on the mountain/i)).not.toBeInTheDocument();
   });

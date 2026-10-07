@@ -32,6 +32,12 @@ describe("ProfileScreen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("points a rider without a ski day this season to the map", () => {
+    render(<ProfileScreen account={{ ...incomplete, onboardingCompleted: true }} skiDays={[]} />);
+    expect(screen.getByRole("note")).toHaveTextContent("No ski day yet this season");
+    expect(screen.getByRole("link", { name: "Open map" })).toHaveAttribute("href", "/map");
+  });
+
   it("shows the signed-in account and its region", () => {
     render(
       <ProfileScreen

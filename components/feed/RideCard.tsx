@@ -92,7 +92,7 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               {full ? t("card.full") : t("card.open", { n: open })}
             </span>
             {isHost ? (
-              <span className="flex min-h-11 items-center px-3.5 text-sm font-semibold" style={{ background: "var(--ochre)", color: "var(--on-bright)", borderRadius: 5 }}>
+              <span className="flex min-h-11 items-center px-3.5 text-sm font-semibold" style={{ background: "var(--ochre)", color: "var(--on-bright)", borderRadius: 12 }}>
                 {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
               </span>
             ) : (
@@ -102,10 +102,10 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               className="min-h-11 px-4 text-sm font-semibold transition-transform active:scale-[0.98]"
               style={
                 isJoined || isPending
-                  ? { background: "var(--paper-2)", color: "var(--ink-1)", borderRadius: 5 }
+                  ? { background: "var(--paper-2)", color: "var(--ink-1)", borderRadius: 12 }
                   : full
-                  ? { background: "var(--paper-2)", color: "var(--ink-3)", borderRadius: 5 }
-                  : { background: "var(--rust)", color: "var(--paper-0)", borderRadius: 5 }
+                  ? { background: "var(--paper-2)", color: "var(--ink-3)", borderRadius: 12 }
+                  : { background: "var(--rust)", color: "var(--paper-0)", borderRadius: 12 }
               }
             >
               {isJoined ? t("card.joined") : isPending ? t("card.asked") : t("card.join")}

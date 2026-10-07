@@ -76,7 +76,7 @@ export default function SkiDaySummarySheet({ day, onClose }: { day: FinishedDay;
                 onClick={() => void save()}
                 disabled={busy}
                 className="flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 5 }}
+                style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
               >
                 {busy ? t("common.saving") : t("track.save")}
               </button>
@@ -88,7 +88,7 @@ export default function SkiDaySummarySheet({ day, onClose }: { day: FinishedDay;
               type="button"
               onClick={() => setSharing(true)}
               className="flex min-h-12 w-full items-center justify-center gap-2 text-sm font-semibold"
-              style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 5 }}
+              style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
             >
               <Icon name="sparkles" size={16} /> {t("track.shareAsPost")}
             </button>
