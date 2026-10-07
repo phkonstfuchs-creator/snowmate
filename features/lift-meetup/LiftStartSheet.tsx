@@ -17,27 +17,33 @@ function station(t: ReturnType<typeof useT>, lift: Lift): string {
 /* "Ich fahr jetzt Lift": the app guesses the lift from the rider's own
    position (it stays on the phone) and shows when they will be at the
    top before anything is shared. Picking by hand stays one tap away. */
-export default function LiftStartSheet({ resortNames, me, busy, result, onLocate, onStart, onClose }: {
+export default function LiftStartSheet({ resortNames, requestPosition, busy, result, onStart, onClose }: {
   /* resorts offered for picking by hand, e.g. the current region's */
   resortNames: string[];
-  me: Position | null;
+  /* one fresh fix, no lasting watch; must be stable (useCallback) */
+  requestPosition: () => Promise<Position | null>;
   busy: boolean;
   result: StartResult | null;
-  onLocate: () => void;
   onStart: (resort: string, liftId: string) => Promise<boolean>;
   onClose: () => void;
 }) {
   const t = useT();
   const locale = INTL_LOCALE[useLocale()];
-  /* Always ask for a fresh fix on open, and only trust positions that
-     arrive after it: an old one would pick yesterday's lift. */
-  const [openedWith] = useState(me);
-  const fresh = me !== openedWith ? me : null;
+  /* Always a fresh fix taken after opening: an old one would pick
+     yesterday's lift. One fix only, so GPS stops with the sheet. */
+  const [fresh, setFresh] = useState<Position | null>(null);
+  const [locating, setLocating] = useState(true);
   useEffect(() => {
-    onLocate();
-    // Only once on open: the position then arrives through `me`.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let active = true;
+    void requestPosition().then((position) => {
+      if (!active) return;
+      setFresh(position);
+      setLocating(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [requestPosition]);
   /* The preview follows the clock while the sheet is open; the server
      sets the shared time at the moment of the tap. */
   const [now, setNow] = useState(() => Date.now());
@@ -53,7 +59,7 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
   const [liftId, setLiftId] = useState(LIFTS.find((lift) => lift.resort === (pickable[0] ?? ""))?.id ?? "");
 
   /* Only a lift the rider can see: the guess, or the lists once shown. */
-  const listsShown = manual || (fresh !== null && !detected);
+  const listsShown = manual || (!locating && !detected);
   const chosen: Lift | undefined = detected && !manual
     ? detected.lift
     : listsShown ? LIFTS.find((lift) => lift.resort === resort && lift.id === liftId) : undefined;
@@ -72,8 +78,8 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
             </div>
           ) : (
             <>
-              {!fresh && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.finding")}</p>}
-              {fresh && !detected && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.notDetected")}</p>}
+              {locating && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.finding")}</p>}
+              {!locating && !detected && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.notDetected")}</p>}
               {listsShown && pickable.length > 0 && (
                 <div className="space-y-3">
                   <div>
@@ -114,7 +120,7 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
               {t("meetup.otherLift")}
             </button>
           )}
-          {!fresh && !manual && (
+          {locating && !manual && (
             <button type="button" onClick={() => setManual(true)} className="flex min-h-11 w-full items-center justify-center text-sm font-semibold" style={{ color: "var(--ink-1)" }}>
               {t("meetup.pickByHand")}
             </button>

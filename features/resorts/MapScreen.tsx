@@ -277,6 +277,7 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
 }
 
 const noSubscription = () => () => {};
+const noPosition = async () => null;
 
 function MapBody({ live, location, meetups }: { live?: LiveMap; location?: LocationState; meetups?: ReturnType<typeof useLiftMeetups> }) {
   const t = useT();
@@ -515,10 +516,9 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
       {activeSheet?.type === "lift" && meetups && (
         <LiftStartSheet
           resortNames={resorts.map((resort) => resort.name)}
-          me={location?.me ?? null}
+          requestPosition={location?.locateOnce ?? noPosition}
           busy={meetups.busy}
           result={meetups.result}
-          onLocate={() => location?.locate()}
           onStart={meetups.start}
           onClose={() => setActiveSheet(null)}
         />
