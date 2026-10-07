@@ -224,7 +224,7 @@ function MatchSheet({ card, onClose }: { card: DeckCard; onClose: () => void }) 
             void openDirectChatAction(card.userId).finally(() => setBusy(false));
           }}
           className="mt-5 flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
-          style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 5 }}
+          style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
         >
           {t("discover.writeMessage")}
         </button>

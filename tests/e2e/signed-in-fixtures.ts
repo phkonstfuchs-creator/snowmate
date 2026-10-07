@@ -134,9 +134,17 @@ export async function inviteFriend(a: RiderPage, b: RiderPage) {
   await expect(b.page).toHaveURL(/\/crew$/);
 }
 
+/** Everything on Today starts from the one "+" (Neu) menu. */
+export async function openCreateMenu(page: Page, item: RegExp) {
+  await page.getByRole("button", { name: "Neu", exact: true }).click();
+  const menu = page.getByRole("dialog", { name: "Was willst du starten?", exact: true });
+  await menu.getByRole("button", { name: item }).click();
+  await expect(menu).toHaveCount(0);
+}
+
 export async function createRide(page: Page, caption: string) {
   await page.goto("/feed");
-  await page.getByRole("button", { name: "Ride posten", exact: true }).click();
+  await openCreateMenu(page, /^Ride posten/);
   const dialog = page.getByRole("dialog", { name: "Ride posten", exact: true });
   await dialog.getByLabel("Skigebiet", { exact: true }).selectOption({ label: "Nordkette" });
   await dialog.getByRole("button", { name: /Park/ }).click();
@@ -170,7 +178,7 @@ export async function sendMessage(page: Page, body: string) {
 
 export async function composePost(page: Page, body: string) {
   await page.goto("/feed");
-  await page.getByRole("button", { name: "Skitag teilen", exact: true }).click();
+  await openCreateMenu(page, /^Skitag teilen/);
   const dialog = page.getByRole("dialog", { name: "Skitag teilen", exact: true });
   await dialog.getByLabel("Was war los?", { exact: true }).fill(body);
   return dialog;

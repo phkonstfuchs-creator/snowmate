@@ -129,7 +129,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
         )}
 
         {/* Details grid */}
-        <div className="mx-5 my-4 rounded-none overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
+        <div className="mx-5 my-4 rounded-[14px] overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
           <div className="grid grid-cols-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <div className="px-4 py-3" style={{ borderRight: `1px solid ${BORDER}` }}>
               <p className="text-xs font-bold mb-0.5" style={{ color: MUTED }}>{t("ride.time")}</p>

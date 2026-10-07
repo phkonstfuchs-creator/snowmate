@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes } from "react";
 
-/* Solid ink button, as on the website. The press effect comes from
+/* The one primary button: rust, rounded (usability pass 2026-10-07). The press effect comes from
    globals.css (:active scales it), not from JS — an inline transform
    would override it. */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -26,7 +26,7 @@ export default function Button({
         padding: "0 22px",
         font: "600 16px var(--font-body-stack)",
         gap: 10,
-        borderRadius: 5,
+        borderRadius: 14,
         width: fullWidth ? "100%" : undefined,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,

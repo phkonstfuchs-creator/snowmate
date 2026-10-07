@@ -15,7 +15,10 @@ describe("CrewOnMap", () => {
   });
 
   it("says when nobody shares, and stays hidden before the first load", () => {
-    const { rerender } = render(<CrewOnMap onFocus={vi.fn()} friends={[]} />);
+    const { rerender } = render(<CrewOnMap onFocus={vi.fn()} friends={[]} canStartLift />);
+    expect(screen.getByText(/Taking a lift\? Let them know below/)).toBeInTheDocument();
+    /* Under 16 there is no lift button below to point to. */
+    rerender(<CrewOnMap onFocus={vi.fn()} friends={[]} />);
     expect(screen.getByText("Nobody in your crew is sharing their location right now.")).toBeInTheDocument();
     rerender(<CrewOnMap onFocus={vi.fn()} friends={null} />);
     expect(screen.queryByText(/crew on the mountain/i)).not.toBeInTheDocument();

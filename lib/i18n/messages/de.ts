@@ -47,6 +47,16 @@ export const de: Record<MessageKey, string> = {
   "crewmap.justNow": "gerade eben",
   "crewmap.ago": "vor {n} Min",
   "crewmap.estimate": "geschätzt",
+  "create.open": "Neu",
+  "create.title": "Was willst du starten?",
+  "create.rideHint": "Sag deiner Crew, wann und wo du fährst.",
+  "create.dayHint": "Zeig deinen Skitag mit Foto.",
+  "create.carpoolHint": "Platz im Auto suchen oder anbieten.",
+  "create.eventsHint": "Offene Treffen in deiner Region.",
+  "next.map": "Gerade teilt niemand aus deiner Crew. Fährst du gleich Lift? Sag unten Bescheid.",
+  "next.profile": "Noch kein Skitag diese Saison. Auf der Karte startest du ihn mit einem Tipp.",
+  "next.toMap": "Zur Karte",
+  "next.feed": "Heute noch kein Ride. Starte einen, deine Crew sieht ihn sofort.",
   "common.back": "Zurück",
   "common.cancel": "Abbrechen",
   "common.next": "Weiter",
@@ -243,7 +253,7 @@ export const de: Record<MessageKey, string> = {
 
   // ── Feed ────────────────────────────────────────────────────────
   "feed.postRide": "Ride posten",
-  "feed.outToday": "{n} heute unterwegs",
+  "feed.outToday": "{n} heute am Berg",
   "feed.finishProfile": "Mach dein Profil fertig, um Rides zu posten und deiner Crew beizutreten.",
   "feed.unavailable": "Rides konnten nicht geladen werden. Zum Aktualisieren ziehen oder gleich nochmal versuchen.",
   "feed.empty": "Heute noch keine Rides",
@@ -255,7 +265,7 @@ export const de: Record<MessageKey, string> = {
   "card.yourRideAsking": "Dein Ride · {n} fragen an",
   "card.joined": "Dabei",
   "card.asked": "Angefragt",
-  "card.join": "Mitfahren",
+  "card.join": "Bin dabei",
   "card.details": "Details & Profil",
   "card.open": "{n} frei",
   "card.full": "voll",
@@ -280,7 +290,7 @@ export const de: Record<MessageKey, string> = {
   "ride.inTapToLeave": "Du bist dabei, tippen zum Verlassen",
   "ride.askedTapToWithdraw": "Angefragt · tippen zum Zurückziehen",
   "ride.isFull": "Ride ist voll",
-  "ride.join": "Mitfahren",
+  "ride.join": "Bin dabei",
   "ride.reportOrBlock": "{name} melden oder blockieren",
 
   // ── Post and edit ride ──────────────────────────────────────────

@@ -85,7 +85,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         <div className="px-5 pt-4 pb-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-none flex items-center justify-center text-white font-black text-xl flex-shrink-0" style={{ background: avatarColor(user.id) }}>
+              <div className="w-16 h-16 rounded-[14px] flex items-center justify-center text-white font-black text-xl flex-shrink-0" style={{ background: avatarColor(user.id) }}>
                 {user.avatar}
               </div>
               {user.isPremium && (
@@ -184,12 +184,12 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             <button
               ref={messageButtonRef}
               onClick={() => { if (onMessage) { onMessage(user.id); } else { setShowThread(true); } }}
-              className="card-tap flex-1 py-3 rounded-none font-black text-sm"
+              className="card-tap flex-1 py-3 rounded-[14px] font-black text-sm"
               style={{ background: BRAND, color: D }}
             >
               Message
             </button>
-            <button className={clsx("card-tap flex-1 py-3 rounded-none font-black text-sm border-2")}
+            <button className={clsx("card-tap flex-1 py-3 rounded-[14px] font-black text-sm border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
               {isFriend ? "In your crew" : "Add to crew"}
             </button>

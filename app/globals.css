@@ -78,12 +78,13 @@
   --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
   --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
 
-  /* Radii — small, like the website */
-  --radius-sm: 5px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --radius-2xl: 14px;
+  /* Radii: soft and round, so the app feels friendly in the hand
+     (usability pass 2026-10-07). Buttons 12-14, cards 18-20. */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
   --radius-pill: 999px;
 
   /* Depth from soft shadows and hairlines */
@@ -585,9 +586,22 @@ body {
   .pulse-dot::after { animation: none; }
 }
 
-/* ─── Buttons — printed blocks with a hard offset ───────────── */
+/* ─── Soft corners for framed boxes ──────────────────────────
+   Many screens frame cards, inputs and icon buttons with an inline
+   `border: var(--rule-thin|thick)` and no radius, which made the app
+   look square. Until each moves to a shared component, every fully
+   framed box without its own radius (inline or a `rounded*` class)
+   gets the card radius. Lines that only draw one side (border-bottom
+   etc.) are not matched. */
+[style*="border: var(--rule-thin)"]:not([style*="border-radius"]):not([class*="rounded"]),
+[style*="border: var(--rule-thick)"]:not([style*="border-radius"]):not([class*="rounded"]),
+[style*="border: 1px solid"]:not([style*="border-radius"]):not([class*="rounded"]) {
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Buttons: one primary colour (rust), soft corners ──────── */
 .sm-btn-primary {
-  background: var(--ink-0);
+  background: var(--rust);
   color: var(--on-accent);
   border: 0 !important;
   border-radius: var(--radius-sm);
@@ -602,7 +616,7 @@ body {
    triggers the hover state and leaves it stuck afterwards — the
    normal case on a mobile-first app. */
 @media (hover: hover) and (pointer: fine) {
-  .sm-btn-primary:hover:not(:disabled) { background: var(--rust); }
+  .sm-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
 }
 
 /* ─── Toggle — tabs on a printed index ─────────────────────── */
