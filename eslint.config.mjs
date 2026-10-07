@@ -143,6 +143,9 @@ const eslintConfig = defineConfig([
     // The marketing website is its own Next.js project with its own lint
     // config and CI job (website/eslint.config.mjs, ci.yml "website").
     "website/**",
+    // The store app shells (ADR 0031): generated native projects and the
+    // asset script, see native/README.md.
+    "native/**",
   ]),
 ]);
 

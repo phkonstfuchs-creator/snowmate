@@ -1,0 +1,25 @@
+{
+  "name": "pistl-native",
+  "private": true,
+  "description": "iOS and Android shells around app.pistl.app (ADR 0031).",
+  "scripts": {
+    "sync": "cap sync",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.5.2",
+    "@capacitor/keyboard": "8.0.6",
+    "@capacitor/share": "8.0.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "typescript": "5.9.3"
+  }
+}

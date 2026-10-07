@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <title>pistl.</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #f6f7f4; color: #202d27; font-family: -apple-system, system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+    main { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; box-sizing: border-box; text-align: center; }
+    .mark { font-size: 44px; font-weight: 800; letter-spacing: -0.075em; }
+    p { margin: 0; color: #59645e; font-size: 15px; line-height: 1.45; max-width: 280px; }
+    button { margin-top: 12px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 5px; background: #315842; color: #fff; font: 600 15px -apple-system, system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark">pistl.</div>
+    <p id="text">Keine Verbindung. Sobald du wieder Netz hast, geht es weiter.</p>
+    <button type="button" id="retry">Nochmal versuchen</button>
+  </main>
+  <script>
+    if (!/^de\b/i.test(navigator.language)) {
+      document.documentElement.lang = "en";
+      document.getElementById("text").textContent = "No connection. Pistl continues as soon as you are back online.";
+      document.getElementById("retry").textContent = "Try again";
+    }
+    var reload = function () { location.href = "https://app.pistl.app/"; };
+    document.getElementById("retry").addEventListener("click", reload);
+    window.addEventListener("online", reload);
+  </script>
+</body>
+</html>
