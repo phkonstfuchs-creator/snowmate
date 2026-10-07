@@ -38,12 +38,15 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
     <section className="px-4 pt-4" aria-labelledby="lift-meetup-title">
       <div className="p-4" style={{ border: "var(--rule-thin)", background: "var(--paper-1)", borderRadius: 18 }}>
         <h2 id="lift-meetup-title" className="text-lg font-semibold" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
-        {mine && myLift && (
-          /* The rider sees the same forecast their crew gets. */
+        {mine && (
+          /* The rider sees the same forecast their crew gets. Stop never
+             depends on knowing the lift locally. */
           <div className="mt-2">
-            <p className="text-base font-semibold" style={{ color: "var(--ink-0)" }}>
-              {t("meetup.yourForecast", { time: timeAt(mine.arrivalAt, locale), station: myLift.topStationName ?? t("meetup.topStationOf", { lift: myLift.name }) })}
-            </p>
+            {myLift && (
+              <p className="text-base font-semibold" style={{ color: "var(--ink-0)" }}>
+                {t("meetup.yourForecast", { time: timeAt(mine.arrivalAt, locale), station: myLift.topStationName ?? t("meetup.topStationOf", { lift: myLift.name }) })}
+              </p>
+            )}
             <div className="mt-1 flex items-center gap-2">
               <p className="min-w-0 flex-1 text-xs" style={{ color: "var(--ink-2)" }}>
                 {t("meetup.visibleUntil", { time: timeAt(mine.expiresAt, locale) })}

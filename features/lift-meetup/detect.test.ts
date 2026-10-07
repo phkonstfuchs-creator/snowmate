@@ -12,8 +12,14 @@ const B = lift("B", [47.30, 11.40], [47.32, 11.40]);
 const at = (lat: number, lng: number) => ({ lat, lng, accuracy: 10 });
 
 describe("detectLift", () => {
-  it("knows the lift you are sitting in", () => {
-    expect(detectLift(at(47.31, 11.3801), [A, B])).toEqual({ lift: A, how: "riding" });
+  it("never guesses from a lift line, only from valley stations", () => {
+    /* Halfway up A: too far from any valley station. */
+    expect(detectLift(at(47.31, 11.3801), [A, B])).toBeNull();
+  });
+
+  it("prefers the valley station you stand at over a lift line passing by", () => {
+    const C = lift("C", [47.2995, 11.385], [47.3005, 11.375]);
+    expect(detectLift(at(47.3001, 11.38), [A, C])).toEqual({ lift: A, how: "at_bottom" });
   });
 
   it("knows the valley station you stand at, or the nearest one", () => {

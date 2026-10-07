@@ -44,4 +44,12 @@ describe("LiftMeetupPanel", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("from 16");
     expect(screen.getByText(/No friends are heading/)).toBeInTheDocument();
   });
+
+  it("shows the rider's own forecast, and can always be ended", () => {
+    const { rerender } = render(<LiftMeetupPanel {...defaults} mine={mine} friends={[]} />);
+    expect(screen.getByText(/You'll be at the top/)).toBeInTheDocument();
+    rerender(<LiftMeetupPanel {...defaults} mine={{ ...mine, liftId: "not-in-this-app-version" }} friends={[]} />);
+    expect(screen.queryByText(/You'll be at the top/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "End" })).toBeEnabled();
+  });
 });

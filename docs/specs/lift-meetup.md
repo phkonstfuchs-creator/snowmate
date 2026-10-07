@@ -18,9 +18,11 @@ Friends on the same mountain need a quick way to meet without exchanging repeate
 - Amendment 2026-10-07 (owner: "sehr wichtiges Feature", one tap, the
   rider sees their own forecast):
   - "Ich fahr jetzt Lift" is the big primary button on the map.
-  - The rider's own position (on the device) picks the lift: the lift
-    they are sitting in, the valley station they stand at, or the nearest
-    one within 400 m. They confirm with one tap. Picking from lists stays
+  - A fresh position (on the device, taken after the sheet opens) picks
+    the lift: the valley station the rider stands at, or the nearest one
+    within 400 m. Lift lines are not matched, because a meetup starts
+    before boarding and lines converge at top stations. The rider
+    confirms with one tap. Picking from lists stays
     one tap away and is the only path without a position. Without a
     position nothing can be started until a lift is visible.
   - Before and after starting, the rider sees "You'll be at the top,

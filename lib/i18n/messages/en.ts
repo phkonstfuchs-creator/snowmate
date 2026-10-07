@@ -727,7 +727,6 @@ export const en = {
   "loc.unavailable": "Your position is not available right now.",
   "loc.unsupported": "This browser cannot share a location.",
   "loc.whoSees": "Only confirmed friends see it. Friends of friends and strangers never do.",
-  "meetup.detectedRiding": "You're riding",
   "meetup.detectedHere": "Your lift?",
   "meetup.finding": "Finding your lift …",
   "meetup.notDetected": "No lift detected nearby. Pick it quickly.",

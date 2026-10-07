@@ -29,24 +29,35 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
 }) {
   const t = useT();
   const locale = INTL_LOCALE[useLocale()];
+  /* Always ask for a fresh fix on open, and only trust positions that
+     arrive after it: an old one would pick yesterday's lift. */
+  const [openedWith] = useState(me);
+  const fresh = me !== openedWith ? me : null;
   useEffect(() => {
-    if (!me) onLocate();
+    onLocate();
     // Only once on open: the position then arrives through `me`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* The preview follows the clock while the sheet is open; the server
+     sets the shared time at the moment of the tap. */
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
-  const detected = useMemo(() => detectLift(me, LIFTS), [me]);
+  const detected = useMemo(() => detectLift(fresh, LIFTS), [fresh]);
   const pickable = resortNames.filter((name) => LIFTS.some((lift) => lift.resort === name));
   const [manual, setManual] = useState(false);
   const [resort, setResort] = useState(pickable[0] ?? "");
   const [liftId, setLiftId] = useState(LIFTS.find((lift) => lift.resort === (pickable[0] ?? ""))?.id ?? "");
 
   /* Only a lift the rider can see: the guess, or the lists once shown. */
-  const listsShown = manual || (me !== null && !detected);
+  const listsShown = manual || (fresh !== null && !detected);
   const chosen: Lift | undefined = detected && !manual
     ? detected.lift
     : listsShown ? LIFTS.find((lift) => lift.resort === resort && lift.id === liftId) : undefined;
-  const arrival = chosen ? estimateLiftArrival(chosen, new Date()) : null;
+  const arrival = chosen ? estimateLiftArrival(chosen, new Date(now)) : null;
   const time = arrival ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(arrival) : "";
 
   return (
@@ -55,14 +66,14 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
         <>
           {detected && !manual ? (
             <div className="p-4" style={{ background: "var(--paper-1)", border: "var(--rule-thin)", borderRadius: 16 }}>
-              <p className="text-mono-label" style={{ color: "var(--ink-2)" }}>{t(detected.how === "riding" ? "meetup.detectedRiding" : "meetup.detectedHere")}</p>
+              <p className="text-mono-label" style={{ color: "var(--ink-2)" }}>{t("meetup.detectedHere")}</p>
               <p className="mt-1 text-lg font-semibold" style={{ color: "var(--ink-0)" }}>{detected.lift.name}</p>
               <p className="text-sm" style={{ color: "var(--ink-2)" }}>{detected.lift.resort}</p>
             </div>
           ) : (
             <>
-              {!me && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.finding")}</p>}
-              {me && !detected && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.notDetected")}</p>}
+              {!fresh && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.finding")}</p>}
+              {fresh && !detected && !manual && <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.notDetected")}</p>}
               {listsShown && pickable.length > 0 && (
                 <div className="space-y-3">
                   <div>
@@ -82,7 +93,7 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
                   </div>
                 </div>
               )}
-              {pickable.length === 0 && (manual || me) && <p className="text-sm">{t("meetup.noLifts")}</p>}
+              {pickable.length === 0 && listsShown && <p className="text-sm">{t("meetup.noLifts")}</p>}
             </>
           )}
 
@@ -103,7 +114,7 @@ export default function LiftStartSheet({ resortNames, me, busy, result, onLocate
               {t("meetup.otherLift")}
             </button>
           )}
-          {!me && !manual && (
+          {!fresh && !manual && (
             <button type="button" onClick={() => setManual(true)} className="flex min-h-11 w-full items-center justify-center text-sm font-semibold" style={{ color: "var(--ink-1)" }}>
               {t("meetup.pickByHand")}
             </button>
