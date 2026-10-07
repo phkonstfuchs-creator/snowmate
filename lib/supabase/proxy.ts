@@ -70,7 +70,15 @@ export async function updateSession(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = redirectPath;
     redirectUrl.search = "";
-    const redirectResponse = NextResponse.redirect(redirectUrl);
+    // Next's action client consumes this header. A Location redirect would
+    // forward the action POST to /login and turn reauthentication into an error.
+    const isServerAction = request.method === "POST" && request.headers.has("next-action");
+    const redirectResponse = isServerAction
+      ? new NextResponse(null, {
+          status: 303,
+          headers: { "x-action-redirect": `${redirectUrl};replace` },
+        })
+      : NextResponse.redirect(redirectUrl);
 
     sessionCookies.forEach(({ name, value, options }) => {
       redirectResponse.cookies.set(name, value, options);
