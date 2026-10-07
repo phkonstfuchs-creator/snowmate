@@ -11,9 +11,8 @@ set local role authenticated;
 set local request.jwt.claim.sub = 'a8a8a8a8-0000-4000-8000-0000000000a1';
 set local request.jwt.claims = '{"role":"authenticated","session_id":"a8a8a8a8-0000-4000-8000-0000000000a2","aal":"aal2"}';
 select is((select count(*)::int from storage.objects where bucket_id in ('avatars', 'post-photos')), 0,
-  'missing Auth sessions table fails closed for Storage RLS');
+  'missing Auth session row fails closed for Storage RLS');
 reset role;
-create table if not exists auth.sessions (id uuid primary key, user_id uuid);
 insert into auth.sessions (id, user_id) values
   ('a8a8a8a8-0000-4000-8000-0000000000a2', 'a8a8a8a8-0000-4000-8000-0000000000a1');
 insert into auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at)

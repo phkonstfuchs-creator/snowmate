@@ -15,7 +15,11 @@ reset role;
 select is((select count(*)::integer from auth.users
   where id = 'a8a8a8a8-0000-4000-8000-0000000000dd'), 1,
   'a failed Storage cleanup leaves the account available for retry');
+-- Fixture metadata only: the Storage service uses this transaction-local
+-- guard when removing the backing file through its API.
+set local storage.allow_delete_query = 'true';
 delete from storage.objects where name = 'a8a8a8a8-0000-4000-8000-0000000000dd/orphan.webp';
+set local storage.allow_delete_query = 'false';
 set local role authenticated;
 select is(public.delete_my_account(), true, 'account deletion succeeds after Storage cleanup');
 

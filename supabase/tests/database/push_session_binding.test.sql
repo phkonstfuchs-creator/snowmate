@@ -1,7 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(14);
-create table if not exists auth.sessions (id uuid primary key, user_id uuid);
 
 insert into auth.users (id, email) values
   ('a8a8a8a8-0000-4000-8000-0000000000e1', 'push-session-one@example.com'),

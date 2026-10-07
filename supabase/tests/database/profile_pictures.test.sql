@@ -1,7 +1,6 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-create table if not exists auth.sessions (id uuid primary key, user_id uuid);
 
 select plan(22);
 

@@ -1,7 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(29);
-create table if not exists auth.sessions (id uuid primary key, user_id uuid);
 
 insert into auth.users (id, email) values
   ('b0b0b0b0-0000-4000-8000-000000000001', 'attest-owner@example.com'),
@@ -160,7 +159,9 @@ select throws_ok($$update storage.objects set version = 'raw-upload-version'
 select lives_ok($$update storage.objects set last_accessed_at = now()
   where id = 'b0b0b0b0-0000-4000-8000-000000000011'$$,
   'read-related access timestamp remains mutable');
+set local storage.allow_delete_query = 'true';
 delete from storage.objects where id = 'b0b0b0b0-0000-4000-8000-000000000011';
+set local storage.allow_delete_query = 'false';
 select throws_ok($$insert into storage.objects (id, bucket_id, name) values
   ('b0b0b0b0-0000-4000-8000-000000000011', 'avatars',
    'b0b0b0b0-0000-4000-8000-000000000001/11111111-1111-4111-8111-111111111111.webp')$$,
