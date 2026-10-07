@@ -78,6 +78,7 @@ describe("resort photos", () => {
   it("turns the author HTML into plain text", () => {
     expect(plainText('<span>Max &amp; <a href="x">Moritz</a></span>')).toBe("Max & Moritz");
     expect(plainText("<script>alert(1)</script>Ok")).toBe("alert(1) Ok");
+    expect(plainText("A &amp;quot;B&amp;quot; &amp;lt;C")).toBe("A &quot;B&quot; &lt;C");
   });
 
   it("falls back to the first wide free photo among the article's images", () => {
