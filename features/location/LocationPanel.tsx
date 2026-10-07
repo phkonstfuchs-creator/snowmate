@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { hasBackgroundLocation } from "@/features/tracking/position-source";
+import { useState, useSyncExternalStore } from "react";
 import Icon from "@/components/ui/Icon";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
@@ -16,6 +17,8 @@ const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
 const RUST = "var(--rust)";
 
+const noSubscription = () => () => {};
+
 function ShareSheet({ onClose, onShare, busy }: {
   onClose: () => void;
   onShare: (minutes: ShareMinutes) => void;
@@ -23,6 +26,8 @@ function ShareSheet({ onClose, onShare, busy }: {
 }) {
   useScrollLock();
   const t = useT();
+  /* Store apps keep sharing with the screen locked (ADR 0031). */
+  const background = useSyncExternalStore(noSubscription, hasBackgroundLocation, () => false);
   const { state, dismiss } = useSheetDismiss(onClose);
   const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [minutes, setMinutes] = useState<ShareMinutes>(60);
@@ -44,7 +49,7 @@ function ShareSheet({ onClose, onShare, busy }: {
             <li className="flex gap-2"><Icon name="users" size={16} color={RUST} className="mt-0.5 flex-shrink-0" />{t("loc.whoSees")}</li>
             <li className="flex gap-2"><Icon name="clock" size={16} color={RUST} className="mt-0.5 flex-shrink-0" />{t("loc.howLong")}</li>
             <li className="flex gap-2"><Icon name="lock" size={16} color={RUST} className="mt-0.5 flex-shrink-0" />{t("loc.noHistory")}</li>
-            <li className="flex gap-2"><Icon name="radio" size={16} color={RUST} className="mt-0.5 flex-shrink-0" />{t("loc.appOpen")}</li>
+            <li className="flex gap-2"><Icon name="radio" size={16} color={RUST} className="mt-0.5 flex-shrink-0" />{t(background ? "loc.lockedToo" : "loc.appOpen")}</li>
           </ul>
           <fieldset>
             <legend className="text-mono-label mb-1.5" style={{ color: INK }}>{t("loc.duration")}</legend>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MessageKey } from "@/lib/i18n/translate";
+import { useT } from "@/lib/i18n/client";
+import { hasBackgroundLocation, watchPositions } from "@/features/tracking/position-source";
 import { friendLocationsAction, shareLocationAction, stopSharingAction } from "./actions";
 import {
   SHARE_MESSAGES,
@@ -17,8 +19,9 @@ const FRIEND_POLL_MS = 20_000;
 
 /* The viewer's own GPS position (stays on the device unless sharing is
    on), their sharing state, and the positions friends share. Browsers
-   stop GPS when the app is in the background, so sharing only updates
-   while the app is open; the UI says so. */
+   stop GPS when the app is in the background, so on the web sharing only
+   updates while the app is open; the UI says so. The store apps keep
+   sending while the phone is locked, until sharing ends (ADR 0031). */
 export function useLiveLocation({
   initialSharingEnd,
   initialFriends,
@@ -40,10 +43,10 @@ export function useLiveLocation({
     sharingRef.current = sharingEnd;
   }, [sharingEnd]);
 
+  const t = useT();
   const supported = typeof navigator !== "undefined" && "geolocation" in navigator;
 
-  const onPosition = useCallback((geo: GeolocationPosition) => {
-    const position = toPosition(geo);
+  const onPositionValue = useCallback((position: Position) => {
     setMe(position);
     setLocating(false);
     setError(null);
@@ -55,6 +58,19 @@ export function useLiveLocation({
       if (result === "invalid") setSharingEnd(null); // ended elsewhere or expired
     });
   }, []);
+
+  const onPosition = useCallback((geo: GeolocationPosition) => onPositionValue(toPosition(geo)), [onPositionValue]);
+
+  /* Store apps: keep sending while sharing, with the screen locked too. */
+  useEffect(() => {
+    if (!sharingEnd || !hasBackgroundLocation()) return;
+    const background = watchPositions(
+      (fix) => onPositionValue({ lat: fix.lat, lng: fix.lng, accuracy: fix.accuracy }),
+      () => undefined,
+      { title: t("loc.backgroundTitle"), message: t("loc.backgroundMessage") },
+    );
+    return () => background.stop();
+  }, [sharingEnd, onPositionValue, t]);
 
   const onGeoError = useCallback((geoError: GeolocationPositionError) => {
     setLocating(false);

@@ -208,7 +208,13 @@ Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed
 friends see it; friends of friends, strangers and blocked people never
 do. Only the latest position is stored, rounded to about 10 m, no
 history; it is part of the data export and goes with the account. A
-browser only reports the position while the app is open. Sharing starts
+browser only reports the position while the app is open; the store apps
+keep reporting with the phone locked until sharing ends, with the system's
+location indicator showing (ADR 0031). The map lists sharing friends with
+a guess of where they are ("on the Seegrubenbahn, at the top in about
+4 min"). The viewer's phone computes it from the position the friend
+already shares and the static lift lines; nothing new is sent or stored
+(ADR 0032). Sharing starts
 at 16 (by birth date; without one, only an account marked adult); younger
 users still see their friends' positions. See
 [ADR 0015](adr/0015-live-location-for-confirmed-friends.md) and
