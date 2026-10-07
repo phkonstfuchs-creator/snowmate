@@ -123,12 +123,14 @@ interface FileAnswer {
 
 const text = (meta: Meta | undefined) => (typeof meta?.value === "string" ? meta.value : "");
 
-/* Wikimedia's author field is HTML; keep the words, drop the markup. */
+/* Wikimedia's author field is HTML; keep the words, drop the markup.
+   &amp; is decoded last, so "&amp;quot;" stays the literal "&quot;". */
 export function plainText(html: string): string {
   return html
     .replace(/<[^>]*>/gu, " ")
-    .replace(/&amp;/gu, "&").replace(/&quot;/gu, '"').replace(/&#0?39;/gu, "'").replace(/&nbsp;/gu, " ")
-    .replace(/&[a-z#0-9]+;/giu, "")
+    .replace(/&quot;/gu, '"').replace(/&#0?39;/gu, "'").replace(/&nbsp;/gu, " ")
+    .replace(/&(?!amp;)[a-z#0-9]+;/giu, "")
+    .replace(/&amp;/gu, "&")
     .replace(/\s+/gu, " ")
     .trim()
     .slice(0, 120);
