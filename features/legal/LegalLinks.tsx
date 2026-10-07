@@ -7,7 +7,7 @@ import { useT } from "@/lib/i18n/client";
 export default function LegalLinks({ className = "" }: { className?: string }) {
   const t = useT();
   return (
-    <nav aria-label={t("legal.imprint")} className={`flex justify-center gap-4 text-xs font-semibold underline ${className}`} style={{ color: "var(--ink-2)" }}>
+    <nav aria-label={t("legal.imprint")} className={`flex justify-center gap-4 text-xs font-semibold underline [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center ${className}`} style={{ color: "var(--ink-2)" }}>
       <Link href="/impressum">{t("legal.imprint")}</Link>
       <Link href="/datenschutz">{t("legal.privacyShort")}</Link>
       <Link href="/lizenzen">{t("legal.licenses")}</Link>

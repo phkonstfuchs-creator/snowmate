@@ -1,5 +1,6 @@
 "use client";
 
+import { seasonLabel } from "@/lib/season";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { PrivacyConsent } from "@/features/legal/LegalLinks";
 import { useRouter } from "next/navigation";
@@ -190,7 +191,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
           </div>
         </div>
         <div className="flex flex-1 flex-col px-4 pt-6">
-          <p className="text-mono-label" style={{ color: RUST }}>{t("onb.season")}</p>
+          <p className="text-mono-label" style={{ color: RUST }}>{t("onb.season", { season: seasonLabel() })}</p>
           <h1 className="text-display-hero mt-3" style={{ color: INK }}>
             {t("onb.heroLine1")}{" "}
             <br />

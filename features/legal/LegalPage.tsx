@@ -7,7 +7,7 @@ import Wordmark from "@/components/ui/Wordmark";
 export default function LegalPage({ title, children }: { title: string; children: ReactNode }) {
   return (
     <main className="mx-auto min-h-dvh max-w-[680px] px-5 py-8" style={{ background: "var(--paper-0)", color: "var(--ink-0)" }}>
-      <nav className="flex items-center gap-4 text-sm font-semibold underline" style={{ color: "var(--ink-1)" }}>
+      <nav className="flex items-center gap-4 text-sm font-semibold underline [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center" style={{ color: "var(--ink-1)" }}>
         <Link href="/" className="no-underline"><Wordmark size={24} /></Link>
         <Link href="/impressum">Impressum</Link>
         <Link href="/datenschutz">Datenschutz</Link>
