@@ -1,17 +1,17 @@
 # App Store and Play Store readiness
 
 This is the checklist for the first submission. The shell is described in
-[ADR 0031](adr/0031-native-apps-with-capacitor.md), which is still Proposed.
+[ADR 0031](adr/0031-native-apps-with-capacitor.md) (Accepted).
 Each line marked **open** needs code or an owner action before submitting.
 
 ## Apple review guidelines
 
 | Guideline | What Apple checks | Pistl today | Status |
 |---|---|---|---|
-| 1.2 User-generated content | Filter for objectionable content, report, block, a contact for abuse, and acting within 24 h | Report and block exist (`features/safety`, ADR 0010) | **open:** basic word filter on posts, chat and names; abuse contact in the app; written 24 h response promise |
+| 1.2 User-generated content | Filter for objectionable content, report, block, a contact for abuse, and acting within 24 h | Report and block (`features/safety`, ADR 0010); word filter in the database for posts, chat, profiles, rides and carpools (`20261027090000_blocked_terms.sql`); abuse e-mail and the 24 h promise in the report sheet | done in code. **Owner:** actually check `public.reports` and the inbox every day |
 | 1.3 Kids / age | Honest age rating; no targeting of under-13s | Sign-up from 14; age bands (ADR 0028); live location from 16 (ADR 0019) | **open:** answer the age-rating questionnaire (expect 12+ or higher for chat and user content) |
 | 2.1 Completeness | Reviewer can sign in and use every feature | Needs a working account | **open:** demo account with a friend, a ride and a chat, credentials in App Store Connect only |
-| 3.1.1 Payments | Digital goods only through in-app purchase; no links to outside payment | Season Pass appears only in `/demo` | **open:** hide `/demo` (or at least its price) inside the native app |
+| 3.1.1 Payments | Digital goods only through in-app purchase; no links to outside payment | Season Pass appears only in `/demo`; the native app is redirected away from `/demo` and the map hides the demo link (`lib/native-app.ts`) | done in code |
 | 4.2 Minimum functionality | More than a website in a frame | Planned: background GPS, native push, share, haptics (ADR 0031) | **open** |
 | 5.1.1 Privacy | Privacy policy link; data collected only with purpose strings; account deletion in the app | `/datenschutz`; deletion in Profile (`delete_my_account`) | **open:** usage strings for location (when in use and always), camera and photos |
 | 5.1.2 Data use | App Privacy labels match reality; no tracking | No ads, no analytics SDK, no tracking | **open:** fill App Privacy labels (below) |

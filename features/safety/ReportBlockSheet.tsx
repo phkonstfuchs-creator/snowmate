@@ -10,6 +10,7 @@ import { settle } from "@/lib/settle";
 import { blockUserAction, reportUserAction, type SafetyActionResult } from "./actions";
 import { MAX_REPORT_DETAILS, REPORT_REASONS, type ReportReason, type SafetyTarget } from "./reports";
 import { useT } from "@/lib/i18n/client";
+import { OPERATOR } from "@/features/legal/operator";
 import { translateText } from "@/lib/i18n/translate";
 
 const INK = "var(--ink-0)";
@@ -92,6 +93,11 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
             <>
               <p className="text-sm leading-relaxed" style={{ color: INK_2 }}>
                 {t("safety.unsafeHint")}
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: INK_2 }}>
+                {t("safety.contactBefore")}
+                <a href={`mailto:${OPERATOR.email}?subject=Pistl%20Meldung`} className="font-semibold underline">{OPERATOR.email}</a>
+                {t("safety.contactAfter")}
               </p>
               <button
                 type="button"

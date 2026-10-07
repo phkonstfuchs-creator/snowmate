@@ -6,6 +6,7 @@ export const de: Record<MessageKey, string> = {
   // ── Shared ───────────────────────────────────────────────────────
   "common.unavailable": "Das hat nicht geklappt. Versuch es gleich nochmal.",
   "common.offline": "Keine Verbindung. Versuch es gleich nochmal.",
+  "common.blockedText": "Bitte formuliere das ohne Beleidigungen oder Hassbegriffe.",
   "common.profileIncomplete": "Mach zuerst dein Profil fertig: Name und Handle im Profil-Tab.",
   "common.close": "Schließen",
   "common.save": "Speichern",
@@ -393,6 +394,8 @@ export const de: Record<MessageKey, string> = {
   "safety.report": "Melden",
   "safety.reportOrBlock": "Melden oder blockieren",
   "safety.unsafeHint": "Wenn du dich unsicher fühlst, verlass das Gespräch und rede mit jemandem, dem du vertraust. Im Notfall ruf 112 an.",
+  "safety.contactBefore": "Du kannst Missbrauch auch direkt an ",
+  "safety.contactAfter": " melden. Wir prüfen jede Meldung innerhalb von 24 Stunden.",
   "safety.reportName": "{name} melden",
   "safety.blockName": "{name} blockieren",
   "safety.blockHint": "Blockieren beendet eure Freundschaft und alle gemeinsamen Rides und Fahrten. Die Person erfährt es nicht.",

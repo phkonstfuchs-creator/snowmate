@@ -7,6 +7,7 @@ export const en = {
   // ── Shared ───────────────────────────────────────────────────────
   "common.unavailable": "That did not work. Try again shortly.",
   "common.offline": "No connection. Try again in a moment.",
+  "common.blockedText": "Please rephrase this without slurs or hate terms.",
   "common.profileIncomplete": "Finish your profile first: add your name and handle on the Profile tab.",
   "common.close": "Close",
   "common.save": "Save",
@@ -394,6 +395,8 @@ export const en = {
   "safety.report": "Report",
   "safety.reportOrBlock": "Report or block",
   "safety.unsafeHint": "If you feel unsafe, leave the conversation and talk to someone you trust. In an emergency call 112.",
+  "safety.contactBefore": "You can also report abuse directly to ",
+  "safety.contactAfter": ". We review every report within 24 hours.",
   "safety.reportName": "Report {name}",
   "safety.blockName": "Block {name}",
   "safety.blockHint": "Blocking ends your friendship and any shared rides or carpools. They are not told.",

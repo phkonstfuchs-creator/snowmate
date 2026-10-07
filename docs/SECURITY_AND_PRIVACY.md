@@ -67,8 +67,16 @@ See [ADR 0009](adr/0009-single-use-invite-links.md).
   day per person, and are reviewed in the Supabase dashboard for now.
 - Entry points: ride and event sheets, carpool cards, every person on the
   Crew tab. Blocked people can be unblocked from the Profile tab.
+- The report sheet shows the operator's e-mail for abuse and promises a
+  review within 24 hours (App Store guideline 1.2).
+- A small word filter in the database (`private.blocked_terms`) refuses
+  severe slurs, hate slogans and calls to self-harm in posts, chat
+  messages, profiles, rides and carpools. Triggers enforce it on every write
+  path; the app shows "please rephrase". It is a floor, not moderation:
+  reports still matter. Clients cannot read the list.
 
-See [ADR 0010](adr/0010-blocking-hides-both-ways.md).
+See [ADR 0010](adr/0010-blocking-hides-both-ways.md) and
+[ADR 0031](adr/0031-native-apps-with-capacitor.md).
 
 ## Minors
 

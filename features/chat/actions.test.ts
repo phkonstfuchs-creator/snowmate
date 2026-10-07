@@ -69,6 +69,8 @@ describe("chat actions", () => {
     await expect(sendMessageAction(CONV, "hi")).resolves.toBe("unavailable");
     mocks.rpc.mockResolvedValue({ data: null, error: { code: "x" } });
     await expect(sendMessageAction(CONV, "hi")).resolves.toBe("unavailable");
+    mocks.rpc.mockResolvedValue({ data: null, error: { code: "PB001" } });
+    await expect(sendMessageAction(CONV, "hi")).resolves.toBe("blocked");
     mocks.rpc.mockRejectedValue(new Error("offline"));
     await expect(sendMessageAction(CONV, "hi")).resolves.toBe("unavailable");
   });

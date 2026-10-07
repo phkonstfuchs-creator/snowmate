@@ -93,6 +93,11 @@ describe("adoptOnboardingDraftAction", () => {
     expect(mocks.revalidatePath).not.toHaveBeenCalled();
   });
 
+  it("gives up on a draft the word filter refuses", async () => {
+    setup({ result: { data: null, error: { code: "PB001" } } });
+    await expect(adoptOnboardingDraftAction(draft)).resolves.toBe("invalid");
+  });
+
   it("reports a taken handle", async () => {
     setup({ result: { data: null, error: { code: "23505" } } });
     await expect(adoptOnboardingDraftAction(draft)).resolves.toBe("handle_taken");
@@ -143,6 +148,12 @@ describe("updateProfileAction", () => {
     setup({ result: { data: null, error: { code: "23505" } } });
     const state = await updateProfileAction(initialProfileActionState, form(validForm));
     expect(state.fieldErrors).toEqual({ handle: "That handle is taken." });
+  });
+
+  it("asks to rephrase text the word filter refuses", async () => {
+    setup({ result: { data: null, error: { code: "PB001" } } });
+    const state = await updateProfileAction(initialProfileActionState, form(validForm));
+    expect(state).toMatchObject({ status: "error", message: "Please rephrase this without slurs or hate terms." });
   });
 
   it("asks to sign in again without a session", async () => {

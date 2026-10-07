@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { isBlockedText } from "@/lib/server-action";
 import { revalidateApp } from "@/lib/revalidate";
 import { prepareImageUpload } from "@/features/profile/safe-upload";
 import { RESORTS } from "@/lib/resorts";
@@ -51,7 +52,7 @@ export async function createPostAction(formData: FormData): Promise<CreatePostOu
     const { data: outcome, error } = await supabase.rpc("create_post", { p_body: body, p_resort: resort, p_photo_path: path });
     if (error || outcome !== "created") {
       if (path) await supabase.storage.from(POST_PHOTO_BUCKET).remove([path]);
-      if (error) return "unavailable";
+      if (error) return isBlockedText(error) ? "blocked" : "unavailable";
       return OUTCOMES.includes(outcome as CreatePostOutcome) ? (outcome as CreatePostOutcome) : "unavailable";
     }
     revalidateApp();

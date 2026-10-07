@@ -80,6 +80,9 @@ describe("createPostAction", () => {
 
     mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "XX000" } });
     await expect(createPostAction(form({ body: "x" }))).resolves.toBe("unavailable");
+    mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "PB001" } });
+    await expect(createPostAction(form({ body: "x", photo: new Blob([WEBP]) }))).resolves.toBe("blocked");
+    expect(mocks.remove).toHaveBeenLastCalledWith([mocks.upload.mock.calls.at(-1)![0]]);
   });
 
   it("rejects unauthenticated and over-quota photos before reading bytes", async () => {

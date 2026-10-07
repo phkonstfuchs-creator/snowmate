@@ -8,7 +8,7 @@ export const POST_PHOTO_BUCKET = "post-photos";
 
 const FORBIDDEN_CHARS = /[\u0001-\u0009\u000b\u000c\u000e-\u001f\u007f‪-‮⁦-⁩]/u;
 
-export type CreatePostOutcome = "created" | "invalid" | "rate_limited" | "profile_incomplete" | "unauthenticated" | "too_large" | "unavailable";
+export type CreatePostOutcome = "created" | "invalid" | "blocked" | "rate_limited" | "profile_incomplete" | "unauthenticated" | "too_large" | "unavailable";
 
 export interface Post {
   id: string;

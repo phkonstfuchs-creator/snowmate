@@ -1,6 +1,6 @@
 # 0031 Native iOS and Android apps: a Capacitor shell around app.pistl.app
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-07: "okay los, es soll aber alles wie bei einer normalen app funktionieren")
 - **Date:** 2026-10-07
 - **Checklist:** [APP_STORE.md](../APP_STORE.md)
 - **Related:** [ADR 0025](0025-push-notifications.md) (push), [ADR 0026](0026-ski-day-tracking.md) (tracking), [ADR 0030](0030-session-and-media-security.md) (sessions, CSP)
@@ -32,9 +32,21 @@ purchases (3.1.1).
    and server-rendered pages do not work in a static export, so the app
    would need to be rebuilt.
 
-## Decision (proposed)
+## Decision
 
-Option 2:
+Option 2. The owner's condition: it must feel like a normal app, not a
+website. That means:
+
+- no browser chrome, no visible URL, no pinch-zoom of the page, no text
+  selection on controls, no rubber-band scrolling of the whole page
+- a native splash screen and status bar in Pistl colours
+- system back gesture on Android, swipe-back where the page has a back
+  button on iOS
+- an offline screen inside the app instead of a browser error
+- sign-in survives app restarts (the session cookies persist)
+- the keyboard does not cover inputs
+
+Then:
 
 - **Shell.** The WebView loads only Pistl origins (`app.pistl.app`, and
   `pistl.app` for legal pages). Any other link opens in the system

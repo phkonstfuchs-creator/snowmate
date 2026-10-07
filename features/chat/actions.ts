@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { dispatchPushSoon } from "@/lib/push/dispatch";
+import { isBlockedText } from "@/lib/server-action";
 import { isValidPosition } from "@/features/location/location";
 import { isUuid, normalizeMessage, toChatMessage, type ChatMessage, type MessageRow, type SendOutcome } from "./message";
 
@@ -44,7 +45,7 @@ export async function sendMessageAction(conversationId: string, text: string): P
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("send_message", { conv: conversationId, message: body });
-    if (error) return "unavailable";
+    if (error) return isBlockedText(error) ? "blocked" : "unavailable";
     if (data === "sent") await dispatchPushSoon(supabase);
     return SEND_OUTCOMES.includes(data as SendOutcome) ? (data as SendOutcome) : "unavailable";
   } catch {
