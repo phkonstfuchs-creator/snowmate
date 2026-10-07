@@ -75,7 +75,7 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
           <button
             type="submit"
             disabled={!confirmed || pending}
-            className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
+            className="w-full py-4 font-display text-lg disabled:opacity-40"
             style={{ background: CRIMSON, color: "var(--paper-0)", border: "var(--rule-thick)" }}
           >
             {pending ? t("profile.deleting") : t("profile.deleteMine")}

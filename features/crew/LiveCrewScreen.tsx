@@ -264,7 +264,7 @@ export default function LiveCrewScreen({ graph, chats = [] }: { graph: FriendGra
               disabled={pendingId === row.user_id}
               aria-label={t("chat.messageTo", { name: row.display_name ?? row.handle ?? t("common.rider") })}
               className="text-mono-label flex min-h-11 items-center gap-1 px-2.5 disabled:opacity-50"
-              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+              style={{ background: "var(--rust)", color: "var(--on-accent)" }}
             >
               <Icon name="message-circle" size={14} color="var(--paper-0)" strokeWidth={2} />
               {t("chat.message")}

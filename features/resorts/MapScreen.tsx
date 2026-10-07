@@ -139,7 +139,7 @@ function ResortDetailSheet({
             className="flex items-baseline justify-between gap-3 px-3 py-2"
             style={{ background: "var(--paper-0)", borderTop: "var(--rule-thin)" }}
           >
-            <span className="font-display text-base uppercase" style={{ color: INK, letterSpacing: 0 }}>
+            <span className="font-display text-base" style={{ color: INK, letterSpacing: 0 }}>
               {resort.name}
             </span>
             <span className="text-mono-label" style={{ color: MUTED }}>
@@ -178,8 +178,8 @@ function ResortDetailSheet({
                 </select>
                 <p className="mt-2 text-xs" style={{ color: MUTED }}>{t("meetup.estimate")}</p>
                 <button type="button" disabled={liftBusy || !selectedLift} onClick={() => void onStartLift(selectedLift).then((ok) => { if (ok) dismiss(); })}
-                  className="card-tap mt-3 min-h-11 w-full font-display text-lg uppercase disabled:opacity-50"
-                  style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>{liftBusy ? t("common.oneMoment") : t("meetup.start")}</button>
+                  className="card-tap mt-3 min-h-11 w-full text-base font-semibold disabled:opacity-50"
+                  style={{ background: "var(--rust)", color: "var(--on-accent)" }}>{liftBusy ? t("common.oneMoment") : t("meetup.start")}</button>
                 {liftResult && liftResult !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[liftResult])}</p>}
               </>
             )}
@@ -188,7 +188,7 @@ function ResortDetailSheet({
 
         {/* Ability bars */}
         <div className="px-5 mt-4">
-          <p className="text-[0.65rem] font-black uppercase mb-2.5" style={{ color: MUTED }}>{t("map.whoRidesWhat")}</p>
+          <p className="text-[0.65rem] font-black mb-2.5" style={{ color: MUTED }}>{t("map.whoRidesWhat")}</p>
           {[
             { label: t("common.chill"), count: resort.chillRiders,    color: "var(--rust-ink)", bg: "var(--accent-warm-subtle)" },
             { label: t("common.park"), count: resort.parkRiders,     color: "var(--sky-ink)",  bg: "rgba(62, 110, 142, 0.16)" },
@@ -210,7 +210,7 @@ function ResortDetailSheet({
         {/* Rides here */}
         {ridesHere.length > 0 && (
           <div className="px-5 mt-4">
-            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>{t("map.ridesHereToday")}</p>
+            <p className="text-[0.65rem] font-black mb-3" style={{ color: MUTED }}>{t("map.ridesHereToday")}</p>
             {ridesHere.map(({ post: ride, host: a }) => {
               return (
                 <div key={ride.id} className="flex items-center gap-3 py-2.5" style={{ borderBottom: `1px solid ${BORDER}` }}>
@@ -316,6 +316,8 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [locateRequest, setLocateRequest] = useState(0);
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
+  /* Sharing already on: open on it, so the person sees how to stop. */
+  const [panel, setPanel] = useState<"day" | "share">(live?.sharingEnd ? "share" : "day");
   const isLive = live !== undefined;
   const rides = live ? live.rides ?? [] : FIXTURE_RIDES;
 
@@ -389,7 +391,6 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onStartClick={() => setActiveSheet({ type: "lift" })}
         />
       )}
-      {live && !inNativeApp && <p className="px-4 pt-2 text-xs" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
 
       {/* Vector map (MapLibre) */}
       <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>
@@ -416,7 +417,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
               locateMe();
             }}
             aria-label={t("loc.locateMe")}
-            className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center"
+            className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full"
             style={{ zIndex: 500, background: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             <Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} strokeWidth={2.2} />
@@ -430,9 +431,21 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         )}
       </div>
 
-      {live && <TrackPanel />}
+      {/* One panel at a time under the map: the ski day or location
+          sharing, never both stacked (design pass 2026-10-07). */}
+      {live && location && (
+        <div className="px-4 pt-4">
+          <SegmentedControl
+            options={[{ value: "day", label: t("map.tabDay") }, { value: "share", label: t("map.tabShare") }]}
+            value={panel}
+            onChange={setPanel}
+            ariaLabel={t("map.panels")}
+          />
+        </div>
+      )}
+      {live && panel === "day" && <TrackPanel />}
 
-      {location && (
+      {location && (!live || panel === "share") && (
         <LocationPanel
           sharingEnd={location.sharingEnd}
           canShare={live?.canShare !== false}
@@ -454,9 +467,11 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         </p>
       )}
 
+      {live && !inNativeApp && <p className="px-4 pt-4 text-sm" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
+
       {/* Resort list */}
       <div className="px-4 pt-4 pb-6">
-        <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>{t("map.allResorts")}</p>
+        <p className="text-[0.65rem] font-black mb-3" style={{ color: MUTED }}>{t("map.allResorts")}</p>
         <div className="space-y-2">
           {sorted.map((resort, i) => (
             <button

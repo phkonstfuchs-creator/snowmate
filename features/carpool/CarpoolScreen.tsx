@@ -428,7 +428,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--status-success)" }} />
-              <h2 className="font-black text-xs uppercase" style={{ color: "var(--status-success)" }}>
+              <h2 className="font-black text-xs" style={{ color: "var(--status-success)" }}>
                 {t("carpool.seatsOpen", { n: drivers.length })}
               </h2>
             </div>
@@ -500,7 +500,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--rust)" }} />
-              <h2 className="font-black text-xs uppercase" style={{ color: "var(--rust)" }}>
+              <h2 className="font-black text-xs" style={{ color: "var(--rust)" }}>
                 {t("carpool.looking", { n: riders.length })}
               </h2>
             </div>

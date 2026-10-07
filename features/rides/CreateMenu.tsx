@@ -44,7 +44,7 @@ export default function CreateMenu({ basePath, onPostRide, onShareDay, onClose }
           {items.map((item) => {
             const body = (
               <>
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: "var(--paper-2)", borderRadius: 14 }}>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: "var(--paper-1)", borderRadius: 14 }}>
                   <Icon name={item.icon} size={20} color="var(--rust)" />
                 </span>
                 <span className="min-w-0 text-left">

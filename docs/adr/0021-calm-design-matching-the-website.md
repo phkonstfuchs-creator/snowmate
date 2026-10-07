@@ -1,6 +1,7 @@
 # 0021 Calm design that matches the website
 
-- **Status:** Accepted (owner, 2026-10-05)
+- **Status:** Accepted (owner, 2026-10-05); lines, shadows and label type
+  partly replaced by [0033](0033-clean-surfaces-instead-of-frames.md) (Proposed)
 - **Date:** 2026-10-05
 - **Replaces:** the "1970s alpine poster on paper" direction described in the
   old header of `app/globals.css`

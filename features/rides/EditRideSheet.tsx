@@ -117,7 +117,7 @@ export default function EditRideSheet({
             type="button"
             onClick={save}
             disabled={saving || meetPoint.trim().length < 2}
-            className="card-tap w-full py-4 font-display text-xl uppercase disabled:opacity-40"
+            className="card-tap w-full py-4 font-display text-xl disabled:opacity-40"
             style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
           >
             {saving ? t("common.saving") : t("common.save")}

@@ -26,7 +26,7 @@ export default function Button({
         padding: "0 22px",
         font: "600 16px var(--font-body-stack)",
         gap: 10,
-        borderRadius: 14,
+        borderRadius: 999,
         width: fullWidth ? "100%" : undefined,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,

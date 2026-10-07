@@ -166,7 +166,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Badges */}
         {earnedBadges.length > 0 && (
           <div className="px-5 pt-4 pb-5">
-            <p className="text-[0.65rem] font-black uppercase mb-3" style={{ color: MUTED }}>Badges ({earnedBadges.length})</p>
+            <p className="text-[0.65rem] font-black mb-3" style={{ color: MUTED }}>Badges ({earnedBadges.length})</p>
             <div className="flex flex-wrap gap-2">
               {earnedBadges.map((b) => (
                 <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-black"

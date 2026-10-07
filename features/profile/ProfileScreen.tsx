@@ -2,9 +2,9 @@
 
 import { seasonStart } from "@/features/tracking/ski-day";
 import NextStep from "@/components/ui/NextStep";
+import SegmentedControl from "@/components/ui/SegmentedControl";
 import { seasonLabel } from "@/lib/season";
 import { useState } from "react";
-import { heroNameFontSize } from "./hero-name";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
 import type { Badge, BadgeRarity, LeaderboardEntry } from "@/lib/types";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -107,7 +107,7 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
 
         <div className="px-5 pt-5 space-y-3">
           <button
-            className="w-full py-4 font-display text-lg uppercase"
+            className="w-full py-4 font-display text-lg"
             style={{ background: OCHRE, color: "var(--on-bright)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
           >
             14.99 € one time
@@ -171,11 +171,9 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
         />
       </div>
       <span
-        className="text-[0.65rem] text-center leading-tight uppercase"
+        className="text-[0.65rem] text-center leading-tight"
         style={{
-          fontFamily: "var(--font-mono-stack)",
-          fontWeight: 700,
-          letterSpacing: 0,
+          fontWeight: 600,
           color: earned ? INK : "var(--ink-3)",
         }}
       >
@@ -229,6 +227,7 @@ export default function ProfileScreen({
   );
   const [showSeasonPass, setShowSeasonPass] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [part, setPart] = useState<"season" | "rides" | "posts">("season");
   const leaderboard = leaderboardCity === "innsbruck" ? LEADERBOARD_INNSBRUCK : LEADERBOARD_SALZBURG;
   const myRank = leaderboard.find((e) => e.userId === "me");
   const pct = Math.min(100, Math.round((ME.xp / ME.xpToNext) * 100));
@@ -243,12 +242,10 @@ export default function ProfileScreen({
 
   return (
     <div className="paper-grain" style={{ background: PAPER }}>
-      {/* ── Poster head ────────────────────────────────────── */}
-      <header className="relative overflow-hidden px-4 pt-5 pb-6" style={{ borderBottom: "var(--rule-heavy)" }}>
-        <div className="halftone absolute -top-8 -right-10 w-44 h-44" aria-hidden="true" />
-
-        <div className="relative flex items-start justify-between">
-          <p className="text-mono-label" style={{ color: RUST }}>
+      {/* ── Head: picture, name, handle, centred as in iOS ───── */}
+      <header className="relative px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between">
+          <p className="text-mono-label" style={{ color: INK_2 }}>
             {t("profile.season", { season: seasonLabel(), city: leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg" })}
           </p>
           <button
@@ -256,47 +253,34 @@ export default function ProfileScreen({
             aria-label={t("profile.edit")}
             onClick={isLive ? () => setShowEdit(true) : undefined}
             aria-disabled={isLive ? undefined : true}
-            className="-mt-2 -mr-1 flex h-11 w-11 items-center justify-center"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full"
           >
-            <Icon name="settings" size={18} color={INK} strokeWidth={1.9} />
+            <Icon name="settings" size={20} color={INK} strokeWidth={1.9} />
           </button>
         </div>
 
-        {/* Space between the lines, otherwise the block break makes the
-            name read as "FelixGruber" to a screen reader */}
-        <h1
-          className="text-display-hero relative mt-2"
-          style={{ color: INK, fontSize: heroNameFontSize(displayName), overflowWrap: "anywhere" }}
-        >
-          {displayName.split(" ").map((word, i) => (
-            <span key={`${word}-${i}`} className="block">
-              {i > 0 ? " " : null}
-              {word}
-            </span>
-          ))}
-        </h1>
-
-        <div className="relative mt-4 flex items-center gap-3">
+        <div className="mt-1 flex flex-col items-center text-center">
           {isLive && account?.id ? (
-            <Avatar id={account.id} version={account.avatarPath ?? null} initials={initials} size={46} />
+            <Avatar id={account.id} version={account.avatarPath ?? null} initials={initials} size={88} />
           ) : (
             <div
               className="avatar-initials"
-              style={{ width: 46, height: 46, background: avatarBg("me"), color: PAPER, fontSize: 17 }}
+              style={{ width: 88, height: 88, background: avatarBg("me"), color: PAPER, fontSize: 30 }}
             >
               {initials}
             </div>
           )}
-          <div>
-            <p className="text-mono-label" style={{ color: INK }}>
-              {isLive
-                ? [account?.city ? t(CITY_LABEL[account.city]) : null, ...(account?.ridingStyles ?? []).map((style) => t(ABILITY_LABEL[style]))]
-                    .filter(Boolean)
-                    .join(" · ") || t("common.rider")
-                : `Level ${ME.level} · ${ME.levelTitle}`}
-            </p>
-            {handle && <p className="text-sm mt-0.5" style={{ color: INK_2 }}>@{handle}</p>}
-          </div>
+          <h1 className="mt-3 font-display text-[1.75rem] font-bold leading-tight" style={{ color: INK, overflowWrap: "anywhere" }}>
+            {displayName}
+          </h1>
+          {handle && <p className="mt-0.5 text-[0.9375rem]" style={{ color: INK_2 }}>@{handle}</p>}
+          <p className="mt-1 text-sm" style={{ color: INK_2 }}>
+            {isLive
+              ? [account?.city ? t(CITY_LABEL[account.city]) : null, ...(account?.ridingStyles ?? []).map((style) => t(ABILITY_LABEL[style]))]
+                  .filter(Boolean)
+                  .join(" · ") || t("common.rider")
+              : `Level ${ME.level} · ${ME.levelTitle}`}
+          </p>
         </div>
       </header>
 
@@ -388,7 +372,7 @@ export default function ProfileScreen({
           >
             <Icon name="star" size={20} color="var(--on-bright)" fill="var(--on-bright)" strokeWidth={0} />
             <div className="flex-1">
-              <p className="font-display text-lg uppercase leading-none" style={{ color: "var(--on-bright)", letterSpacing: 0 }}>
+              <p className="font-display text-lg leading-none" style={{ color: "var(--on-bright)", letterSpacing: 0 }}>
                 Season Pass
               </p>
               <p className="text-sm mt-1" style={{ color: "var(--on-bright)" }}>
@@ -562,24 +546,49 @@ export default function ProfileScreen({
         </>
       )}
 
-      {/* No ski day yet this season: point to where it starts. */}
-      {isLive && skiDays && today && !skiDays.some((day) => Date.parse(day.startedAt) >= seasonStart(new Date(today)).getTime()) && (
-        <NextStep icon="mountain-snow" text={t("next.profile")} action={t("next.toMap")} href="/map" />
+      {/* One part at a time: the season, my rides or my posts. */}
+      {isLive && (
+        <div className="px-4 pt-6">
+          <SegmentedControl
+            options={[
+              { value: "season", label: t("profile.tabSeason") },
+              { value: "rides", label: t("profile.tabRides") },
+              { value: "posts", label: t("profile.tabPosts") },
+            ]}
+            value={part}
+            onChange={setPart}
+            ariaLabel={t("profile.parts")}
+          />
+        </div>
       )}
-      {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}
-      {isLive && skiDays !== undefined && (
-        <Badges
-          earned={earnedBadges({
-            days: skiDays ?? [],
-            ridesHosted: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => ride.isHost).length,
-            ridesJoined: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => !ride.isHost).length,
-            friends: stats?.crew ?? 0,
-          })}
-        />
+      {part === "season" && (
+        <>
+          {/* No ski day yet this season: point to where it starts. */}
+          {isLive && skiDays && today && !skiDays.some((day) => Date.parse(day.startedAt) >= seasonStart(new Date(today)).getTime()) && (
+            <NextStep icon="mountain-snow" text={t("next.profile")} action={t("next.toMap")} href="/map" />
+          )}
+          {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}
+          {isLive && skiDays !== undefined && (
+            <Badges
+              earned={earnedBadges({
+                days: skiDays ?? [],
+                ridesHosted: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => ride.isHost).length,
+                ridesJoined: [...(myRides?.upcoming ?? []), ...(myRides?.past ?? [])].filter((ride) => !ride.isHost).length,
+                friends: stats?.crew ?? 0,
+              })}
+            />
+          )}
+          {isLive && seasonBoard !== undefined && <Leaderboard initial={seasonBoard} inRegion={leaderboardSettings?.region === true} />}
+        </>
       )}
-      {isLive && seasonBoard !== undefined && <Leaderboard initial={seasonBoard} inRegion={leaderboardSettings?.region === true} />}
-      {isLive && myRides && <MyRides upcoming={myRides.upcoming} past={myRides.past} />}
-      {isLive && myPosts !== undefined && <PostList posts={myPosts} title={t("posts.mine")} />}
+      {part === "rides" && isLive && myRides && <MyRides upcoming={myRides.upcoming} past={myRides.past} />}
+      {part === "rides" && isLive && myRides && myRides.upcoming.length + myRides.past.length === 0 && (
+        <NextStep icon="plus" text={t("profile.noRides")} action={t("next.toFeed")} href="/feed" />
+      )}
+      {part === "posts" && isLive && myPosts !== undefined && <PostList posts={myPosts} title={t("posts.mine")} />}
+      {part === "posts" && isLive && myPosts?.length === 0 && (
+        <NextStep icon="sparkles" text={t("profile.noPosts")} action={t("next.toFeed")} href="/feed" />
+      )}
 
       {/* Settings are needed rarely: one row that opens them. */}
       <details className="settings-disclosure mx-4 mt-6 mb-4" style={{ borderTop: "var(--rule-thin)" }}>
