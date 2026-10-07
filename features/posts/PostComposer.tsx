@@ -3,10 +3,8 @@
 import Image from "next/image";
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { useSheetDismiss } from "@/hooks/useSheetDismiss";
-import { useScrollLock } from "@/hooks/useScrollLock";
 import Icon from "@/components/ui/Icon";
+import Sheet from "@/components/ui/Sheet";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 import { resortNamesIn } from "@/lib/resorts";
@@ -54,12 +52,9 @@ export default function PostComposer({
   initialBody?: string;
   initialResort?: string;
 }) {
-  useScrollLock();
   const t = useT();
   const router = useRouter();
   const ids = useId();
-  const { state, dismiss } = useSheetDismiss(onClose);
-  const panelRef = useDialogFocus<HTMLDivElement>(dismiss);
   const [body, setBody] = useState(initialBody);
   const [resort, setResort] = useState(initialResort);
   const [photo, setPhoto] = useState<Blob | null>(null);
@@ -78,7 +73,7 @@ export default function PostComposer({
     setPreview(URL.createObjectURL(blob));
   };
 
-  const submit = async () => {
+  const submit = async (close: () => void) => {
     if (busy || normalizePostBody(body) === null) return;
     setBusy(true);
     setError(null);
@@ -90,7 +85,7 @@ export default function PostComposer({
     setBusy(false);
     if (outcome === "created") {
       router.refresh();
-      dismiss();
+      close();
     } else {
       setError(t(OUTCOME[outcome]));
     }
@@ -99,16 +94,9 @@ export default function PostComposer({
   const remaining = MAX_POST_LENGTH - [...body].length;
 
   return (
-    <>
-      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={panelRef} className="sheet-panel" data-state={state} role="dialog" aria-modal="true" aria-labelledby={`${ids}-title`} tabIndex={-1} style={{ maxHeight: "92dvh", overflowY: "auto" }}>
-        <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <h2 id={`${ids}-title`} className="text-display-md">{t("posts.new")}</h2>
-          <button type="button" onClick={dismiss} aria-label={t("common.close")} className="flex h-11 w-11 items-center justify-center">
-            <Icon name="x" size={18} color="var(--ink-2)" />
-          </button>
-        </div>
-        <div className="space-y-4 px-5 pb-6">
+    <Sheet title={t("posts.new")} onClose={onClose} style={{ maxHeight: "92dvh", overflowY: "auto" }}>
+      {(close) => (
+        <>
           <div>
             <label htmlFor={`${ids}-body`} className="text-mono-label" style={{ color: "var(--ink-2)" }}>{t("posts.text")}</label>
             <textarea
@@ -148,15 +136,15 @@ export default function PostComposer({
           {error && <p role="alert" className="text-sm" style={{ color: "var(--crimson)" }}>{error}</p>}
           <button
             type="button"
-            onClick={() => void submit()}
+            onClick={() => void submit(close)}
             disabled={busy || normalizePostBody(body) === null}
             className="flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
             style={{ background: "var(--rust)", color: "var(--paper-0)", borderRadius: 5 }}
           >
             {busy ? t("common.publishing") : t("posts.share")}
           </button>
-        </div>
-      </div>
-    </>
+        </>
+      )}
+    </Sheet>
   );
 }

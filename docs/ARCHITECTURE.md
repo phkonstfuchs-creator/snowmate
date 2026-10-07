@@ -39,6 +39,7 @@ Browser ◄── feature screens (client components) ◄───────�
 | `features/<f>/actions.ts`, `*-actions.ts` | Server actions: validate input, call the database, revalidate | Import fixtures, UI or hooks |
 | `features/<f>/*.ts` (everything else) | Business rules: validation (`*-input.ts`), mapping (`live-*.ts`), capacity, visibility | Import React, Next, Supabase, fixtures, hooks or UI |
 | `components/` | Reusable presentation; receives data and callbacks as props | Own business rules, read fixtures |
+| `components/ui/Sheet.tsx` | The bottom sheet for new sheets: overlay, exit motion, focus trap, Escape, scroll lock | Be copied as raw `sheet-panel` markup |
 | `features/demo/` | UI that exists only in the prototype (sample profiles, chats) | Be used by signed-in routes |
 | `lib/resorts.ts`, `lib/lifts.ts` | Attributed reference data: resorts and lifts covered, coordinates and durations | Carry sample conditions |
 | `lib/data/` | Prototype fixtures only | Be read by signed-in routes or the server boundary |
