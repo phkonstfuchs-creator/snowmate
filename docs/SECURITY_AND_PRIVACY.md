@@ -143,6 +143,12 @@ runs. The app and the database refuse implausible values, and at most 5
 days can be saved per 24 h. The export lists the days, and account
 deletion removes them. See [ADR 0026](adr/0026-ski-day-tracking.md).
 
+In the store apps (ADR 0031) a native watcher keeps recording with the
+screen locked, only between start and finish of a day. iOS shows the blue
+location indicator and Android an ongoing notification the whole time;
+the fixes go to the same on-device tracker and nowhere else
+(`features/tracking/position-source.ts`).
+
 ## Leaderboards
 
 Only season totals leave the database, through `public.leaderboard()`:

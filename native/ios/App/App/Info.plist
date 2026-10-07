@@ -67,6 +67,13 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Pistl uses your location to show you on the piste map, to share it with friends you choose and to track your ski day. You decide each time.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>While you record a ski day, Pistl keeps counting your runs with the screen locked. Your route stays on your phone; only the day's totals are saved.</string>
+	<!-- Ski-day tracking with the screen locked, only while a day is running (ADR 0026, 0031). -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Pistl uses the camera when you take a profile picture or a photo for a post.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -12,9 +12,9 @@ Each line marked **open** needs code or an owner action before submitting.
 | 1.3 Kids / age | Honest age rating; no targeting of under-13s | Sign-up from 14; age bands (ADR 0028); live location from 16 (ADR 0019) | **open:** answer the age-rating questionnaire (expect 12+ or higher for chat and user content) |
 | 2.1 Completeness | Reviewer can sign in and use every feature | Needs a working account | **open:** demo account with a friend, a ride and a chat, credentials in App Store Connect only |
 | 3.1.1 Payments | Digital goods only through in-app purchase; no links to outside payment | Season Pass appears only in `/demo`; the native app is redirected away from `/demo` and the map hides the demo link (`lib/native-app.ts`) | done in code |
-| 4.2 Minimum functionality | More than a website in a frame | Shell in `native/`: own offline screen, splash, swipe-back, portrait, keyboard handling. Planned: background GPS, native push, share, haptics | **open:** native push and background GPS |
+| 4.2 Minimum functionality | More than a website in a frame | Shell in `native/`: own offline screen, splash, swipe-back, portrait, keyboard handling. Background GPS for a running ski day (`position-source.ts`). Planned: native push | **open:** native push |
 | 4.8 Sign in with Apple | Required only when other social logins are offered | E-mail and password only | not needed |
-| 5.1.1 Privacy | Privacy policy link; data collected only with purpose strings; account deletion in the app | `/datenschutz`; deletion in Profile (`delete_my_account`) | **open:** usage strings for location (when in use and always), camera and photos |
+| 5.1.1 Privacy | Privacy policy link; data collected only with purpose strings; account deletion in the app | `/datenschutz`; deletion in Profile (`delete_my_account`) | usage strings for location (when in use, and always for a running ski day), camera and photos are in `Info.plist` | done in code |
 | 5.1.2 Data use | App Privacy labels match reality; no tracking | No ads, no analytics SDK, no tracking | **open:** fill App Privacy labels (below) |
 
 ## App Privacy labels (draft)
