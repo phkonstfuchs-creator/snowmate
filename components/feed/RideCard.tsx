@@ -72,8 +72,10 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center -space-x-1.5 flex-1">
+        {/* Wraps instead of clipping: on a narrow phone a long host
+            status moves to its own line, right-aligned. */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+          <div className="flex min-w-0 items-center -space-x-1.5 flex-1">
             {joinedUsers.slice(0, 5).map((u) => (
               <div key={u.id} className="rounded-full" style={{ boxShadow: "0 0 0 2px var(--paper-1)" }}>
                 <Avatar id={u.id} initials={u.avatar} size={22} />
@@ -84,15 +86,15 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
             )}
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="ml-auto flex min-w-0 items-center gap-3">
             <span
-              className="text-sm font-medium"
+              className="whitespace-nowrap text-sm font-medium"
               style={{ color: full ? "var(--ink-3)" : open === 1 ? "var(--rust)" : "var(--ink-2)" }}
             >
               {full ? t("card.full") : t("card.open", { n: open })}
             </span>
             {isHost ? (
-              <span className="flex min-h-11 items-center px-4 text-sm font-semibold" style={{ background: "var(--ochre)", color: "var(--on-bright)", borderRadius: 999 }}>
+              <span className="flex min-h-11 min-w-0 items-center px-4 text-sm font-semibold" style={{ background: "var(--ochre)", color: "var(--on-bright)", borderRadius: 999 }}>
                 {requestCount > 0 ? t("card.yourRideAsking", { n: requestCount }) : t("card.yourRide")}
               </span>
             ) : (
