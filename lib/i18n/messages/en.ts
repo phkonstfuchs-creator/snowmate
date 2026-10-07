@@ -39,6 +39,7 @@ export const en = {
   "status.retry": "Try again",
   "status.home": "Go to start",
   "crewmap.title": "Your crew on the mountain",
+  "crewmap.none": "Nobody in your crew is sharing their location right now.",
   "crewmap.onLift": "On {lift} · at the top in about {n} min",
   "crewmap.atBottom": "At the {lift} valley station",
   "crewmap.atTop": "At the top, {place}",

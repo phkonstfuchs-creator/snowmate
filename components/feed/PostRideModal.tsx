@@ -318,7 +318,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
 
             {/* Summary pill */}
-            <div className="rounded-none px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
+            <div className="rounded-[14px] px-4 py-3 flex items-center gap-3" style={{ background: "var(--accent-primary-subtle)" }}>
               <Icon name="mountain" size={16} color="var(--sky)" strokeWidth={2} />
               <div>
                 <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{resort}</span>

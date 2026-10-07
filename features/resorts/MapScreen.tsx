@@ -152,7 +152,7 @@ function ResortDetailSheet({
         <div className="grid grid-cols-3 gap-3 px-5 mt-4">
           {stats.map(({ label, val, live, cond }) => (
             <div key={label}
-              className={clsx("rounded-none p-3 text-center", cond ? `cond-${cond}` : "")}
+              className={clsx("rounded-[14px] p-3 text-center", cond ? `cond-${cond}` : "")}
               style={cond ? {} : { background: SURFACE, border: `1px solid ${BORDER}` }}>
               {live && <div className="flex justify-center mb-1"><span className="pulse-dot" style={{ width: 6, height: 6 }} /></div>}
               <p className="font-black text-lg" style={{ color: cond ? undefined : INK }}>{val}</p>
@@ -374,7 +374,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         </div>
       </header>
 
-      {location && <CrewOnMap friends={location.friends} onFocus={focusOn} />}
+      {location && <CrewOnMap friends={location.friends} onFocus={focusOn} canStartLift={live?.canShareLift === true} />}
 
       {location && meetups && (
         <LiftMeetupPanel
@@ -461,7 +461,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           {sorted.map((resort, i) => (
             <button
               key={resort.name}
-              className="card-tap w-full flex items-center gap-3 p-0 rounded-none overflow-hidden anim-fade-up text-left"
+              className="card-tap w-full flex items-center gap-3 p-0 rounded-[14px] overflow-hidden anim-fade-up text-left"
               style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
               onClick={() => openResort(resort)}
             >

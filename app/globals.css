@@ -590,11 +590,12 @@ body {
    Many screens frame cards, inputs and icon buttons with an inline
    `border: var(--rule-thin|thick)` and no radius, which made the app
    look square. Until each moves to a shared component, every fully
-   framed box without its own radius gets the card radius. Lines that
-   only draw one side (border-bottom etc.) are not matched. */
-[style*="border: var(--rule-thin)"]:not([style*="border-radius"]),
-[style*="border: var(--rule-thick)"]:not([style*="border-radius"]),
-[style*="border: 1px solid"]:not([style*="border-radius"]) {
+   framed box without its own radius (inline or a `rounded*` class)
+   gets the card radius. Lines that only draw one side (border-bottom
+   etc.) are not matched. */
+[style*="border: var(--rule-thin)"]:not([style*="border-radius"]):not([class*="rounded"]),
+[style*="border: var(--rule-thick)"]:not([style*="border-radius"]):not([class*="rounded"]),
+[style*="border: 1px solid"]:not([style*="border-radius"]):not([class*="rounded"]) {
   border-radius: var(--radius-lg);
 }
 

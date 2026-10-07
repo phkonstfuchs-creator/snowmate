@@ -33,9 +33,12 @@ describe("ProfileScreen", () => {
   });
 
   it("points a rider without a ski day this season to the map", () => {
-    render(<ProfileScreen account={{ ...incomplete, onboardingCompleted: true }} skiDays={[]} />);
+    const lastSeason = { id: "d1", resort: "Nordkette", startedAt: "2026-02-10T09:00:00Z", endedAt: "2026-02-10T15:00:00Z", distanceM: 20000, verticalM: 5000, maxSpeedKmh: 60, runs: 10 };
+    const { rerender } = render(<ProfileScreen account={{ ...incomplete, onboardingCompleted: true }} skiDays={[lastSeason]} today="2026-10-07" />);
     expect(screen.getByRole("note")).toHaveTextContent("No ski day yet this season");
     expect(screen.getByRole("link", { name: "Open map" })).toHaveAttribute("href", "/map");
+    rerender(<ProfileScreen account={{ ...incomplete, onboardingCompleted: true }} skiDays={[{ ...lastSeason, startedAt: "2026-10-05T09:00:00Z", endedAt: "2026-10-05T15:00:00Z" }]} today="2026-10-07" />);
+    expect(screen.queryByRole("link", { name: "Open map" })).not.toBeInTheDocument();
   });
 
   it("shows the signed-in account and its region", () => {

@@ -77,7 +77,7 @@ export default function CrewScreen() {
       {/* Crew tab */}
       {tab === "crew" && (
         <div className="px-4 pt-4 pb-6">
-          <div className="flex items-start gap-3 rounded-none px-4 py-3 mb-4" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
+          <div className="flex items-start gap-3 rounded-[14px] px-4 py-3 mb-4" style={{ background: "var(--accent-primary-subtle)", border: "var(--rule-thin)" }}>
             <Icon name="shield-check" size={16} color={BRAND} strokeWidth={1.6} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-black" style={{ color: BRAND }}>How visibility works</p>
@@ -87,7 +87,7 @@ export default function CrewScreen() {
 
           <div className="space-y-2">
             {myFriends.map((friend) => (
-              <div key={friend.id} className="flex items-center gap-3 p-3 rounded-none" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
+              <div key={friend.id} className="flex items-center gap-3 p-3 rounded-[14px]" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
                 <Avatar id={friend.id} initials={friend.avatar} size={42} verified={friend.accountType === "verified"} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function CrewScreen() {
           {CREWS.map((crew) => {
             const members = crew.memberIds.map((id) => getUserById(id)!).filter(Boolean);
             return (
-              <div key={crew.id} className="rounded-none p-4" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
+              <div key={crew.id} className="rounded-[14px] p-4" style={{ border: `1px solid ${BORDER}`, background: SURFACE }}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="font-black text-[0.9375rem]" style={{ color: INK }}>{crew.name}</p>
@@ -154,7 +154,7 @@ export default function CrewScreen() {
               </div>
             );
           })}
-          <button className="w-full rounded-none p-4 flex items-center justify-center gap-2 text-sm font-black" style={{ border: `2px dashed ${BORDER}`, color: BRAND }}>
+          <button className="w-full rounded-[14px] p-4 flex items-center justify-center gap-2 text-sm font-black" style={{ border: `2px dashed ${BORDER}`, color: BRAND }}>
             <Icon name="plus" size={14} strokeWidth={2.2} />
             Create new squad
           </button>

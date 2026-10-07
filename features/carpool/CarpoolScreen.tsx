@@ -154,7 +154,7 @@ function OfferModal({
           <button
             onClick={submit}
             disabled={!canSubmit}
-            className="card-tap w-full py-4 rounded-none font-black text-base disabled:opacity-40"
+            className="card-tap w-full py-4 rounded-[14px] font-black text-base disabled:opacity-40"
             style={{ background: BRAND, color: D }}
           >
             {submitting ? t("common.publishing") : t("common.publish")}
@@ -212,7 +212,7 @@ function RequestButton({
     <button
       onClick={onClick}
       disabled={pending || (full && pool.myRequest === null)}
-      className="w-full min-h-11 rounded-none text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+      className="w-full min-h-11 rounded-[14px] text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
       style={
         pool.myRequest
           ? { background: "var(--accent-primary-subtle)", color: BRAND }
@@ -438,7 +438,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                 return (
                   <div
                     key={post.id}
-                    className="rounded-none overflow-hidden anim-fade-up"
+                    className="rounded-[14px] overflow-hidden anim-fade-up"
                     style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
                   >
                     {/* Mini resort scene strip */}
@@ -510,7 +510,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
                 return (
                   <div
                     key={post.id}
-                    className="rounded-none p-4 anim-fade-up"
+                    className="rounded-[14px] p-4 anim-fade-up"
                     style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
                   >
                     <div className="flex items-start gap-3">

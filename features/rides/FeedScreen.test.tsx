@@ -261,7 +261,10 @@ describe("FeedScreen with real data", () => {
     expect(within(menu).getByRole("link", { name: /Events/ })).toHaveAttribute("href", "/events");
     expect(within(menu).getByRole("button", { name: /Share your ski day/ })).toBeInTheDocument();
     fireEvent.click(within(menu).getByRole("button", { name: /Post a ride/ }));
+    /* The ride sheet opens only after the menu has gone. */
+    expect(screen.queryByLabelText("Resort")).not.toBeInTheDocument();
     expect(await screen.findByLabelText("Resort")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "What do you want to start?" })).not.toBeInTheDocument();
   });
 
   it("points an empty feed to the open events", () => {

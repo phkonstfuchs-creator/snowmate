@@ -1,5 +1,6 @@
 "use client";
 
+import { seasonStart } from "@/features/tracking/ski-day";
 import NextStep from "@/components/ui/NextStep";
 import { seasonLabel } from "@/lib/season";
 import { useState } from "react";
@@ -562,7 +563,7 @@ export default function ProfileScreen({
       )}
 
       {/* No ski day yet this season: point to where it starts. */}
-      {isLive && skiDays !== undefined && skiDays !== null && skiDays.length === 0 && (
+      {isLive && skiDays && today && !skiDays.some((day) => Date.parse(day.startedAt) >= seasonStart(new Date(today)).getTime()) && (
         <NextStep icon="mountain-snow" text={t("next.profile")} action={t("next.toMap")} href="/map" />
       )}
       {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}

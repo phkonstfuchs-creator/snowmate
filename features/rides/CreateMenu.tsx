@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Sheet from "@/components/ui/Sheet";
 import Icon from "@/components/ui/Icon";
@@ -26,6 +27,9 @@ export default function CreateMenu({ basePath, onPostRide, onShareDay, onClose }
   onClose: () => void;
 }) {
   const t = useT();
+  /* The chosen sheet opens only once this one has finished closing, so
+     two dialogs never compete for Escape and focus. */
+  const next = useRef<(() => void) | null>(null);
   const items: Item[] = [
     { icon: "plus", label: "feed.postRide", hint: "create.rideHint", onSelect: onPostRide },
     ...(onShareDay ? [{ icon: "sparkles" as IconName, label: "posts.shareDay" as MessageKey, hint: "create.dayHint" as MessageKey, onSelect: onShareDay }] : []),
@@ -34,7 +38,7 @@ export default function CreateMenu({ basePath, onPostRide, onShareDay, onClose }
   ];
 
   return (
-    <Sheet title={t("create.title")} onClose={onClose}>
+    <Sheet title={t("create.title")} onClose={() => { onClose(); next.current?.(); }}>
       {(close) => (
         <ul className="space-y-2">
           {items.map((item) => {
@@ -57,9 +61,8 @@ export default function CreateMenu({ basePath, onPostRide, onShareDay, onClose }
                   <Link href={item.href} className={className} style={style}>{body}</Link>
                 ) : (
                   <button type="button" className={className} style={style} onClick={() => {
-                    /* The next sheet opens once this one has gone. */
+                    next.current = item.onSelect ?? null;
                     close();
-                    item.onSelect?.();
                   }}>{body}</button>
                 )}
               </li>

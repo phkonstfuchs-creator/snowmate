@@ -156,7 +156,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       )}
 
       {/* Nothing today: say what to do instead of an empty screen. */}
-      {rides.length === 0 && !unavailable && (
+      {todaysRides.length === 0 && !unavailable && (
         <NextStep icon="plus" text={t("next.feed")} action={t("feed.postRide")} onAction={() => setShowPostModal(true)} />
       )}
 

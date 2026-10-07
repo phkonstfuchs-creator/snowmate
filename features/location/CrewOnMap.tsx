@@ -22,7 +22,12 @@ function describe(t: Translate, item: FriendWhereabouts): string {
 /* "Where is my crew?" first: who shares their position right now, where
    they probably are, and when they are at the top. Tap flies the map
    there. Positions are the ones friends already share (ADR 0015). */
-export default function CrewOnMap({ friends, onFocus }: { friends: FriendLocation[] | null; onFocus: (lat: number, lng: number) => void }) {
+export default function CrewOnMap({ friends, onFocus, canStartLift = false }: {
+  friends: FriendLocation[] | null;
+  onFocus: (lat: number, lng: number) => void;
+  /* Only then can the hint point to the lift button below. */
+  canStartLift?: boolean;
+}) {
   const t = useT();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -38,7 +43,7 @@ export default function CrewOnMap({ friends, onFocus }: { friends: FriendLocatio
       <h2 id="crew-on-map" className="text-mono-label" style={{ color: "var(--ink-2)" }}>{t("crewmap.title")}</h2>
       {items.length === 0 ? (
         /* The big lift button follows right below: point to it, no copy of it. */
-        <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>{t("next.map")}</p>
+        <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>{t(canStartLift ? "next.map" : "crewmap.none")}</p>
       ) : (
         <ul className="-mx-4 mt-2 flex snap-x gap-2 overflow-x-auto px-4 pb-1">
           {items.map((item) => (

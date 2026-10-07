@@ -38,6 +38,7 @@ export const de: Record<MessageKey, string> = {
   "status.retry": "Nochmal versuchen",
   "status.home": "Zur Startseite",
   "crewmap.title": "Deine Crew am Berg",
+  "crewmap.none": "Gerade teilt niemand aus deiner Crew den Standort.",
   "crewmap.onLift": "Im {lift} · oben in ca. {n} Min",
   "crewmap.atBottom": "An der Talstation {lift}",
   "crewmap.atTop": "Oben bei {place}",
