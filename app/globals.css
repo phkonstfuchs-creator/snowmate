@@ -598,7 +598,7 @@ body {
   background: var(--rust);
   color: var(--on-accent);
   border: 0 !important;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-pill);
   box-shadow: none;
 }
 .sm-btn-primary:active:not(:disabled) {
@@ -765,7 +765,7 @@ body [style*="border: 1px solid"]:not([style*="border-radius"]):not([class*="rou
 }
 body :is(button, a, label)[style*="background:var(--rust)"],
 body :is(button, a, label)[style*="background: var(--rust)"] {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-pill);
   border: 0 !important;
   box-shadow: none !important;
 }

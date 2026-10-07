@@ -6,7 +6,7 @@ product
 
 ## Users
 
-Young urban skiers aged 16–25, primarily students and seasonal workers in Innsbruck and Salzburg, Austria. They are ski-native residents (not tourists), hold multi-resort passes (SKI plus City Pass = 13 areas on one pass in Innsbruck), and coordinate their mountain days through scattered WhatsApp groups and Instagram DMs. Their primary context: weekend mornings deciding whether to go, who to go with, how to get there. Job to be done: "find compatible people to ride with today, at my level, right now — and get there."
+Young urban skiers aged 14–25 (owner decision 2026-10-07: minimum age 14), primarily students and seasonal workers in Innsbruck and Salzburg, Austria. They are ski-native residents (not tourists), hold multi-resort passes (SKI plus City Pass = 13 areas on one pass in Innsbruck), and coordinate their mountain days through scattered WhatsApp groups and Instagram DMs. Their primary context: weekend mornings deciding whether to go, who to go with, how to get there. Job to be done: "find compatible people to ride with today, at my level, right now — and get there."
 
 Three core personas:
 - **Seasonal worker**: 4 months on the mountain, huge free time, zero local network
@@ -65,4 +65,4 @@ Language: launching in German and English.
 
 ## Accessibility & Inclusion
 
-WCAG AA minimum. Color choices must maintain 4.5:1 contrast for body text on the ice-blue/white background system. The bottom tab navigation must be touch-target compliant (min 44×44px). Reduced-motion alternatives required for any entrance animations. The product serves 16–17 year olds (minors) — safety architecture must be structurally visible in the data model (`isMinor`, `accountType` fields) even in prototype form.
+WCAG AA minimum. Color choices must maintain 4.5:1 contrast for body text on the ice-blue/white background system. The bottom tab navigation must be touch-target compliant (min 44×44px). Reduced-motion alternatives required for any entrance animations. The product serves 14–17 year olds (minors) — safety architecture must be structurally visible in the data model (`isMinor`, `accountType` fields) even in prototype form.
