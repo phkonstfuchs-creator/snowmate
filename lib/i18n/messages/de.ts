@@ -697,6 +697,8 @@ export const de: Record<MessageKey, string> = {
   "loc.backgroundTitle": "Du teilst deinen Standort mit deiner Crew",
   "loc.backgroundMessage": "Bis du stoppst oder die Zeit abläuft.",
   "loc.lockedToo": "In der App läuft das Teilen auch bei gesperrtem Handy weiter, bis die Zeit abläuft.",
+  "loc.backgroundDenied": "Standort im Hintergrund ist blockiert. Erlaube „Immer“ in den Einstellungen, sonst sehen dich Freunde nur, solange Pistl offen ist.",
+  "loc.backgroundFailed": "Dein Standort konnte gerade nicht gesendet werden. Pistl versucht es weiter.",
   "loc.appOpen": "Dein Handy schickt seine Position nur, solange Pistl offen ist.",
   "loc.denied": "Der Standortzugriff ist blockiert. Erlaube ihn für diese Seite in den Browser- oder Handy-Einstellungen.",
   "loc.duration": "Teilen für",

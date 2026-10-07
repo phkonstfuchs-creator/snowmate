@@ -83,7 +83,10 @@ export function friendWhereabouts(friend: FriendLocation, now = Date.now()): Fri
   const ageMinutes = Math.max(0, (now - Date.parse(friend.updatedAt)) / 60_000);
   const stale = ageMinutes > STALE_MINUTES;
   const where = whereabouts(friend, ageMinutes);
-  /* An old fix on a lift says nothing about the lift any more. */
-  const honest: Whereabouts = stale && where.kind === "lift" ? { kind: "resort", resort: where.lift.resort } : where;
+  /* An old fix says nothing about lifts or stations any more: only the
+     resort is still a fair guess. */
+  const honest: Whereabouts = stale && (where.kind === "lift" || where.kind === "top" || where.kind === "bottom")
+    ? { kind: "resort", resort: where.lift.resort }
+    : where;
   return { friend, where: honest, ageMinutes, stale };
 }

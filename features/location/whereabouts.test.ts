@@ -46,7 +46,10 @@ describe("friendWhereabouts", () => {
     const result = friendWhereabouts(friend, now);
     expect(result.stale).toBe(true);
     expect(result.ageMinutes).toBe(30);
-    expect(result.where.kind).not.toBe("lift");
+    expect(result.where).toEqual({ kind: "resort", resort: "Nordkette" });
+    /* Not "at the top" either, even though the ride would be over. */
+    const atStation = { ...friend, lat: 47.3198 };
+    expect(friendWhereabouts(atStation, now).where.kind).toBe("resort");
     expect(friendWhereabouts({ ...friend, updatedAt: "2026-01-10T10:29:00Z" }, now).stale).toBe(false);
   });
 });

@@ -3,7 +3,8 @@
 - **Status:** Accepted (owner, 2026-10-07: estimate from data when a friend is at which lift, and show friends who share the map)
 - **Date:** 2026-10-07
 - **Builds on:** [ADR 0015](0015-live-location-for-confirmed-friends.md), [ADR 0029](0029-lift-meetup-estimates.md), [ADR 0031](0031-native-apps-with-capacitor.md)
-- **Checks:** `features/location/whereabouts.test.ts`, `CrewOnMap.test.tsx`, `useLiveLocation.native.test.ts`
+- **Spec:** [live location](../specs/live-location.md) (amendment 2026-10-07)
+- **Checks:** `features/location/whereabouts.test.ts`, `CrewOnMap.test.tsx`, `background-sharing.test.ts`, `useLiveLocation.native.test.ts`
 
 ## Context
 
@@ -28,8 +29,13 @@ pick a lift by hand, and the result was not obvious to the people waiting.
 - The UI marks the lift guess as an estimate. A rider skiing right under a
   lift can look like riding it.
 - In the store apps, location sharing keeps sending while the phone is
-  locked, using the same background watcher as ski-day tracking, until
-  sharing ends.
+  locked. It uses one native watcher at module level
+  (`background-sharing.ts`), so leaving the Map tab does not stop it.
+  While it runs, the page starts no browser watcher of its own. It stops
+  at the chosen end, on Stop or on sign-out, resumes after a restart, and
+  shows a denied or failed permission.
+- A position older than 15 minutes gives no lift or station guess, only
+  the resort.
 
 ## Consequences
 

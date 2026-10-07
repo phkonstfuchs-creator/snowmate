@@ -698,6 +698,8 @@ export const en = {
   "loc.backgroundTitle": "You are sharing your location with your crew",
   "loc.backgroundMessage": "Until you stop or the time runs out.",
   "loc.lockedToo": "In the app, sharing keeps running with the phone locked until the time runs out.",
+  "loc.backgroundDenied": "Background location is blocked. Allow \"Always\" in Settings, or friends only see you while Pistl is open.",
+  "loc.backgroundFailed": "Your location could not be sent just now. Pistl keeps trying.",
   "loc.appOpen": "Your phone only sends its position while Pistl is open.",
   "loc.denied": "Location access is blocked. Allow it for this site in your browser or phone settings.",
   "loc.duration": "Share for",

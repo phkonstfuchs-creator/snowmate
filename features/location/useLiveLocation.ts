@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MessageKey } from "@/lib/i18n/translate";
 import { useT } from "@/lib/i18n/client";
-import { hasBackgroundLocation, watchPositions } from "@/features/tracking/position-source";
+import { hasBackgroundLocation } from "@/features/tracking/position-source";
+import { isBackgroundSharing, onBackgroundSharing, startBackgroundSharing, stopBackgroundSharing } from "./background-sharing";
 import { friendLocationsAction, shareLocationAction, stopSharingAction } from "./actions";
 import {
   SHARE_MESSAGES,
@@ -51,7 +52,8 @@ export function useLiveLocation({
     setLocating(false);
     setError(null);
 
-    if (!sharingRef.current) return;
+    /* In the store apps the background watcher sends instead. */
+    if (!sharingRef.current || isBackgroundSharing()) return;
     if (!shouldSendUpdate(lastSent.current, position, Date.now())) return;
     lastSent.current = { position, at: Date.now() };
     void shareLocationAction(position, null).then((result) => {
@@ -61,16 +63,21 @@ export function useLiveLocation({
 
   const onPosition = useCallback((geo: GeolocationPosition) => onPositionValue(toPosition(geo)), [onPositionValue]);
 
-  /* Store apps: keep sending while sharing, with the screen locked too. */
+  /* Store apps: one background watcher sends while sharing, with the
+     screen locked and on every tab; this screen only shows what it sees. */
+  const backgroundTexts = useMemo(() => ({ title: t("loc.backgroundTitle"), message: t("loc.backgroundMessage") }), [t]);
   useEffect(() => {
-    if (!sharingEnd || !hasBackgroundLocation()) return;
-    const background = watchPositions(
-      (fix) => onPositionValue({ lat: fix.lat, lng: fix.lng, accuracy: fix.accuracy }),
-      () => undefined,
-      { title: t("loc.backgroundTitle"), message: t("loc.backgroundMessage") },
-    );
-    return () => background.stop();
-  }, [sharingEnd, onPositionValue, t]);
+    if (sharingEnd) startBackgroundSharing(sharingEnd, backgroundTexts);
+  }, [sharingEnd, backgroundTexts]);
+  useEffect(
+    () =>
+      onBackgroundSharing((event) => {
+        if (event.type === "position") onPositionValue(event.position);
+        else if (event.type === "ended") setSharingEnd(null);
+        else setError(event.error === "denied" ? "loc.backgroundDenied" : "loc.backgroundFailed");
+      }),
+    [onPositionValue],
+  );
 
   const onGeoError = useCallback((geoError: GeolocationPositionError) => {
     setLocating(false);
@@ -125,8 +132,10 @@ export function useLiveLocation({
         const result = await shareLocationAction(position, minutes);
         if (result === "sharing" || result === "throttled") {
           lastSent.current = { position, at: Date.now() };
-          setSharingEnd(new Date(Date.now() + minutes * 60_000).toISOString());
-          watch();
+          const end = new Date(Date.now() + minutes * 60_000).toISOString();
+          setSharingEnd(end);
+          /* One GPS stream: the native one in the store apps, else the page's. */
+          if (!startBackgroundSharing(end, backgroundTexts)) watch();
           return true;
         }
         setError(SHARE_MESSAGES[result]);
@@ -138,7 +147,7 @@ export function useLiveLocation({
         setBusy(false);
       }
     },
-    [currentPosition, me, watch],
+    [backgroundTexts, currentPosition, me, watch],
   );
 
   const stopSharing = useCallback(async () => {
@@ -146,6 +155,7 @@ export function useLiveLocation({
     const ok = await stopSharingAction();
     setBusy(false);
     if (ok) {
+      stopBackgroundSharing();
       setSharingEnd(null);
       lastSent.current = null;
     } else {
@@ -155,7 +165,7 @@ export function useLiveLocation({
 
   /* Resume GPS when sharing was already on (e.g. after reopening the app). */
   useEffect(() => {
-    if (initialSharingEnd) startWatch();
+    if (initialSharingEnd && !hasBackgroundLocation()) startWatch();
   }, [initialSharingEnd, startWatch]);
 
   /* Sharing ends by itself at its end time. */
