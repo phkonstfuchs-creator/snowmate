@@ -106,6 +106,19 @@ Then set `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (the public key) in the app's
 Vercel project and redeploy. Without it the switch stays hidden and the
 app never calls the function.
 
+The iPhone app (ADR 0031) needs an APNs key: Apple Developer, then
+Certificates, Identifiers & Profiles, then Keys, then a new key with
+"Apple Push Notifications service". Download the `.p8` once and keep it
+private.
+
+```bash
+npx supabase secrets set APNS_KEY_ID=… APNS_TEAM_ID=… APNS_KEY="$(cat AuthKey_XXXX.p8)"
+# optional: APNS_HOST=api.sandbox.push.apple.com while testing builds run from Xcode
+npx supabase functions deploy push-dispatch
+```
+
+Without these the function still sends web push and skips iPhones.
+
 ## Commands
 
 | Command | Does |
