@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RESORTS } from "@/lib/resorts";
-import { addFix, isTrackerState, nearestResort, startTracker, summarize, type SkiDaySummary, type TrackerState } from "./tracker";
+import { useT } from "@/lib/i18n/client";
+import { addFix, isTrackerState, nearestResort, startTracker, summarize, type Fix, type SkiDaySummary, type TrackerState } from "./tracker";
+import { hasPositionSource, watchPositions, type PositionWatch } from "./position-source";
 
 const STORAGE_KEY = "pistl.skiday.v1";
 const CLEAR_EVENT = "pistl:skiday:clear";
@@ -67,13 +69,15 @@ function store(userId: string, state: TrackerState | null) {
 /* Records a ski day on this device (ADR 0026). The track lives in memory
    and, so a reload does not lose it, in this browser's storage; it is
    deleted when the day ends. Browsers pause GPS while the screen is off,
-   so the screen is kept on while recording where the device allows it. */
+   so the screen is kept on while recording where the device allows it;
+   the store apps keep recording with the screen locked. */
 export function useSkiDayTracker(userId: string) {
   const [state, setState] = useState<TrackerState | null>(null);
   const [finished, setFinished] = useState<FinishedDay | null>(null);
   const [error, setError] = useState<TrackerError | null>(null);
   const [now, setNow] = useState(0);
-  const watchId = useRef<number | null>(null);
+  const t = useT();
+  const watch = useRef<PositionWatch | null>(null);
   const wakeLock = useRef<WakeLockSentinelLike | null>(null);
   const lastStored = useRef(0);
   const stateRef = useRef<TrackerState | null>(null);
@@ -94,21 +98,14 @@ export function useSkiDayTracker(userId: string) {
   }, []);
 
   const stopWatch = useCallback(() => {
-    if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
-    watchId.current = null;
+    watch.current?.stop();
+    watch.current = null;
   }, []);
 
-  const onFix = useCallback((geo: GeolocationPosition) => {
+  const onFix = useCallback((fix: Fix) => {
     const current = stateRef.current;
     if (!current) return;
-    const next = addFix(current, {
-      lat: geo.coords.latitude,
-      lng: geo.coords.longitude,
-      alt: geo.coords.altitude,
-      accuracy: geo.coords.accuracy,
-      speed: geo.coords.speed,
-      t: geo.timestamp || Date.now(),
-    });
+    const next = addFix(current, fix);
     stateRef.current = next;
     setState(next);
     setError(null);
@@ -119,25 +116,21 @@ export function useSkiDayTracker(userId: string) {
   }, [userId]);
 
   const startWatch = useCallback(() => {
-    if (watchId.current !== null) return;
-    watchId.current = navigator.geolocation.watchPosition(
+    if (watch.current !== null) return;
+    watch.current = watchPositions(
       onFix,
-      (geoError) => {
-        if (geoError.code === 1) {
-          stopWatch();
-          setError("denied");
-        } else {
-          setError("unavailable");
-        }
+      (positionError) => {
+        if (positionError === "denied") stopWatch();
+        setError(positionError);
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 30_000 },
+      { title: t("track.backgroundTitle"), message: t("track.backgroundMessage") },
     );
-  }, [onFix, stopWatch]);
+  }, [onFix, stopWatch, t]);
 
   /* A day still running from before a reload carries on. */
   useEffect(() => {
     const restored = readStored(userId);
-    if (!restored || !("geolocation" in navigator)) return;
+    if (!restored || !hasPositionSource()) return;
     stateRef.current = restored;
     queueMicrotask(() => setState(restored));
     startWatch();
@@ -181,7 +174,7 @@ export function useSkiDayTracker(userId: string) {
   }, [stopWatch, releaseAwake]);
 
   const start = useCallback(() => {
-    if (!("geolocation" in navigator)) {
+    if (!hasPositionSource()) {
       setError("unsupported");
       return;
     }

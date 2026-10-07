@@ -24,6 +24,8 @@ const config: CapacitorConfig = {
     limitsNavigationsToAppBoundDomains: true,
   },
   android: {
+    /* Keeps background location updates flowing past five minutes. */
+    useLegacyBridge: true,
     webContentsDebuggingEnabled: false,
     allowMixedContent: false,
   },

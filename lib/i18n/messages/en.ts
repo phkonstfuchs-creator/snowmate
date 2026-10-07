@@ -614,6 +614,8 @@ export const en = {
   "track.discard": "Discard",
   "track.confirmDiscard": "Discard this ski day without saving?",
   "track.invalid": "This day could not be saved: the values look implausible.",
+  "track.backgroundTitle": "Pistl is recording your ski day",
+  "track.backgroundMessage": "Tap to open the app. Your route stays on this phone.",
   "track.rateLimited": "You have saved enough days for today.",
   "track.failed": "Could not save. Please try again.",
   "track.shareText": "Ski day at {where}: {km} km, {vertical} m vertical, {runs} runs, top speed {speed} km/h.",

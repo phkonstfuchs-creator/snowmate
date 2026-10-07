@@ -613,6 +613,8 @@ export const de: Record<MessageKey, string> = {
   "track.discard": "Verwerfen",
   "track.confirmDiscard": "Skitag verwerfen, ohne zu speichern?",
   "track.invalid": "Der Tag konnte nicht gespeichert werden: Die Werte wirken unrealistisch.",
+  "track.backgroundTitle": "Pistl zeichnet deinen Skitag auf",
+  "track.backgroundMessage": "Tippe hier, um zur App zu kommen. Dein Weg bleibt auf dem Handy.",
   "track.rateLimited": "Du hast heute schon genug Tage gespeichert.",
   "track.failed": "Speichern hat nicht geklappt. Bitte versuch es nochmal.",
   "track.shareText": "Skitag am {where}: {km} km, {vertical} Hm, {runs} Abfahrten, Topspeed {speed} km/h.",
