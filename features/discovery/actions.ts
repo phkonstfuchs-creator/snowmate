@@ -3,25 +3,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidateApp } from "@/lib/revalidate";
 import { dispatchPushSoon } from "@/lib/push/dispatch";
+import { isUuid, rpcOutcome } from "@/lib/server-action";
 import { SWIPE_OUTCOMES, type DeckCard, type SwipeOutcome } from "./discovery";
 import { getDeck } from "./queries";
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
-
 export async function swipeAction(targetId: unknown, liked: unknown): Promise<SwipeOutcome> {
-  if (typeof targetId !== "string" || !UUID.test(targetId) || typeof liked !== "boolean") return "invalid";
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("swipe", { target: targetId, p_liked: liked });
-    if (error) return "unavailable";
-    if (data === "matched") {
-      revalidateApp();
-      await dispatchPushSoon(supabase);
-    }
-    return SWIPE_OUTCOMES.includes(data as SwipeOutcome) ? (data as SwipeOutcome) : "unavailable";
-  } catch {
-    return "unavailable";
-  }
+  if (!isUuid(targetId) || typeof liked !== "boolean") return "invalid";
+  return rpcOutcome("swipe", { target: targetId, p_liked: liked }, SWIPE_OUTCOMES, async (outcome, supabase) => {
+    if (outcome !== "matched") return;
+    revalidateApp();
+    await dispatchPushSoon(supabase);
+  });
 }
 
 export async function deckAction(): Promise<DeckCard[] | null> {

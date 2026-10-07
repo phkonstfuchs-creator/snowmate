@@ -37,6 +37,7 @@ Browser ◄── feature screens (client components) ◄───────�
 | `features/<f>/use*.ts` | Client hooks (e.g. `useRideBoard`: one code path for demo and live) | Be imported by rules or the server boundary |
 | `features/<f>/queries.ts` | Server-side reads, shaping rows into UI types | Import fixtures, UI or hooks |
 | `features/<f>/actions.ts`, `*-actions.ts` | Server actions: validate input, call the database, revalidate | Import fixtures, UI or hooks |
+| `lib/server-action.ts` | Shared plumbing for actions: `isUuid`, `rpcOutcome` (an allow-listed outcome or `"unavailable"`) | Be a `"use server"` module, take a user id as input |
 | `features/<f>/*.ts` (everything else) | Business rules: validation (`*-input.ts`), mapping (`live-*.ts`), capacity, visibility | Import React, Next, Supabase, fixtures, hooks or UI |
 | `components/` | Reusable presentation; receives data and callbacks as props | Own business rules, read fixtures |
 | `components/ui/Sheet.tsx` | The bottom sheet for new sheets: overlay, exit motion, focus trap, Escape, scroll lock | Be copied as raw `sheet-panel` markup |
