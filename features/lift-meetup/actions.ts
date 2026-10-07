@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { findLift } from "@/lib/lifts";
 import { dispatchPushSoon } from "@/lib/push/dispatch";
+import { rpcOutcome } from "@/lib/server-action";
 import { toLiftMeetup, type LiftMeetup, type LiftMeetupRow, type StartResult } from "./meetup";
 
 const KNOWN_RESULTS: readonly StartResult[] = ["sharing", "invalid", "profile_incomplete", "too_young", "unauthenticated"];
@@ -11,19 +12,9 @@ export async function startLiftMeetupAction(resort: string, liftId: string): Pro
   if (typeof resort !== "string" || typeof liftId !== "string" || resort.length > 100 || liftId.length > 100) return "invalid";
   const lift = findLift(resort, liftId);
   if (!lift) return "invalid";
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("start_my_lift_meetup", {
-      p_resort: lift.resort,
-      p_lift_id: lift.id,
-    });
-    if (error) return "unavailable";
-    const result = KNOWN_RESULTS.includes(data as StartResult) ? data as StartResult : "unavailable";
+  return rpcOutcome("start_my_lift_meetup", { p_resort: lift.resort, p_lift_id: lift.id }, KNOWN_RESULTS, async (result, supabase) => {
     if (result === "sharing") await dispatchPushSoon(supabase);
-    return result;
-  } catch {
-    return "unavailable";
-  }
+  });
 }
 
 export async function stopLiftMeetupAction(): Promise<boolean> {
