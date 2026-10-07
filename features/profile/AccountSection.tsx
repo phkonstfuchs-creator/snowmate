@@ -6,8 +6,6 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Icon from "@/components/ui/Icon";
-import { stopBackgroundSharing } from "@/features/location/background-sharing";
-import { clearStoredSkiDay } from "@/features/tracking/useSkiDayTracker";
 import { deleteAccountAction } from "./account-actions";
 import { initialDeleteAccountState, isDeleteConfirmation } from "./action-state";
 import { useT } from "@/lib/i18n/client";
@@ -52,8 +50,7 @@ function DeleteAccountSheet({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Device-side location work ends before the account does. */}
-        <form action={formAction} onSubmit={() => { stopBackgroundSharing(); clearStoredSkiDay(); }} className="space-y-4 px-5 pt-5">
+        <form action={formAction} className="space-y-4 px-5 pt-5">
           <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
             {t("profile.deleteWarning")}
           </p>

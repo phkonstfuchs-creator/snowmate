@@ -80,18 +80,23 @@ export function startBackgroundSharing(end: string, texts: { title: string; mess
       const position: Position = { lat: fix.lat, lng: fix.lng, accuracy: fix.accuracy };
       emit({ type: "position", position });
       if (!shouldSendUpdate(lastSent, position, Date.now())) return;
-      lastSent = { position, at: Date.now() };
+      const attempt = { position, at: Date.now() };
+      lastSent = attempt;
       void shareLocationAction(position, null).then((result) => {
         if (current !== generation) return;
-        if (result === "invalid") {
-          // Ended elsewhere or expired on the server.
-          stopBackgroundSharing();
-          emit({ type: "ended" });
-        } else if (result === "unavailable") {
-          // Not sent: let the next fix try again right away, and say so.
+        if (result === "sharing" || result === "throttled") return;
+        if (result === "unavailable") {
+          // Not sent: unless a newer send went out meanwhile, let the next
+          // fix try again right away, and say so.
+          if (lastSent !== attempt) return;
           lastSent = null;
           emit({ type: "error", error: "unavailable" });
+          return;
         }
+        // Ended elsewhere, expired, signed out or account deleted: the
+        // server no longer accepts this share, so stop reading location.
+        stopBackgroundSharing();
+        emit({ type: "ended" });
       });
     },
     (error) => {

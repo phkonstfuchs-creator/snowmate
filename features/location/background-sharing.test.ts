@@ -77,6 +77,34 @@ describe("background sharing", () => {
     expect(isBackgroundSharing()).toBe(true);
   });
 
+  it("stops once the account is gone (signed out or deleted)", async () => {
+    const events: unknown[] = [];
+    onBackgroundSharing((event) => events.push(event));
+    mocks.share.mockResolvedValueOnce("unauthenticated");
+    startBackgroundSharing(inOneHour(), TEXTS);
+    mocks.onFix!({ lat: 47.31, lng: 11.38, accuracy: 9 });
+    await vi.waitFor(() => expect(events).toContainEqual({ type: "ended" }));
+    expect(isBackgroundSharing()).toBe(false);
+  });
+
+  it("lets an older failed send not undo a newer one", async () => {
+    vi.useFakeTimers();
+    const events: unknown[] = [];
+    onBackgroundSharing((event) => events.push(event));
+    let failOld: (value: string) => void = () => undefined;
+    mocks.share.mockReturnValueOnce(new Promise((resolve) => { failOld = resolve; })).mockResolvedValueOnce("sharing");
+    startBackgroundSharing(inOneHour(), TEXTS);
+    mocks.onFix!({ lat: 47.31, lng: 11.38, accuracy: 9 });
+    vi.advanceTimersByTime(5 * 60_000);
+    mocks.onFix!({ lat: 47.32, lng: 11.38, accuracy: 9 });
+    expect(mocks.share).toHaveBeenCalledTimes(2);
+    failOld("unavailable");
+    await vi.advanceTimersByTimeAsync(0);
+    expect(events).not.toContainEqual({ type: "error", error: "unavailable" });
+    mocks.onFix!({ lat: 47.32, lng: 11.38, accuracy: 9 });
+    expect(mocks.share).toHaveBeenCalledTimes(2);
+  });
+
   it("ignores an answer that belongs to a share already stopped", async () => {
     let answer: (value: string) => void = () => undefined;
     mocks.share.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
