@@ -33,13 +33,14 @@ export function useTracking(): SkiDayTracker | null {
 }
 
 /* While a day runs and the map is not open: one quiet line above the
-   tab bar that leads back to it. */
+   tab bar that leads back to it. Not in a chat thread, where the
+   message box takes that place. */
 function TrackingBar({ tracker }: { tracker: SkiDayTracker }) {
   const t = useT();
   const locale = useLocale();
   const pathname = usePathname();
   const { state, now } = tracker;
-  if (!state || pathname.startsWith("/map")) return null;
+  if (!state || pathname.startsWith("/map") || pathname.startsWith("/crew/chat/")) return null;
   return (
     <Link
       href="/map"
