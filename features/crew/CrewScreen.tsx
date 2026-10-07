@@ -45,7 +45,7 @@ export default function CrewScreen() {
           <Link
             href={`${basePath}/people`}
             aria-label="Find people"
-            className="card-tap flex h-11 w-11 items-center justify-center"
+            className="card-tap flex h-11 w-11 items-center justify-center rounded-full"
             style={{ background: BRAND, color: D }}
           >
             <Icon name="user-plus" size={17} strokeWidth={2.2} />

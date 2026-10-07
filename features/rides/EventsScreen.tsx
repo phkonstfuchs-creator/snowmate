@@ -197,7 +197,7 @@ function EventDetailSheet({
             <button
               type="button"
               onClick={onEdit}
-              className="card-tap mb-2 w-full py-4 font-display text-lg uppercase"
+              className="card-tap mb-2 w-full py-4 font-display text-lg"
               style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
             >
               {t("events.edit")}
@@ -208,7 +208,7 @@ function EventDetailSheet({
               type="button"
               onClick={onCancel}
               disabled={pending}
-              className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
+              className="w-full py-4 font-display text-lg disabled:opacity-40"
               style={{ background: PAPER_1, color: "var(--crimson)", border: "1px solid var(--crimson)" }}
             >
               {t("events.cancel")}
@@ -218,7 +218,7 @@ function EventDetailSheet({
           <button
             onClick={onJoin}
             disabled={(full && !isJoined) || pending}
-            className="card-tap w-full py-4 font-display text-lg uppercase"
+            className="card-tap w-full py-4 font-display text-lg"
             style={
               isJoined
                 ? { background: PAPER_1, color: INK, border: "var(--rule-thick)" }

@@ -63,7 +63,7 @@ export default function ConditionsPanel({ conditions }: { conditions: ResortCond
           </div>
         ))}
       </div>
-      <p className="text-[0.65rem] font-black uppercase mt-4 mb-2" style={{ color: MUTED }}>
+      <p className="text-[0.65rem] font-black mt-4 mb-2" style={{ color: MUTED }}>
         {t("cond.next3")} · {t("cond.expected", { n: conditions.forecastSnowCm })}
       </p>
       <ol className="grid grid-cols-3 gap-3">

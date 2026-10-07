@@ -65,7 +65,7 @@ function ShareSheet({ onClose, onShare, busy }: {
             </div>
           </fieldset>
           <button type="button" disabled={busy} onClick={() => onShare(minutes)}
-            className="card-tap w-full py-4 font-display text-xl uppercase disabled:opacity-40"
+            className="card-tap w-full py-4 font-display text-xl disabled:opacity-40"
             style={{ background: RUST, color: PAPER, border: "var(--rule-thick)" }}>
             {busy ? t("common.oneMoment") : t("loc.startSharing")}
           </button>
@@ -132,7 +132,7 @@ export default function LocationPanel({
       </div>
 
       <div className="mt-4">
-        <p className="mb-2 text-[0.65rem] font-black uppercase" style={{ color: "var(--text-tertiary)" }}>
+        <p className="mb-2 text-[0.65rem] font-black" style={{ color: "var(--text-tertiary)" }}>
           {t("loc.friendsOnMap", { n: friends?.length ?? 0 })}
         </p>
         {friends === null ? (

@@ -85,7 +85,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
             className="px-3 py-2"
             style={{ background: "var(--paper-0)", borderTop: "var(--rule-thin)" }}
           >
-            <p className="font-display text-base uppercase" style={{ color: INK, letterSpacing: 0 }}>
+            <p className="font-display text-base" style={{ color: INK, letterSpacing: 0 }}>
               {post.resort}
             </p>
             <p className="text-mono-label mt-0.5" style={{ color: MUTED }}>{post.meetPoint}</p>
@@ -155,7 +155,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {/* Riders */}
         <div className="px-5 pt-2 pb-2" style={{ borderTop: `1px solid ${BORDER}` }}>
-          <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>{t("ride.going", { n: post.takenSpots })}</p>
+          <p className="text-[0.65rem] font-black mb-3 mt-3" style={{ color: MUTED }}>{t("ride.going", { n: post.takenSpots })}</p>
           <div className="space-y-2.5">
             <PersonRow className="flex items-center gap-3 w-full text-left active:opacity-70 transition-opacity" onOpen={onOpenProfile && (() => onOpenProfile(author))}>
               <Avatar id={author.id} initials={author.avatar} size={36} />
@@ -184,7 +184,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
 
         {isHost && requests.length > 0 && (
           <div className="px-5 pt-3" style={{ borderTop: `1px solid ${BORDER}` }}>
-            <p className="text-[0.65rem] font-black uppercase mb-3 mt-3" style={{ color: MUTED }}>
+            <p className="text-[0.65rem] font-black mb-3 mt-3" style={{ color: MUTED }}>
               {t("ride.asking", { n: requests.length })}
             </p>
             <div className="space-y-2">
@@ -237,7 +237,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               type="button"
               onClick={onEdit}
               className="mb-2 w-full py-4 font-black text-base"
-              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+              style={{ background: "var(--paper-2)", color: "var(--ink-0)", borderRadius: 14 }}
             >
               {t("ride.edit")}
             </button>

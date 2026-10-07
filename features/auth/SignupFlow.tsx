@@ -90,7 +90,7 @@ function PrimaryButton({ children, disabled, onClick, type = "button" }: {
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="card-tap w-full py-4 font-display text-xl uppercase disabled:opacity-40"
+      className="card-tap w-full py-4 font-display text-xl disabled:opacity-40"
       style={{ background: RUST, color: PAPER, border: "var(--rule-thick)", boxShadow: "var(--shadow-print)", letterSpacing: 0 }}
     >
       {children}
@@ -243,7 +243,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
                 <ResortScene name={scene} className="absolute inset-0 h-full w-full" />
                 <div className="absolute inset-x-0 bottom-0 px-3 py-2" style={{ background: PAPER, borderTop: "var(--rule-thick)" }}>
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-display text-xl uppercase leading-none" style={{ color: INK, letterSpacing: 0 }}>{label}</p>
+                    <p className="font-display text-xl leading-none" style={{ color: INK, letterSpacing: 0 }}>{label}</p>
                     {selected && <Icon name="check" size={18} color={RUST} strokeWidth={2.6} />}
                   </div>
                   <p className="mt-1 text-xs" style={{ color: INK_2 }}>{t(sub)}</p>
@@ -278,7 +278,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
               >
                 <Icon name={opt.icon} size={28} color={selected ? onColor : opt.color} strokeWidth={1.9} />
                 <div className="min-w-0 flex-1">
-                  <p className="font-display text-xl uppercase leading-none" style={{ color: selected ? onColor : INK, letterSpacing: 0 }}>{t(opt.label)}</p>
+                  <p className="font-display text-xl leading-none" style={{ color: selected ? onColor : INK, letterSpacing: 0 }}>{t(opt.label)}</p>
                   <p className="mt-1 text-sm" style={{ color: selected ? onColor : INK_2 }}>{t(opt.desc)}</p>
                 </div>
                 {selected && <Icon name="check" size={20} color={onColor} strokeWidth={2.6} />}

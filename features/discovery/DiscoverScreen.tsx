@@ -163,7 +163,7 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
         }}
       >
         {hint && (
-          <span className="absolute right-4 top-4 px-2 py-1 text-xs font-bold uppercase" style={{ color: hint === "like" ? "var(--rust)" : "var(--ink-2)", border: "2px solid currentColor", borderRadius: 6 }} aria-hidden>
+          <span className="absolute right-4 top-4 px-2 py-1 text-xs font-bold" style={{ color: hint === "like" ? "var(--rust)" : "var(--ink-2)", border: "2px solid currentColor", borderRadius: 6 }} aria-hidden>
             {hint === "like" ? t("discover.like") : t("discover.pass")}
           </span>
         )}

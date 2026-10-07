@@ -102,7 +102,7 @@ export default function AvatarEditor({ profile }: { profile: OwnProfile }) {
           <label
             htmlFor={inputId}
             className="flex min-h-11 cursor-pointer items-center px-3.5 text-sm font-semibold"
-            style={{ background: "var(--ink-0)", color: "var(--paper-0)", borderRadius: 12, opacity: busy ? 0.5 : 1 }}
+            style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12, opacity: busy ? 0.5 : 1 }}
           >
             {busy ? t("avatar.uploading") : version ? t("avatar.change") : t("avatar.choose")}
           </label>

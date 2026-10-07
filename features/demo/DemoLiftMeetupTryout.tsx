@@ -32,7 +32,7 @@ export default function DemoLiftMeetupTryout() {
   return (
     <section className="mx-4 mt-4 p-4" aria-labelledby="demo-lift-title"
       style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
-      <h2 id="demo-lift-title" className="font-display text-xl uppercase" style={{ color: "var(--ink-0)" }}>
+      <h2 id="demo-lift-title" className="font-display text-xl" style={{ color: "var(--ink-0)" }}>
         {t("demo.meetup.title")}
       </h2>
       <p className="mt-2 text-sm" style={{ color: "var(--ink-1)" }}>{t("demo.meetup.lead")}</p>
@@ -59,8 +59,8 @@ export default function DemoLiftMeetupTryout() {
         </>
       ) : (
         <button type="button" onClick={startSample}
-          className="card-tap mt-4 min-h-11 w-full px-3 font-display text-lg uppercase"
-          style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>
+          className="card-tap mt-4 min-h-11 w-full px-3 text-base font-semibold"
+          style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
           {t("demo.meetup.start")}
         </button>
       )}

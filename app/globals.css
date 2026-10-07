@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 /* ─── Pistl design tokens ───────────────────────────────────
-   DNA: the same calm alpine look as the website (pistl.app). Light
-   paper, dark pine ink, one green accent used sparingly. Few colours,
-   thin lines, generous space; content first, decoration last.
+   DNA: calm and clean, close to iOS (ADR 0033, building on 0021).
+   A light canvas, white cards that lift off it with a soft shadow
+   instead of a frame, one green accent, sentence-case labels in one
+   typeface, generous space. One block of content per screen part.
    The variable names (paper, ink, rust, …) come from the first
    design and are kept so every screen follows the tokens: "rust" is
    now the pine accent. Every text pair is checked against WCAG AA.
@@ -14,22 +15,24 @@
   --font-body: "Hanken Grotesk Variable";
   --font-mono: "Space Mono";
 
-  /* Paper, as on the website */
-  --paper-0: #f6f7f4; /* canvas */
-  --paper-1: #fbfcfa; /* card */
-  --paper-2: #edf0e8; /* recessed area, inputs, chips */
-  --paper-3: #d4dbd3; /* line */
+  /* Surfaces, Apple-style grouped: a light canvas, white cards that
+     lift off it with a soft shadow instead of a frame, and one fill
+     for inputs, chips and secondary buttons (design pass 2026-10-07). */
+  --paper-0: #f2f4f1; /* canvas */
+  --paper-1: #ffffff; /* card */
+  --paper-2: #e9ede7; /* fill: inputs, chips, secondary buttons */
+  --paper-3: #dde2db; /* hairline */
 
   /* Ink, darkest first */
   --ink-0: #202d27; /* primary */
   --ink-1: #3f4b45; /* body */
   --ink-2: #59645e; /* labels */
-  --ink-3: #646f69; /* disabled */
+  --ink-3: #5e6964; /* disabled, placeholders: AA on the fill */
 
   /* One accent: pine */
-  --rust-ink: #203e2d; /* accent as text */
-  --rust: #315842; /* action, brand */
-  --rust-light: #3f6b52; /* areas only */
+  --rust-ink: #1d4a35; /* accent as text */
+  --rust: #2b6448; /* action, brand */
+  --rust-light: #3b7a5a; /* areas only */
 
   --pine: #31705a; /* success */
   --pine-light: #4d8a72;
@@ -63,7 +66,7 @@
   --accent-primary: var(--rust);
   --accent-primary-hover: var(--rust-ink);
   --accent-primary-active: var(--rust-ink);
-  --accent-primary-subtle: rgba(49, 88, 66, 0.08);
+  --accent-primary-subtle: rgba(43, 100, 72, 0.09);
 
   --accent-warm: var(--ochre);
   --accent-warm-subtle: var(--paper-2);
@@ -87,14 +90,18 @@
   --radius-2xl: 22px;
   --radius-pill: 999px;
 
-  /* Depth from soft shadows and hairlines */
+  /* Depth from soft shadows, not frames. Screens still write
+     `border: var(--rule-thin|thick)` for a box; the frame is now
+     invisible and the box reads as a card (see "Surfaces" below).
+     Single lines (borderTop/borderBottom) stay a hairline; the heavy
+     rule under screen headers is gone, as in iOS large titles. */
   --rule-thin: 1px solid var(--border-rule);
   --rule-thick: 1px solid var(--border-rule);
-  --rule-heavy: 1px solid var(--border-rule);
-  --shadow-card: none;
-  --shadow-print: none;
+  --rule-heavy: 0 solid transparent;
+  --shadow-card: 0 1px 2px rgba(32, 45, 39, 0.05), 0 6px 20px rgba(32, 45, 39, 0.06);
+  --shadow-print: 0 4px 16px rgba(32, 45, 39, 0.14);
   --shadow-sheet: 0 -8px 30px rgba(32, 45, 39, 0.12);
-  --glow-focus: 0 0 0 3px rgba(49, 88, 66, 0.2);
+  --glow-focus: 0 0 0 3px rgba(43, 100, 72, 0.2);
 
   /* Motion — print does not move softly. Short and dry.
      Two real curves instead of one: things entering and leaving run
@@ -134,13 +141,15 @@
   --text-caption: 500 13px / 1.4 var(--font-body-stack);
 
   /* Generous line height, otherwise capital umlauts (Ä/Ö/Ü) clip */
-  --text-mono-label: 400 11px / 1.5 var(--font-mono-stack);
+  /* Small labels: sentence case in the body face, like iOS section
+     headers. The mono face stays for codes and handles only. */
+  --text-mono-label: 600 13px / 1.4 var(--font-body-stack);
   --text-mono-data: 650 22px / 1.1 var(--font-body-stack);
   --text-mono-data-lg: 650 34px / 1 var(--font-body-stack);
 
   /* Poster type runs tight and in capitals */
   --tracking-display: -0.04em;
-  --tracking-mono-label: 0.02em;
+  --tracking-mono-label: 0;
 
   --z-dropdown: 100;
   --z-sticky: 200;
@@ -235,7 +244,7 @@ body {
 
 /* Outside the sheet: the dark workbench it rests on */
 @media (min-width: 640px) {
-  body { background: #e4ebdf; }
+  body { background: #e6eae4; }
   .app-shell { box-shadow: 0 0 0 1px var(--paper-3); }
 }
 
@@ -287,10 +296,10 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  background: rgba(246, 247, 244, 0.94);
+  background: rgba(255, 255, 255, 0.92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  border-top: 1px solid var(--paper-3);
+  border-top: 0.5px solid var(--paper-3);
   z-index: var(--z-sticky);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -304,7 +313,6 @@ body {
 .text-mono-label {
   font: var(--text-mono-label);
   letter-spacing: var(--tracking-mono-label);
-  text-transform: uppercase;
 }
 .text-mono-data { font: var(--text-mono-data); }
 .text-mono-data-lg { font: var(--text-mono-data-lg); }
@@ -315,8 +323,7 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-3);
-  border-bottom: var(--rule-thin);
-  padding-bottom: 6px;
+  padding-bottom: 2px;
   margin-bottom: var(--space-4);
 }
 
@@ -399,7 +406,7 @@ body {
   max-width: 430px;
   background: var(--paper-1);
   border-radius: 24px 24px 0 0;
-  border-top: 1px solid var(--paper-3);
+  border-top: 0;
   box-shadow: var(--shadow-sheet);
   z-index: var(--z-modal);
   padding-bottom: env(safe-area-inset-bottom, 16px);
@@ -546,7 +553,7 @@ body {
 .form-input {
   width: 100%;
   background: var(--paper-2);
-  border: 1px solid var(--paper-3);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 0.9375rem;
@@ -586,25 +593,12 @@ body {
   .pulse-dot::after { animation: none; }
 }
 
-/* ─── Soft corners for framed boxes ──────────────────────────
-   Many screens frame cards, inputs and icon buttons with an inline
-   `border: var(--rule-thin|thick)` and no radius, which made the app
-   look square. Until each moves to a shared component, every fully
-   framed box without its own radius (inline or a `rounded*` class)
-   gets the card radius. Lines that only draw one side (border-bottom
-   etc.) are not matched. */
-[style*="border: var(--rule-thin)"]:not([style*="border-radius"]):not([class*="rounded"]),
-[style*="border: var(--rule-thick)"]:not([style*="border-radius"]):not([class*="rounded"]),
-[style*="border: 1px solid"]:not([style*="border-radius"]):not([class*="rounded"]) {
-  border-radius: var(--radius-lg);
-}
-
 /* ─── Buttons: one primary colour (rust), soft corners ──────── */
 .sm-btn-primary {
   background: var(--rust);
   color: var(--on-accent);
   border: 0 !important;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   box-shadow: none;
 }
 .sm-btn-primary:active:not(:disabled) {
@@ -633,14 +627,12 @@ body {
   min-height: 44px;
   padding: 9px 12px;
   border-radius: var(--radius-pill);
-  font: var(--text-mono-label);
-  letter-spacing: var(--tracking-mono-label);
-  text-transform: uppercase;
+  font: 600 15px / 1.2 var(--font-body-stack);
   transition: background var(--duration-fast) var(--ease-standard);
   border: none;
   cursor: pointer;
 }
-.city-toggle-btn.active { background: var(--ink-0); color: var(--paper-0); }
+.city-toggle-btn.active { background: var(--paper-1); color: var(--ink-0); box-shadow: 0 1px 3px rgba(32, 45, 39, 0.12); }
 .city-toggle-btn:not(.active) { background: transparent; color: var(--ink-2); }
 
 /* ─── Stamp ring — for number one ───────────────────────────── */
@@ -714,28 +706,65 @@ body {
 .legal-text li { margin-top: 0.25rem; }
 .legal-text a { color: var(--rust-ink); text-decoration: underline; overflow-wrap: anywhere; }
 
-/* ─── Shape layer for the dark design ─────────────────────────
-   Screens set borders inline from the tokens (border: var(--rule-…)).
-   Instead of touching every block, bordered blocks and accent buttons
-   get their radius here. Lines that are only top or bottom rules
-   (border-top / border-bottom) do not match and stay straight. */
-body .rounded-none,
-body [style*="border:var(--rule-"],
-body [style*="border: var(--rule-"],
-body [style*="border:1px solid var(--border-"],
-body [style*="border: 1px solid var(--border-"] {
-  border-radius: var(--radius-lg);
+/* ─── Surfaces: cards instead of frames ──────────────────────
+   Screens draw a box with an inline `border: var(--rule-thin|thick)`
+   (React writes it with or without a space). Instead of a line round
+   every box, as on paper, a box is now a white card with a soft
+   shadow on the canvas, and a grey fill inside a card or a sheet, the
+   way iOS groups content. The 1px border stays, transparent, so no
+   layout moves. Single lines (border-top/bottom) are not matched.
+   New code should use `.surface` and `.surface-fill` directly. */
+.surface,
+body [style*="border:var(--rule-thin)"],
+body [style*="border: var(--rule-thin)"],
+body [style*="border:var(--rule-thick)"],
+body [style*="border: var(--rule-thick)"],
+body [style*="border:1px solid var(--border-subtle)"],
+body [style*="border: 1px solid var(--border-subtle)"] {
+  border-color: transparent !important;
+  box-shadow: var(--shadow-card);
 }
+/* A `rounded-*` class or an inline radius keeps its own shape. */
+.surface,
+body [style*="border:var(--rule-thin)"]:not([class*="rounded"]),
+body [style*="border: var(--rule-thin)"]:not([class*="rounded"]),
+body [style*="border:var(--rule-thick)"]:not([class*="rounded"]),
+body [style*="border: var(--rule-thick)"]:not([class*="rounded"]),
+body [style*="border:1px solid var(--border-subtle)"]:not([class*="rounded"]),
+body [style*="border: 1px solid var(--border-subtle)"]:not([class*="rounded"]) {
+  border-radius: var(--radius-xl);
+}
+.surface { background: var(--paper-1); border: 1px solid transparent; }
+body [style*="border:var(--rule-thin)"]:not([style*="background"]),
+body [style*="border: var(--rule-thin)"]:not([style*="background"]),
+body [style*="border:var(--rule-thick)"]:not([style*="background"]),
+body [style*="border: var(--rule-thick)"]:not([style*="background"]),
+body [style*="border:1px solid var(--border-subtle)"]:not([style*="background"]),
+body [style*="border: 1px solid var(--border-subtle)"]:not([style*="background"]) {
+  background: var(--paper-1);
+}
+/* Inside a card or a sheet a box is a fill, not a second card.
+   Accent-coloured buttons keep their colour. */
+.surface-fill,
+:is(.surface, .sheet-panel, [style*="rule-thin"], [style*="rule-thick"], [style*="border: 1px solid var(--border-subtle)"], [style*="border:1px solid var(--border-subtle)"]) :is([style*="border:var(--rule-thin)"], [style*="border: var(--rule-thin)"], [style*="border:var(--rule-thick)"], [style*="border: var(--rule-thick)"], [style*="border:1px solid var(--border-subtle)"], [style*="border: 1px solid var(--border-subtle)"]):not([style*="background:var(--rust)"]):not([style*="background: var(--rust)"]):not([style*="background:var(--accent-primary)"]):not([style*="background: var(--accent-primary)"]) {
+  background: var(--paper-2) !important;
+  box-shadow: none;
+}
+.surface-fill { border: 1px solid transparent; border-radius: var(--radius-lg); }
 /* Cards with pictures: the picture follows the rounded corner. */
 body [style*="border:var(--rule-thick)"],
 body [style*="border: var(--rule-thick)"] {
   overflow: hidden;
 }
-body :is(button, a)[style*="background:var(--rust)"],
-body :is(button, a)[style*="background: var(--rust)"],
-body :is(button, a)[style*="background:var(--ink-0)"],
-body :is(button, a)[style*="background: var(--ink-0)"] {
-  border-radius: var(--radius-sm);
+/* Remaining square framed boxes and accent buttons get soft corners. */
+body .rounded-none,
+body [style*="border:1px solid"]:not([style*="border-radius"]):not([class*="rounded"]),
+body [style*="border: 1px solid"]:not([style*="border-radius"]):not([class*="rounded"]) {
+  border-radius: var(--radius-lg);
+}
+body :is(button, a, label)[style*="background:var(--rust)"],
+body :is(button, a, label)[style*="background: var(--rust)"] {
+  border-radius: var(--radius-lg);
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -744,3 +773,8 @@ body :is(button, a)[style*="background: var(--ink-0)"] {
 .settings-disclosure > summary { list-style: none; }
 .settings-disclosure > summary::-webkit-details-marker { display: none; }
 .settings-disclosure[open] > summary svg { transform: rotate(180deg); }
+
+/* Small labels on a colour are pills; corner badges sit inside the
+   card's rounded corner instead of on it. */
+span.text-mono-label[style*="background"] { border-radius: var(--radius-pill); }
+.text-mono-label.absolute[style*="background"] { margin: 8px; }

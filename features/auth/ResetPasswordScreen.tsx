@@ -20,7 +20,7 @@ export default function ResetPasswordScreen() {
       {state.status === "success" ? (
         <div className="space-y-4">
           <p role="status" className="px-4 py-4 text-sm" style={{ border: "var(--rule-thick)", color: "var(--ink-1)" }}>{state.message}</p>
-          <Link href="/feed" className="block py-3 text-center font-display uppercase" style={{ background: "var(--rust)", color: "var(--paper-0)" }}>
+          <Link href="/feed" className="block py-3 text-center font-display" style={{ background: "var(--rust)", color: "var(--paper-0)" }}>
             {t("auth.toApp")}
           </Link>
         </div>

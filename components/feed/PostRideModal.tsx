@@ -130,7 +130,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
         {step === 1 && (
           <div className="px-5 pt-5 pb-6 space-y-5">
             <div>
-              <label htmlFor="post-ride-resort" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <label htmlFor="post-ride-resort" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.resort")}
               </label>
               <select
@@ -147,7 +147,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
 
             <div>
-              <p id="post-ride-level-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <p id="post-ride-level-label" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.style")}
               </p>
               <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="post-ride-level-label">
@@ -182,7 +182,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               </p>
             )}
             <div>
-              <label htmlFor="post-ride-date" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <label htmlFor="post-ride-date" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.day")}
               </label>
               <input
@@ -196,7 +196,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                <label htmlFor="post-ride-time" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                <label htmlFor="post-ride-time" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                   {t("post.time")}
                 </label>
                 <input
@@ -208,7 +208,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 />
               </div>
               <div className="w-24">
-                <label htmlFor="post-ride-spots" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+                <label htmlFor="post-ride-spots" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                   {t("post.spots")}
                 </label>
                 <select
@@ -225,7 +225,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
 
             <div>
-              <label htmlFor="post-ride-meeting-point" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <label htmlFor="post-ride-meeting-point" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.meetingPoint")}
               </label>
               <input
@@ -239,7 +239,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
 
             <div>
-              <label htmlFor="post-ride-caption" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <label htmlFor="post-ride-caption" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.note")} {t("common.optional")}
               </label>
               <textarea
@@ -253,7 +253,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
             </div>
 
             <div>
-              <p id="post-ride-visibility-label" className="block text-xs font-semibold uppercase mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <p id="post-ride-visibility-label" className="block text-xs font-semibold mb-2" style={{ color: "var(--text-tertiary)" }}>
                 {t("post.audience")}
               </p>
               <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="post-ride-visibility-label">
@@ -301,7 +301,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                   <p className="text-[0.7rem] leading-snug mt-2" style={{ color: "var(--text-tertiary)" }}>
                     {t("post.publicHint")}
                   </p>
-                  <label htmlFor="post-ride-title" className="block text-xs font-semibold uppercase mt-3 mb-2" style={{ color: "var(--text-tertiary)" }}>
+                  <label htmlFor="post-ride-title" className="block text-xs font-semibold mt-3 mb-2" style={{ color: "var(--text-tertiary)" }}>
                     {t("post.eventName")}
                   </label>
                   <input

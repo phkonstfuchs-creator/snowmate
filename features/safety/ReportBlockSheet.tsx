@@ -85,7 +85,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
           {result ? (
             <>
               <p role="status" className="text-base" style={{ color: result.ok ? INK : CRIMSON }}>{translateText(t, result.message)}</p>
-              <button type="button" onClick={dismiss} className="w-full py-4 font-display text-lg uppercase" style={{ background: INK, color: "var(--paper-0)" }}>
+              <button type="button" onClick={dismiss} className="w-full py-4 font-display text-lg" style={{ background: INK, color: "var(--paper-0)" }}>
                 {t("common.done")}
               </button>
             </>
@@ -156,7 +156,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
                 type="button"
                 onClick={report}
                 disabled={!reason || pending}
-                className="w-full py-4 font-display text-lg uppercase disabled:opacity-40"
+                className="w-full py-4 font-display text-lg disabled:opacity-40"
                 style={{ background: CRIMSON, color: "var(--paper-0)", border: "var(--rule-thick)" }}
               >
                 {pending ? t("safety.sending") : t("safety.send")}

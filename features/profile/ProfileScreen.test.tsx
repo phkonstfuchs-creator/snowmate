@@ -61,6 +61,22 @@ describe("ProfileScreen", () => {
     expect(screen.queryByText("Profile incomplete")).not.toBeInTheDocument();
   });
 
+  it("shows one part at a time: season, rides or posts", () => {
+    render(
+      <ProfileScreen
+        account={{ ...incomplete, displayName: "Lena Moser", handle: "lena_m", onboardingCompleted: true }}
+        myRides={{ upcoming: [], past: [] }}
+        myPosts={[]}
+      />,
+    );
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Rides" }));
+    expect(screen.getByRole("note")).toHaveTextContent("No rides yet");
+    fireEvent.click(screen.getByRole("button", { name: "Posts" }));
+    expect(screen.getByRole("note")).toHaveTextContent("No posts yet");
+    expect(screen.getByRole("link", { name: "Open Today" })).toHaveAttribute("href", "/feed");
+  });
+
   it("prompts an incomplete account to finish and opens the editor", () => {
     render(<ProfileScreen account={incomplete} />);
 

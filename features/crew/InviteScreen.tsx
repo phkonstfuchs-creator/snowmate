@@ -76,7 +76,7 @@ export default function InviteScreen({
             {t("invite.signInLead")}
           </p>
           <div className="mt-6 flex flex-col gap-3">
-            <Link href="/onboarding" className="card-tap font-display px-6 py-3 text-lg uppercase" style={primary}>
+            <Link href="/onboarding" className="card-tap font-display px-6 py-3 text-lg" style={primary}>
               {t("auth.createAccount")}
             </Link>
             <Link href="/login" className="text-sm font-semibold underline" style={{ color: INK }}>
@@ -106,7 +106,7 @@ export default function InviteScreen({
               type="button"
               onClick={accept}
               disabled={pending}
-              className="card-tap font-display mt-6 px-6 py-3 text-lg uppercase disabled:opacity-50"
+              className="card-tap font-display mt-6 px-6 py-3 text-lg disabled:opacity-50"
               style={primary}
             >
               {pending ? t("common.oneMoment") : t("invite.addToCrew")}
@@ -132,7 +132,7 @@ export default function InviteScreen({
           <p role="status" className="mt-3 max-w-sm text-base" style={{ color: result.ok ? INK : "var(--crimson)" }}>
             {translateText(t, result.message)}
           </p>
-          <Link href="/crew" className="card-tap font-display mt-6 px-6 py-3 text-lg uppercase" style={primary}>
+          <Link href="/crew" className="card-tap font-display mt-6 px-6 py-3 text-lg" style={primary}>
             {t("invite.goCrew")}
           </Link>
         </>

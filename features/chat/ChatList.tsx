@@ -48,7 +48,7 @@ export default function ChatList({ chats, friends = [] }: { chats: ChatSummary[]
             onClick={() => setPicking((value) => !value)}
             aria-expanded={picking}
             className="text-mono-label flex min-h-9 items-center gap-1 px-2.5"
-            style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}
+            style={{ background: "var(--rust)", color: "var(--on-accent)" }}
           >
             <Icon name={picking ? "x" : "plus"} size={13} color="var(--paper-0)" strokeWidth={2.4} />
             {t("chat.newChat")}
@@ -103,7 +103,7 @@ export default function ChatList({ chats, friends = [] }: { chats: ChatSummary[]
                   {chat.kind === "direct" && chat.otherUserId ? (
                     <Avatar id={chat.otherUserId} initials={initialsFor(chat.otherName, chat.otherHandle)} size={40} />
                   ) : (
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center" style={{ background: "var(--ink-0)" }} aria-hidden="true">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--rust)" }} aria-hidden="true">
                       <Icon name="users" size={18} color="var(--paper-0)" />
                     </span>
                   )}

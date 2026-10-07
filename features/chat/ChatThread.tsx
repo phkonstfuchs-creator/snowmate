@@ -201,7 +201,7 @@ export default function ChatThread({
             onClick={sendLocation}
             disabled={sending}
             aria-label={t("chat.sendLocation")}
-            className="flex h-11 w-11 flex-shrink-0 items-center justify-center disabled:opacity-40"
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full disabled:opacity-40"
             style={{ border: "var(--rule-thin)", background: PAPER_1 }}
           >
             <Icon name="map-pin" size={18} color={INK} strokeWidth={2.2} />
@@ -226,7 +226,7 @@ export default function ChatThread({
             type="submit"
             disabled={sending || normalizeMessage(draft) === null}
             aria-label={sending ? t("chat.sending") : t("chat.send")}
-            className="flex h-11 w-11 flex-shrink-0 items-center justify-center disabled:opacity-40"
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full disabled:opacity-40"
             style={{ background: RUST, border: "var(--rule-thick)" }}
           >
             <Icon name="send" size={18} color={PAPER} strokeWidth={2.2} />

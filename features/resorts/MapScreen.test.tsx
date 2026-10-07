@@ -51,6 +51,19 @@ describe("MapScreen", () => {
     expect(within(dialog).getByRole("button", { name: "Tell my crew" })).toBeEnabled();
   });
 
+  it("shows one panel under the map: the ski day, or location sharing on demand", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
+    expect(screen.queryByRole("region", { name: "Live location" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "My location" }));
+    expect(screen.getByRole("region", { name: "Live location" })).toBeInTheDocument();
+  });
+
+  it("opens on location sharing while it is on, so stopping is one tap away", () => {
+    const sharingEnd = new Date(Date.now() + 30 * 60_000).toISOString();
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true, sharingEnd }} />);
+    expect(screen.getByRole("region", { name: /Sharing until/ })).toBeInTheDocument();
+  });
+
   it("only offers lift sharing after an explicit age-eligibility check", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
     fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);
