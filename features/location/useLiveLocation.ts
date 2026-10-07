@@ -201,5 +201,16 @@ export function useLiveLocation({
     [],
   );
 
-  return { me, locating, error, locate: watch, sharingEnd, busy, startSharing, stopSharing, friends, supported };
+  /* One fresh fix without a lasting GPS watch, e.g. to guess a lift. It
+     is handed to the caller only, never kept as `me`, so a later share
+     cannot start from this old position. */
+  const locateOnce = useCallback(async (): Promise<Position | null> => {
+    try {
+      return await currentPosition();
+    } catch {
+      return null;
+    }
+  }, [currentPosition]);
+
+  return { me, locating, error, locate: watch, locateOnce, sharingEnd, busy, startSharing, stopSharing, friends, supported };
 }

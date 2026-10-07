@@ -114,3 +114,15 @@ describe("useLiveLocation", () => {
     expect(result.current.friends).toHaveLength(1);
   });
 });
+
+describe("locateOnce", () => {
+  it("returns one fix without keeping it or starting a watch", async () => {
+    mocks.friends.mockResolvedValue([]);
+    const { result } = renderHook(() => useLiveLocation({ initialSharingEnd: null, initialFriends: [] }));
+    let position: unknown = null;
+    await act(async () => { position = await result.current.locateOnce(); });
+    expect(position).toEqual({ lat: 47.26, lng: 11.39, accuracy: 8 });
+    expect(result.current.me).toBeNull();
+    expect(navigator.geolocation.watchPosition).not.toHaveBeenCalled();
+  });
+});

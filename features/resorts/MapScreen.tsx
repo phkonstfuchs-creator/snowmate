@@ -25,6 +25,7 @@ import { isNativeApp } from "@/lib/native-app";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
 import CrewOnMap from "@/features/location/CrewOnMap";
+import LiftStartSheet from "@/features/lift-meetup/LiftStartSheet";
 import TrackPanel from "@/features/tracking/TrackPanel";
 import { useTracking } from "@/features/tracking/TrackingProvider";
 import type { FriendLocation } from "@/features/location/location";
@@ -55,64 +56,6 @@ const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
 };
 
 type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | null;
-
-function LiftQuickStartSheet({ resorts, busy, result, onStart, onClose }: {
-  resorts: ResortStatus[];
-  busy: boolean;
-  result: StartResult | null;
-  onStart: (resort: string, liftId: string) => Promise<boolean>;
-  onClose: () => void;
-}) {
-  useScrollLock();
-  const t = useT();
-  const { state, dismiss } = useSheetDismiss(onClose);
-  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
-  const available = resorts.filter((resort) => LIFTS.some((lift) => lift.resort === resort.name));
-  const [selectedResort, setSelectedResort] = useState(available[0]?.name ?? "");
-  const lifts = LIFTS.filter((lift) => lift.resort === selectedResort);
-  const [selectedLift, setSelectedLift] = useState(lifts[0]?.id ?? "");
-
-  return (
-    <>
-      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel p-5" data-state={state} role="dialog" aria-modal="true"
-        aria-label={t("meetup.quickStartTitle")} tabIndex={-1}>
-        <div className="flex justify-between gap-3">
-          <h2 className="font-display text-xl uppercase" style={{ color: INK }}>{t("meetup.quickStartTitle")}</h2>
-          <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="min-h-11 min-w-11">
-            <Icon name="x" size={18} color={MUTED} />
-          </button>
-        </div>
-        <p className="mt-2 text-sm" style={{ color: MUTED }}>{t("meetup.privacy")}</p>
-        {available.length === 0 ? <p className="mt-4 text-sm">{t("meetup.noLifts")}</p> : (
-          <>
-            <label htmlFor="quick-resort" className="text-mono-label mt-5 block" style={{ color: INK }}>{t("meetup.pickResort")}</label>
-            <select id="quick-resort" value={selectedResort} onChange={(event) => {
-              const resort = event.target.value;
-              setSelectedResort(resort);
-              setSelectedLift(LIFTS.find((lift) => lift.resort === resort)?.id ?? "");
-            }} className="mt-1 min-h-11 w-full px-2" style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: INK }}>
-              {available.map((resort) => <option key={resort.name} value={resort.name}>{resort.name}</option>)}
-            </select>
-            <label htmlFor="quick-lift" className="text-mono-label mt-4 block" style={{ color: INK }}>{t("meetup.pickLift")}</label>
-            <select id="quick-lift" value={selectedLift} onChange={(event) => setSelectedLift(event.target.value)}
-              className="mt-1 min-h-11 w-full px-2" style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: INK }}>
-              {lifts.map((lift) => <option key={lift.id} value={lift.id}>{lift.name}</option>)}
-            </select>
-            <p className="mt-3 text-xs" style={{ color: MUTED }}>{t("meetup.estimate")}</p>
-            <button type="button" disabled={busy || !selectedLift}
-              onClick={() => void onStart(selectedResort, selectedLift).then((ok) => { if (ok) dismiss(); })}
-              className="card-tap mt-4 min-h-12 w-full font-display text-lg uppercase disabled:opacity-50"
-              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>
-              {busy ? t("common.oneMoment") : t("meetup.start")}
-            </button>
-            {result && result !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[result])}</p>}
-          </>
-        )}
-      </div>
-    </>
-  );
-}
 
 function ResortDetailSheet({
   resort,
@@ -334,6 +277,7 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
 }
 
 const noSubscription = () => () => {};
+const noPosition = async () => null;
 
 function MapBody({ live, location, meetups }: { live?: LiveMap; location?: LocationState; meetups?: ReturnType<typeof useLiftMeetups> }) {
   const t = useT();
@@ -570,8 +514,9 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         />
       )}
       {activeSheet?.type === "lift" && meetups && (
-        <LiftQuickStartSheet
-          resorts={resorts}
+        <LiftStartSheet
+          resortNames={resorts.map((resort) => resort.name)}
+          requestPosition={location?.locateOnce ?? noPosition}
           busy={meetups.busy}
           result={meetups.result}
           onStart={meetups.start}

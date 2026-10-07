@@ -31,29 +31,42 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
     const timer = setInterval(() => setAt(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
+  const myLift = mine ? findLift(mine.resort, mine.liftId) : undefined;
   const activeFriends = friends?.filter((friend) => new Date(friend.expiresAt).getTime() > at.getTime()) ?? [];
 
   return (
     <section className="px-4 pt-4" aria-labelledby="lift-meetup-title">
-      <div className="p-4" style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
-        <h2 id="lift-meetup-title" className="font-display text-xl uppercase" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
+      <div className="p-4" style={{ border: "var(--rule-thin)", background: "var(--paper-1)", borderRadius: 18 }}>
+        <h2 id="lift-meetup-title" className="text-lg font-semibold" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
+        {mine && (
+          /* The rider sees the same forecast their crew gets. Stop never
+             depends on knowing the lift locally. */
+          <div className="mt-2">
+            {myLift && (
+              <p className="text-base font-semibold" style={{ color: "var(--ink-0)" }}>
+                {t("meetup.yourForecast", { time: timeAt(mine.arrivalAt, locale), station: myLift.topStationName ?? t("meetup.topStationOf", { lift: myLift.name }) })}
+              </p>
+            )}
+            <div className="mt-1 flex items-center gap-2">
+              <p className="min-w-0 flex-1 text-xs" style={{ color: "var(--ink-2)" }}>
+                {t("meetup.visibleUntil", { time: timeAt(mine.expiresAt, locale) })}
+              </p>
+              <button type="button" onClick={onStop} disabled={busy} className="min-h-11 px-3 text-sm font-semibold disabled:opacity-50"
+                style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: "var(--crimson)", borderRadius: 12 }}>{t("meetup.stop")}</button>
+            </div>
+          </div>
+        )}
         {onStartClick && canShare && (
           <button type="button" onClick={onStartClick} disabled={busy}
-            className="card-tap mt-3 min-h-12 w-full px-3 font-display text-lg uppercase disabled:opacity-50"
-            style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>
+            className={`card-tap mt-3 flex w-full items-center justify-center gap-2 px-3 font-semibold disabled:opacity-50 ${mine ? "min-h-11 text-sm" : "min-h-14 text-base"}`}
+            style={mine
+              ? { border: "var(--rule-thin)", color: "var(--ink-1)", borderRadius: 14 }
+              : { background: "var(--rust)", color: "var(--on-accent)", borderRadius: 16 }}>
+            {!mine && <Icon name="mountain-snow" size={18} />}
             {mine ? t("meetup.changeLift") : t("meetup.quickStart")}
           </button>
         )}
         {onStartClick && !canShare && <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("meetup.from16")}</p>}
-        {mine && (
-          <div className="mt-2 flex items-center gap-2">
-            <p className="min-w-0 flex-1 text-sm" style={{ color: "var(--ink-1)" }}>
-              {t("meetup.active", { time: timeAt(mine.expiresAt, locale) })}
-            </p>
-            <button type="button" onClick={onStop} disabled={busy} className="text-mono-label min-h-11 px-3 disabled:opacity-50"
-              style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: "var(--crimson)" }}>{t("meetup.stop")}</button>
-          </div>
-        )}
         {result && result !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[result])}</p>}
         <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("meetup.estimate")}</p>
       </div>

@@ -44,6 +44,8 @@ describe("MapScreen", () => {
     expect(cta.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.click(cta);
     const dialog = screen.getByRole("dialog", { name: "Choose your lift" });
+    /* Without a position yet, picking by hand is one tap away. */
+    fireEvent.click(within(dialog).getByRole("button", { name: "Pick the lift myself" }));
     expect(within(dialog).getByRole("combobox", { name: "Resort" })).toBeInTheDocument();
     expect(within(dialog).getByRole("combobox", { name: "Choose a lift" })).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: "Tell my crew" })).toBeEnabled();
