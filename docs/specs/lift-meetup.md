@@ -14,6 +14,8 @@ Friends on the same mountain need a quick way to meet without exchanging repeate
 - Confirmed friends see an estimated arrival time and destination mountain station until the status expires after 30 minutes.
 - When a viewer's own position is available on their device, the device suggests a lift and estimates their arrival at the meeting station with a short route hint.
 - Estimates use static OpenStreetMap lift data and a clearly labeled waiting-time heuristic.
+- The map shows a direct lift-start control before the map. A local demo at `/demo/map` simulates Lena and a sample viewer position without an account, GPS, push, or persistence.
+- With push enabled, current confirmed friends receive a generic lift-meetup notice. The notice contains no lift, station, coordinates, or ETA.
 
 ## Not included
 
@@ -34,6 +36,7 @@ Friends on the same mountain need a quick way to meet without exchanging repeate
 3. Friends see the station and an estimated arrival labeled as a *Schätzung* / *estimate*.
 4. The viewer's lift suggestion is calculated on the device from their own position; that position is never sent to the lift-status server action.
 5. The export includes the rider's stored lift status; the privacy and licence pages describe the feature and OSM attribution.
+6. The map offers a direct lift picker and a discoverable demo. Starting or replacing a status queues push only for subscribed confirmed unblocked friends. Stopping removes pending notices, and dispatch checks visibility again.
 
 ## Evidence
 
@@ -42,3 +45,4 @@ Friends on the same mountain need a quick way to meet without exchanging repeate
 | 1–2, 5 | `supabase/tests/database/lift_meetups.test.sql` |
 | 3–4 | `features/lift-meetup/*.test.ts(x)` and manual map check |
 | 3 | `lib/i18n/i18n.test.ts` |
+| 6 | `features/resorts/MapScreen.test.tsx`, `features/demo/DemoLiftMeetupTryout.test.tsx`, `supabase/tests/database/lift_meetup_push.test.sql` |

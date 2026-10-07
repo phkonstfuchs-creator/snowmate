@@ -9,11 +9,12 @@ select plan(22);
 insert into auth.users (id, email)
 select ('a7a7a7a7-0000-4000-8000-00000000000' || n)::uuid, 'pic' || n || '@example.com'
 from generate_series(1, 7) n;
+insert into auth.sessions (id, user_id)
+select id, id from auth.users where id::text like 'a7a7a7a7-%';
 
 update public.profiles
 set display_name = 'Pic ' || right(id::text, 1), handle = 'pic_' || right(id::text, 1),
-    city = 'innsbruck', ability_level = 'chill', birth_date = date '1995-01-01',
-    avatar_path = id::text || '/me.webp'
+    city = 'innsbruck', ability_level = 'chill', birth_date = date '1995-01-01'
 where id::text like 'a7a7a7a7-%';
 update public.profiles set birth_date = (private.local_today() - interval '15 years')::date
 where id = 'a7a7a7a7-0000-4000-8000-000000000006';
@@ -34,11 +35,18 @@ values ('a7a7f1de-0000-4000-8000-000000000001', 'a7a7a7a7-0000-4000-8000-0000000
 
 insert into storage.objects (bucket_id, name)
 select 'avatars', id::text || '/me.webp' from public.profiles where id::text like 'a7a7a7a7-%';
+insert into private.media_attestations (object_id, owner_id, bucket_id, name, key_id, issued_at)
+select o.id, split_part(o.name, '/', 1)::uuid, o.bucket_id, o.name, 'v1', now()
+from storage.objects o where o.bucket_id = 'avatars' and o.name like 'a7a7a7a7-%';
+update public.profiles set avatar_path = id::text || '/me.webp'
+where id::text like 'a7a7a7a7-%';
 
 create function pg_temp.sees(viewer text, owner text) returns boolean language plpgsql as $$
 declare result boolean;
 begin
   perform set_config('request.jwt.claim.sub', viewer, true);
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role', 'authenticated', 'session_id', viewer)::text, true);
   execute 'set local role authenticated';
   select public.can_see_avatar(owner::uuid) into result;
   execute 'reset role';
@@ -71,13 +79,16 @@ select is(pg_temp.sees('a7a7a7a7-0000-4000-8000-000000000003', 'a7a7a7a7-0000-40
 -- Paths and storage rows follow the same rule.
 set local role authenticated;
 set local request.jwt.claim.sub = 'a7a7a7a7-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"a7a7a7a7-0000-4000-8000-000000000004"}';
 select is(public.avatar_path_for('a7a7a7a7-0000-4000-8000-000000000001'), null, 'a stranger gets no path');
 select is((select count(*)::int from storage.objects where bucket_id = 'avatars'), 1, 'a stranger reads only their own object');
 set local request.jwt.claim.sub = 'a7a7a7a7-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"a7a7a7a7-0000-4000-8000-000000000002"}';
 select is(public.avatar_path_for('a7a7a7a7-0000-4000-8000-000000000001'), 'a7a7a7a7-0000-4000-8000-000000000001/me.webp', 'a friend gets the path');
 
 -- Writing: only your own folder.
 set local request.jwt.claim.sub = 'a7a7a7a7-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"a7a7a7a7-0000-4000-8000-000000000004"}';
 select lives_ok($$insert into storage.objects (bucket_id, name) values ('avatars', 'a7a7a7a7-0000-4000-8000-000000000004/new.webp')$$,
   'I can upload into my own folder');
 select throws_ok($$insert into storage.objects (bucket_id, name) values ('avatars', 'a7a7a7a7-0000-4000-8000-000000000001/evil.webp')$$,

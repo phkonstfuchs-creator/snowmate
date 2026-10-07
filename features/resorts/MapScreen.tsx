@@ -32,6 +32,7 @@ import type { ResortConditions } from "@/features/conditions/conditions";
 import type { ResortPhoto } from "./resort-photo";
 import ResortPhotoCredit from "./ResortPhotoCredit";
 import Image from "next/image";
+import Link from "next/link";
 import { LIFTS } from "@/lib/lifts";
 import { useLiftMeetups } from "@/features/lift-meetup/useLiftMeetups";
 import LiftMeetupPanel from "@/features/lift-meetup/LiftMeetupPanel";
@@ -51,7 +52,65 @@ const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
   fresh: "map.fresh", groomed: "map.groomed", icy: "map.icy", slushy: "map.slushy",
 };
 
-type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | null;
+type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | null;
+
+function LiftQuickStartSheet({ resorts, busy, result, onStart, onClose }: {
+  resorts: ResortStatus[];
+  busy: boolean;
+  result: StartResult | null;
+  onStart: (resort: string, liftId: string) => Promise<boolean>;
+  onClose: () => void;
+}) {
+  useScrollLock();
+  const t = useT();
+  const { state, dismiss } = useSheetDismiss(onClose);
+  const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
+  const available = resorts.filter((resort) => LIFTS.some((lift) => lift.resort === resort.name));
+  const [selectedResort, setSelectedResort] = useState(available[0]?.name ?? "");
+  const lifts = LIFTS.filter((lift) => lift.resort === selectedResort);
+  const [selectedLift, setSelectedLift] = useState(lifts[0]?.id ?? "");
+
+  return (
+    <>
+      <div className="sheet-overlay" data-state={state} onClick={dismiss} aria-hidden />
+      <div ref={dialogRef} className="sheet-panel p-5" data-state={state} role="dialog" aria-modal="true"
+        aria-label={t("meetup.quickStartTitle")} tabIndex={-1}>
+        <div className="flex justify-between gap-3">
+          <h2 className="font-display text-xl uppercase" style={{ color: INK }}>{t("meetup.quickStartTitle")}</h2>
+          <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="min-h-11 min-w-11">
+            <Icon name="x" size={18} color={MUTED} />
+          </button>
+        </div>
+        <p className="mt-2 text-sm" style={{ color: MUTED }}>{t("meetup.privacy")}</p>
+        {available.length === 0 ? <p className="mt-4 text-sm">{t("meetup.noLifts")}</p> : (
+          <>
+            <label htmlFor="quick-resort" className="text-mono-label mt-5 block" style={{ color: INK }}>{t("meetup.pickResort")}</label>
+            <select id="quick-resort" value={selectedResort} onChange={(event) => {
+              const resort = event.target.value;
+              setSelectedResort(resort);
+              setSelectedLift(LIFTS.find((lift) => lift.resort === resort)?.id ?? "");
+            }} className="mt-1 min-h-11 w-full px-2" style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: INK }}>
+              {available.map((resort) => <option key={resort.name} value={resort.name}>{resort.name}</option>)}
+            </select>
+            <label htmlFor="quick-lift" className="text-mono-label mt-4 block" style={{ color: INK }}>{t("meetup.pickLift")}</label>
+            <select id="quick-lift" value={selectedLift} onChange={(event) => setSelectedLift(event.target.value)}
+              className="mt-1 min-h-11 w-full px-2" style={{ border: "var(--rule-thin)", background: "var(--paper-0)", color: INK }}>
+              {lifts.map((lift) => <option key={lift.id} value={lift.id}>{lift.name}</option>)}
+            </select>
+            <p className="mt-3 text-xs" style={{ color: MUTED }}>{t("meetup.estimate")}</p>
+            <button type="button" disabled={busy || !selectedLift}
+              onClick={() => void onStart(selectedResort, selectedLift).then((ok) => { if (ok) dismiss(); })}
+              className="card-tap mt-4 min-h-12 w-full font-display text-lg uppercase disabled:opacity-50"
+              style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>
+              {busy ? t("common.oneMoment") : t("meetup.start")}
+            </button>
+            {result && result !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[result])}</p>}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
 
 function ResortDetailSheet({
   resort,
@@ -365,6 +424,21 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         </div>
       </header>
 
+      {location && meetups && (
+        <LiftMeetupPanel
+          mine={meetups.mine}
+          friends={meetups.friends}
+          me={location.me}
+          busy={meetups.busy}
+          result={meetups.result}
+          onStop={() => void meetups.stop()}
+          onLocate={location.locate}
+          canShare={live?.canShareLift === true}
+          onStartClick={() => setActiveSheet({ type: "lift" })}
+        />
+      )}
+      {live && <p className="px-4 pt-2 text-xs" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
+
       {/* Vector map (MapLibre) */}
       <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>
         <SkiMap
@@ -419,18 +493,6 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
             window.scrollTo({ top: 0, behavior: "smooth" });
             focusOn(friend.lat, friend.lng);
           }}
-        />
-      )}
-
-      {location && meetups && (
-        <LiftMeetupPanel
-          mine={meetups.mine}
-          friends={meetups.friends}
-          me={location.me}
-          busy={meetups.busy}
-          result={meetups.result}
-          onStop={() => void meetups.stop()}
-          onLocate={location.locate}
         />
       )}
 
@@ -496,6 +558,15 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           liftBusy={meetups?.busy ?? false}
           liftResult={meetups?.result ?? null}
           onStartLift={(liftId) => meetups?.start(activeSheet.resort.name, liftId) ?? Promise.resolve(false)}
+          onClose={() => setActiveSheet(null)}
+        />
+      )}
+      {activeSheet?.type === "lift" && meetups && (
+        <LiftQuickStartSheet
+          resorts={resorts}
+          busy={meetups.busy}
+          result={meetups.result}
+          onStart={meetups.start}
           onClose={() => setActiveSheet(null)}
         />
       )}

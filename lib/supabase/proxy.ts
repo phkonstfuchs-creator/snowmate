@@ -5,6 +5,7 @@ import {
 import { NextResponse, type NextRequest } from "next/server";
 import { getAuthRedirect } from "@/features/auth/route-access";
 import { getSupabasePublicConfig } from "./config";
+import { sessionCookieOptions } from "./cookie-options";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -17,6 +18,7 @@ export async function updateSession(request: NextRequest) {
   const { url, publishableKey } = getSupabasePublicConfig();
 
   const supabase = createServerClient(url, publishableKey, {
+    cookieOptions: sessionCookieOptions(process.env.NODE_ENV === "production"),
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -45,15 +47,17 @@ export async function updateSession(request: NextRequest) {
   let needsSecondFactor = false;
 
   try {
-    const { data } = await supabase.auth.getClaims();
-    isAuthenticated = Boolean(data?.claims);
+    const { data, error } = await supabase.auth.getUser();
+    isAuthenticated = !error && Boolean(data?.user?.email_confirmed_at);
 
-    if (isAuthenticated && data?.claims?.aal !== "aal2") {
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      needsSecondFactor = aal?.nextLevel === "aal2";
+    if (isAuthenticated) {
+      const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aalError || !aal) throw new Error("Assurance verification unavailable");
+      needsSecondFactor = aal.nextLevel === "aal2" && aal.currentLevel !== "aal2";
     }
   } catch {
     // Fail closed when identity verification is unavailable.
+    isAuthenticated = false;
   }
 
   const redirectPath = getAuthRedirect(

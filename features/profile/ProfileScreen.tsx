@@ -13,6 +13,7 @@ import Avatar from "@/components/ui/Avatar";
 import MyRides from "./MyRides";
 import PostList from "@/features/posts/PostList";
 import PushSettings from "@/features/notifications/PushSettings";
+import SignOutForm from "@/features/notifications/SignOutForm";
 import SkiDays from "@/features/tracking/SkiDays";
 import Badges from "@/features/gamification/BadgeGallery";
 import Leaderboard from "@/features/gamification/LeaderboardPanel";
@@ -22,7 +23,6 @@ import type { LeaderboardRow, LeaderboardSettings as LeaderboardSettingsValue } 
 import type { SkiDay } from "@/features/tracking/ski-day";
 import type { Post } from "@/features/posts/post";
 import type { LiveRide } from "@/features/rides/live-ride";
-import { signOutAction } from "@/features/auth/actions";
 import ProfileEditSheet from "./ProfileEditSheet";
 import AccountSection from "./AccountSection";
 import LanguageSwitch from "./LanguageSwitch";
@@ -592,7 +592,7 @@ export default function ProfileScreen({
 
       {/* ── Sign out ───────────────────────────────────────── */}
       <div className="px-4 pb-8">
-        <form action={signOutAction}>
+        <SignOutForm>
           <button
             type="submit"
             className="text-mono-label flex min-h-12 w-full items-center justify-center gap-2"
@@ -601,7 +601,7 @@ export default function ProfileScreen({
             <Icon name="log-out" size={15} />
             {t("profile.signOut")}
           </button>
-        </form>
+        </SignOutForm>
       </div>
 
       {showSeasonPass && <SeasonPassSheet onClose={() => setShowSeasonPass(false)} />}

@@ -11,14 +11,28 @@ beforeEach(() => {
   vi.clearAllMocks();
   counter += 1;
   mocks.sub.value = `user-${counter}`;
+  mfa.unenroll.mockResolvedValue({ error: null });
   mocks.createClient.mockResolvedValue({
-    auth: { getClaims: async () => ({ data: mocks.sub.value ? { claims: { sub: mocks.sub.value } } : null }), mfa },
+    auth: { getUser: async () => ({ data: { user: mocks.sub.value ? { id: mocks.sub.value } : null }, error: null }), mfa },
   });
 });
 
 const FACTOR = "11111111-2222-4333-8444-555555555555";
 
 describe("security actions", () => {
+  it("fails closed when the authentication service is unavailable", async () => {
+    mocks.createClient.mockRejectedValueOnce(new Error("unavailable"));
+    await expect(enrollMfaAction()).resolves.toMatchObject({ status: "error" });
+    expect(mfa.enroll).not.toHaveBeenCalled();
+  });
+
+  it("does not disable or enroll factors when the factor lookup fails", async () => {
+    mfa.listFactors.mockResolvedValue({ data: null, error: { message: "unavailable" } });
+    await expect(disableMfaAction("123456")).resolves.toMatchObject({ status: "error" });
+    await expect(enrollMfaAction()).resolves.toMatchObject({ status: "error" });
+    expect(mfa.unenroll).not.toHaveBeenCalled();
+    expect(mfa.enroll).not.toHaveBeenCalled();
+  });
   it("removes abandoned enrolments and returns only an SVG QR code", async () => {
     mfa.listFactors.mockResolvedValue({ data: { totp: [], all: [{ id: "old", status: "unverified" }] } });
     mfa.enroll.mockResolvedValue({ data: { id: FACTOR, totp: { qr_code: "data:image/svg+xml;utf-8,<svg/>", secret: "S" } }, error: null });

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { findLift } from "@/lib/lifts";
+import { dispatchPushSoon } from "@/lib/push/dispatch";
 import { toLiftMeetup, type LiftMeetup, type LiftMeetupRow, type StartResult } from "./meetup";
 
 const KNOWN_RESULTS: readonly StartResult[] = ["sharing", "invalid", "profile_incomplete", "too_young", "unauthenticated"];
@@ -17,7 +18,9 @@ export async function startLiftMeetupAction(resort: string, liftId: string): Pro
       p_lift_id: lift.id,
     });
     if (error) return "unavailable";
-    return KNOWN_RESULTS.includes(data as StartResult) ? data as StartResult : "unavailable";
+    const result = KNOWN_RESULTS.includes(data as StartResult) ? data as StartResult : "unavailable";
+    if (result === "sharing") await dispatchPushSoon(supabase);
+    return result;
   } catch {
     return "unavailable";
   }

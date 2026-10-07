@@ -9,13 +9,17 @@ export interface PushSubscriptionInput {
 
 const ENDPOINT = /^https:\/\/(fcm\.googleapis\.com|web\.push\.apple\.com|updates\.push\.services\.mozilla\.com|[a-z0-9-]+\.notify\.windows\.com)\/[!-~]+$/u;
 
+export function validPushEndpoint(value: unknown): value is string {
+  return typeof value === "string" && value.length <= 1000 && ENDPOINT.test(value);
+}
+
 /* From PushSubscription.toJSON(); null when it is not a usable one. */
 export function toSubscriptionInput(value: unknown): PushSubscriptionInput | null {
   if (typeof value !== "object" || value === null) return null;
   const { endpoint, keys } = value as { endpoint?: unknown; keys?: { p256dh?: unknown; auth?: unknown } };
   const p256dh = keys?.p256dh;
   const auth = keys?.auth;
-  if (typeof endpoint !== "string" || endpoint.length > 1000 || !ENDPOINT.test(endpoint)) return null;
+  if (!validPushEndpoint(endpoint)) return null;
   if (typeof p256dh !== "string" || !/^[A-Za-z0-9_-]{87}$/u.test(p256dh)) return null;
   if (typeof auth !== "string" || !/^[A-Za-z0-9_-]{22}$/u.test(auth)) return null;
   return { endpoint, p256dh, auth };

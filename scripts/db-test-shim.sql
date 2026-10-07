@@ -19,6 +19,10 @@ create table auth.users (
   raw_user_meta_data jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
+create table auth.sessions (
+  id uuid primary key,
+  user_id uuid not null references auth.users(id) on delete cascade
+);
 create function auth.uid() returns uuid language sql stable as $$
   select nullif(coalesce(current_setting('request.jwt.claim.sub', true),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')), '')::uuid
@@ -54,6 +58,9 @@ create table storage.objects (
   bucket_id text references storage.buckets (id),
   name text,
   owner uuid,
+  version text,
+  updated_at timestamptz,
+  last_accessed_at timestamptz,
   created_at timestamptz default now(),
   unique (bucket_id, name)
 );

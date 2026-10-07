@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+function isPublicKey(value: string): boolean {
+  if (value.startsWith("sb_publishable_")) return true;
+  try {
+    const parts = value.split(".");
+    if (parts.length !== 3 || !parts.every((part) => /^[A-Za-z0-9_-]+={0,2}$/.test(part))) return false;
+    const payload: unknown = JSON.parse(atob(parts[1]!.replace(/-/g, "+").replace(/_/g, "/")));
+    return typeof payload === "object" && payload !== null && "role" in payload && payload.role === "anon";
+  } catch {
+    return false;
+  }
+}
+
 const safeUrlSchema = z
   .string()
   .trim()
@@ -17,7 +29,7 @@ const safeUrlSchema = z
     const isLocal =
       url.hostname === "localhost" || url.hostname === "127.0.0.1";
 
-    return url.protocol === "https:" || (isLocal && url.protocol === "http:");
+    return !url.username && !url.password && (url.protocol === "https:" || (isLocal && url.protocol === "http:"));
   }, "Use HTTPS outside local development.");
 
 const publicConfigSchema = z.object({
@@ -27,8 +39,7 @@ const publicConfigSchema = z.object({
     .trim()
     .min(1)
     .refine(
-      (value) =>
-        value.startsWith("sb_publishable_") || value.startsWith("eyJ"),
+      isPublicKey,
       "Use a publishable or legacy anon key, never a secret key.",
     ),
   siteUrl: safeUrlSchema,

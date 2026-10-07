@@ -15,6 +15,35 @@ env:
   NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
 
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan Git history for secrets
+        shell: bash
+        run: |
+          scan_dir="$(mktemp -d)"
+          curl --fail --silent --show-error --location \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$scan_dir/gitleaks.tar.gz"
+          printf '%s  %s\n' '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb' "$scan_dir/gitleaks.tar.gz" | sha256sum --check
+          tar -xzf "$scan_dir/gitleaks.tar.gz" -C "$scan_dir" gitleaks
+          "$scan_dir/gitleaks" git --log-opts=--all --redact=100 --ignore-gitleaks-allow .
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm audit --omit=dev --audit-level=moderate
+      - run: npm ci --ignore-scripts
+        working-directory: website
+      - run: npm audit --omit=dev --audit-level=moderate
+        working-directory: website
+
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -101,15 +130,29 @@ jobs:
             exit 1
           fi
 
+          # The migration generates a random private key for this disposable
+          # local database. Keep it out of logs and expose it only to the app.
+          media_key="$(PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -Atqc \
+            "select encode(secret, 'base64') from private.media_attestation_keys where key_id = 'v1'")"
+          if [[ ! "$media_key" =~ ^[A-Za-z0-9+/]{43}=$ ]]; then
+            echo "The local media attestation key is unavailable." >&2
+            exit 1
+          fi
+          printf '::add-mask::%s\n' "$media_key"
+
           {
             printf 'NEXT_PUBLIC_SUPABASE_URL=%s\n' "$api_url"
             printf 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$public_key"
-            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://localhost:3000"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://127.0.0.1:3000"
             printf 'MAILPIT_URL=%s\n' "$mailpit_url"
             printf 'LOCAL_SUPABASE_E2E=%s\n' "1"
+            printf 'MEDIA_ATTESTATION_KEY_ID=%s\n' "v1"
+            printf 'MEDIA_ATTESTATION_KEY=%s\n' "$media_key"
           } >> "$GITHUB_ENV"
+      - name: Build app with local Supabase configuration
+        run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: PISTL_E2E_PRODUCTION=1 npm run test:e2e
       - if: always()
         continue-on-error: true
         run: npx supabase stop --no-backup

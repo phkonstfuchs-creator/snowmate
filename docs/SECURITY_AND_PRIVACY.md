@@ -82,9 +82,10 @@ rules above apply. See [ADR 0012](adr/0012-age-from-birth-date.md).
 
 ## Profile pictures
 
-Optional. The browser crops the picture to 512 px and re-encodes it,
-which drops EXIF data such as the GPS position. The server accepts only
-WebP or JPEG by their first bytes, up to 512 KB. Pictures sit in the
+Optional. The browser crops the picture to 512 px and re-encodes it.
+The server independently decodes and re-encodes WebP/JPEG, dropping EXIF/GPS
+metadata and refusing malformed files or more than 16 million decoded pixels.
+The input and output are limited to 512 KB. Pictures sit in the
 private `avatars` bucket, one folder per account, and only the owner
 writes there.
 
@@ -93,7 +94,11 @@ owner, confirmed friends, and, if the owner chose "contacts", friends of
 friends and people in the same ride. Minors' pictures are friends-only
 whatever they chose, and a block hides them both ways. The app serves
 pictures from its own `/avatar/<id>` route, so browsers never get a
-storage URL. Deleting the account removes the files. See
+storage URL. Storage permits a friend to read only the owner's currently referenced,
+server-attested immutable avatar, with the same audience, session and MFA
+rules. Old orphaned and unattested paths are denied. Owners retain access to
+their own files for cleanup; that does not make raw files shareable.
+Private media responses use no-store. Deleting the account removes the files. See
 [ADR 0022](adr/0022-profile-pictures.md).
 
 ## Ski-day posts
@@ -101,20 +106,30 @@ storage URL. Deleting the account removes the files. See
 Short text, an optional photo and a resort. Only the author and confirmed
 friends see a post. This applies to minors and adults alike, and a block
 hides posts both ways (`private.can_see_posts_of`). Photos are shrunk and
-re-encoded on the phone, which drops EXIF/GPS. The server accepts only
-WebP/JPEG bytes up to 1.5 MB. Photos are stored in the private
+re-encoded on the phone and independently decoded/re-encoded by the server,
+dropping EXIF/GPS and bounding decoded pixels. Input and output are limited
+to 1.5 MB. Photos are stored in the private
 `post-photos` bucket and served only through `/post-photo/<id>` after
 `post_photo_path_for()` allows it. Posting is limited to 10 a day. The
 author can delete a post, and its photo goes with it. Other people's
 posts can be reported through report and block. Posts are in the data
-export, and account deletion removes the photos. See
+export, and account deletion removes the photos. Storage permits friends to read only server-attested immutable photos still
+attached to visible posts. New avatar/post references require that certificate.
+A private HMAC key certifies the exact owner/object-id/bucket/path/time tuple;
+clients cannot forge certificates or overwrite certified files. Deleted object
+ids cannot be reused. Existing unattested originals remain owner-only until
+re-upload or reviewed sanitization; do not assume that old stored files are
+metadata-free. Certificates are included in the owner export and deleted with
+the account. See
 [ADR 0024](adr/0024-ski-day-posts.md).
 
 ## Ski-day tracking
 
 Started and finished by the person on the map. The GPS track stays on the
 device: it is held in memory and, while recording, in this browser's
-storage, and is deleted on finish. Only the summary is saved, and only
+storage tied to the account id, and is deleted on finish or explicit logout.
+Legacy or other-account recordings are discarded; switching accounts stops
+the old GPS watch. Only the summary is saved, and only
 the owner sees it: times, resort, distance, vertical, top speed and
 runs. The app and the database refuse implausible values, and at most 5
 days can be saved per 24 h. The export lists the days, and account
@@ -145,12 +160,23 @@ kind, the sender's display name and the page to open, never message
 text. It is encrypted for the device (RFC 8291), so the push service
 cannot read it.
 
-The `push-dispatch` edge function takes the queue with the service role,
-which stays inside Supabase; the app holds no secret. The function only
-sends what is queued, so it needs no caller authentication. Notices
+A lift-meetup start or replacement queues a generic notice for subscribed
+confirmed friends. It contains no lift, station, coordinates or ETA.
+Stopping withdraws pending notices. Dispatch checks the current status,
+age, friendship, two-way block and expiry again before sending.
+
+The `push-dispatch` edge function verifies a user bearer token and uses a
+service-only session-scoped RPC to take only that actor's queued notices.
+The database rechecks the source session, recipient sessions and blocks.
+The push service role stays inside Supabase; no Supabase service-role key
+belongs in the app.
+The response is empty and reveals no activity count. Notices
 older than an hour are dropped. Devices the push service reports as gone
 are deleted. Each person keeps at most 10 devices. Account deletion
-cascades, and the export lists the devices. See
+cascades, and the export lists the devices. Devices are bound to the login
+session that opted in. Logout removes this browser's subscription and ends
+location announcements; revoked sessions receive no further queued push.
+Existing unbound devices must opt in again. See
 [ADR 0025](adr/0025-push-notifications.md).
 
 ## Live location
@@ -214,6 +240,11 @@ encrypted; they are in the export and go with the account. See
 - Two-factor sign-in with an authenticator app (Profile tab). With it on,
   a password-only session reaches nothing, enforced in the database
   (`public.check_request`, the PostgREST pre-request hook).
+- The proxy and protected layout verify the current Auth user. The database
+  rejects missing/revoked sessions. Restrictive Storage RLS repeats session
+  and MFA checks because Storage bypasses the PostgREST hook.
+- Changing a password revokes other Auth sessions. Reset and resend email
+  targets also have hashed per-instance quotas and generic reset responses.
 - Limits: sign-in 8 tries per account and visitor and 30 per visitor in 15
   minutes; sign-up, reset, handle checks and codes are limited too; every
   account at most 300 writes a minute in the database.
@@ -222,6 +253,11 @@ encrypted; they are in the export and go with the account. See
 - Confirmation and reset links only redirect to allow-listed app paths.
 - Sign-up is confirmed with the emailed code (or its link). Codes are
   limited to 8 tries per address and 20 per visitor in 15 minutes.
+- Media uploads are limited per account before image decoding. Ride and
+  carpool planning dates must be from today through 365 days ahead.
+
+These in-memory app limits are per server instance. They supplement Supabase
+limits; distributed bot protection still requires hosted rate limits/CAPTCHA.
 
 See [ADR 0013](adr/0013-request-guard-2fa-and-rate-limits.md).
 
@@ -236,18 +272,39 @@ must change with every new kind of data, processor or audience rule.
 - Art. 15 and 20: `/profile/export` downloads everything stored about the
   caller as JSON (`export_my_data()`).
 - Art. 17: "Delete account" removes the auth user; everything else cascades
-  (`delete_my_account()`).
+  (`delete_my_account()`). The application checks Storage list/remove errors
+  first; the RPC refuses deletion while owned media remains, so retry cannot
+  silently strand orphaned files.
 
 ## Secrets
 
-Only the three browser-safe values in `.env.example` are used. No
-service-role key exists in the app, in CI or in the repository. The
-response headers (CSP, frame, referrer, permissions, HSTS) are set in
-`next.config.ts` and checked by an e2e test.
+The app uses browser-safe values in `.env.example`, including the optional
+public VAPID key. Configuration rejects service-role/secret keys in public
+Supabase variables. Photo uploads additionally use a limited server-only
+`MEDIA_ATTESTATION_KEY` generated in a private database table and provisioned
+out-of-band. This key can certify sanitized media but cannot read user data;
+its exposure would require rotation and review of media certificates. It must
+never enter public variables, preview projects using a different database or
+Git. Setup and rotation live in [DEVELOPMENT.md](DEVELOPMENT.md#private-media-signing-key).
+The separate website's waitlist has server-only
+Supabase/Resend credentials; they must never use a NEXT_PUBLIC name or enter
+Git. CI uses a local test stack and placeholders, never production secrets.
 
-## Not yet covered
+Response headers (CSP, frame, referrer, permissions, HSTS) live in
+`lib/security-headers.ts`. The proxy creates a fresh script nonce per request;
+Next document rendering is dynamic. Production scripts require the nonce,
+inline styles remain permitted for existing CSS/map APIs. Auth cookies are
+HttpOnly, Secure in production and SameSite=Lax. Browser tests check the
+built production app as well as the development server.
 
-Chats and squads have no backend.
-Do not attach real data to them before they have their own schema,
-audience rules and negative tests. Direct messages involving minors need a
-product decision on consent and moderation first.
+## Audit and operations
+
+[SECURITY_AUDIT.md](SECURITY_AUDIT.md) records reviewed findings, tests and
+remaining operational work. Source visibility is not an access control:
+private data is protected by sessions, grants, RLS and audience functions.
+No confirmed production credential was found in the scanned tracked source
+or reachable history. This does not verify the operator's private credentials,
+dashboard MFA, backup restoration, deployed schema or provider contracts.
+
+Squads remain a prototype. Real social features require their own audience
+rules and denied-access tests before receiving real data.

@@ -4,7 +4,8 @@ import { updateSession } from "./proxy";
 
 const mocks = vi.hoisted(() => ({
   createServerClient: vi.fn(),
-  getClaims: vi.fn(),
+  getUser: vi.fn(),
+  getAuthenticatorAssuranceLevel: vi.fn(),
 }));
 
 vi.mock("@supabase/ssr", () => ({
@@ -38,13 +39,20 @@ describe("updateSession", () => {
     mocks.createServerClient.mockImplementation(
       (_url, _key, options: { cookies: CookieMethods }) => {
         cookieMethods = options.cookies;
-        return { auth: { getClaims: mocks.getClaims } };
+        return { auth: { getUser: mocks.getUser, mfa: { getAuthenticatorAssuranceLevel: mocks.getAuthenticatorAssuranceLevel } } };
       },
     );
+    mocks.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: "aal1", nextLevel: "aal1" }, error: null });
+  });
+
+  it("keeps server-managed session cookies unavailable to browser JavaScript", async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
+    await updateSession(new NextRequest("http://localhost:3000/feed"));
+    expect(mocks.createServerClient.mock.calls[0]?.[2].cookieOptions).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/" });
   });
 
   it("redirects signed-out users away from product routes", async () => {
-    mocks.getClaims.mockResolvedValue({ data: null });
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
 
     const response = await updateSession(
       new NextRequest("http://localhost:3000/feed"),
@@ -56,7 +64,7 @@ describe("updateSession", () => {
   });
 
   it("preserves refreshed cookies and no-cache headers on redirects", async () => {
-    mocks.getClaims.mockImplementation(async () => {
+    mocks.getUser.mockImplementation(async () => {
       cookieMethods.setAll(
         [
           {
@@ -73,7 +81,7 @@ describe("updateSession", () => {
         },
       );
 
-      return { data: { claims: { sub: "user-id" } } };
+      return { data: { user: { id: "user-id", email_confirmed_at: "2026-10-01" } } };
     });
 
     const response = await updateSession(
@@ -89,7 +97,7 @@ describe("updateSession", () => {
   });
 
   it("does not protect similarly named public routes", async () => {
-    mocks.getClaims.mockResolvedValue({ data: null });
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
 
     const response = await updateSession(
       new NextRequest("http://localhost:3000/feedback"),
@@ -99,7 +107,7 @@ describe("updateSession", () => {
   });
 
   it("fails closed when claim verification is unavailable", async () => {
-    mocks.getClaims.mockRejectedValue(new Error("JWKS unavailable"));
+    mocks.getUser.mockRejectedValue(new Error("Auth unavailable"));
 
     const response = await updateSession(
       new NextRequest("http://localhost:3000/feed"),

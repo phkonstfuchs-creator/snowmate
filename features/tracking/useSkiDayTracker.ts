@@ -5,6 +5,7 @@ import { RESORTS } from "@/lib/resorts";
 import { addFix, isTrackerState, nearestResort, startTracker, summarize, type SkiDaySummary, type TrackerState } from "./tracker";
 
 const STORAGE_KEY = "pistl.skiday.v1";
+const CLEAR_EVENT = "pistl:skiday:clear";
 const SAVE_EVERY_MS = 15_000;
 const MAX_DAY_MS = 16 * 3600_000;
 
@@ -19,21 +20,45 @@ interface WakeLockSentinelLike {
   release(): Promise<void>;
 }
 
-function readStored(): TrackerState | null {
+function removeStoredSkiDay(): void {
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Private mode or blocked storage: nothing persisted to clear.
+  }
+}
+
+/** Sign-out uses this to clear storage and stop an active GPS session. */
+export function clearStoredSkiDay(): void {
+  removeStoredSkiDay();
+  window.dispatchEvent(new Event(CLEAR_EVENT));
+}
+
+function readStored(userId: string): TrackerState | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    const value: unknown = raw ? JSON.parse(raw) : null;
-    if (!isTrackerState(value) || Date.now() - value.startedAt > MAX_DAY_MS) return null;
-    return value;
+    if (!raw) return null;
+    const saved: unknown = JSON.parse(raw);
+    if (typeof saved !== "object" || saved === null || !("userId" in saved) || !("state" in saved)) {
+      removeStoredSkiDay();
+      return null;
+    }
+    const { userId: owner, state } = saved;
+    if (owner !== userId || !isTrackerState(state) || Date.now() - state.startedAt > MAX_DAY_MS) {
+      removeStoredSkiDay();
+      return null;
+    }
+    return state;
   } catch {
+    removeStoredSkiDay();
     return null;
   }
 }
 
-function store(state: TrackerState | null) {
+function store(userId: string, state: TrackerState | null) {
   try {
-    if (state) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    else window.localStorage.removeItem(STORAGE_KEY);
+    if (state) window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ userId, state }));
+    else removeStoredSkiDay();
   } catch {
     // Private mode or full storage: the day still runs in memory.
   }
@@ -43,7 +68,7 @@ function store(state: TrackerState | null) {
    and, so a reload does not lose it, in this browser's storage; it is
    deleted when the day ends. Browsers pause GPS while the screen is off,
    so the screen is kept on while recording where the device allows it. */
-export function useSkiDayTracker() {
+export function useSkiDayTracker(userId: string) {
   const [state, setState] = useState<TrackerState | null>(null);
   const [finished, setFinished] = useState<FinishedDay | null>(null);
   const [error, setError] = useState<TrackerError | null>(null);
@@ -89,9 +114,9 @@ export function useSkiDayTracker() {
     setError(null);
     if (Date.now() - lastStored.current > SAVE_EVERY_MS) {
       lastStored.current = Date.now();
-      store(next);
+      store(userId, next);
     }
-  }, []);
+  }, [userId]);
 
   const startWatch = useCallback(() => {
     if (watchId.current !== null) return;
@@ -111,13 +136,13 @@ export function useSkiDayTracker() {
 
   /* A day still running from before a reload carries on. */
   useEffect(() => {
-    const restored = readStored();
+    const restored = readStored(userId);
     if (!restored || !("geolocation" in navigator)) return;
     stateRef.current = restored;
     queueMicrotask(() => setState(restored));
     startWatch();
     void keepAwake();
-  }, [startWatch, keepAwake]);
+  }, [userId, startWatch, keepAwake]);
 
   /* The clock on screen, and the screen lock comes back after the app was hidden. */
   useEffect(() => {
@@ -139,7 +164,21 @@ export function useSkiDayTracker() {
     };
   }, [state, keepAwake]);
 
-  useEffect(() => () => stopWatch(), [stopWatch]);
+  useEffect(() => {
+    const onClear = () => {
+      stopWatch();
+      releaseAwake();
+      stateRef.current = null;
+      setState(null);
+      setFinished(null);
+    };
+    window.addEventListener(CLEAR_EVENT, onClear);
+    return () => {
+      window.removeEventListener(CLEAR_EVENT, onClear);
+      stopWatch();
+      releaseAwake();
+    };
+  }, [stopWatch, releaseAwake]);
 
   const start = useCallback(() => {
     if (!("geolocation" in navigator)) {
@@ -149,23 +188,23 @@ export function useSkiDayTracker() {
     const fresh = startTracker(Date.now());
     stateRef.current = fresh;
     lastStored.current = Date.now();
-    store(fresh);
+    store(userId, fresh);
     setFinished(null);
     setError(null);
     setState(fresh);
     startWatch();
     void keepAwake();
-  }, [startWatch, keepAwake]);
+  }, [userId, startWatch, keepAwake]);
 
   const finish = useCallback(() => {
     const current = stateRef.current;
     stopWatch();
     releaseAwake();
     stateRef.current = null;
-    store(null);
+    store(userId, null);
     setState(null);
     if (current) setFinished({ summary: summarize(current, Date.now()), resort: nearestResort(current.track, RESORTS) });
-  }, [stopWatch, releaseAwake]);
+  }, [userId, stopWatch, releaseAwake]);
 
   const clearFinished = useCallback(() => setFinished(null), []);
 

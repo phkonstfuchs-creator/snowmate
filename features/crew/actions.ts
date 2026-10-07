@@ -43,7 +43,7 @@ async function requestFriendshipActionImpl(
 
     if (outcome.ok) {
       revalidateGraph();
-      dispatchPushSoon();
+      await dispatchPushSoon(supabase);
     }
     return { status: outcome.ok ? "success" : "error", message: outcome.message };
   } catch {
@@ -60,7 +60,7 @@ async function callGraphFunction(
     const { data, error } = await supabase.rpc(fn, args);
     if (error || data !== true) return false;
     revalidateGraph();
-    if (fn === "accept_friendship") dispatchPushSoon();
+    if (fn === "accept_friendship") await dispatchPushSoon(supabase);
     return true;
   } catch {
     return false;

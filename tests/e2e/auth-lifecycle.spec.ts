@@ -1,15 +1,9 @@
 import {
   expect,
   test,
-  type APIRequestContext,
   type Page,
 } from "@playwright/test";
-
-interface MailpitSearchResult {
-  messages?: Array<{
-    ID?: string;
-  }>;
-}
+import { waitForConfirmationCode } from "./local-supabase-auth";
 
 const localSupabaseEnabled = process.env.LOCAL_SUPABASE_E2E === "1";
 
@@ -27,41 +21,6 @@ async function signUp(page: Page, email: string, password: string, handle: strin
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Confirm password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
-}
-
-/* The confirmation email carries a code (typed into the app) and a link
-   (fallback). Returns the code. */
-async function waitForConfirmationCode(
-  request: APIRequestContext,
-  mailpitUrl: string,
-  email: string,
-): Promise<string> {
-  const deadline = Date.now() + 20_000;
-
-  while (Date.now() < deadline) {
-    const searchResponse = await request.get(`${mailpitUrl}/api/v1/search`, {
-      params: { query: `to:"${email}"`, limit: 1 },
-    });
-
-    if (searchResponse.ok()) {
-      const result = (await searchResponse.json()) as MailpitSearchResult;
-      const messageId = result.messages?.[0]?.ID;
-
-      if (messageId) {
-        const emailResponse = await request.get(
-          `${mailpitUrl}/view/${encodeURIComponent(messageId)}.html`,
-        );
-        const code = emailResponse.ok()
-          ? />\s*(\d{6,10})\s*</u.exec(await emailResponse.text())?.[1]
-          : undefined;
-        if (code) return code;
-      }
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-
-  throw new Error(`No confirmation email arrived for ${email}.`);
 }
 
 test.describe("account lifecycle", () => {

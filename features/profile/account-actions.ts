@@ -22,20 +22,18 @@ export async function deleteAccountAction(
 
   const supabase = await createClient();
 
-  /* Storage files do not cascade with the account: remove the picture
-     and the post photos first. If this fails the account is still
-     deleted; the operator cleans up orphaned files (the folder name is
-     the deleted id). */
+  /* Storage is a separate service: finish cleanup before deleting its
+     owner. The RPC independently refuses while any own object remains. */
   try {
-    const { data: claims } = await supabase.auth.getClaims();
-    const userId = claims?.claims?.sub;
-    if (typeof userId === "string") {
-      for (const bucket of [AVATAR_BUCKET, POST_PHOTO_BUCKET]) {
-        await removeFolder(supabase, bucket, userId);
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) return { status: "error", message: t("profile.deleteFailed") };
+    for (const bucket of [AVATAR_BUCKET, POST_PHOTO_BUCKET]) {
+      if (!await removeFolder(supabase, bucket, data.user.id)) {
+        return { status: "error", message: t("profile.deleteFailed") };
       }
     }
   } catch {
-    // Not a reason to keep the account.
+    return { status: "error", message: t("profile.deleteFailed") };
   }
 
   try {
@@ -62,9 +60,11 @@ export async function deleteAccountAction(
    history without risking an endless retry on a failing remove. */
 async function removeFolder(supabase: Awaited<ReturnType<typeof createClient>>, bucket: string, userId: string) {
   for (let round = 0; round < 20; round += 1) {
-    const { data: files } = await supabase.storage.from(bucket).list(userId, { limit: 100 });
-    if (!files || files.length === 0) return;
+    const { data: files, error: listError } = await supabase.storage.from(bucket).list(userId, { limit: 100 });
+    if (listError || !files) return false;
+    if (files.length === 0) return true;
     const { error } = await supabase.storage.from(bucket).remove(files.map((file) => `${userId}/${file.name}`));
-    if (error) return;
+    if (error) return false;
   }
+  return false;
 }

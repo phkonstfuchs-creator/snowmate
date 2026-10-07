@@ -46,7 +46,7 @@ async function acceptInviteActionImpl(token: string): Promise<AcceptInviteResult
     if (error || !isInviteStatus(data) || data === "valid") return { ok: false, message: UNAVAILABLE };
     if (data === "accepted") {
       revalidateApp();
-      dispatchPushSoon();
+      await dispatchPushSoon(supabase);
     }
     return { ok: data === "accepted" || data === "already_friends", message: INVITE_MESSAGES[data] };
   } catch {

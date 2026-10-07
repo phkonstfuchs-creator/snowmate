@@ -422,7 +422,10 @@ enabled = true
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
 
-# Push notices (ADR 0025): called by the app after a write, without a
-# user token; it only empties the queue the database fills.
+# Push notices (ADR 0025): the app sends a user bearer token after a
+# successful write. The function verifies it with Auth, then drains only
+# that actor's notices through a session-checked service-role RPC.
+# Platform JWT verification stays off for publishable
+# keys and newer signing-key projects; authorization happens in the handler.
 [functions.push-dispatch]
 verify_jwt = false

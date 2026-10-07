@@ -18,12 +18,15 @@ export const RATE_RULES = {
   signupIp: { max: 6, windowMs: 60 * 60_000 },
   handleCheckIp: { max: 60, windowMs: 10 * 60_000 },
   passwordResetIp: { max: 5, windowMs: 60 * 60_000 },
+  passwordResetTarget: { max: 3, windowMs: 60 * 60_000 },
   mfaUser: { max: 10, windowMs: 15 * 60_000 },
   passwordChangeUser: { max: 5, windowMs: 60 * 60_000 },
+  mediaUploadUser: { max: 10, windowMs: 5 * 60_000 },
   /* Sign-up code from the email: per visitor and per address. */
   signupCodeIp: { max: 20, windowMs: 15 * 60_000 },
   signupCodeEmail: { max: 8, windowMs: 15 * 60_000 },
   signupResendIp: { max: 5, windowMs: 60 * 60_000 },
+  signupResendTarget: { max: 3, windowMs: 60 * 60_000 },
 } as const satisfies Record<string, RateRule>;
 
 export type RateBucket = keyof typeof RATE_RULES;

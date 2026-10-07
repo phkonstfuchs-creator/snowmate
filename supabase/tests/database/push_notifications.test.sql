@@ -13,6 +13,7 @@ update public.profiles
 set display_name = 'Pusher ' || right(id::text, 1), handle = 'push_' || right(id::text, 1),
     city = 'innsbruck', ability_level = 'chill', onboarding_completed = true
 where id::text like '9054b000-%';
+insert into auth.sessions (id, user_id) select id, id from auth.users where id::text like '9054b000-%';
 
 insert into public.friendships (requester_id, addressee_id, status) values
   ('9054b000-0000-4000-8000-000000000001', '9054b000-0000-4000-8000-000000000002', 'accepted'),
@@ -22,6 +23,7 @@ insert into public.friendships (requester_id, addressee_id, status) values
 -- Closed tables.
 set local role authenticated;
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000001"}';
 select throws_ok($$select * from public.push_subscriptions$$, '42501', null, 'subscriptions are not readable directly');
 select throws_ok($$select * from private.push_outbox$$, '42501', null, 'the queue is not readable');
 select throws_ok($$select * from public.push_take_outbox()$$, '42501', null, 'a client cannot take the queue');
@@ -39,11 +41,14 @@ select is((select count(*)::int from public.push_subscriptions where user_id = '
 set local role authenticated;
 
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000002"}';
 select is(public.save_push_subscription('https://updates.push.services.mozilla.com/wpush/v2/friend', repeat('C', 87), repeat('d', 22)), 'saved', 'my friend stores a device');
 select ok(not public.delete_push_subscription('https://web.push.apple.com/me-11'), 'nobody deletes someone else''s device');
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000003';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000003"}';
 select is(public.save_push_subscription('https://wns2-par02p.notify.windows.com/w/?token=x', repeat('E', 87), repeat('f', 22)), 'saved', 'a new contact stores a device');
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000004"}';
 select is(public.save_push_subscription('https://fcm.googleapis.com/fcm/send/blocked', repeat('G', 87), repeat('h', 22)), 'saved', 'a friend I will block stores a device');
 reset role;
 insert into public.blocks (blocker_id, blocked_id)
@@ -52,6 +57,7 @@ values ('9054b000-0000-4000-8000-000000000001', '9054b000-0000-4000-8000-0000000
 -- Notices.
 set local role authenticated;
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000001"}';
 select is(public.send_message(public.open_direct_chat('9054b000-0000-4000-8000-000000000002'), 'Erste Gondel um 8?'), 'sent', 'I write to my friend');
 select is(public.send_message(public.open_direct_chat('9054b000-0000-4000-8000-000000000002'), 'Oder 9?'), 'sent', 'and again');
 select is(public.send_message(public.open_direct_chat('9054b000-0000-4000-8000-000000000005'), 'Hi'), 'sent', 'and to a friend without a device');
@@ -79,6 +85,7 @@ select is((select count(*)::int from private.push_outbox), 0, 'taken notices lea
 -- Accepting tells the one who asked, not the one who accepted.
 set local role authenticated;
 set local request.jwt.claim.sub = '9054b000-0000-4000-8000-000000000003';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9054b000-0000-4000-8000-000000000003"}';
 select ok(public.accept_friendship('9054b000-0000-4000-8000-000000000001'), 'the new contact accepts');
 reset role;
 select is((select count(*)::int from private.push_outbox where kind = 'friend_accepted'), 1, 'one acceptance notice, to me');

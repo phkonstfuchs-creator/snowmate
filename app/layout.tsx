@@ -6,6 +6,7 @@ import "@fontsource/space-mono/700.css";
 import "./globals.css";
 import { getLocale } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
+import { connection } from "next/server";
 
 export const metadata: Metadata = {
   title: "Pistl",
@@ -27,6 +28,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /* Every document needs its request's CSP nonce. */
+  await connection();
   const locale = await getLocale();
 
   return (

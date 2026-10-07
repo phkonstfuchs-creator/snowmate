@@ -115,10 +115,15 @@ export default function DatenschutzPage() {
         Nur wenn du sie in den Einstellungen einschaltest, und nur für das Gerät, auf dem du das tust. Dann speichern
         wir die Push-Adresse, die dein Browser dafür erzeugt, und schicken über den Push-Dienst deines Browsers
         (Apple, Google, Mozilla oder Microsoft) kurze Hinweise: wer dir geschrieben, dich als Freund angefragt oder
-        deinen Ride betreffend etwas getan hat. Der Inhalt ist Ende-zu-Ende verschlüsselt, sodass der Push-Dienst ihn
+        deinen Ride betreffend etwas getan hat oder ein bestätigter Freund einen Lift-Treffpunkt gestartet hat.
+        Die Lift-Benachrichtigung nennt weder Lift noch Station, Koordinaten oder Ankunftszeit. Beim Beenden werden
+        noch nicht versandte Lift-Hinweise entfernt; vor dem Versand prüfen wir die Freundschaft und den Status erneut.
+        Der Inhalt ist Ende-zu-Ende verschlüsselt, sodass der Push-Dienst ihn
         nicht lesen kann, und enthält nie den Text einer Nachricht. Der Push-Dienst sieht nur, dass und wann eine
         Benachrichtigung an dein Gerät geht. Ausschalten kannst du sie jederzeit in Pistl oder in den
         Geräte-Einstellungen; wir löschen die Push-Adresse dann bzw. sobald der Push-Dienst sie für ungültig erklärt.
+        Das Push-Abo ist an deine Anmeldesitzung gebunden. Beim Abmelden entfernen wir es auf diesem Gerät;
+        nach Widerruf der Sitzung werden keine weiteren gespeicherten Hinweise dafür versandt.
         Rechtsgrundlage: deine Einwilligung, Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG.
       </p>
       <h3>Meldungen und Blockierungen</h3>
@@ -131,6 +136,10 @@ export default function DatenschutzPage() {
         Beim Aufruf verarbeiten unsere Dienstleister technisch notwendige Daten wie IP-Adresse, Zeitpunkt und
         aufgerufene Adresse (Server-Logs). Für die Begrenzung von Anmeldeversuchen merken wir uns IP-Adressen kurz im
         Arbeitsspeicher, für die Begrenzung von Schreibzugriffen den Zeitpunkt deiner Anfragen für zwei Minuten.
+        Für E-Mail- und Upload-Begrenzungen verwenden wir außerdem kurzzeitig einen Hash der Zieladresse bzw.
+        deine Konto-ID. Bilder werden auch auf dem Server neu kodiert, um eingebettete Metadaten wie GPS zu entfernen.
+        Für die Freigabe speichern wir eine technische Bestätigung zur Datei, ihrer Konto-ID und dem Zeitpunkt;
+        sie bleibt zum Schutz vor Wiederverwendung gelöschter Dateien bis zur Kontolöschung gespeichert und ist im Datenexport enthalten.
         Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Sicherheit und Missbrauchsschutz).
       </p>
 
@@ -139,7 +148,9 @@ export default function DatenschutzPage() {
         Pistl setzt nur technisch notwendige Cookies: die Anmeldesitzung, die gewählte Sprache und, während einer
         Registrierung, für höchstens eine Stunde die E-Mail-Adresse, an die der Bestätigungscode ging. Im Browser
         werden außerdem Antworten aus der Registrierung und ein offener Einladungslink zwischengespeichert. Es gibt
-        keine Analyse-, Werbe- oder Tracking-Cookies. Rechtsgrundlage: § 25 Abs. 2 Nr. 2 TDDDG.
+        keine Analyse-, Werbe- oder Tracking-Cookies. Die Anmelde-Cookies sind für Browser-Skripte nicht lesbar.
+        Ein laufender GPS-Track ist nur diesem Konto zugeordnet; beim Abmelden stoppen und löschen wir ihn
+        zusammen mit zwischengespeicherten Registrierungsantworten. Rechtsgrundlage: § 25 Abs. 2 Nr. 2 TDDDG.
       </p>
 
       <h2>5. Dienstleister (Auftragsverarbeiter)</h2>

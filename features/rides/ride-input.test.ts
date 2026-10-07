@@ -12,10 +12,11 @@ const valid = {
   caption: "  ",
   visibility: "friends",
 };
+const NOW = new Date("2027-01-08T08:00:00Z");
 
 describe("validateRideInput", () => {
   it("normalises a friends ride", () => {
-    expect(validateRideInput(valid)).toEqual({
+    expect(validateRideInput(valid, NOW)).toEqual({
       success: true,
       data: {
         resort: "Nordkette",
@@ -32,11 +33,11 @@ describe("validateRideInput", () => {
   });
 
   it("requires a name for a public event", () => {
-    expect(validateRideInput({ ...valid, visibility: "public" })).toEqual({
+    expect(validateRideInput({ ...valid, visibility: "public" }, NOW)).toEqual({
       success: false,
       message: "v.eventName",
     });
-    expect(validateRideInput({ ...valid, visibility: "public", title: "Park day" }).success).toBe(true);
+    expect(validateRideInput({ ...valid, visibility: "public", title: "Park day" }, NOW).success).toBe(true);
   });
 
   it.each([
@@ -46,6 +47,10 @@ describe("validateRideInput", () => {
     [{ totalSpots: 0 }, "v.minSpot"],
     [{ city: "wien" }, "v.pickRegion"],
   ])("rejects %j", (patch, message) => {
-    expect(validateRideInput({ ...valid, ...patch })).toEqual({ success: false, message });
+    expect(validateRideInput({ ...valid, ...patch }, NOW)).toEqual({ success: false, message });
+  });
+
+  it.each(["2027-01-07", "2028-01-09", "9999-01-01"])("refuses out-of-window date %s", (rideDate) => {
+    expect(validateRideInput({ ...valid, rideDate }, NOW)).toEqual({ success: false, message: "v.dateWithinYear" });
   });
 });

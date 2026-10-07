@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { deletePushSubscriptionAction, savePushSubscriptionAction } from "./actions";
+import { deletePushSubscriptionAction, isMyPushSubscriptionAction, savePushSubscriptionAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ rpc: mocks.rpc }) }));
@@ -30,5 +30,18 @@ describe("push subscription actions", () => {
     mocks.rpc.mockResolvedValue({ data: true, error: null });
     await expect(deletePushSubscriptionAction(subscription.endpoint)).resolves.toBe(true);
     expect(mocks.rpc).toHaveBeenCalledWith("delete_push_subscription", { p_endpoint: subscription.endpoint });
+    mocks.rpc.mockResolvedValueOnce({ data: false, error: null });
+    await expect(deletePushSubscriptionAction(subscription.endpoint)).resolves.toBe(false);
+  });
+
+  it("checks that an existing browser endpoint belongs to this session before showing push as on", async () => {
+    mocks.rpc.mockResolvedValueOnce({ data: true, error: null });
+    await expect(isMyPushSubscriptionAction(subscription.endpoint)).resolves.toBe(true);
+    expect(mocks.rpc).toHaveBeenCalledWith("is_my_push_subscription", { p_endpoint: subscription.endpoint });
+
+    mocks.rpc.mockResolvedValueOnce({ data: false, error: null });
+    await expect(isMyPushSubscriptionAction(subscription.endpoint)).resolves.toBe(false);
+    await expect(isMyPushSubscriptionAction("https://evil.example/x")).resolves.toBe(false);
+    expect(mocks.rpc).toHaveBeenCalledTimes(2);
   });
 });

@@ -58,7 +58,7 @@ const auth = {
   signInWithPassword: vi.fn(),
   signUp: vi.fn(),
   signOut: vi.fn(),
-  getClaims: vi.fn(),
+  getUser: vi.fn(),
   updateUser: vi.fn(),
   resetPasswordForEmail: vi.fn(),
   verifyOtp: vi.fn(),
@@ -98,6 +98,7 @@ describe("auth actions", () => {
     mocks.createClient.mockResolvedValue({ auth, rpc });
     rpc.mockResolvedValue({ data: true, error: null });
     auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: "aal1", nextLevel: "aal1" } });
+    auth.signOut.mockResolvedValue({ error: null });
   });
 
   it("does not call Supabase when login input is invalid", async () => {
@@ -343,11 +344,11 @@ describe("auth actions", () => {
   });
 
   it("changes the password only for a signed-in account and with a strong password", async () => {
-    auth.getClaims.mockResolvedValue({ data: null });
+    auth.getUser.mockResolvedValue({ data: { user: null } });
     const signedOut = await updatePasswordAction(initialAuthActionState, formData({ password: "Fresh-Powder-2026", confirmPassword: "Fresh-Powder-2026" }));
     expect(signedOut.message).toBe("Your session ended. Sign in again.");
 
-    auth.getClaims.mockResolvedValue({ data: { claims: { sub: "user-1" } } });
+    auth.getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
     const weak = await updatePasswordAction(initialAuthActionState, formData({ password: "short", confirmPassword: "short" }));
     expect(weak.status).toBe("error");
     expect(auth.updateUser).not.toHaveBeenCalled();
@@ -356,10 +357,46 @@ describe("auth actions", () => {
     const ok = await updatePasswordAction(initialAuthActionState, formData({ password: "Fresh-Powder-2026", confirmPassword: "Fresh-Powder-2026" }));
     expect(ok).toMatchObject({ status: "success", message: "Password changed." });
     expect(auth.updateUser).toHaveBeenCalledWith({ password: "Fresh-Powder-2026" });
+    expect(auth.signOut).toHaveBeenCalledWith({ scope: "others" });
+  });
+
+  it("handles a failed identity check without changing the password", async () => {
+    auth.getUser.mockRejectedValueOnce(new Error("auth unavailable"));
+    await expect(updatePasswordAction(initialAuthActionState, formData({
+      password: "Fresh-Powder-2026", confirmPassword: "Fresh-Powder-2026",
+    }))).resolves.toMatchObject({ status: "error" });
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+
+  it("does not open the app when the MFA factor lookup fails", async () => {
+    auth.getUser.mockResolvedValue({ data: { user: { id: "mfa-failure" } } });
+    auth.mfa.listFactors.mockResolvedValueOnce({ data: null, error: { message: "unavailable" } });
+    await expect(verifyLoginMfaAction(initialAuthActionState, formData({ code: "123456" })))
+      .resolves.toMatchObject({ status: "error" });
+    expect(auth.mfa.challengeAndVerify).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("keeps reset provider cooldowns indistinguishable from an unknown account", async () => {
+    auth.resetPasswordForEmail.mockResolvedValueOnce({ error: { code: "over_email_send_rate_limit" } });
+    const throttled = await requestPasswordResetAction(initialAuthActionState, formData({ email: "cooldown@example.com" }));
+    auth.resetPasswordForEmail.mockResolvedValueOnce({ error: { code: "user_not_found" } });
+    const unknown = await requestPasswordResetAction(initialAuthActionState, formData({ email: "missing-cooldown@example.com" }));
+    expect(throttled.status).toBe("success");
+    expect(throttled.message).toBe(unknown.message);
+  });
+
+  it("limits reset email delivery across different visitors without revealing the limit", async () => {
+    auth.resetPasswordForEmail.mockResolvedValue({ error: null });
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const result = await requestPasswordResetAction(initialAuthActionState, formData({ email: "mail-quota@example.com" }));
+      expect(result.status).toBe("success");
+    }
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledTimes(3);
   });
 
   it("verifies the second factor before opening the app", async () => {
-    auth.getClaims.mockResolvedValue({ data: { claims: { sub: "user-2" } } });
+    auth.getUser.mockResolvedValue({ data: { user: { id: "user-2" } } });
     auth.mfa.listFactors.mockResolvedValue({ data: { totp: [{ id: "factor-1", status: "verified" }] } });
 
     expect((await verifyLoginMfaAction(initialAuthActionState, formData({ code: "12" }))).message)

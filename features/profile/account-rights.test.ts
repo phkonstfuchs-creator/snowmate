@@ -23,7 +23,11 @@ const form = (confirmation?: string) => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.createClient.mockResolvedValue({ rpc: mocks.rpc, auth: { signOut: mocks.signOut } });
+  mocks.createClient.mockResolvedValue({
+    rpc: mocks.rpc,
+    auth: { signOut: mocks.signOut, getUser: async () => ({ data: { user: { id: "u-1" } }, error: null }) },
+    storage: { from: () => ({ list: async () => ({ data: [], error: null }) }) },
+  });
 });
 
 describe("exportMyDataResponse", () => {
@@ -62,7 +66,7 @@ describe("deleteAccountAction", () => {
     const remove = vi.fn();
     mocks.createClient.mockResolvedValue({
       rpc: mocks.rpc,
-      auth: { signOut: mocks.signOut, getClaims: async () => ({ data: { claims: { sub: "u-1" } } }) },
+      auth: { signOut: mocks.signOut, getUser: async () => ({ data: { user: { id: "u-1" } }, error: null }) },
       storage: {
         from: (bucket: string) => ({
           list: (folder: string) => {

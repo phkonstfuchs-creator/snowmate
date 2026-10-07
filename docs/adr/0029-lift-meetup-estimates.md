@@ -23,3 +23,5 @@ Use option 2. The database computes the arrival estimate from a trusted lift dur
 - The estimate may be inaccurate, especially when a lift is closed or the queue changes. The UI labels it as an estimate.
 - Reference lifts must be refreshed deliberately when OSM changes; no person's location is sent to OSM or a routing provider.
 - Block and friendship changes take effect on the next read without waiting for expiry.
+- A generic Web Push notice is queued for subscribed confirmed friends on start or replacement. It carries only the event kind, sender name, and map URL. Stop withdraws pending notices; dispatch checks the current status, age, friendship, block, and expiry again before sending.
+- The map offers direct lift selection and a fixture-only demo, so the estimate can be tried without granting location access or creating an account.

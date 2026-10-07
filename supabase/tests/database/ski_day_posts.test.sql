@@ -20,6 +20,11 @@ insert into public.friendships (requester_id, addressee_id, status) values
   ('9057a000-0000-4000-8000-000000000001', '9057a000-0000-4000-8000-000000000005', 'accepted');
 insert into public.blocks (blocker_id, blocked_id)
 values ('9057a000-0000-4000-8000-000000000005', '9057a000-0000-4000-8000-000000000001');
+insert into storage.objects (bucket_id, name)
+values ('post-photos', '9057a000-0000-4000-8000-000000000001/a.webp');
+insert into private.media_attestations (object_id, owner_id, bucket_id, name, key_id, issued_at)
+select o.id, '9057a000-0000-4000-8000-000000000001', o.bucket_id, o.name, 'v1', now()
+from storage.objects o where o.name = '9057a000-0000-4000-8000-000000000001/a.webp';
 
 -- Closed table.
 set local role authenticated;
