@@ -61,13 +61,12 @@ export default function LizenzenPage() {
 
       <h2>Schriften</h2>
       <ul>
-        <li>Hanken Grotesk, Hanken Design Co.</li>
-        <li>Jost, indestructible type*</li>
+        <li>Hanken Grotesk, Hanken Design Co. (Logo)</li>
         <li>Space Mono, Colophon Foundry</li>
       </ul>
       <p>
         Alle unter der <A href="https://openfontlicense.org">SIL Open Font License 1.1</A>, ausgeliefert über{" "}
-        <A href="https://fontsource.org">Fontsource</A>.
+        <A href="https://fontsource.org">Fontsource</A>. Alle anderen Texte nutzen die Systemschrift des Geräts; sie wird nicht mit der App ausgeliefert.
       </p>
 
       <h2>Symbole</h2>

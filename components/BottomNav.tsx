@@ -57,7 +57,7 @@ export default function BottomNav({
             <Link
               key={tab.href}
               href={href}
-              className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-3 min-h-[56px] transition-colors duration-150"
+              className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-2 min-h-[52px] transition-colors duration-150"
               style={{ color: isActive ? "var(--rust)" : "var(--ink-2)" }}
               aria-current={isActive ? "page" : undefined}
               aria-label={badge > 0 ? t("nav.waiting", { label: t(tab.label), n: badge }) : undefined}
@@ -76,16 +76,10 @@ export default function BottomNav({
               )}
               <span className={clsx(
                 "text-[0.6875rem] leading-none",
-                isActive ? "font-black" : "font-bold"
+                isActive ? "font-semibold" : "font-medium"
               )}>
                 {t(tab.label)}
               </span>
-              {isActive && (
-                <span
-                  className="absolute inset-x-0 top-0"
-                  style={{ height: 3, background: "var(--rust)" }}
-                />
-              )}
             </Link>
           );
         })}

@@ -387,7 +387,7 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("carpool.title")}</h1>
+            <h1 className="large-title" style={{ color: INK }}>{t("carpool.title")}</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{t("carpool.subtitle")}</p>
           </div>
           <button

@@ -11,8 +11,10 @@
    ──────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light;
-  --font-display: "Hanken Grotesk Variable";
-  --font-body: "Hanken Grotesk Variable";
+  /* The phone's own typeface (San Francisco on iPhone, Roboto on
+     Android). Only referenced by name, never shipped with the app. */
+  --font-display: -apple-system;
+  --font-body: -apple-system;
   --font-mono: "Space Mono";
 
   /* Surfaces, Apple-style grouped: a light canvas, white cards that
@@ -120,12 +122,11 @@
      often stays under 300ms. */
   --duration-celebrate: 700ms;
 
-  /* Typography — three voices.
-     Jost (geometric, Futura heritage) for poster headlines,
-     Hanken Grotesk for body text, Space Mono for all numbers. */
-  --font-display-stack: var(--font-display), "Futura", "Century Gothic", sans-serif;
+  /* Typography: the system face for everything; Space Mono only for
+     codes and handles. */
+  --font-display-stack: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", monospace;
-  --font-body-stack: var(--font-body), -apple-system, "Segoe UI", sans-serif;
+  --font-body-stack: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --text-display-hero: 650 48px / 1.02 var(--font-display-stack);
   --text-display-lg: 650 34px / 1.06 var(--font-display-stack);
@@ -186,6 +187,10 @@
      The mono face is kept for small labels (.text-mono-label). */
   --font-mono: var(--font-body-stack);
   --font-sans: var(--font-body-stack);
+  /* The system face runs heavy: iOS uses semibold and bold, not black.
+     Older screens ask for black/extrabold; they get bold. */
+  --font-weight-extrabold: 700;
+  --font-weight-black: 700;
 }
 
 /* ─── Reset ──────────────────────────────────────────────────── */
@@ -254,7 +259,7 @@ body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 84px;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -288,23 +293,31 @@ body {
 }
 
 /* ─── Bottom navigation — printed footer bar ────────────────── */
-.bottom-nav a:active { background: var(--paper-2); }
 .bottom-nav {
   position: fixed;
-  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
-  background: rgba(255, 255, 255, 0.92);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border-top: 0.5px solid var(--paper-3);
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  width: calc(100% - 24px);
+  max-width: 406px;
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-radius: 28px;
+  box-shadow: 0 8px 28px rgba(32, 45, 39, 0.16), 0 0 0 0.5px rgba(32, 45, 39, 0.08);
   z-index: var(--z-sticky);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding: 4px;
 }
+.bottom-nav a { border-radius: 24px; }
+.bottom-nav a:active { background: var(--paper-2); }
+.bottom-nav a[aria-current="page"] { background: var(--accent-primary-subtle); }
 
 /* ─── Typography helpers ────────────────────────────────────── */
+/* Screen titles as iOS large titles: big, bold, tight. */
+.large-title { font: 700 2.125rem / 1.1 var(--font-display-stack); letter-spacing: -0.025em; }
+/* Long German words ("Datenschutzerklärung") break instead of pushing
+   the page sideways on small phones. */
+h1, h2, .large-title, .text-display-hero, .text-display-lg, .text-display-md { overflow-wrap: break-word; hyphens: auto; }
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }
 .text-display-hero { font: var(--text-display-hero); letter-spacing: var(--tracking-display); }

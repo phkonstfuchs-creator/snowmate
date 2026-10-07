@@ -44,7 +44,7 @@ function TrackingBar({ tracker }: { tracker: SkiDayTracker }) {
     <Link
       href="/map"
       className="tracking-bar fixed left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 px-4 text-sm font-semibold"
-      style={{ bottom: "calc(74px + env(safe-area-inset-bottom, 0px))", whiteSpace: "nowrap", minHeight: 40, background: "var(--ink-0)", color: "var(--paper-0)", borderRadius: 999 }}
+      style={{ bottom: "calc(82px + env(safe-area-inset-bottom, 0px))", whiteSpace: "nowrap", minHeight: 40, background: "var(--ink-0)", color: "var(--paper-0)", borderRadius: 999 }}
     >
       <span className="pulse-dot" style={{ width: 7, height: 7 }} aria-hidden />
       {t("track.running")} · {formatDuration(now - state.startedAt)} · {formatKm(state.distanceM, INTL_LOCALE[locale])} km

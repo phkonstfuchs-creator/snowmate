@@ -357,7 +357,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
     <>
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="px-4 pt-4 pb-3">
-          <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>
+          <h1 className="large-title" style={{ color: INK }}>
             {t("events.title")}
           </h1>
           <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>

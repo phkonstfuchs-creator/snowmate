@@ -340,7 +340,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>{t("map.title")}</h1>
+            <h1 className="large-title" style={{ color: INK }}>{t("map.title")}</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
               {t("map.summary", { n: totalRiders, riding: isLive ? t("map.ridingToday") : t("map.ridingNow"), resorts: resorts.length })}
             </p>

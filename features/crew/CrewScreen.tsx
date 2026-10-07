@@ -39,7 +39,7 @@ export default function CrewScreen() {
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Crew</h1>
+            <h1 className="large-title" style={{ color: INK }}>Crew</h1>
             <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>{myFriends.length} friends · {CREWS.length} squads</p>
           </div>
           <Link

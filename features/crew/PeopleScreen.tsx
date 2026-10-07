@@ -186,7 +186,7 @@ export default function PeopleScreen() {
             <Icon name="arrow-left" size={18} color={INK} strokeWidth={2} />
           </Link>
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>
+            <h1 className="large-title" style={{ color: INK }}>
               People
             </h1>
             <p className="mt-0.5 text-xs font-semibold" style={{ color: INK_2 }}>
