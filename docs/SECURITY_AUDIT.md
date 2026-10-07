@@ -30,7 +30,7 @@ Supabase Edge runtime, never in app browser code.
 |---|---|---|
 | High | Authenticated JWTs could outlive revocation at Data API and Storage boundaries | Match `auth.sessions`; fail closed for absent/revoked session; restrictive Storage session/MFA policy. `session_revocation`, `storage_session_gate` |
 | High | Storage audience access included old/orphan files in another account's permitted folder | Only the current avatar and photos attached to visible posts can be read. `security_hardening` |
-| High | Authorized direct Storage uploads/downloads could bypass metadata removal and share originals with embedded location | Private HMAC certificates after server re-encoding; friend reads/new references require attestation; immutable object id/path/version also covers Storage's privileged upload completion. `media_attestation`, server upload tests; HTTP integration prepared for CI |
+| High | Authorized direct Storage uploads/downloads could bypass metadata removal and share originals with embedded location | Private HMAC certificates after server re-encoding; friend reads/new references require attestation; immutable object id/path/version also covers Storage's privileged upload completion. `media_attestation`, server upload tests and a real two-account Storage HTTP journey in CI |
 | High | Upload actions trusted client metadata stripping; malformed/header-only files passed the old boundary | Shared Sharp decoder, 16 MP bound, WebP re-encoding, EXIF removal, byte limits and pre-decode quota. Real JPEG/EXIF and truncated/oversized file tests |
 | High | A shared browser could restore another account's GPS recording | Account-bound storage envelope, discard legacy/foreign data, stop watches on switch/logout. Tracking and logout tests |
 | Medium | Another account could claim a known browser push endpoint | Conflict updates require the existing owner; session-bound opt-in; settings do not silently resubscribe. `security_hardening`, `push_session_binding` |
@@ -102,7 +102,8 @@ Negative pgTAP tests cover privileged version updates on both raw and certified
 objects. The inspected [official uploader source](https://github.com/supabase/storage/blob/master/src/storage/uploader.ts)
 and [S3 adapter](https://github.com/supabase/storage/blob/master/src/storage/backend/s3/adapter.ts)
 explain this path; the exact hosted image version is not verified by reviewing
-upstream `master`. Actual HTTP upload and overwrite tests remain a rollout gate.
+upstream `master`. Actual HTTP upload and overwrite tests passed against CI's
+local Supabase stack; repeat them against the deployed version before rollout.
 
 ## Verification
 
@@ -120,13 +121,18 @@ Evidence is from the isolated worktree, not from an asserted production rollout.
 - Website lint, 19 Node tests and production build run locally.
 - Deno 2.9.6 `deno check supabase/functions/push-dispatch/index.ts` succeeds.
 
-The full Docker Supabase integration/auth lifecycle and actual Web Push
-delivery are not replaced by the PostgreSQL shim or browser mock data.
-CI retains those integration checks and adds a real two-account media HTTP
-journey (raw upload denial, clean app upload, friend access and overwrite denial).
+The [Docker Supabase CI run](https://github.com/phkonstfuchs-creator/snowmate/actions/runs/37595080939)
+also applied all migrations and passed 36 pgTAP files / 644 assertions and the
+12-rider race. Its Auth signup/confirmation/logout/login journey and real
+two-account Storage HTTP journey passed: raw uploads remain private, clean app
+uploads are readable by friends, and overwrites are denied. That run exposed
+a separate nonce assertion failure under Next's development server; the full
+production browser gate must pass before acceptance. CI rebuilds with its
+local Supabase values to exercise the production server.
+
 The disposable local media signing key is read from the test DB and masked;
-production credentials are never needed by CI. Do not describe them as locally passed
-when Docker/provider test credentials are unavailable.
+production credentials are never needed by CI. These results do not establish
+hosted provider settings or actual Web Push delivery; both remain rollout checks.
 
 ## Required operational decisions
 
@@ -171,7 +177,7 @@ can accept the changes against evidence and separately authorize deployment.
 | Risk | Current state | Next action |
 |---|---|---|
 | Critical | No confirmed production credential leak/backdoor was found. The NULL proof bypass occurred in new unreleased code and is corrected | Do not claim the scan covers ignored secrets, unreachable history or private hosting values |
-| High | Reproduced session/media/account-local privacy defects are patched on this branch; production has not been changed by the audit | Complete real Supabase HTTP integration and an approved database/key/Edge/app rollout; verify denied access with two accounts |
+| High | Reproduced session/media/account-local privacy defects are patched on this branch; production has not been changed by the audit | Complete the production browser gate and approve a database/key/Edge/app rollout; repeat denied-access checks against the deployed stack with two accounts |
 | Medium | Push consent/queue, logout/MFA failure paths, image caching, CSP and deletion/invite defects are patched locally | Test actual push delivery, blocking/logout and account export/deletion in the deployed test environment |
 | Low | URL/date validation and duplicated image/date/header rules are corrected | Maintain existing checks and the documented boundaries |
 | Open dependency | One upstream development-only advisory remains, reported as five high package nodes; runtime audits are clean | Track a compatible upstream patch; keep lint rules and framework version, avoid downgrading to hide it |

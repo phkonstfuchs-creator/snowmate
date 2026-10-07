@@ -9,17 +9,21 @@ test("request CSP nonce cannot be supplied by a visitor and client UI hydrates",
   const nonce = /'nonce-([A-Za-z0-9+/=]+)'/u.exec(policy)?.[1];
   expect(nonce).toBeTruthy();
   expect(policy).not.toContain("attacker-chosen-nonce");
-  expect(policy.split(";").find((part) => part.trim().startsWith("script-src"))).not.toContain("'unsafe-inline'");
+  const scriptSource = policy.split(";").find((part) => part.trim().startsWith("script-src"));
+  expect(scriptSource).not.toContain("'unsafe-inline'");
+  expect(scriptSource).not.toContain("'unsafe-eval'");
   expect(response?.headers()["cache-control"]).toContain("no-store");
 
   const scriptNonces = await page.locator("script").evaluateAll((scripts) => scripts.map((element) => {
     const script = element as HTMLScriptElement;
-    return { nonce: script.nonce, src: script.src };
+    return { nonce: script.nonce, src: script.src, id: script.id, type: script.type, attributes: [...script.attributes].map((attribute) => attribute.name) };
   }));
   expect(scriptNonces.length).toBeGreaterThan(0);
   // Next injects additional external chunks after hydration. strict-dynamic
   // allows trusted scripts to load them without copying the nonce.
-  expect(scriptNonces.filter((script) => !script.src).every((script) => script.nonce === nonce)).toBe(true);
+  expect(scriptNonces.filter((script) => !script.src).every((script) => script.nonce === nonce),
+    `Inline scripts without the response nonce: ${JSON.stringify(scriptNonces.filter((script) => !script.src && script.nonce !== nonce))}`)
+    .toBe(true);
   expect(scriptNonces.some((script) => script.nonce === nonce)).toBe(true);
 
   const tryout = page.getByRole("region", { name: "Try the lift meetup" });

@@ -143,14 +143,16 @@ jobs:
           {
             printf 'NEXT_PUBLIC_SUPABASE_URL=%s\n' "$api_url"
             printf 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$public_key"
-            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://localhost:3000"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://127.0.0.1:3000"
             printf 'MAILPIT_URL=%s\n' "$mailpit_url"
             printf 'LOCAL_SUPABASE_E2E=%s\n' "1"
             printf 'MEDIA_ATTESTATION_KEY_ID=%s\n' "v1"
             printf 'MEDIA_ATTESTATION_KEY=%s\n' "$media_key"
           } >> "$GITHUB_ENV"
+      - name: Build app with local Supabase configuration
+        run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: PISTL_E2E_PRODUCTION=1 npm run test:e2e
       - if: always()
         continue-on-error: true
         run: npx supabase stop --no-backup
