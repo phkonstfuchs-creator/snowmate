@@ -46,3 +46,41 @@ export async function isMyPushSubscriptionAction(endpoint: string): Promise<bool
     return false;
   }
 }
+
+const APNS_TOKEN = /^[0-9a-f]{64,200}$/u;
+
+/* The store apps' iPhone token (ADR 0031), bound to this session like a
+   web subscription. */
+export async function saveNativePushTokenAction(token: unknown): Promise<PushSaveOutcome> {
+  if (typeof token !== "string" || !APNS_TOKEN.test(token.toLowerCase())) return "invalid";
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("save_native_push_token", { p_token: token.toLowerCase(), p_platform: "ios" });
+    if (error) return "unavailable";
+    return data === "saved" || data === "invalid" || data === "unauthenticated" ? data : "unavailable";
+  } catch {
+    return "unavailable";
+  }
+}
+
+export async function deleteNativePushTokenAction(token: unknown): Promise<boolean> {
+  if (typeof token !== "string" || !APNS_TOKEN.test(token.toLowerCase())) return false;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("delete_native_push_token", { p_token: token.toLowerCase() });
+    return !error && data === true;
+  } catch {
+    return false;
+  }
+}
+
+export async function isMyNativePushTokenAction(token: unknown): Promise<boolean> {
+  if (typeof token !== "string" || !APNS_TOKEN.test(token.toLowerCase())) return false;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("is_my_native_push_token", { p_token: token.toLowerCase() });
+    return !error && data === true;
+  } catch {
+    return false;
+  }
+}

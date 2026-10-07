@@ -36,6 +36,11 @@ In Xcode:
 2. Pick your iPhone as the run target and press Run.
 3. For TestFlight: **Product**, then **Archive**, then **Distribute App**.
 
+Push needs the APNs key in the Supabase secrets (see
+[DEVELOPMENT.md](../docs/DEVELOPMENT.md)). Builds started from Xcode talk
+to Apple's sandbox: set `APNS_HOST=api.sandbox.push.apple.com` while
+testing them, and remove it again before TestFlight.
+
 Android: `npx cap open android`, wait for Gradle, then Run.
 
 ## After changing icons or the config

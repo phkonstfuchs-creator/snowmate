@@ -1,0 +1,9 @@
+/* Push notices (ADR 0025, 0031). Same sentences as public/sw.js. */
+"push.message" = "%@ sent you a message";
+"push.friend_request" = "%@ wants to be friends";
+"push.friend_accepted" = "%@ is now in your crew";
+"push.ride_request" = "%@ asked to join your ride";
+"push.ride_joined" = "%@ joined your ride";
+"push.ride_accepted" = "%@ let you into the ride";
+"push.lift_meetup" = "%@ is taking a lift. See the meetup on the map";
+"push.fallback" = "Something new in your crew";

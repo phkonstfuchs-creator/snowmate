@@ -1,0 +1,9 @@
+/* Push-Hinweise (ADR 0025, 0031). Dieselben Sätze wie public/sw.js. */
+"push.message" = "%@ hat dir geschrieben";
+"push.friend_request" = "%@ möchte mit dir befreundet sein";
+"push.friend_accepted" = "%@ ist jetzt in deiner Crew";
+"push.ride_request" = "%@ möchte bei deinem Ride mitfahren";
+"push.ride_joined" = "%@ fährt bei deinem Ride mit";
+"push.ride_accepted" = "%@ hat dich in den Ride gelassen";
+"push.lift_meetup" = "%@ fährt gerade Lift. Treffpunkt auf der Karte ansehen";
+"push.fallback" = "Neues in deiner Crew";

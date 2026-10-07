@@ -2,8 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n/client";
-import { deletePushSubscriptionAction, isMyPushSubscriptionAction, savePushSubscriptionAction } from "./actions";
+import {
+  deleteNativePushTokenAction,
+  deletePushSubscriptionAction,
+  isMyNativePushTokenAction,
+  isMyPushSubscriptionAction,
+  saveNativePushTokenAction,
+  savePushSubscriptionAction,
+} from "./actions";
 import { applicationServerKey } from "./push-subscription";
+import {
+  askNativePermission,
+  hasNativePush,
+  nativePermission,
+  registerNativePush,
+  rememberNativeToken,
+  storedNativeToken,
+  unregisterNativePush,
+} from "./native-push";
 
 type PushState = "checking" | "unsupported" | "install" | "denied" | "off" | "on" | "busy";
 
@@ -22,16 +38,45 @@ async function registration() {
   return navigator.serviceWorker.register("/sw.js", { scope: "/" });
 }
 
+/* The iPhone app's push (ADR 0031): same switch, native token. */
+async function checkNative(): Promise<PushState> {
+  if ((await nativePermission()) === "denied") return "denied";
+  const token = storedNativeToken();
+  if (token && (await isMyNativePushTokenAction(token).catch(() => false))) return "on";
+  return "off";
+}
+
+async function turnOnNative(): Promise<PushState | "failed"> {
+  const permission = await askNativePermission();
+  if (permission !== "granted") return permission === "denied" ? "denied" : "off";
+  const token = await registerNativePush();
+  if (!token || (await saveNativePushTokenAction(token)) !== "saved") return "failed";
+  rememberNativeToken(token);
+  return "on";
+}
+
+async function turnOffNative(): Promise<void> {
+  const token = storedNativeToken();
+  if (token) await deleteNativePushTokenAction(token);
+  await unregisterNativePush();
+  rememberNativeToken(null);
+}
+
 /* Opt-in push notices for this device (ADR 0025). Off until the person
    switches it on; the browser asks for permission at that moment. */
 export default function PushSettings() {
   const t = useT();
   const [state, setState] = useState<PushState>("checking");
   const [failed, setFailed] = useState(false);
+  const [native, setNative] = useState(false);
 
   useEffect(() => {
     let active = true;
     const check = async (): Promise<PushState> => {
+      if (hasNativePush()) {
+        if (active) setNative(true);
+        return checkNative();
+      }
       if (!VAPID_PUBLIC_KEY) return "unsupported";
       if (!supported()) return needsInstall() ? "install" : "unsupported";
       if (Notification.permission === "denied") return "denied";
@@ -53,12 +98,22 @@ export default function PushSettings() {
     };
   }, []);
 
-  if (!VAPID_PUBLIC_KEY) return null;
+  if (!VAPID_PUBLIC_KEY && !native) return null;
 
   const turnOn = async () => {
     setFailed(false);
     setState("busy");
     try {
+      if (native) {
+        const next = await turnOnNative();
+        if (next === "failed") {
+          setFailed(true);
+          setState("off");
+        } else {
+          setState(next);
+        }
+        return;
+      }
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setState(permission === "denied" ? "denied" : "off");
@@ -86,6 +141,11 @@ export default function PushSettings() {
     setFailed(false);
     setState("busy");
     try {
+      if (native) {
+        await turnOffNative();
+        setState("off");
+        return;
+      }
       const subscription = await (await registration()).pushManager.getSubscription();
       if (subscription) {
         await deletePushSubscriptionAction(subscription.endpoint);

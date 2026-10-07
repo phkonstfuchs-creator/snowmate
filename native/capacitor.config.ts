@@ -40,6 +40,10 @@ const config: CapacitorConfig = {
       resize: "native",
       resizeOnFullScreen: true,
     },
+    PushNotifications: {
+      /* Show notices while the app is open too, like other apps do. */
+      presentationOptions: ["badge", "sound", "alert"],
+    },
     StatusBar: {
       style: "LIGHT",
       backgroundColor: "#f6f7f4",

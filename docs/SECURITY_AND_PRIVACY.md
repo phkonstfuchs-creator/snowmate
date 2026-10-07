@@ -193,6 +193,15 @@ location announcements; revoked sessions receive no further queued push.
 Existing unbound devices must opt in again. See
 [ADR 0025](adr/0025-push-notifications.md).
 
+In the iPhone app (ADR 0031) the same switch registers an APNs device
+token in `native_push_tokens` instead: same opt-in, same session binding,
+same 10-device limit, same outbox and checks, listed in the export without
+the token. A phone whose owner's session has ended can be registered by the
+next account that signs in on it; a live one cannot be taken over. The
+notice names only a sentence key and the sender's name; iOS words it in the
+phone's language from the app's `Localizable.strings`. The Apple signing
+key (`APNS_KEY`) lives only in the Supabase function secrets.
+
 ## Live location
 
 Opt-in, for 1, 4 or 12 hours, ends by itself or on Stop. Only confirmed
