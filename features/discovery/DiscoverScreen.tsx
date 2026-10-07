@@ -73,7 +73,7 @@ export default function DiscoverScreen({
       <header className="sticky top-0 z-50" style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <div className="min-w-0 flex-1">
-            <h1 className="font-display" style={{ color: "var(--ink-0)", fontSize: 24, fontWeight: 800 }}>{t("discover.title")}</h1>
+            <h1 className="large-title" style={{ color: "var(--ink-0)" }}>{t("discover.title")}</h1>
             <p className="text-xs font-semibold" style={{ color: "var(--ink-2)" }}>{isMinor ? t("discover.subtitleMinor") : t("discover.subtitleAdult")}</p>
           </div>
         </div>

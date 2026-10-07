@@ -33,18 +33,19 @@ export function useTracking(): SkiDayTracker | null {
 }
 
 /* While a day runs and the map is not open: one quiet line above the
-   tab bar that leads back to it. */
+   tab bar that leads back to it. Not in a chat thread, where the
+   message box takes that place. */
 function TrackingBar({ tracker }: { tracker: SkiDayTracker }) {
   const t = useT();
   const locale = useLocale();
   const pathname = usePathname();
   const { state, now } = tracker;
-  if (!state || pathname.startsWith("/map")) return null;
+  if (!state || pathname.startsWith("/map") || pathname.startsWith("/crew/chat/")) return null;
   return (
     <Link
       href="/map"
       className="tracking-bar fixed left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 px-4 text-sm font-semibold"
-      style={{ bottom: "calc(74px + env(safe-area-inset-bottom, 0px))", whiteSpace: "nowrap", minHeight: 40, background: "var(--ink-0)", color: "var(--paper-0)", borderRadius: 999 }}
+      style={{ bottom: "calc(82px + env(safe-area-inset-bottom, 0px))", whiteSpace: "nowrap", minHeight: 40, background: "var(--ink-0)", color: "var(--paper-0)", borderRadius: 999 }}
     >
       <span className="pulse-dot" style={{ width: 7, height: 7 }} aria-hidden />
       {t("track.running")} · {formatDuration(now - state.startedAt)} · {formatKm(state.distanceM, INTL_LOCALE[locale])} km

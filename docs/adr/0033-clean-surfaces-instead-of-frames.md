@@ -78,3 +78,37 @@ Option 3.
   else used it.
 - Contrast was re-checked: muted text (5.6:1) and placeholders (4.8:1)
   pass AA on canvas and fill, and white on the accent is 7:1.
+
+## Step 2 (2026-10-07)
+
+The owner judged step 1 better, but still too close to the old look. The
+owner's condition for going further: no copyright problems. Step 2 makes
+the app feel native on the phone.
+
+**Type**
+- All text uses the phone's own typeface: San Francisco on iPhone,
+  Roboto on Android.
+- It is only named in the CSS font stack (`-apple-system, system-ui,
+  …`). No Apple font file is shipped, so Apple's font licence is not
+  touched.
+- Hanken Grotesk stays only for the logo, as on the website.
+- Jost was unused and is removed with its package. The licence page
+  says this.
+
+**Titles and weights**
+- Screen titles are iOS-style large titles (`.large-title`, 34 px
+  bold).
+- The black and extrabold weights map to bold, because the system face
+  runs heavy.
+
+**Tab bar**
+- A floating, blurred bar with rounded ends replaces the edge-to-edge
+  bar with a top line and active stripe.
+- The active tab sits on a soft accent pill.
+- The chat composer and the tracking bar sit above it.
+- These are design patterns, not protected assets. The icons stay
+  Lucide (ISC licence).
+
+**Photos**
+- Photos on feed cards were left out. Freely licensed photos need their
+  credit next to them, and the cards have no room for it.

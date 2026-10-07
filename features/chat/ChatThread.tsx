@@ -187,8 +187,9 @@ export default function ChatThread({
       </ol>
 
       <form
-        className="sticky bottom-[84px] px-3 py-2"
-        style={{ background: PAPER, borderTop: "var(--rule-thin)" }}
+        className="sticky px-3 py-2"
+        /* Sits just above the floating tab bar. */
+        style={{ bottom: "calc(80px + env(safe-area-inset-bottom, 0px))", background: PAPER, borderTop: "var(--rule-thin)" }}
         onSubmit={(event) => {
           event.preventDefault();
           void send();
