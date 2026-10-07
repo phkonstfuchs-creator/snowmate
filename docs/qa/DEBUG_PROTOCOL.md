@@ -59,3 +59,65 @@ accounts, check:
 | Medium | `/demo/crew`, `/demo/people`, demo profile blocks | Demo-only screens are English only | planned in the copy pass (Step 3) | — |
 | Low | map | Tile attribution links are 13 px tall (MapLibre default) | kept: the attribution must stay visible and small | — |
 | Info | all | 0 page errors, 0 horizontal scrolling, 0 serious axe violations on 15 routes × 3 sizes × 2 modes | — | sweep |
+
+## Signed-in browser journeys (2026-10-07)
+
+`tests/e2e/signed-in-journeys.spec.ts` automates seven browser journeys
+from section 3: invite-link friendship, ride join/leave persistence,
+bidirectional persistent chat, friends-only text posts (with stranger C),
+word-filter rejection without saving, two-way blocking, and session
+revocation on a second device with a copied session and independent cookies.
+All contexts use iPhone 13 dimensions and German UI. Accounts are registered
+through `supabase.auth.signUp`, confirmed with the local Mailpit code, and
+signed into the app through its UI. There are no seeded accounts or
+administrative keys. Worker accounts are reused within the file to respect
+unchanged Auth limits; the logout journey gets its own account.
+
+These journeys run only when `LOCAL_SUPABASE_E2E=1`. CI's existing
+`integration` job already starts the stack, supplies the local public key
+and Mailpit URL, builds the production app, and runs the complete E2E suite.
+The remaining native/manual checks in section 3 (locked-phone tracking,
+location, push, flight mode, permission prompts and layout) still require
+separate verification; the seven tests do not replace those checks.
+
+To run locally with Docker available, in a disposable local stack:
+
+```bash
+npm ci
+npm run lint
+npm run typecheck
+npm run test:coverage
+npm run build
+npx supabase start
+```
+
+Supply `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+(or the local anonymous key), `NEXT_PUBLIC_SITE_URL` and `MAILPIT_URL`
+from local configuration. Read only the public key and Mailpit/API fields
+from `npx supabase status -o env`; never put a service-role key into the
+app or tests. Use the same app origin for the site URL and Playwright
+(e.g. `http://127.0.0.1:3103` below). For the full existing E2E suite, also
+configure the local media attestation key as described in DEVELOPMENT.md
+and the integration job. Then rebuild for the local stack and run:
+
+```bash
+npm run build
+LOCAL_SUPABASE_E2E=1 PISTL_E2E_PRODUCTION=1 PISTL_E2E_PORT=3103 \
+  node --env-file=.env.local node_modules/@playwright/test/cli.js test \
+  tests/e2e/signed-in-journeys.spec.ts --workers=1
+```
+
+### Findings / verification
+
+| Severity | Where | Finding | Fix | Test |
+|---|---|---|---|---|
+| Medium | session expiry / Server Actions | After logout on another device, the next write was rejected but shown as a generic network failure. The proxy's 307 forwarded the action POST to `/login`, whose response the action client could not consume | `lib/supabase/proxy.ts`: denied action POSTs use Next's 303 + `x-action-redirect` protocol without a Location header; ordinary redirects, Auth/MFA checks, session cookies and cache headers stay intact | Regression first failed in the browser; two new unit assertions failed before the fix. All eight proxy tests and the real-session logout journey pass after it |
+| Info | signed-in browser journeys | Seven real-account journeys have reload and negative-access assertions; no account seed or administrative key | `tests/e2e/signed-in-fixtures.ts`, `tests/e2e/signed-in-journeys.spec.ts` | Full local production E2E suite: **17 passed**, including all seven new journeys, against Docker Desktop + local Supabase; no retries or skips |
+| Info | verification gates | All required checks pass | Existing lint rules, test thresholds, policies and migrations are unchanged | Lint and typecheck exit 0; **140 test files / 855 tests passed**; coverage **85.88% statements / 83.02% branches / 83.27% functions / 88.27% lines**; production build exit 0; production dependency audit: 0 vulnerabilities. With `LOCAL_SUPABASE_E2E=0`, all seven new tests skip as required |
+
+Remove the test-file argument to run the full E2E suite. The existing CI
+`integration` job discovers these tests automatically; its result will be
+reported on the PR, separately from the local results above.
+
+No architectural decision was made. Existing tests, lint rules, policies and
+applied migrations are unchanged.

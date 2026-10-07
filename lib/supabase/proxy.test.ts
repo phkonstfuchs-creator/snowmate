@@ -117,4 +117,43 @@ describe("updateSession", () => {
       "http://localhost:3000/login",
     );
   });
+  it("redirects an expired Server Action through the action protocol without forwarding its POST", async () => {
+    mocks.getUser.mockImplementation(async () => {
+      cookieMethods.setAll(
+        [{ name: "sb-session", value: "", options: { httpOnly: true, path: "/", sameSite: "lax" } }],
+        { "Cache-Control": "private, no-store" },
+      );
+      return { data: { user: null } };
+    });
+    const response = await updateSession(new NextRequest("http://localhost:3000/feed?draft=private", {
+      method: "POST", headers: { "Next-Action": "action-id" },
+    }));
+    expect(response.status).toBe(303);
+    expect(response.headers.get("x-action-redirect")).toBe("http://localhost:3000/login;replace");
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.cookies.get("sb-session")?.value).toBe("");
+    expect(response.cookies.get("sb-session")?.httpOnly).toBe(true);
+    expect(response.headers.get("cache-control")).toContain("no-store");
+  });
+
+  it("still requires the second factor for Server Actions", async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: { id: "user-id", email_confirmed_at: "2026-10-01" } } });
+    mocks.getAuthenticatorAssuranceLevel.mockResolvedValue({ data: { currentLevel: "aal1", nextLevel: "aal2" }, error: null });
+    const response = await updateSession(new NextRequest("http://localhost:3000/feed", {
+      method: "POST", headers: { "Next-Action": "action-id" },
+    }));
+    expect(response.status).toBe(303);
+    expect(response.headers.get("x-action-redirect")).toBe("http://localhost:3000/login/verify;replace");
+  });
+
+  it("uses a regular redirect for GET even with an action header", async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
+    const response = await updateSession(new NextRequest("http://localhost:3000/feed", {
+      headers: { "Next-Action": "action-id" },
+    }));
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe("http://localhost:3000/login");
+    expect(response.headers.get("x-action-redirect")).toBeNull();
+  });
+
 });
