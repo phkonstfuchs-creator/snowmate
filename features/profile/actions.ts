@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
+import { isBlockedText } from "@/lib/server-action";
 import { getT } from "@/lib/i18n/server";
 import { translateFieldErrors } from "@/lib/i18n/translate";
 import type { DraftAdoptionResult, ProfileActionState } from "./action-state";
@@ -15,7 +16,7 @@ import {
 
 const UNIQUE_VIOLATION = "23505";
 
-type SaveOutcome = "saved" | "handle_taken" | "unauthenticated" | "unavailable";
+type SaveOutcome = "saved" | "blocked" | "handle_taken" | "unauthenticated" | "unavailable";
 
 function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -57,6 +58,7 @@ async function writeProfile(
     const { data, error } = await query.select("id");
 
     if (error) {
+      if (isBlockedText(error)) return "blocked";
       return error.code === UNIQUE_VIOLATION ? "handle_taken" : "unavailable";
     }
 
@@ -83,7 +85,9 @@ export async function adoptOnboardingDraftAction(
     return "invalid";
   }
 
-  return writeProfile(validation.data, { onlyIfIncomplete: true });
+  const outcome = await writeProfile(validation.data, { onlyIfIncomplete: true });
+  /* A draft that the filter refuses will never save: stop retrying. */
+  return outcome === "blocked" ? "invalid" : outcome;
 }
 
 export async function updateProfileAction(
@@ -118,6 +122,8 @@ export async function updateProfileAction(
         message: t("v.handleTaken"),
         fieldErrors: { handle: t("v.handleTaken") },
       };
+    case "blocked":
+      return { status: "error", message: t("common.blockedText") };
     case "unauthenticated":
       return { status: "error", message: t("profile.sessionEnded") };
     default:

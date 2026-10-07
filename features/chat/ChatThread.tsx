@@ -21,6 +21,7 @@ const RUST = "var(--rust)";
 const SEND_ERRORS: Record<string, MessageKey> = {
   forbidden: "chat.forbidden",
   invalid: "chat.invalid",
+  blocked: "common.blockedText",
   rate_limited: "chat.rateLimited",
   profile_incomplete: "chat.profileIncomplete",
   too_young: "loc.from16",

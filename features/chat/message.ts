@@ -6,7 +6,7 @@ export const POLL_INTERVAL_MS = 4000;
 const FORBIDDEN_CHARS = /[\u0001-\u0009\u000b\u000c\u000e-\u001f\u007f‪-‮⁦-⁩]/u;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
-export type SendOutcome = "sent" | "forbidden" | "invalid" | "rate_limited" | "profile_incomplete" | "too_young";
+export type SendOutcome = "sent" | "forbidden" | "invalid" | "blocked" | "rate_limited" | "profile_incomplete" | "too_young";
 
 /* The stored text of a location message; the list shows a label instead. */
 export const LOCATION_BODY = "📍";

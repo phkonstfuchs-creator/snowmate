@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { isNativeApp } from "@/lib/native-app";
 import BottomNav from "@/components/BottomNav";
 import { getT } from "@/lib/i18n/server";
 
@@ -15,6 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function DemoLayout({ children }: { children: React.ReactNode }) {
+  /* The store apps show only the real app: the prototype advertises a
+     Season Pass price, and purchases there must go through the stores. */
+  if (isNativeApp((await headers()).get("user-agent"))) redirect("/");
   const t = await getT();
   return (
     <div className="app-shell">

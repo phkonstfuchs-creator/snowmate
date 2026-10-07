@@ -13,6 +13,12 @@ export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID.test(value);
 }
 
+/* The database word filter (migration 20261027090000) raises this code
+   when a text contains a blocked term. */
+export function isBlockedText(error: { code?: string } | null | undefined): boolean {
+  return error?.code === "PB001";
+}
+
 /* Calls a security-definer function that answers with one of a fixed set
    of outcome strings. Anything else, an error or a throw becomes
    "unavailable", so a changed database never leaks through to the UI.

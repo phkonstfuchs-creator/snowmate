@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
@@ -21,6 +21,7 @@ import Icon from "@/components/ui/Icon";
 import type { MapPerson } from "@/components/map/SkiMap";
 import { RESORT_ZOOM } from "@/components/map/map-style";
 import { resortCoordinates } from "@/lib/resorts";
+import { isNativeApp } from "@/lib/native-app";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
 import TrackPanel from "@/features/tracking/TrackPanel";
@@ -331,9 +332,13 @@ function LiveMapScreen({ live }: { live: LiveMap }) {
   return <MapBody live={live} location={location} meetups={meetups} />;
 }
 
+const noSubscription = () => () => {};
+
 function MapBody({ live, location, meetups }: { live?: LiveMap; location?: LocationState; meetups?: ReturnType<typeof useLiftMeetups> }) {
   const t = useT();
   const tracking = useTracking();
+  /* The store apps have no demo (ADR 0031); false during server render. */
+  const inNativeApp = useSyncExternalStore(noSubscription, () => isNativeApp(navigator.userAgent), () => false);
   const pin = live?.pin ?? null;
   const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(
     pin ? { lat: pin.lat, lng: pin.lng, zoom: 15, key: 1 } : null,
@@ -437,7 +442,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onStartClick={() => setActiveSheet({ type: "lift" })}
         />
       )}
-      {live && <p className="px-4 pt-2 text-xs" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
+      {live && !inNativeApp && <p className="px-4 pt-2 text-xs" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
 
       {/* Vector map (MapLibre) */}
       <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>

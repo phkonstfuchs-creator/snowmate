@@ -14,6 +14,7 @@ import { MAX_POST_LENGTH, POST_PHOTO_MAX_BYTES, POST_PHOTO_MAX_SIDE, fitWithin, 
 
 const OUTCOME: Record<Exclude<CreatePostOutcome, "created">, MessageKey> = {
   invalid: "posts.invalid",
+  blocked: "common.blockedText",
   rate_limited: "posts.rateLimited",
   profile_incomplete: "common.profileIncomplete",
   unauthenticated: "profile.sessionEnded",
