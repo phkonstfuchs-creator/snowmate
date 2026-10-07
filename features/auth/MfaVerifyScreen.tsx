@@ -4,8 +4,9 @@ import { useActionState, useState } from "react";
 import Button from "@/components/ui/Button";
 import { useT } from "@/lib/i18n/client";
 import AuthShell from "./AuthShell";
-import { signOutAction, verifyLoginMfaAction } from "./actions";
+import { verifyLoginMfaAction } from "./actions";
 import { initialAuthActionState } from "./action-state";
+import SignOutForm from "@/features/notifications/SignOutForm";
 
 export default function MfaVerifyScreen() {
   const t = useT();
@@ -37,11 +38,11 @@ export default function MfaVerifyScreen() {
           {pending ? t("auth.signingIn") : t("mfa.verify")}
         </Button>
       </form>
-      <form action={signOutAction} className="mt-4">
+      <SignOutForm className="mt-4">
         <button type="submit" className="w-full py-3 text-sm font-semibold underline" style={{ color: "var(--ink-2)" }}>
           {t("mfa.useOtherAccount")}
         </button>
-      </form>
+      </SignOutForm>
     </AuthShell>
   );
 }

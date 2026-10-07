@@ -30,8 +30,9 @@ Create `.env.local` from `.env.example`. It needs three browser-safe values:
 Optional, for push notifications: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, the
 public half of the VAPID key pair (see "Push notifications" below).
 
-Never add a secret or service-role key; nothing in the app needs one.
-`.env.local` and the Supabase project link are ignored by Git.
+Never add a Supabase service-role key to the app. Photo uploads require the
+limited server-only media signing key described below; it must never have a
+`NEXT_PUBLIC_` prefix. `.env.local` and the Supabase project link are ignored by Git.
 
 ## Database
 
@@ -47,6 +48,48 @@ npx supabase db push     # apply new migrations to the linked project
 Migrations are append-only once applied to a hosted project: fix a
 mistake with a new migration. `supabase/config.toml` configures the local
 stack only; hosted Auth settings are managed in the Supabase Dashboard.
+
+## Private media signing key
+
+Migration `20261026090000_media_attestation.sql` creates a random 32-byte key
+inside `private.media_attestation_keys`. The app uses the same key to certify
+only freshly uploaded files after server decoding/re-encoding. The certificate
+binds the owner, immutable Storage object id, bucket, path and issuance time;
+it grants no access to anyone else's account. Missing/malformed keys refuse
+photo uploads before decoding or writing; text-only posts and `/demo` work.
+
+After applying the migration to the intended project, an administrator can
+read its key in a **private Supabase SQL editor session**:
+
+```sql
+select key_id, encode(secret, 'base64') as signing_key
+from private.media_attestation_keys where key_id = 'v1';
+```
+
+Copy that value directly to the app project's encrypted **server-only**
+`MEDIA_ATTESTATION_KEY` environment variable and set
+`MEDIA_ATTESTATION_KEY_ID=v1`. Match the environment to its database: a local
+or preview project must never receive the production key. Do not paste the
+SQL result into chat, CI logs, issues or tracked files. Local `.env.local` is
+ignored; CI reads only its freshly generated local-stack key and masks it.
+No deployed secret is needed to lint, typecheck, build or run unit/demo tests.
+
+**Rollout:** back up first; apply migrations, provision the corresponding
+server key, deploy Edge and app, then verify real Storage HTTP uploads and
+overwrite denial with two test accounts. Existing images have no certificate
+and become unreadable to friends; owners can still view/delete their files.
+Use owner re-upload or an explicitly reviewed, bounded server sanitization
+backfill into new paths. Do not certify legacy bytes without decoding them.
+The metadata claim does not imply historical originals have already been
+cleaned or removed. Keep this visible in the release review.
+
+**Rotation:** create a new database key id (e.g. `v2`) with a generated secret,
+provision it privately, and deploy the app with that id. After old instances
+have stopped, replace the old secret with fresh random bytes to reject old
+signatures; retain the key-id row for existing certificate references.
+Deleted object certificates stay until account deletion to prevent UUID reuse
+and are included in the owner's data export. Never rotate using a literal
+secret in a migration. See [ADR 0030](adr/0030-session-and-media-security.md).
 
 ## Push notifications
 

@@ -1,0 +1,19 @@
+title = "Pistl secret scan"
+
+[extend]
+useDefault = true
+
+# Reviewed literals used only as passwords/tokens by mocked/local tests.
+# Both the exact fixture value and one of these exact test paths must match.
+# Other values in these files, and these values outside tests, remain scanned.
+[[allowlists]]
+description = "Known non-production test fixtures"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^(Snowmate2026Pass|Fresh-Powder-2026|0123456789abcdef0123456789abcdef)$''']
+paths = [
+  '''(^|/)features/auth/(actions|credentials)\.test\.ts$''',
+  '''(^|/)features/crew/(InviteScreen\.test\.tsx|invites\.test\.ts)$''',
+  '''(^|/)tests/e2e/auth-lifecycle\.spec\.ts$''',
+]

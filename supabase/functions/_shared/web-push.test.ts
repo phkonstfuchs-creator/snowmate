@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { base64UrlDecode, base64UrlEncode, encryptPayload, vapidAuthorization } from "./web-push";
+import { describe, expect, it, vi } from "vitest";
+import { base64UrlDecode, base64UrlEncode, encryptPayload, sendWebPush, vapidAuthorization } from "./web-push";
 
 const encoder = new TextEncoder();
 
@@ -48,6 +48,22 @@ describe("encryptPayload", () => {
 });
 
 describe("vapidAuthorization", () => {
+  it("does not follow redirects out of the trusted push endpoint", async () => {
+    const device = await browser();
+    const pair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+    const pushFetch = vi.fn().mockResolvedValue({ status: 201 });
+    vi.stubGlobal("fetch", pushFetch);
+    try {
+      await sendWebPush({ ...device, endpoint: "https://fcm.googleapis.com/fcm/send/test-device" }, "{}", {
+        publicKey: base64UrlEncode(new Uint8Array(await crypto.subtle.exportKey("raw", pair.publicKey))),
+        privateKey: (await crypto.subtle.exportKey("jwk", pair.privateKey)).d!,
+        subject: "mailto:operator@example.com",
+      });
+      expect(pushFetch).toHaveBeenCalledWith("https://fcm.googleapis.com/fcm/send/test-device", expect.objectContaining({ redirect: "error" }));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it("signs a short-lived token for the push service's origin", async () => {
     const pair = (await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"])) as CryptoKeyPair;
     const publicKey = base64UrlEncode(new Uint8Array(await crypto.subtle.exportKey("raw", pair.publicKey)));

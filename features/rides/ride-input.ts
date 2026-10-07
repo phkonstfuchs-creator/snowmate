@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ABILITY_VALUES, CITY_VALUES } from "@/features/profile/profile-input";
+import { isPlanningDate } from "./planning-date";
 
 /* Mirrors the constraints on public.rides. */
 export const rideInputSchema = z
@@ -35,9 +36,12 @@ export type RideFormInput = z.input<typeof rideInputSchema>;
 
 export function validateRideInput(
   input: unknown,
+  now: Date = new Date(),
 ): { success: true; data: RideInput } | { success: false; message: string } {
   const result = rideInputSchema.safeParse(input);
-  if (result.success) return { success: true, data: result.data };
+  if (result.success) return isPlanningDate(result.data.rideDate, now)
+    ? { success: true, data: result.data }
+    : { success: false, message: "v.dateWithinYear" };
   return { success: false, message: result.error.issues[0]?.message ?? "v.checkRide" };
 }
 

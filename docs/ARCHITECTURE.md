@@ -22,8 +22,10 @@ Browser ◄── feature screens (client components) ◄───────�
 - **Supabase** provides auth (email and password, SSR cookies via
   `@supabase/ssr`), Postgres and one edge function that sends push
   notices (ADR 0025). There is no other backend.
-- Identity always comes from the server session (`auth.getClaims()` or
-  `auth.uid()` in SQL), never from a client-supplied id.
+- Identity always comes from the server session, never from a client-supplied id.
+  The proxy and protected layout verify `auth.getUser()`; SQL uses `auth.uid()`
+  and rejects missing/revoked session ids. `getClaims()` in a data boundary
+  is used only together with a database call that enforces that session guard.
 
 ## Responsibilities
 
@@ -38,11 +40,22 @@ Browser ◄── feature screens (client components) ◄───────�
 | `features/<f>/*.ts` (everything else) | Business rules: validation (`*-input.ts`), mapping (`live-*.ts`), capacity, visibility | Import React, Next, Supabase, fixtures, hooks or UI |
 | `components/` | Reusable presentation; receives data and callbacks as props | Own business rules, read fixtures |
 | `features/demo/` | UI that exists only in the prototype (sample profiles, chats) | Be used by signed-in routes |
-| `lib/resorts.ts` | Reference data: the resorts covered, regions, coordinates | Carry sample conditions |
+| `lib/resorts.ts`, `lib/lifts.ts` | Attributed reference data: resorts and lifts covered, coordinates and durations | Carry sample conditions |
 | `lib/data/` | Prototype fixtures only | Be read by signed-in routes or the server boundary |
 | `lib/i18n/` | Locale choice, the en/de dictionaries, `getT()` (server) and `useT()` (client) | Hold business rules |
 | `supabase/migrations/` | Schema, grants, RLS, security-definer functions | Be edited once applied; add a new migration instead |
-| `supabase/functions/` | Edge functions that need the service role (only `push-dispatch`, ADR 0025); shared code in `_shared/` uses WebCrypto only and is unit-tested | Be called with or return anyone's data to clients |
+| `supabase/functions/` | Edge functions that need the service role (only `push-dispatch`, ADR 0025); shared crypto and dispatch rules in `_shared/` are unit-tested | Return anyone's subscriptions or queue contents to clients |
+
+## Session and browser boundary
+
+The application has no browser Supabase client. Auth cookies are HttpOnly,
+Secure in production and SameSite=Lax. A fresh server nonce in `proxy.ts`
+protects scripts; `lib/security-headers.ts` owns the policy. Document rendering
+is dynamic so that a nonce is never shared through a static cache. Private
+media responses are never cached. The server-only `lib/media-attestation.ts`
+certifies newly sanitized immutable Storage objects with a limited private HMAC
+key. Database policies require the certificate for friend reads and new media
+references. Setup and rotation are in [DEVELOPMENT.md](DEVELOPMENT.md#private-media-signing-key). See [ADR 0030](adr/0030-session-and-media-security.md).
 
 ## Text and languages
 

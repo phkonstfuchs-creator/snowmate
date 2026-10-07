@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import TrackingProvider from "./TrackingProvider";
+import { clearStoredSkiDay } from "./useSkiDayTracker";
 import TrackPanel from "./TrackPanel";
 
 const mocks = vi.hoisted(() => ({ save: vi.fn(), pathname: "/map" }));
@@ -10,6 +11,8 @@ vi.mock("next/navigation", () => ({ usePathname: () => mocks.pathname, useRouter
 
 let onFix: ((position: GeolocationPosition) => void) | null = null;
 const clearWatch = vi.fn();
+const USER = "c4a70000-0000-4000-8000-000000000001";
+const OTHER = "c4a70000-0000-4000-8000-000000000002";
 
 function fix(lat: number, alt: number, t: number): GeolocationPosition {
   return { coords: { latitude: lat, longitude: 11.39, altitude: alt, accuracy: 6, speed: 12, altitudeAccuracy: null, heading: null, toJSON: () => ({}) }, timestamp: t, toJSON: () => ({}) } as GeolocationPosition;
@@ -30,10 +33,10 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("ski-day tracking", () => {
   it("starts, records, survives in storage and saves only the summary", async () => {
-    render(<TrackingProvider><TrackPanel /></TrackingProvider>);
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
     fireEvent.click(screen.getByRole("button", { name: /Start/ }));
     expect(screen.getByText("Ski day running")).toBeInTheDocument();
-    expect(JSON.parse(window.localStorage.getItem("pistl.skiday.v1")!)).toMatchObject({ distanceM: 0 });
+    expect(JSON.parse(window.localStorage.getItem("pistl.skiday.v1")!)).toMatchObject({ userId: USER, state: { distanceM: 0 } });
 
     const start = Date.now();
     act(() => {
@@ -56,7 +59,7 @@ describe("ski-day tracking", () => {
   });
 
   it("asks before throwing away an unsaved day", async () => {
-    render(<TrackingProvider><TrackPanel /></TrackingProvider>);
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
     fireEvent.click(screen.getByRole("button", { name: /Start/ }));
     const start = Date.now();
     act(() => {
@@ -72,19 +75,58 @@ describe("ski-day tracking", () => {
 
   it("shows a running day on other tabs as one line back to the map", () => {
     mocks.pathname = "/crew";
-    render(<TrackingProvider><TrackPanel /></TrackingProvider>);
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
     fireEvent.click(screen.getByRole("button", { name: /Start/ }));
     expect(screen.getByRole("link", { name: /Ski day running/ })).toHaveAttribute("href", "/map");
     mocks.pathname = "/map";
   });
 
   it("explains a blocked location", () => {
-    render(<TrackingProvider><TrackPanel /></TrackingProvider>);
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
     vi.mocked(navigator.geolocation.watchPosition).mockImplementation((_s, error) => {
       error?.({ code: 1, message: "denied", PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 } as GeolocationPositionError);
       return 8;
     });
     fireEvent.click(screen.getByRole("button", { name: /Start/ }));
     expect(screen.getByText(/Location is blocked/)).toBeInTheDocument();
+  });
+
+  it("drops an old account's stored GPS track instead of restoring it for another account", () => {
+    const first = render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    fireEvent.click(screen.getByRole("button", { name: /Start/ }));
+    expect(window.localStorage.getItem("pistl.skiday.v1")).not.toBeNull();
+    first.rerender(<TrackingProvider userId={OTHER}><TrackPanel /></TrackingProvider>);
+    expect(clearWatch).toHaveBeenCalledWith(7);
+    expect(screen.getByRole("button", { name: /Start/ })).toBeInTheDocument();
+    expect(window.localStorage.getItem("pistl.skiday.v1")).toBeNull();
+  });
+
+  it("resumes a stored day only for the same account after a reload", async () => {
+    const first = render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    fireEvent.click(screen.getByRole("button", { name: /Start/ }));
+    expect(window.localStorage.getItem("pistl.skiday.v1")).not.toBeNull();
+    first.unmount();
+    expect(window.localStorage.getItem("pistl.skiday.v1")).not.toBeNull();
+
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    expect(await screen.findByText("Ski day running")).toBeInTheDocument();
+    act(() => clearStoredSkiDay());
+    expect(window.localStorage.getItem("pistl.skiday.v1")).toBeNull();
+  });
+
+  it("stops the active GPS watch when sign-out clears the stored day", () => {
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    fireEvent.click(screen.getByRole("button", { name: /Start/ }));
+    act(() => clearStoredSkiDay());
+    expect(clearWatch).toHaveBeenCalledWith(7);
+    expect(screen.getByRole("button", { name: /Start/ })).toBeInTheDocument();
+    expect(window.localStorage.getItem("pistl.skiday.v1")).toBeNull();
+  });
+
+  it("discards legacy GPS tracks that have no account owner", () => {
+    window.localStorage.setItem("pistl.skiday.v1", JSON.stringify({ startedAt: Date.now(), track: [[11.39, 47.3]] }));
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    expect(window.localStorage.getItem("pistl.skiday.v1")).toBeNull();
+    expect(screen.getByRole("button", { name: /Start/ })).toBeInTheDocument();
   });
 });

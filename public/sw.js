@@ -10,6 +10,7 @@ const TEXT = {
     ride_request: "{name} möchte bei deinem Ride mitfahren",
     ride_joined: "{name} fährt bei deinem Ride mit",
     ride_accepted: "{name} hat dich in den Ride gelassen",
+    lift_meetup: "{name} fährt gerade Lift. Treffpunkt auf der Karte ansehen",
     fallback: "Neues in deiner Crew",
     someone: "Jemand",
   },
@@ -20,13 +21,14 @@ const TEXT = {
     ride_request: "{name} asked to join your ride",
     ride_joined: "{name} joined your ride",
     ride_accepted: "{name} let you into the ride",
+    lift_meetup: "{name} is taking a lift. See the meetup on the map",
     fallback: "Something new in your crew",
     someone: "Someone",
   },
 };
 
 function safePath(value) {
-  return typeof value === "string" && /^\/[A-Za-z0-9/_-]{0,120}$/.test(value) ? value : "/feed";
+  return typeof value === "string" && /^\/(?!\/)[A-Za-z0-9/_-]{0,120}$/.test(value) ? value : "/feed";
 }
 
 self.addEventListener("push", (event) => {

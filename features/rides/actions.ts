@@ -90,6 +90,7 @@ async function callRideFunction(
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc(fn, { target_ride: rideId });
+    if (!error && fn === "join_ride") await dispatchPushSoon(supabase);
     return error ? null : { data };
   } catch {
     return null;
@@ -101,7 +102,6 @@ async function joinRideActionImpl(rideId: string): Promise<RideActionResult> {
   if (!result) return UNAVAILABLE;
 
   revalidateRides();
-  dispatchPushSoon();
   return JOIN_MESSAGES[String(result.data)] ?? UNAVAILABLE;
 }
 
@@ -178,7 +178,7 @@ async function respondRideRequestActionImpl(
     });
     if (error) return UNAVAILABLE;
     revalidateRides();
-    if (accept) dispatchPushSoon();
+    if (accept) await dispatchPushSoon(supabase);
     return RESPOND_MESSAGES[String(data)] ?? UNAVAILABLE;
   } catch {
     return UNAVAILABLE;

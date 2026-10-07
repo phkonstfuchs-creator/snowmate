@@ -13,7 +13,7 @@ function timeAt(iso: string, locale: Intl.LocalesArgument): string {
   return new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
-export default function LiftMeetupPanel({ mine, friends, me, busy, result, onStop, onLocate }: {
+export default function LiftMeetupPanel({ mine, friends, me, busy, result, onStop, onLocate, canShare, onStartClick }: {
   mine: LiftMeetup | null;
   friends: LiftMeetup[] | null;
   me: Position | null;
@@ -21,6 +21,8 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
   result: StartResult | null;
   onStop: () => void;
   onLocate: () => void;
+  canShare?: boolean;
+  onStartClick?: () => void;
 }) {
   const t = useT();
   const locale = INTL_LOCALE[useLocale()];
@@ -33,8 +35,16 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
 
   return (
     <section className="px-4 pt-4" aria-labelledby="lift-meetup-title">
-      <div className="p-3" style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
-        <h2 id="lift-meetup-title" className="text-sm font-black" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
+      <div className="p-4" style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
+        <h2 id="lift-meetup-title" className="font-display text-xl uppercase" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
+        {onStartClick && canShare && (
+          <button type="button" onClick={onStartClick} disabled={busy}
+            className="card-tap mt-3 min-h-12 w-full px-3 font-display text-lg uppercase disabled:opacity-50"
+            style={{ background: "var(--ink-0)", color: "var(--paper-0)" }}>
+            {mine ? t("meetup.changeLift") : t("meetup.quickStart")}
+          </button>
+        )}
+        {onStartClick && !canShare && <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("meetup.from16")}</p>}
         {mine && (
           <div className="mt-2 flex items-center gap-2">
             <p className="min-w-0 flex-1 text-sm" style={{ color: "var(--ink-1)" }}>

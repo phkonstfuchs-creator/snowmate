@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n/client";
-import { deletePushSubscriptionAction, savePushSubscriptionAction } from "./actions";
+import { deletePushSubscriptionAction, isMyPushSubscriptionAction, savePushSubscriptionAction } from "./actions";
 import { applicationServerKey } from "./push-subscription";
 
 type PushState = "checking" | "unsupported" | "install" | "denied" | "off" | "on" | "busy";
@@ -37,9 +37,11 @@ export default function PushSettings() {
       if (Notification.permission === "denied") return "denied";
       const existing = await (await registration()).pushManager.getSubscription();
       if (!existing) return "off";
-      /* Keeps the server in step, e.g. after another account used this browser. */
-      await savePushSubscriptionAction(existing.toJSON()).catch(() => null);
-      return "on";
+      /* A subscription from another account or revoked session must never
+         become this account's opt-in just because settings were opened. */
+      if (await isMyPushSubscriptionAction(existing.endpoint).catch(() => false)) return "on";
+      await existing.unsubscribe();
+      return "off";
     };
     void check()
       .catch((): PushState => "unsupported")

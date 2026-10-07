@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { contentSecurityPolicy } from "@/lib/security-headers";
 import { MAP_TILE_HOSTS, PISTE_TILES, RASTER_FALLBACK_STYLE, TERRAIN_TILES, VECTOR_STYLE_URL, accuracyCircle, clampAccuracy, paperTint } from "./map-style";
 
 describe("map style", () => {
@@ -11,8 +11,7 @@ describe("map style", () => {
   });
 
   it("loads pistes and terrain over https from hosts the CSP allows", () => {
-    const config = readFileSync("next.config.ts", "utf8");
-    const connect = config.match(/"connect-src ([^"]+)"/u)?.[1] ?? "";
+    const connect = contentSecurityPolicy("testnonce", false).match(/connect-src ([^;]+)/u)?.[1] ?? "";
     for (const host of MAP_TILE_HOSTS) expect(connect.split(" ")).toContain(host);
     expect(PISTE_TILES).toMatch(/^https:\/\/tiles\.opensnowmap\.org\/.+\{z\}\/\{x\}\/\{y\}\.png$/u);
     expect(TERRAIN_TILES).toMatch(/^https:\/\/s3\.amazonaws\.com\/elevation-tiles-prod\/terrarium\//u);

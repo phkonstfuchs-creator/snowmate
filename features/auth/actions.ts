@@ -71,12 +71,9 @@ async function hashKey(value: string): Promise<string> {
 /* An account with a verified second factor gets an aal1 session from
    the password alone; it must pass /login/verify before anything else. */
 async function needsSecondFactor(supabase: Awaited<ReturnType<typeof createClient>>): Promise<boolean> {
-  try {
-    const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    return data?.nextLevel === "aal2" && data.currentLevel !== "aal2";
-  } catch {
-    return false;
-  }
+  const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (error || !data) throw new Error("Assurance verification unavailable");
+  return data.nextLevel === "aal2" && data.currentLevel !== "aal2";
 }
 
 export async function signInAction(
@@ -266,6 +263,9 @@ export async function resendSignupCodeAction(): Promise<AuthActionState> {
   if (!rateLimiter.hit("signupResendIp", await getRequestIp())) {
     return { status: "error", message: t("auth.tooManyAttempts") };
   }
+  if (!rateLimiter.hit("signupResendTarget", await hashKey(email.toLowerCase()))) {
+    return { status: "success", message: t("signupCode.resent") };
+  }
 
   try {
     const supabase = await createClient();
@@ -304,6 +304,14 @@ export async function checkHandleAction(candidate: string): Promise<HandleCheck>
 export async function signOutAction(): Promise<void> {
   const supabase = await createClient();
 
+  /* End location announcements while the authenticated session is valid. */
+  try {
+    await supabase.rpc("stop_my_lift_meetup");
+    await supabase.rpc("stop_sharing_location");
+  } catch {
+    // Expiry still bounds a status when the backend cannot be reached.
+  }
+
   try {
     const { error } = await supabase.auth.signOut();
 
@@ -337,15 +345,15 @@ export async function requestPasswordResetAction(
   if (!rateLimiter.hit("passwordResetIp", await getRequestIp())) {
     return { status: "error", message: t("auth.tooManyAttempts"), email };
   }
+  if (!rateLimiter.hit("passwordResetTarget", await hashKey(validation.data.email.toLowerCase()))) {
+    return { status: "success", message: t("auth.resetSent"), email: validation.data.email };
+  }
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(validation.data.email, {
+    await supabase.auth.resetPasswordForEmail(validation.data.email, {
       redirectTo: new URL("/auth/confirm?next=/reset-password", getSiteUrl()).toString(),
     });
-    if (error && error.code === "over_email_send_rate_limit") {
-      return { status: "error", message: t("auth.emailRateLimit"), email };
-    }
   } catch {
     return { status: "error", message: t("auth.signInUnavailable"), email };
   }
@@ -369,17 +377,14 @@ export async function updatePasswordAction(
     return invalidState(t, "", validation.fieldErrors);
   }
 
-  const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  const userId = claims?.claims?.sub;
-  if (!userId) {
-    return { status: "error", message: t("profile.sessionEnded") };
-  }
-  if (!rateLimiter.hit("passwordChangeUser", userId)) {
-    return { status: "error", message: t("auth.tooManyAttempts") };
-  }
-
   try {
+    const supabase = await createClient();
+    const { data, error: userError } = await supabase.auth.getUser();
+    const userId = userError ? null : data?.user?.id;
+    if (!userId) return { status: "error", message: t("profile.sessionEnded") };
+    if (!rateLimiter.hit("passwordChangeUser", userId)) {
+      return { status: "error", message: t("auth.tooManyAttempts") };
+    }
     const { error } = await supabase.auth.updateUser({ password: validation.data.password });
     if (error) {
       const key: MessageKey =
@@ -392,6 +397,8 @@ export async function updatePasswordAction(
               : "auth.passwordChangeFailed";
       return { status: "error", message: t(key) };
     }
+    const { error: revokeError } = await supabase.auth.signOut({ scope: "others" });
+    if (revokeError) return { status: "error", message: t("auth.passwordChangeFailed") };
   } catch {
     return { status: "error", message: t("auth.passwordChangeFailed") };
   }
@@ -410,18 +417,16 @@ export async function verifyLoginMfaAction(
     return { status: "error", message: t("mfa.codeFormat") };
   }
 
-  const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  const userId = claims?.claims?.sub;
-  if (!userId) {
-    redirect("/login");
-  }
-  if (!rateLimiter.hit("mfaUser", userId)) {
-    return { status: "error", message: t("auth.tooManyAttempts") };
-  }
-
   try {
-    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const supabase = await createClient();
+    const { data, error: userError } = await supabase.auth.getUser();
+    const userId = userError ? null : data?.user?.id;
+    if (!userId) redirect("/login");
+    if (!rateLimiter.hit("mfaUser", userId)) {
+      return { status: "error", message: t("auth.tooManyAttempts") };
+    }
+    const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError || !factors) throw new Error("Factor verification unavailable");
     const factor = factors?.totp.find((item) => item.status === "verified");
     if (!factor) {
       redirect("/feed");

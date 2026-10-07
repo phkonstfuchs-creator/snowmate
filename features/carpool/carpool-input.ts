@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CITY_VALUES } from "@/features/profile/profile-input";
+import { isPlanningDate } from "@/features/rides/planning-date";
 
 /* Mirrors the constraints on public.carpools. */
 export const carpoolInputSchema = z.object({
@@ -21,8 +22,11 @@ export type CarpoolFormInput = z.input<typeof carpoolInputSchema>;
 
 export function validateCarpoolInput(
   input: unknown,
+  now: Date = new Date(),
 ): { success: true; data: z.infer<typeof carpoolInputSchema> } | { success: false; message: string } {
   const result = carpoolInputSchema.safeParse(input);
-  if (result.success) return { success: true, data: result.data };
+  if (result.success) return isPlanningDate(result.data.rideDate, now)
+    ? { success: true, data: result.data }
+    : { success: false, message: "v.dateWithinYear" };
   return { success: false, message: result.error.issues[0]?.message ?? "v.checkDetails" };
 }

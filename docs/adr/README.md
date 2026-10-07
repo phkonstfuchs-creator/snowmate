@@ -37,5 +37,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0027](0027-leaderboards-and-stamps.md) | Leaderboards from season totals; region opt-in, minors anonymous | Accepted |
 | [0028](0028-swipe-discovery.md) | Swipe discovery: opt-in, age bands, minors only among friends of friends | Accepted |
 | [0029](0029-lift-meetup-estimates.md) | Short-lived lift meetup estimates from static data | Proposed |
+| [0030](0030-session-and-media-security.md) | Session revocation, private media and browser scripts | Proposed |
 
 Template: context, options considered, decision, consequences, status.

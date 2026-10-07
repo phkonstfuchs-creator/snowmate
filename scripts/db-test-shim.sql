@@ -54,6 +54,9 @@ create table storage.objects (
   bucket_id text references storage.buckets (id),
   name text,
   owner uuid,
+  version text,
+  updated_at timestamptz,
+  last_accessed_at timestamptz,
   created_at timestamptz default now(),
   unique (bucket_id, name)
 );

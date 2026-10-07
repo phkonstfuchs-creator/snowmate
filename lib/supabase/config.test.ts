@@ -38,6 +38,14 @@ describe("parseSupabasePublicConfig", () => {
     ).toThrow("Supabase public configuration is invalid");
   });
 
+  it("rejects legacy service-role JWTs and malformed JWTs", () => {
+    const token = (role: string) => `eyJhbGciOiJIUzI1NiJ9.${btoa(JSON.stringify({ role }))}.signature`;
+    for (const publishableKey of [token("service_role"), token("authenticated"), "eyJbad"]) {
+      expect(() => parseSupabasePublicConfig({ ...validConfig, publishableKey })).toThrow();
+    }
+    expect(parseSupabasePublicConfig({ ...validConfig, publishableKey: token("anon") }).publishableKey).toBe(token("anon"));
+  });
+
   it("rejects insecure non-local URLs", () => {
     expect(() =>
       parseSupabasePublicConfig({

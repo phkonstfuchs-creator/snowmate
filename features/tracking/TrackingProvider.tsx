@@ -13,8 +13,12 @@ const TrackingContext = createContext<SkiDayTracker | null>(null);
 
 /* The tracker lives in the app layout, so a running day survives
    switching tabs (ADR 0026). */
-export default function TrackingProvider({ children }: { children: ReactNode }) {
-  const tracker = useSkiDayTracker();
+export default function TrackingProvider({ children, userId }: { children: ReactNode; userId: string }) {
+  return <TrackingSession key={userId} userId={userId}>{children}</TrackingSession>;
+}
+
+function TrackingSession({ children, userId }: { children: ReactNode; userId: string }) {
+  const tracker = useSkiDayTracker(userId);
   return (
     <TrackingContext.Provider value={tracker}>
       {children}

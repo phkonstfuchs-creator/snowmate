@@ -15,9 +15,9 @@ export default async function AppLayout({
   children: React.ReactNode;
 }>) {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (!data?.claims) {
+  if (error || !data?.user?.email_confirmed_at) {
     redirect("/login");
   }
 
@@ -27,7 +27,7 @@ export default async function AppLayout({
 
   return (
     <div className="app-shell">
-      <TrackingProvider>
+      <TrackingProvider userId={data.user.id}>
         <main className="page-content">{children}</main>
       </TrackingProvider>
       <BottomNav

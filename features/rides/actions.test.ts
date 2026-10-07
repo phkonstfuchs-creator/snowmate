@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cancelRideAction, createRideAction, joinRideAction, leaveRideAction, respondRideRequestAction, updateRideAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({
@@ -27,11 +27,14 @@ const ride = {
 describe("ride actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2027-01-08T08:00:00Z"));
     mocks.createClient.mockResolvedValue({
       from: vi.fn(() => ({ insert: mocks.insert })),
       rpc: mocks.rpc,
     });
   });
+  afterEach(() => vi.useRealTimers());
 
   describe("createRideAction", () => {
     it("inserts without a host id and revalidates the ride screens", async () => {
@@ -54,6 +57,14 @@ describe("ride actions", () => {
       await expect(createRideAction({ ...ride, meetPoint: "" })).resolves.toEqual({
         ok: false,
         message: "Add a meeting point.",
+      });
+      expect(mocks.createClient).not.toHaveBeenCalled();
+    });
+
+    it("refuses a far-future ride before inserting it", async () => {
+      await expect(createRideAction({ ...ride, rideDate: "9999-01-01" })).resolves.toEqual({
+        ok: false,
+        message: "Choose a date within the next 365 days.",
       });
       expect(mocks.createClient).not.toHaveBeenCalled();
     });

@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LIFTS } from "@/lib/lifts";
 import { friendLiftMeetupsAction, myLiftMeetupAction, startLiftMeetupAction, stopLiftMeetupAction } from "./actions";
 
-const mocks = vi.hoisted(() => ({ rpc: vi.fn(), createClient: vi.fn() }));
+const mocks = vi.hoisted(() => ({ rpc: vi.fn(), createClient: vi.fn(), dispatchPushSoon: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: mocks.createClient }));
+vi.mock("@/lib/push/dispatch", () => ({ dispatchPushSoon: mocks.dispatchPushSoon }));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -24,6 +25,7 @@ describe("lift meetup server boundary", () => {
       p_resort: lift.resort,
       p_lift_id: lift.id,
     });
+    expect(mocks.dispatchPushSoon).toHaveBeenCalledOnce();
   });
 
   it("passes through the database's age refusal and fails closed on errors", async () => {
@@ -32,6 +34,7 @@ describe("lift meetup server boundary", () => {
     await expect(startLiftMeetupAction(lift.resort, lift.id)).resolves.toBe("too_young");
     mocks.rpc.mockResolvedValueOnce({ data: "unknown", error: null });
     await expect(startLiftMeetupAction(lift.resort, lift.id)).resolves.toBe("unavailable");
+    expect(mocks.dispatchPushSoon).not.toHaveBeenCalled();
     mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "PGRST" } });
     await expect(startLiftMeetupAction(lift.resort, lift.id)).resolves.toBe("unavailable");
   });

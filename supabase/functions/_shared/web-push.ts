@@ -110,6 +110,6 @@ export async function sendWebPush(target: PushTarget, payload: string, vapid: Va
   };
   /* A newer notice with the same topic replaces one still waiting. */
   if (topic) headers.Topic = topic;
-  const response = await fetch(target.endpoint, { method: "POST", headers, body, signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(target.endpoint, { method: "POST", headers, body, redirect: "error", signal: AbortSignal.timeout(10_000) });
   return response.status;
 }

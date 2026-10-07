@@ -2,9 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidateApp } from "@/lib/revalidate";
-import { sniffAvatarType } from "@/features/profile/avatar-image";
+import { prepareImageUpload } from "@/features/profile/safe-upload";
 import { RESORTS } from "@/lib/resorts";
-import { POST_PHOTO_BUCKET, POST_PHOTO_MAX_BYTES, normalizePostBody, type CreatePostOutcome } from "./post";
+import { rateLimiter } from "@/lib/rate-limit";
+import { attestUploadedMedia, readMediaAttestationKey } from "@/lib/media-attestation";
+import { POST_PHOTO_BUCKET, POST_PHOTO_MAX_BYTES, POST_PHOTO_MAX_SIDE, normalizePostBody, type CreatePostOutcome } from "./post";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 const OUTCOMES: readonly CreatePostOutcome[] = ["created", "invalid", "rate_limited", "profile_incomplete", "unauthenticated"];
@@ -22,18 +24,28 @@ export async function createPostAction(formData: FormData): Promise<CreatePostOu
 
   try {
     const supabase = await createClient();
-    const { data } = await supabase.auth.getClaims();
-    const userId = data?.claims?.sub;
+    const { data, error: authError } = await supabase.auth.getUser();
+    const userId = authError ? null : data.user?.id;
     if (typeof userId !== "string") return "unauthenticated";
 
     let path: string | null = null;
     if (photo instanceof Blob && photo.size > 0) {
+      if (!rateLimiter.hit("mediaUploadUser", userId)) return "unavailable";
+      const signingKey = readMediaAttestationKey();
+      if (!signingKey) return "unavailable";
       const bytes = new Uint8Array(await photo.arrayBuffer());
-      const type = sniffAvatarType(bytes);
-      if (!type) return "invalid";
-      path = `${userId}/${crypto.randomUUID()}.${type === "image/webp" ? "webp" : "jpg"}`;
-      const upload = await supabase.storage.from(POST_PHOTO_BUCKET).upload(path, bytes, { contentType: type, upsert: false });
+      const prepared = await prepareImageUpload(bytes, { maxSide: POST_PHOTO_MAX_SIDE, maxBytes: POST_PHOTO_MAX_BYTES, square: false });
+      if (prepared.status !== "ready") return prepared.status;
+      path = `${userId}/${crypto.randomUUID()}.webp`;
+      const upload = await supabase.storage.from(POST_PHOTO_BUCKET).upload(path, prepared.bytes, { contentType: prepared.type, upsert: false });
       if (upload.error) return "unavailable";
+      const attested = typeof upload.data?.id === "string" && await attestUploadedMedia(supabase, {
+        ownerId: userId, objectId: upload.data.id, bucket: POST_PHOTO_BUCKET, path,
+      }, signingKey);
+      if (!attested) {
+        await supabase.storage.from(POST_PHOTO_BUCKET).remove([path]);
+        return "unavailable";
+      }
     }
 
     const { data: outcome, error } = await supabase.rpc("create_post", { p_body: body, p_resort: resort, p_photo_path: path });

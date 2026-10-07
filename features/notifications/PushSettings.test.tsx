@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ save: vi.fn(), remove: vi.fn() }));
-vi.mock("./actions", () => ({ savePushSubscriptionAction: mocks.save, deletePushSubscriptionAction: mocks.remove }));
+const mocks = vi.hoisted(() => ({ save: vi.fn(), remove: vi.fn(), owns: vi.fn() }));
+vi.mock("./actions", () => ({ savePushSubscriptionAction: mocks.save, deletePushSubscriptionAction: mocks.remove, isMyPushSubscriptionAction: mocks.owns }));
 
 const subscription = {
   endpoint: "https://web.push.apple.com/QGx",
@@ -28,6 +28,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.save.mockResolvedValue("saved");
   mocks.remove.mockResolvedValue(true);
+  mocks.owns.mockResolvedValue(true);
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -56,11 +57,35 @@ describe("PushSettings", () => {
     render(<PushSettings />);
     const toggle = await screen.findByRole("switch");
     await vi.waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "true"));
+    expect(mocks.owns).toHaveBeenCalledWith(subscription.endpoint);
+    expect(mocks.save).not.toHaveBeenCalled();
     fireEvent.click(toggle);
     await vi.waitFor(() => expect(subscription.unsubscribe).toHaveBeenCalled());
     expect(mocks.remove).toHaveBeenCalledWith(subscription.endpoint);
     await vi.waitFor(() => expect(screen.getByRole("switch")).not.toBeDisabled());
     expect(screen.getByRole("switch")).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("does not claim or keep another account's subscription on a shared browser", async () => {
+    browser("granted", subscription);
+    mocks.owns.mockResolvedValue(false);
+    const PushSettings = await load();
+    render(<PushSettings />);
+    const toggle = await screen.findByRole("switch");
+    await vi.waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "false"));
+    expect(subscription.unsubscribe).toHaveBeenCalledOnce();
+    expect(mocks.owns).toHaveBeenCalledWith(subscription.endpoint);
+    expect(mocks.save).not.toHaveBeenCalled();
+  });
+
+  it("removes an unverified existing subscription after a server failure", async () => {
+    browser("granted", subscription);
+    mocks.owns.mockRejectedValue(new Error("network"));
+    const PushSettings = await load();
+    render(<PushSettings />);
+    const toggle = await screen.findByRole("switch");
+    await vi.waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "false"));
+    expect(subscription.unsubscribe).toHaveBeenCalledOnce();
   });
 
   it("explains a blocked permission instead of offering the switch", async () => {

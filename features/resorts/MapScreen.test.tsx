@@ -37,6 +37,18 @@ const liveRide = toLiveRide(
 );
 
 describe("MapScreen", () => {
+  it("puts lift meetup before the map and opens a direct lift picker", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
+    const cta = screen.getByRole("button", { name: "I'm taking a lift now" });
+    const map = screen.getByTestId("map");
+    expect(cta.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(cta);
+    const dialog = screen.getByRole("dialog", { name: "Choose your lift" });
+    expect(within(dialog).getByRole("combobox", { name: "Resort" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("combobox", { name: "Choose a lift" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Tell my crew" })).toBeEnabled();
+  });
+
   it("only offers lift sharing after an explicit age-eligibility check", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
     fireEvent.click(screen.getAllByRole("button", { name: /Nordkette/ })[0]!);

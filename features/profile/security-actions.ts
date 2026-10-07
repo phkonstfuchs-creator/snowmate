@@ -13,9 +13,13 @@ export type MfaEnrollment =
 export type MfaResult = { status: "ok" | "error"; message: string };
 
 async function signedInClient() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  return { supabase, userId: data?.claims?.sub ?? null };
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+    return { supabase, userId: error ? null : data?.user?.id ?? null };
+  } catch {
+    return { supabase: null, userId: null };
+  }
 }
 
 /* Starts a TOTP enrolment. Earlier abandoned attempts are removed first,
@@ -23,16 +27,20 @@ async function signedInClient() {
 export async function enrollMfaAction(): Promise<MfaEnrollment> {
   const t = await getT();
   const { supabase, userId } = await signedInClient();
-  if (!userId) return { status: "error", message: t("profile.sessionEnded") };
+  if (!supabase || !userId) return { status: "error", message: t("profile.sessionEnded") };
   if (!rateLimiter.hit("mfaUser", userId)) return { status: "error", message: t("auth.tooManyAttempts") };
 
   try {
-    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const { data: factors, error: factorError } = await supabase.auth.mfa.listFactors();
+    if (factorError || !factors) throw new Error("Factor verification unavailable");
     if (factors?.totp.some((factor) => factor.status === "verified")) {
       return { status: "error", message: t("mfa.alreadyOn") };
     }
     for (const factor of factors?.all ?? []) {
-      if (factor.status !== "verified") await supabase.auth.mfa.unenroll({ factorId: factor.id });
+      if (factor.status !== "verified") {
+        const { error } = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+        if (error) throw new Error("Enrollment cleanup unavailable");
+      }
     }
 
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Pistl" });
@@ -54,7 +62,7 @@ export async function confirmMfaAction(factorId: string, rawCode: string): Promi
     return { status: "error", message: t("mfa.codeFormat") };
   }
   const { supabase, userId } = await signedInClient();
-  if (!userId) return { status: "error", message: t("profile.sessionEnded") };
+  if (!supabase || !userId) return { status: "error", message: t("profile.sessionEnded") };
   if (!rateLimiter.hit("mfaUser", userId)) return { status: "error", message: t("auth.tooManyAttempts") };
 
   try {
@@ -75,11 +83,12 @@ export async function disableMfaAction(rawCode: string): Promise<MfaResult> {
   const code = parseOtpCode(String(rawCode ?? ""));
   if (!code) return { status: "error", message: t("mfa.codeFormat") };
   const { supabase, userId } = await signedInClient();
-  if (!userId) return { status: "error", message: t("profile.sessionEnded") };
+  if (!supabase || !userId) return { status: "error", message: t("profile.sessionEnded") };
   if (!rateLimiter.hit("mfaUser", userId)) return { status: "error", message: t("auth.tooManyAttempts") };
 
   try {
-    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const { data: factors, error: factorError } = await supabase.auth.mfa.listFactors();
+    if (factorError || !factors) throw new Error("Factor verification unavailable");
     const factor = factors?.totp.find((item) => item.status === "verified");
     if (!factor) return { status: "ok", message: t("mfa.disabled") };
 

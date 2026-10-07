@@ -2,16 +2,18 @@
 
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
-import { AVATAR_BUCKET, AVATAR_MAX_BYTES, avatarPath, isOwnAvatarPath, sniffAvatarType } from "./avatar-image";
+import { rateLimiter } from "@/lib/rate-limit";
+import { attestUploadedMedia, readMediaAttestationKey } from "@/lib/media-attestation";
+import { AVATAR_BUCKET, AVATAR_MAX_BYTES, AVATAR_SIZE_PX, avatarPath, isOwnAvatarPath } from "./avatar-image";
+import { prepareImageUpload } from "./safe-upload";
 import type { AvatarVisibility } from "./profile-input";
 
 export type AvatarOutcome = "saved" | "invalid" | "too_large" | "unauthenticated" | "unavailable";
 
 async function currentUser() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const userId = data?.claims?.sub;
-  return { supabase, userId: typeof userId === "string" ? userId : null };
+  const { data, error } = await supabase.auth.getUser();
+  return { supabase, userId: error ? null : data.user?.id ?? null };
 }
 
 /* Stores a new picture in the caller's own folder, points the profile at
@@ -26,16 +28,26 @@ export async function uploadAvatarAction(formData: FormData): Promise<AvatarOutc
   try {
     const { supabase, userId } = await currentUser();
     if (!userId) return "unauthenticated";
+    if (!rateLimiter.hit("mediaUploadUser", userId)) return "unavailable";
+    const signingKey = readMediaAttestationKey();
+    if (!signingKey) return "unavailable";
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const type = sniffAvatarType(bytes);
-    if (!type) return "invalid";
+    const prepared = await prepareImageUpload(bytes, { maxSide: AVATAR_SIZE_PX, maxBytes: AVATAR_MAX_BYTES, square: true });
+    if (prepared.status !== "ready") return prepared.status;
 
     const { data: before } = await supabase.from("profiles").select("avatar_path").eq("id", userId).maybeSingle<{ avatar_path: string | null }>();
-    const path = avatarPath(userId, type, crypto.randomUUID());
+    const path = avatarPath(userId, prepared.type, crypto.randomUUID());
 
-    const upload = await supabase.storage.from(AVATAR_BUCKET).upload(path, bytes, { contentType: type, upsert: false });
+    const upload = await supabase.storage.from(AVATAR_BUCKET).upload(path, prepared.bytes, { contentType: prepared.type, upsert: false });
     if (upload.error) return "unavailable";
+    const attested = typeof upload.data?.id === "string" && await attestUploadedMedia(supabase, {
+      ownerId: userId, objectId: upload.data.id, bucket: AVATAR_BUCKET, path,
+    }, signingKey);
+    if (!attested) {
+      await supabase.storage.from(AVATAR_BUCKET).remove([path]);
+      return "unavailable";
+    }
 
     const { error } = await supabase.from("profiles").update({ avatar_path: path }).eq("id", userId);
     if (error) {

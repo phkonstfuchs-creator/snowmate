@@ -16,7 +16,7 @@ export async function swipeAction(targetId: unknown, liked: unknown): Promise<Sw
     if (error) return "unavailable";
     if (data === "matched") {
       revalidateApp();
-      dispatchPushSoon();
+      await dispatchPushSoon(supabase);
     }
     return SWIPE_OUTCOMES.includes(data as SwipeOutcome) ? (data as SwipeOutcome) : "unavailable";
   } catch {

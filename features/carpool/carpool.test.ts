@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { validateCarpoolInput } from "./carpool-input";
 import { LOCKED_DEPARTURE_LABEL, toLiveCarpool, type CarpoolRow } from "./live-carpool";
 import { listCarpools } from "./queries";
@@ -50,8 +50,11 @@ const input = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
   mocks.createClient.mockResolvedValue({ rpc: mocks.rpc, from: vi.fn(() => ({ insert: mocks.insert })) });
 });
+afterEach(() => vi.useRealTimers());
 
 describe("toLiveCarpool", () => {
   it("maps a locked row", () => {
@@ -92,7 +95,7 @@ describe("toLiveCarpool", () => {
 
 describe("validateCarpoolInput", () => {
   it("normalises valid input", () => {
-    expect(validateCarpoolInput(input)).toMatchObject({ success: true, data: { departurePoint: "Innsbruck Hbf", note: null } });
+    expect(validateCarpoolInput(input, NOW)).toMatchObject({ success: true, data: { departurePoint: "Innsbruck Hbf", note: null } });
   });
 
   it.each([
@@ -101,7 +104,11 @@ describe("validateCarpoolInput", () => {
     [{ seats: 9 }, "v.maxSeats"],
     [{ departureTime: "7:30" }, "v.pickTime"],
   ])("rejects %j", (patch, message) => {
-    expect(validateCarpoolInput({ ...input, ...patch })).toEqual({ success: false, message });
+    expect(validateCarpoolInput({ ...input, ...patch }, NOW)).toEqual({ success: false, message });
+  });
+
+  it.each(["2027-01-07", "2028-01-09", "9999-01-01"])("refuses out-of-window date %s", (rideDate) => {
+    expect(validateCarpoolInput({ ...input, rideDate }, NOW)).toEqual({ success: false, message: "v.dateWithinYear" });
   });
 });
 
@@ -122,6 +129,14 @@ describe("carpool actions", () => {
     await expect(createCarpoolAction(input)).resolves.toEqual({ ok: true, message: "Posted." });
     expect(mocks.insert.mock.calls[0]![0]).not.toHaveProperty("author_id");
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
+  });
+
+  it("refuses a far-future carpool before inserting it", async () => {
+    await expect(createCarpoolAction({ ...input, rideDate: "9999-01-01" })).resolves.toEqual({
+      ok: false,
+      message: "Choose a date within the next 365 days.",
+    });
+    expect(mocks.createClient).not.toHaveBeenCalled();
   });
 
   it("rejects invalid input and database errors", async () => {

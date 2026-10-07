@@ -1,12 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { toSubscriptionInput } from "./push-subscription";
+import { toSubscriptionInput, validPushEndpoint } from "./push-subscription";
 
 export type PushSaveOutcome = "saved" | "invalid" | "unauthenticated" | "unavailable";
 
-/* Ties this device to the signed-in account (or moves it from another
-   account that used the same browser). */
+/* Ties this device to the current session. Another account's endpoint
+   cannot be reassigned; the browser must unsubscribe and opt in again. */
 export async function savePushSubscriptionAction(subscription: unknown): Promise<PushSaveOutcome> {
   const input = toSubscriptionInput(subscription);
   if (!input) return "invalid";
@@ -25,11 +25,23 @@ export async function savePushSubscriptionAction(subscription: unknown): Promise
 }
 
 export async function deletePushSubscriptionAction(endpoint: string): Promise<boolean> {
-  if (typeof endpoint !== "string" || endpoint.length > 1000) return false;
+  if (!validPushEndpoint(endpoint)) return false;
   try {
     const supabase = await createClient();
-    const { error } = await supabase.rpc("delete_push_subscription", { p_endpoint: endpoint });
-    return !error;
+    const { data, error } = await supabase.rpc("delete_push_subscription", { p_endpoint: endpoint });
+    return !error && data === true;
+  } catch {
+    return false;
+  }
+}
+
+/** A browser endpoint is only "on" for the currently authenticated session. */
+export async function isMyPushSubscriptionAction(endpoint: string): Promise<boolean> {
+  if (!validPushEndpoint(endpoint)) return false;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("is_my_push_subscription", { p_endpoint: endpoint });
+    return !error && data === true;
   } catch {
     return false;
   }
