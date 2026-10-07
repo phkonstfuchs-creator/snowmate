@@ -3,6 +3,7 @@
 import { useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { signOutAction } from "@/features/auth/actions";
 import { clearStoredSkiDay } from "@/features/tracking/useSkiDayTracker";
+import { stopBackgroundSharing } from "@/features/location/background-sharing";
 import { removePushOnSignOut } from "./remove-on-sign-out";
 import { ONBOARDING_DRAFT_KEY } from "@/features/profile/profile-input";
 
@@ -15,6 +16,7 @@ export default function SignOutForm({ children, className }: { children: ReactNo
     if (cleaning || signingOut) return;
     setCleaning(true);
     clearStoredSkiDay();
+    stopBackgroundSharing();
     try {
       localStorage.removeItem(ONBOARDING_DRAFT_KEY);
     } catch {

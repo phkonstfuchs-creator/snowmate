@@ -24,6 +24,7 @@ import { resortCoordinates } from "@/lib/resorts";
 import { isNativeApp } from "@/lib/native-app";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
+import CrewOnMap from "@/features/location/CrewOnMap";
 import TrackPanel from "@/features/tracking/TrackPanel";
 import { useTracking } from "@/features/tracking/TrackingProvider";
 import type { FriendLocation } from "@/features/location/location";
@@ -428,6 +429,8 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           />
         </div>
       </header>
+
+      {location && <CrewOnMap friends={location.friends} onFocus={focusOn} />}
 
       {location && meetups && (
         <LiftMeetupPanel

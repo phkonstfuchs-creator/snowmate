@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MessageKey } from "@/lib/i18n/translate";
+import { useT } from "@/lib/i18n/client";
+import { hasBackgroundLocation } from "@/features/tracking/position-source";
+import { isBackgroundSharing, onBackgroundSharing, startBackgroundSharing, stopBackgroundSharing } from "./background-sharing";
 import { friendLocationsAction, shareLocationAction, stopSharingAction } from "./actions";
 import {
   SHARE_MESSAGES,
@@ -17,8 +20,9 @@ const FRIEND_POLL_MS = 20_000;
 
 /* The viewer's own GPS position (stays on the device unless sharing is
    on), their sharing state, and the positions friends share. Browsers
-   stop GPS when the app is in the background, so sharing only updates
-   while the app is open; the UI says so. */
+   stop GPS when the app is in the background, so on the web sharing only
+   updates while the app is open; the UI says so. The store apps keep
+   sending while the phone is locked, until sharing ends (ADR 0031). */
 export function useLiveLocation({
   initialSharingEnd,
   initialFriends,
@@ -40,21 +44,40 @@ export function useLiveLocation({
     sharingRef.current = sharingEnd;
   }, [sharingEnd]);
 
+  const t = useT();
   const supported = typeof navigator !== "undefined" && "geolocation" in navigator;
 
-  const onPosition = useCallback((geo: GeolocationPosition) => {
-    const position = toPosition(geo);
+  const onPositionValue = useCallback((position: Position) => {
     setMe(position);
     setLocating(false);
     setError(null);
 
-    if (!sharingRef.current) return;
+    /* In the store apps the background watcher sends instead. */
+    if (!sharingRef.current || isBackgroundSharing()) return;
     if (!shouldSendUpdate(lastSent.current, position, Date.now())) return;
     lastSent.current = { position, at: Date.now() };
     void shareLocationAction(position, null).then((result) => {
       if (result === "invalid") setSharingEnd(null); // ended elsewhere or expired
     });
   }, []);
+
+  const onPosition = useCallback((geo: GeolocationPosition) => onPositionValue(toPosition(geo)), [onPositionValue]);
+
+  /* Store apps: one background watcher sends while sharing, with the
+     screen locked and on every tab; this screen only shows what it sees. */
+  const backgroundTexts = useMemo(() => ({ title: t("loc.backgroundTitle"), message: t("loc.backgroundMessage") }), [t]);
+  useEffect(() => {
+    if (sharingEnd) startBackgroundSharing(sharingEnd, backgroundTexts);
+  }, [sharingEnd, backgroundTexts]);
+  useEffect(
+    () =>
+      onBackgroundSharing((event) => {
+        if (event.type === "position") onPositionValue(event.position);
+        else if (event.type === "ended") setSharingEnd(null);
+        else setError(event.error === "denied" ? "loc.backgroundDenied" : "loc.backgroundFailed");
+      }),
+    [onPositionValue],
+  );
 
   const onGeoError = useCallback((geoError: GeolocationPositionError) => {
     setLocating(false);
@@ -109,8 +132,10 @@ export function useLiveLocation({
         const result = await shareLocationAction(position, minutes);
         if (result === "sharing" || result === "throttled") {
           lastSent.current = { position, at: Date.now() };
-          setSharingEnd(new Date(Date.now() + minutes * 60_000).toISOString());
-          watch();
+          const end = new Date(Date.now() + minutes * 60_000).toISOString();
+          setSharingEnd(end);
+          /* One GPS stream: the native one in the store apps, else the page's. */
+          if (!startBackgroundSharing(end, backgroundTexts)) watch();
           return true;
         }
         setError(SHARE_MESSAGES[result]);
@@ -122,7 +147,7 @@ export function useLiveLocation({
         setBusy(false);
       }
     },
-    [currentPosition, me, watch],
+    [backgroundTexts, currentPosition, me, watch],
   );
 
   const stopSharing = useCallback(async () => {
@@ -130,6 +155,7 @@ export function useLiveLocation({
     const ok = await stopSharingAction();
     setBusy(false);
     if (ok) {
+      stopBackgroundSharing();
       setSharingEnd(null);
       lastSent.current = null;
     } else {
@@ -139,7 +165,7 @@ export function useLiveLocation({
 
   /* Resume GPS when sharing was already on (e.g. after reopening the app). */
   useEffect(() => {
-    if (initialSharingEnd) startWatch();
+    if (initialSharingEnd && !hasBackgroundLocation()) startWatch();
   }, [initialSharingEnd, startWatch]);
 
   /* Sharing ends by itself at its end time. */
