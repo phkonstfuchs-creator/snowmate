@@ -1,5 +1,6 @@
 "use client";
 
+import { seasonLabel } from "@/lib/season";
 import { useState } from "react";
 import { heroNameFontSize } from "./hero-name";
 import { ME, LEADERBOARD_INNSBRUCK, LEADERBOARD_SALZBURG, BADGES, getUserById } from "@/lib/data";
@@ -76,7 +77,7 @@ function SeasonPassSheet({ onClose }: { onClose: () => void }) {
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
         <div className="px-5 pt-6 pb-5" style={{ borderBottom: "var(--rule-thin)" }}>
-          <p className="text-mono-label mb-2" style={{ color: RUST }}>December to April · Season 25/26</p>
+          <p className="text-mono-label mb-2" style={{ color: RUST }}>December to April · Season {seasonLabel()}</p>
           <h2 className="text-display-md" style={{ color: INK }}>Season{" "}<br />Pass</h2>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
             Once for the whole season. No subscription, no renewal.
@@ -246,7 +247,7 @@ export default function ProfileScreen({
 
         <div className="relative flex items-start justify-between">
           <p className="text-mono-label" style={{ color: RUST }}>
-            {t("profile.season", { city: leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg" })}
+            {t("profile.season", { season: seasonLabel(), city: leaderboardCity === "innsbruck" ? "Innsbruck" : "Salzburg" })}
           </p>
           <button
             type="button"

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { seasonLabel } from "@/lib/season";
 import { describe, expect, it, vi } from "vitest";
 import ProfileScreen from "./ProfileScreen";
 import type { OwnProfile } from "./profile-input";
@@ -47,7 +48,7 @@ describe("ProfileScreen", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Lena Moser");
     expect(screen.getByText("@lena_m")).toBeInTheDocument();
     expect(screen.getByText("LM")).toBeInTheDocument();
-    expect(screen.getByText(/Season 25\/26 · Salzburg/)).toBeInTheDocument();
+    expect(screen.getByText(`Season ${seasonLabel()} · Salzburg`, { exact: false })).toBeInTheDocument();
     expect(screen.queryByText("Profile incomplete")).not.toBeInTheDocument();
   });
 

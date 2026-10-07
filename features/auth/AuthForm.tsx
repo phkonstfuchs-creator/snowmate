@@ -113,7 +113,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {!isSignup ? (
         <Link
           href="/forgot-password"
-          className="-mt-2 block w-fit py-1 text-sm font-semibold underline"
+          className="-mt-2 flex min-h-11 w-fit items-center text-sm font-semibold underline"
           style={{ color: "var(--ink-2)" }}
         >
           {t("auth.forgotPassword")}

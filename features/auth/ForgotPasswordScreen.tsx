@@ -31,7 +31,7 @@ export default function ForgotPasswordScreen() {
           </Button>
         </form>
       )}
-      <Link href="/login" className="mt-5 block text-center text-sm font-semibold underline" style={{ color: "var(--ink-1)" }}>
+      <Link href="/login" className="mt-5 flex min-h-11 items-center justify-center text-sm font-semibold underline" style={{ color: "var(--ink-1)" }}>
         {t("auth.backToSignIn")}
       </Link>
     </AuthShell>

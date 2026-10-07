@@ -57,7 +57,7 @@ export default function SegmentedControl<T extends string>({
             aria-pressed={active}
             className="relative z-10 flex-1 flex items-center justify-center transition-colors"
             style={{
-              height: 38,
+              height: 44,
               font: `${active ? 650 : 500} 14px var(--font-body-stack)`,
               letterSpacing: "-0.01em",
               color: active ? "var(--ink-0)" : "var(--ink-2)",
