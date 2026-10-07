@@ -546,10 +546,6 @@ export default function ProfileScreen({
         </>
       )}
 
-      {/* No ski day yet this season: point to where it starts. */}
-      {isLive && skiDays && today && !skiDays.some((day) => Date.parse(day.startedAt) >= seasonStart(new Date(today)).getTime()) && (
-        <NextStep icon="mountain-snow" text={t("next.profile")} action={t("next.toMap")} href="/map" />
-      )}
       {/* One part at a time: the season, my rides or my posts. */}
       {isLive && (
         <div className="px-4 pt-6">
@@ -567,6 +563,10 @@ export default function ProfileScreen({
       )}
       {part === "season" && (
         <>
+          {/* No ski day yet this season: point to where it starts. */}
+          {isLive && skiDays && today && !skiDays.some((day) => Date.parse(day.startedAt) >= seasonStart(new Date(today)).getTime()) && (
+            <NextStep icon="mountain-snow" text={t("next.profile")} action={t("next.toMap")} href="/map" />
+          )}
           {isLive && skiDays !== undefined && today && <SkiDays days={skiDays} today={today} />}
           {isLive && skiDays !== undefined && (
             <Badges

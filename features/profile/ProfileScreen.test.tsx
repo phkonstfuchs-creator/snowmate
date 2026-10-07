@@ -67,9 +67,12 @@ describe("ProfileScreen", () => {
         account={{ ...incomplete, displayName: "Lena Moser", handle: "lena_m", onboardingCompleted: true }}
         myRides={{ upcoming: [], past: [] }}
         myPosts={[]}
+        skiDays={[]}
+        today="2026-10-07"
       />,
     );
-    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+    /* The season part points to the map; other parts show only their own hint. */
+    expect(screen.getByRole("note")).toHaveTextContent("No ski day yet this season");
     fireEvent.click(screen.getByRole("button", { name: "Rides" }));
     expect(screen.getByRole("note")).toHaveTextContent("No rides yet");
     fireEvent.click(screen.getByRole("button", { name: "Posts" }));
