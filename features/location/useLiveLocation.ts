@@ -201,12 +201,12 @@ export function useLiveLocation({
     [],
   );
 
-  /* One fresh fix without a lasting GPS watch, e.g. to guess a lift. */
+  /* One fresh fix without a lasting GPS watch, e.g. to guess a lift. It
+     is handed to the caller only, never kept as `me`, so a later share
+     cannot start from this old position. */
   const locateOnce = useCallback(async (): Promise<Position | null> => {
     try {
-      const position = await currentPosition();
-      setMe(position);
-      return position;
+      return await currentPosition();
     } catch {
       return null;
     }
