@@ -15,6 +15,18 @@ Friends on the same mountain need a quick way to meet without exchanging repeate
 - When a viewer's own position is available on their device, the device suggests a lift and estimates their arrival at the meeting station with a short route hint.
 - Estimates use static OpenStreetMap lift data and a clearly labeled waiting-time heuristic.
 - The map shows a direct lift-start control before the map. A local demo at `/demo/map` simulates Lena and a sample viewer position without an account, GPS, push, or persistence.
+- Amendment 2026-10-07 (owner: "sehr wichtiges Feature", one tap, the
+  rider sees their own forecast):
+  - "Ich fahr jetzt Lift" is the big primary button on the map.
+  - The rider's own position (on the device) picks the lift: the lift
+    they are sitting in, the valley station they stand at, or the nearest
+    one within 400 m. They confirm with one tap. Picking from lists stays
+    one tap away and is the only path without a position. Without a
+    position nothing can be started until a lift is visible.
+  - Before and after starting, the rider sees "You'll be at the top,
+    {station}, around {time}". It is the same estimate their crew gets.
+    Checks: `features/lift-meetup/detect.test.ts`,
+    `LiftStartSheet.test.tsx`.
 - With push enabled, current confirmed friends receive a generic lift-meetup notice. The notice contains no lift, station, coordinates, or ETA.
 
 ## Not included
