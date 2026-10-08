@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
+import { isBlockedText } from "@/lib/server-action";
 import { validateCarpoolInput } from "./carpool-input";
 
 export type CarpoolActionResult = { ok: boolean; message: string };
@@ -61,6 +62,7 @@ async function createCarpoolActionImpl(input: unknown): Promise<CarpoolActionRes
     });
     if (error) {
       /* A failed RLS check here means the profile is not finished. */
+      if (isBlockedText(error)) return { ok: false, message: "common.blockedText" };
       return error.code === "42501" ? MESSAGES.profile_incomplete! : UNAVAILABLE;
     }
   } catch {

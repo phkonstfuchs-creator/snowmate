@@ -143,6 +143,8 @@ describe("carpool actions", () => {
     await expect(createCarpoolAction({ ...input, seats: 0 })).resolves.toMatchObject({ ok: false });
     mocks.insert.mockResolvedValueOnce({ error: { code: "42501" } });
     await expect(createCarpoolAction(input)).resolves.toMatchObject({ message: expect.stringContaining("Finish your profile") });
+    mocks.insert.mockResolvedValueOnce({ error: { code: "PB001" } });
+    await expect(createCarpoolAction(input)).resolves.toMatchObject({ ok: false, message: "Please rephrase this without slurs or hate terms." });
     mocks.insert.mockResolvedValueOnce({ error: { code: "x" } });
     await expect(createCarpoolAction(input)).resolves.toMatchObject({ ok: false });
     mocks.insert.mockRejectedValueOnce(new Error("offline"));

@@ -1,0 +1,5 @@
+/* Permission texts in English (the same as Info.plist). */
+"NSLocationWhenInUseUsageDescription" = "Pistl uses your location to show you on the piste map, to share it with friends you choose and to track your ski day. You decide each time.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "With the screen locked, Pistl keeps sharing your location with the friends you chose, until the time you picked runs out or you stop, and keeps counting your runs while you record a ski day. Your route stays on your phone.";
+"NSCameraUsageDescription" = "Pistl uses the camera when you take a profile picture or a photo for a post.";
+"NSPhotoLibraryUsageDescription" = "Pistl opens your photos when you choose a profile picture or a photo for a post.";

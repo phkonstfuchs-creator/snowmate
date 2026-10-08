@@ -32,6 +32,8 @@ interface Props {
   onEdit?: () => void;
   /* Live only: open the report/block sheet for someone on this ride. */
   onSafety?: (user: User) => void;
+  /* Hides report and block on the viewer's own row. */
+  viewerId?: string;
   /* Opens a rider's profile. Only the demo passes it: real accounts do
      not have profile pages yet, so the rows are plain text there instead
      of buttons that do nothing. The sheet itself never loads fixtures. */
@@ -49,7 +51,7 @@ function PersonRow({ onOpen, className, children }: { onOpen?: () => void; class
   );
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile, onOpenChat }: Props) {
+export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile, onOpenChat, viewerId }: Props) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -177,6 +179,18 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
                   <span className="text-xs font-bold" style={{ color: MUTED }}>{profilesEnabled ? t("ride.levelLine", { level: u.level, title: u.levelTitle }) : u.handle ? `@${u.handle}` : ""}</span>
                 </div>
                 {profilesEnabled && <Icon name="chevron-right" size={13} color={MUTED} strokeWidth={2} />}
+                {/* Everyone in the ride can be reported, not only the host
+                    (App Store 1.2). Live only, where rows are not buttons. */}
+                {onSafety && !profilesEnabled && u.id !== viewerId && (
+                  <button
+                    type="button"
+                    onClick={() => onSafety(u)}
+                    aria-label={t("ride.reportOrBlock", { name: u.name })}
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
+                  >
+                    <Icon name="more-horizontal" size={16} color={MUTED} strokeWidth={2} />
+                  </button>
+                )}
               </PersonRow>
             ))}
           </div>

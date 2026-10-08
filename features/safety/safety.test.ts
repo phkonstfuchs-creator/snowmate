@@ -62,8 +62,23 @@ describe("reportUserAction", () => {
       details: "links",
       ride: "r1",
       also_block: true,
+      post: null,
     });
     expect(mocks.revalidatePath).toHaveBeenCalled();
+  });
+
+  it("sends the reported post and refreshes, because the post is hidden for the reporter", async () => {
+    mocks.rpc.mockResolvedValue({ data: "reported", error: null });
+    const postId = "8f1c2a4e-1b2c-4d5e-8f90-123456789abc";
+    await reportUserAction({ userId: "u1", reason: "harassment", postId });
+    expect(mocks.rpc).toHaveBeenCalledWith("report_user", expect.objectContaining({ post: postId }));
+    expect(mocks.revalidatePath).toHaveBeenCalled();
+  });
+
+  it("drops a malformed post id", async () => {
+    mocks.rpc.mockResolvedValue({ data: "reported", error: null });
+    await reportUserAction({ userId: "u1", reason: "spam", postId: "not-a-uuid" });
+    expect(mocks.rpc).toHaveBeenCalledWith("report_user", expect.objectContaining({ post: null }));
   });
 
   it("reports without blocking", async () => {

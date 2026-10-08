@@ -246,6 +246,18 @@ describe("FeedScreen with real data", () => {
     expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
   });
 
+  it("lets a rider report or block someone else who joined, never themselves", () => {
+    const participants = [
+      { id: "me-1", display_name: "Me Myself", handle: "me_1" },
+      { id: "rider-2", display_name: "Tom Fremd", handle: "tom_f" },
+    ];
+    render(<FeedScreen live={{ ...live([row({ is_joined: true, taken_spots: 2, participants })]), viewerId: "me-1" }} />);
+    fireEvent.click(screen.getByText("Rails are set"));
+    expect(screen.queryByRole("button", { name: "Report or block Me Myself" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Report or block Tom Fremd" }));
+    expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
+  });
+
   it("says when rides could not be loaded", () => {
     render(<FeedScreen live={live(null)} />);
     expect(screen.getByText(/Rides could not be loaded/)).toBeInTheDocument();
@@ -317,6 +329,27 @@ describe("FeedScreen with real data", () => {
     fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByRole("button", { name: /Public/ })).toBeDisabled();
+    /* Under 18, friends of friends never see the ride: the copy says so. */
+    expect(screen.getByRole("button", { name: /Friends.*Only your confirmed friends/ })).toBeInTheDocument();
+  });
+
+  it("limits the meeting point and note to what the server accepts", () => {
+    render(<FeedScreen live={live([], false)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
+    fireEvent.change(screen.getByLabelText("Resort"), { target: { value: "Nordkette" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByLabelText("Meeting point")).toHaveAttribute("maxLength", "120");
+    expect(screen.getByLabelText(/^Note/)).toHaveAttribute("maxLength", "280");
+  });
+
+  it("tells an adult that friends of friends see a friends ride", () => {
+    render(<FeedScreen live={live([], false)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
+    fireEvent.change(screen.getByLabelText("Resort"), { target: { value: "Nordkette" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Chill/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("button", { name: /Friends.*Friends and their friends/ })).toBeInTheDocument();
   });
 });
 

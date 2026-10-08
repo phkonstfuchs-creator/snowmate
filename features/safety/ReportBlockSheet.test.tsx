@@ -50,6 +50,17 @@ describe("ReportBlockSheet", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Thanks");
   });
 
+  it("passes the reported post along", async () => {
+    mocks.report.mockResolvedValue({ ok: true, message: "Thanks. We will look at it." });
+    render(<ReportBlockSheet target={{ userId: "u1", name: "Max", postId: "p1" }} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Report Max/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "Spam or selling" }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Send report" }));
+    });
+    expect(mocks.report).toHaveBeenCalledWith(expect.objectContaining({ postId: "p1" }));
+  });
+
   it("shows a refusal and does not refresh", async () => {
     mocks.report.mockResolvedValue({ ok: false, message: "You have sent many reports today. Try again tomorrow." });
     render(<ReportBlockSheet target={{ userId: "u1", name: "Max" }} onClose={() => {}} />);

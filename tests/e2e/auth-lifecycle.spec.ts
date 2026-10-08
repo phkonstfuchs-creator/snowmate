@@ -20,6 +20,7 @@ async function signUp(page: Page, email: string, password: string, handle: strin
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("checkbox", { name: /I accept the terms of use/ }).check();
   await page.getByRole("button", { name: "Create account" }).click();
 }
 

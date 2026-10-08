@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import LegalPage from "@/features/legal/LegalPage";
 import { OPERATOR } from "@/features/legal/operator";
@@ -7,11 +8,17 @@ export const metadata: Metadata = { title: "Datenschutz · Pistl" };
 export default function DatenschutzPage() {
   return (
     <LegalPage title="Datenschutzerklärung">
+      <p>
+        <em>
+          Kurz gesagt: Pistl speichert nur, was die App braucht, zeigt deine Daten nur den Personen, die die Regeln
+          erlauben, nutzt kein Tracking und keine Werbung, und du kannst im Profil jederzeit alles herunterladen oder
+          löschen.
+        </em>
+      </p>
       <p lang="en">
         <em>
-          Privacy policy under the GDPR. In short: Pistl stores only what the app needs, shows your data only to the
-          people the rules allow, uses no tracking or advertising, and you can download or delete everything in your
-          profile at any time.
+          In short (English): Pistl stores only what the app needs, shows your data only to the people the rules allow,
+          uses no tracking or advertising, and you can download or delete everything in your profile at any time.
         </em>
       </p>
       <p>Stand: {OPERATOR.updated}</p>
@@ -34,7 +41,9 @@ export default function DatenschutzPage() {
       <h3>Konto</h3>
       <p>
         E-Mail-Adresse und Passwort (nur als sicherer Hash gespeichert), optional eine Zwei-Faktor-App. Zweck:
-        Anmeldung und Schutz deines Kontos. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertrag).
+        Anmeldung und Schutz deines Kontos. Bei der Registrierung speichern wir außerdem, welche Fassung der{" "}
+        <Link href="/nutzungsbedingungen">Nutzungsbedingungen</Link> du akzeptiert hast. Rechtsgrundlage: Art. 6 Abs. 1 lit. b
+        DSGVO (Vertrag).
       </p>
       <h3>Profil</h3>
       <p>
@@ -129,7 +138,11 @@ export default function DatenschutzPage() {
       <h3>Meldungen und Blockierungen</h3>
       <p>
         Wenn du jemanden meldest oder blockierst, speichern wir das, um Missbrauch zu verhindern und Meldungen zu
-        prüfen. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Schutz der Nutzerinnen und Nutzer).
+        prüfen. Meldest du einen Post, ist er für dich sofort ausgeblendet; melden ihn zwei verschiedene Personen,
+        ist er für alle ausgeblendet, bis wir ihn geprüft haben. Lehnt jemand deine Freundschaftsanfrage ab, merken
+        wir uns, wie oft: Nach zwei Ablehnungen kannst du dieser Person erst nach einer Pause wieder schreiben, nach
+        fünf gar nicht mehr. Diesen Zähler sieht niemand. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Schutz der
+        Nutzerinnen und Nutzer).
       </p>
       <h3>Sicherheit und Technik</h3>
       <p>
@@ -200,6 +213,7 @@ export default function DatenschutzPage() {
         <li>Standort, den du im Chat schickst: 24 Stunden, danach löschen wir die Koordinaten.</li>
         <li>Anfragezähler zum Missbrauchsschutz: zwei Minuten.</li>
         <li>Meldungen: so lange, wie es für ihre Prüfung und den Schutz anderer nötig ist.</li>
+        <li>Zähler abgelehnter Freundschaftsanfragen: bis eines der beiden Konten gelöscht wird.</li>
       </ul>
 
       <h2>7. Deine Rechte</h2>
@@ -220,8 +234,10 @@ export default function DatenschutzPage() {
       <p>
         Pistl ist ab 14 Jahren. Für Minderjährige gelten strengere Regeln: Ihre Rides und ihr Standort sind nur für
         bestätigte Freunde sichtbar. Den eigenen Standort teilen kann man erst ab 16; jüngere Nutzer sehen nur die
-        Positionen ihrer Freunde. Auch einen eigenen Lift-Treffpunkt kann man erst ab 16 teilen. Das Alter ergibt sich
-        aus dem Geburtsdatum, das du bei der Registrierung angibst.
+        Positionen ihrer Freunde. Auch einen eigenen Lift-Treffpunkt kann man erst ab 16 teilen. Öffentliche Rides
+        kann man erst ab 18 veranstalten; ab 14 kann man ihnen beitreten und ist dann mit den anderen Mitfahrenden im
+        Ride-Chat. Jede Person dort lässt sich melden und blockieren. Das Alter ergibt sich aus dem Geburtsdatum, das
+        du bei der Registrierung angibst.
       </p>
 
       <h2>9. Keine automatisierten Entscheidungen</h2>

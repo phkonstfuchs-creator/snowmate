@@ -77,6 +77,7 @@ const PROFILE = {
   handle: "new_rider",
   city: "innsbruck",
   birthDate: "2004-02-14",
+  acceptTerms: "2026-10-07",
 };
 
 function signupForm(values: Record<string, string>, styles: string[] = ["park", "chill"]): FormData {
@@ -253,9 +254,18 @@ describe("auth actions", () => {
           city: "innsbruck",
           riding_styles: ["park", "chill"],
           birth_date: "2004-02-14",
+          terms_version: "2026-10-07",
         },
       }),
     }));
+  });
+
+  it("creates nothing until the terms of use are accepted", async () => {
+    const form = signupForm({ email: "new.rider@example.com", password: "Pistl2026Pass", confirmPassword: "Pistl2026Pass" });
+    form.delete("acceptTerms");
+    const result = await signUpAction(initialAuthActionState, form);
+    expect(result).toMatchObject({ status: "error", message: "Please accept the terms of use." });
+    expect(auth.signUp).not.toHaveBeenCalled();
   });
 
   it("stops at a taken handle before creating anything", async () => {

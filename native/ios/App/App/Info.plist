@@ -68,8 +68,8 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Pistl uses your location to show you on the piste map, to share it with friends you choose and to track your ski day. You decide each time.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>While you record a ski day, Pistl keeps counting your runs with the screen locked. Your route stays on your phone; only the day's totals are saved.</string>
-	<!-- Ski-day tracking with the screen locked, only while a day is running (ADR 0026, 0031). -->
+	<string>With the screen locked, Pistl keeps sharing your location with the friends you chose, until the time you picked runs out or you stop, and keeps counting your runs while you record a ski day. Your route stays on your phone.</string>
+	<!-- Background location only between start and stop: a running ski day (ADR 0026, 0031) or live sharing with friends (ADR 0015, 0032). -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

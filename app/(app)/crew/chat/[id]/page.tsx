@@ -2,6 +2,7 @@ import ChatThread from "@/features/chat/ChatThread";
 import ChatUnavailable from "@/features/chat/ChatUnavailable";
 import { chatTitle } from "@/features/chat/chat-title";
 import { getNewDirectChat, listChatMessages, listMyChats } from "@/features/chat/queries";
+import { getCanShareLocation } from "@/features/location/queries";
 import { getLocale, getT } from "@/lib/i18n/server";
 
 export default async function ChatPage({
@@ -12,7 +13,9 @@ export default async function ChatPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams]);
-  const [chats, messages, t, locale] = await Promise.all([listMyChats(), listChatMessages(id), getT(), getLocale()]);
+  const [chats, messages, t, locale, canSharePosition] = await Promise.all([
+    listMyChats(), listChatMessages(id), getT(), getLocale(), getCanShareLocation(),
+  ]);
   /* The list holds chats with messages; a brand-new direct chat is
      confirmed separately. */
   const withUser = typeof query.with === "string" ? query.with : null;
@@ -28,5 +31,5 @@ export default async function ChatPage({
   const { title, subtitle } = chatTitle(chat, t, locale);
   const other = chat.kind === "direct" && chat.otherUserId ? { id: chat.otherUserId, name: title } : null;
 
-  return <ChatThread conversationId={chat.id} title={title} subtitle={subtitle} initialMessages={messages} other={other} />;
+  return <ChatThread conversationId={chat.id} title={title} subtitle={subtitle} initialMessages={messages} other={other} canSharePosition={canSharePosition} />;
 }

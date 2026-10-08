@@ -65,7 +65,7 @@ export default function PostCard({ post }: { post: Post }) {
           style={{ height: "auto", maxHeight: 420 }}
         />
       )}
-      {reporting && <ReportBlockSheet target={{ userId: post.authorId, name: post.authorName }} onClose={() => setReporting(false)} />}
+      {reporting && <ReportBlockSheet target={{ userId: post.authorId, name: post.authorName, postId: post.id }} onClose={() => setReporting(false)} />}
     </article>
   );
 }

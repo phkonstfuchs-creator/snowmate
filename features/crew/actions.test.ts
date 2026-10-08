@@ -40,6 +40,8 @@ describe("friend actions", () => {
     ["self", "error", "That is your own handle."],
     ["profile_incomplete", "error", "Finish your profile first: add your name and handle on the Profile tab."],
     ["accepted", "success", "They had already asked you. You are friends now."],
+    ["cooling_down", "error", "They said no to your last requests. You can ask again in a while."],
+    ["declined_often", "error", "They said no several times. You cannot ask them again."],
     ["surprise", "error", "That did not work. Try again shortly."],
   ])("maps %s", async (data, status, message) => {
     mocks.rpc.mockResolvedValue({ data, error: null });
