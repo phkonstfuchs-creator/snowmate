@@ -28,6 +28,8 @@ import Avatar from "@/components/ui/Avatar";
 import NextStep from "@/components/ui/NextStep";
 import { initialsFor } from "@/features/profile/profile-input";
 import CreateMenu from "./CreateMenu";
+import { crewOutLine } from "./crew-out";
+import PushAsk, { usePushAskAfterJoin } from "@/features/notifications/PushAsk";
 
 export interface LiveFeed {
   /* null when the backend could not be reached */
@@ -41,10 +43,12 @@ export interface LiveFeed {
   /* The viewer's account id, so a ride sheet offers report and block for
      everyone in it except the viewer. */
   viewerId?: string;
+  /* Confirmed friends' ids: only they are named in "who's out today". */
+  friendIds?: string[];
 }
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
-export default function FeedScreen({ live }: { live?: LiveFeed }) {
+export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; referenceTime?: string }) {
   const basePath = useBasePath();
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
@@ -54,7 +58,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
-  const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS);
+  const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS, referenceTime);
   const unavailable = live !== undefined && live.rides === null;
 
   const [storyUser, setStoryUser] = useState<User | null>(null);
@@ -63,6 +67,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
      the animation mid-flight. A changing key remounts it and the toast
      starts over instead of being swallowed. */
   const [xpToast, setXpToast] = useState(0);
+  const pushAsk = usePushAskAfterJoin(live !== undefined);
 
   /* The effect owns the timer, so each new toast cancels the previous
      one through the cleanup and unmounting cannot leave one running. */
@@ -80,15 +85,25 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
      its riders are not on the mountain yet. */
   const todaysRides = rides.filter((ride) => ride.isToday);
   const facesToday = [...new Map(todaysRides.flatMap((ride) => [ride.host, ...ride.participants]).map((user) => [user.id, user])).values()];
-  const ridersToday = board.isLive
-    ? todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0)
-    : city === "innsbruck" ? 174 : 127;
+  const ridersToday = todaysRides.reduce((sum, ride) => sum + 1 + ride.post.takenSpots, 0);
+  const outLine = crewOutLine(facesToday, live ? live.friendIds ?? [] : ME.friendIds, ridersToday);
+  const shownFaces = outLine && outLine.friendIds.length > 0
+    ? facesToday.filter((user) => outLine.friendIds.includes(user.id))
+    : facesToday;
 
   const handleJoin = async (postId: string) => {
     if (board.pendingId) return;
+    /* Leaving or withdrawing happens in the ride sheet, which says so.
+       A second tap on the card never takes you out by accident. */
+    const ride = rides.find((candidate) => candidate.post.id === postId);
+    if (ride && (ride.isJoined || ride.isPending) && selectedPostId !== postId) {
+      setSelectedPostId(postId);
+      return;
+    }
     const didJoin = await board.toggleJoin(postId);
     if (didJoin) {
       setXpToast((n) => n + 1);
+      pushAsk.offer();
     }
   };
 
@@ -119,15 +134,15 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       </header>
 
       {/* "Who's out today?" first: faces, not just a number. */}
-      {ridersToday > 0 && (
-        <section aria-label={t("feed.outToday", { n: ridersToday })} className="flex items-center gap-3 px-4 pt-4 pb-1">
-          <div className="flex -space-x-2">
-            {facesToday.slice(0, 5).map((user) => (
+      {outLine && (
+        <section aria-label={t(outLine.key, outLine.values)} className="flex items-center gap-3 px-4 pt-4 pb-1">
+          <div className="flex -space-x-1.5">
+            {shownFaces.slice(0, 4).map((user) => (
               <Avatar key={user.id} id={user.id} initials={initialsFor(user.name, user.handle)} size={32} className="ring-2 ring-[var(--paper-0)]" />
             ))}
           </div>
           <span className="text-sm font-semibold" style={{ color: "var(--ink-0)" }}>
-            {t("feed.outToday", { n: ridersToday })}
+            {t(outLine.key, outLine.values)}
           </span>
         </section>
       )}
@@ -191,6 +206,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {/* Post Modal */}
       {live && <PostList posts={live.posts ?? []} title={t("posts.fromCrew")} />}
       {live && <div className="pb-4" />}
+
 
       {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
 
@@ -264,6 +280,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {/* Story user profile */}
       {storyUser && (
         <UserProfileSheet user={storyUser} onClose={() => setStoryUser(null)} />
+      )}
+
+      {pushAsk.pending && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
+        <PushAsk onClose={pushAsk.dismiss} />
       )}
 
       {/* XP toast */}

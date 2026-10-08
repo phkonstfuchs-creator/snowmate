@@ -19,7 +19,7 @@ describe("UserProfileSheet", () => {
 
     fireEvent.click(messageButton);
     fireEvent.click(
-      screen.getByRole("button", { name: "Close conversation" }),
+      screen.getByRole("button", { name: "Back to Crew" }),
     );
 
     await waitFor(() => expect(messageButton).toHaveFocus());

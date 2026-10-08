@@ -7,6 +7,7 @@ describe("DemoLiftMeetupTryout", () => {
     render(<DemoLiftMeetupTryout />);
 
     expect(screen.getByRole("heading", { name: "Try the lift meetup" })).toBeInTheDocument();
+    expect(screen.getByText(/no account and no GPS/)).toBeInTheDocument();
     expect(screen.getByText(/No account needed; no GPS, push notification, or saved data/)).toBeInTheDocument();
     expect(screen.queryByText(/Lena is estimated/)).not.toBeInTheDocument();
 

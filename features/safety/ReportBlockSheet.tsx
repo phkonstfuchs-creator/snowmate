@@ -18,7 +18,8 @@ const INK_2 = "var(--ink-2)";
 const CRIMSON = "var(--crimson)";
 const OFFLINE: SafetyActionResult = { ok: false, message: "common.offline" };
 
-export default function ReportBlockSheet({ target, onClose }: { target: SafetyTarget; onClose: () => void }) {
+/* `demo`: the /demo prototype shows the same sheet but sends nothing. */
+export default function ReportBlockSheet({ target, onClose, demo = false }: { target: SafetyTarget; onClose: () => void; demo?: boolean }) {
   useScrollLock();
   const t = useT();
   const router = useRouter();
@@ -40,13 +41,18 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
   const block = async () => {
     if (!window.confirm(t("safety.confirmBlock", { name: target.name }))) return;
     setPending(true);
-    finish(await settle(blockUserAction(target.userId), OFFLINE));
+    finish(demo ? { ok: true, message: t("demo.notSent") } : await settle(blockUserAction(target.userId), OFFLINE));
     setPending(false);
   };
 
   const report = async () => {
     if (!reason) return;
     setPending(true);
+    if (demo) {
+      finish({ ok: true, message: t("demo.notSent") });
+      setPending(false);
+      return;
+    }
     finish(
       await settle(
         reportUserAction({ userId: target.userId, reason, details, alsoBlock, ...(target.rideId ? { rideId: target.rideId } : {}), ...(target.postId ? { postId: target.postId } : {}) }),
@@ -85,7 +91,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
           {result ? (
             <>
               <p role="status" className="text-base" style={{ color: result.ok ? INK : CRIMSON }}>{translateText(t, result.message)}</p>
-              <button type="button" onClick={dismiss} className="w-full py-4 font-display text-lg" style={{ background: INK, color: "var(--paper-0)" }}>
+              <button type="button" onClick={dismiss} className="w-full py-4 font-display text-lg" style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
                 {t("common.done")}
               </button>
             </>

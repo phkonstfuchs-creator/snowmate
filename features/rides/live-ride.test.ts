@@ -98,6 +98,14 @@ describe("formatRideDate", () => {
     expect(formatRideDate(input, NOW)).toBe(expected);
   });
 
+  it("formats a later day the same on server and phone, in both languages", () => {
+    /* Fixed words, not Intl: Node and the phone's browser ship different
+       ICU data, which broke hydration of demo dates (sweep 2026-10-08). */
+    expect(formatRideDate("2027-01-12", NOW, "de")).toBe("Di., 12. Jan.");
+    expect(formatRideDate("2027-05-01", NOW, "de")).toBe("Sa., 1. Mai");
+    expect(formatRideDate("2027-03-20", NOW, "en")).toBe("Sat 20 Mar");
+  });
+
   it("crosses a month boundary for tomorrow", () => {
     expect(formatRideDate("2027-02-01", new Date(Date.UTC(2027, 0, 31, 9)))).toBe("Tomorrow");
   });

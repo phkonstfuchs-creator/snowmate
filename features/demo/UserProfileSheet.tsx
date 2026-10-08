@@ -11,6 +11,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { avatarColor } from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import XPBar from "@/components/ui/XPBar";
+import { useT } from "@/lib/i18n/client";
 
 const D = "var(--bg-canvas)";
 const SURFACE = "var(--bg-surface-1)";
@@ -46,6 +47,7 @@ const BADGE_INK: Record<string, string> = {
 
 export default function UserProfileSheet({ user, onClose, onMessage }: { user: User; onClose: () => void; onMessage?: (userId: string) => void }) {
   useScrollLock();
+  const t = useT();
   const [showThread, setShowThread] = useState(false);
   const messageButtonRef = useRef<HTMLButtonElement>(null);
   const { state, dismiss } = useSheetDismiss(onClose);
@@ -76,7 +78,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 z-10" style={{ background: SURFACE }}>
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-          <button type="button" onClick={dismiss} aria-label="Close profile" className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
+          <button type="button" onClick={dismiss} aria-label={t("common.close")} className="absolute right-3 top-1 flex h-11 w-11 items-center justify-center">
             <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
           </button>
         </div>
@@ -115,7 +117,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
               {user.instagram && (
                 <a href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer"
                   className="card-tap flex items-center gap-1.5 text-xs font-bold px-3 py-1.5"
-                  style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: "1px solid rgba(200,90,160,0.3)" }}
+                  style={{ background: "var(--paper-2)", color: "var(--ink-1)" }}
                   onClick={(e) => e.stopPropagation()}>
                   <Icon name="instagram" size={12} />
                   @{user.instagram}
@@ -136,9 +138,9 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {/* Stats */}
         <div className="grid grid-cols-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
           {[
-            { label: "Days", value: user.daysThisSeason },
-            { label: "Resorts", value: user.resortsVisited },
-            { label: "Streak", value: `${user.streakWeeks} wk` },
+            { label: t("demo.statDays"), value: user.daysThisSeason },
+            { label: t("demo.statResorts"), value: user.resortsVisited },
+            { label: t("demo.statStreak"), value: t("demo.weeks", { n: user.streakWeeks }) },
           ].map(({ label, value }, i) => (
             <div key={label} className="flex flex-col items-center py-4 gap-0.5" style={i < 2 ? { borderRight: `1px solid ${BORDER}` } : {}}>
               <span className="font-mono font-bold text-xl" style={{ color: INK }}>{value}</span>
@@ -159,7 +161,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
         {user.favoriteResort && (
           <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <Icon name="mountain" size={14} color={BRAND} strokeWidth={2} />
-            <span className="text-sm font-medium" style={{ color: MUTED }}>Home resort: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
+            <span className="text-sm font-medium" style={{ color: MUTED }}>{t("demo.homeResort")}: <span className="font-black" style={{ color: INK }}>{user.favoriteResort}</span></span>
           </div>
         )}
 
@@ -191,7 +193,7 @@ export default function UserProfileSheet({ user, onClose, onMessage }: { user: U
             </button>
             <button className={clsx("card-tap flex-1 py-3 rounded-[14px] font-black text-sm border-2")}
               style={isFriend ? { border: `2px solid ${BORDER}`, color: MUTED } : { border: `2px solid ${BRAND}`, color: BRAND }}>
-              {isFriend ? "In your crew" : "Add to crew"}
+              {isFriend ? t("demo.inCrew") : t("demo.addToCrew")}
             </button>
           </div>
         )}

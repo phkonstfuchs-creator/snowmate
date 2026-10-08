@@ -1,6 +1,6 @@
 import type { AbilityLevel, City, RidePost, RideVisibility, User } from "@/lib/types";
 import { initialsFor } from "@/features/profile/profile-input";
-import { DEFAULT_LOCALE, INTL_LOCALE, type Locale } from "@/lib/i18n/locales";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locales";
 import { translator } from "@/lib/i18n/translate";
 
 /* Row shape returned by the list_rides() database function. The meeting
@@ -113,8 +113,24 @@ export function formatRideDate(isoDate: string, now: Date, locale: Locale = DEFA
 
   const [y, m, d] = isoDate.split("-").map(Number);
   const date = new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1, 12));
-  return date.toLocaleDateString(INTL_LOCALE[locale], { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+  const names = DAY_NAMES[locale];
+  const weekday = names.weekdays[date.getUTCDay()];
+  const month = names.months[date.getUTCMonth()];
+  return locale === "de" ? `${weekday}, ${date.getUTCDate()}. ${month}` : `${weekday} ${date.getUTCDate()} ${month}`;
 }
+
+/* Fixed short names instead of Intl: the server and the phone's browser
+   ship different ICU data, and a demo date rendered on both must match. */
+const DAY_NAMES: Record<Locale, { weekdays: string[]; months: string[] }> = {
+  de: {
+    weekdays: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
+    months: ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."],
+  },
+  en: {
+    weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  },
+};
 
 export function formatPostedAt(isoTimestamp: string, now: Date, locale: Locale = DEFAULT_LOCALE): string {
   const t = translator(locale);

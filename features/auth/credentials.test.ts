@@ -46,6 +46,11 @@ describe("validateSignupCredentials", () => {
     expect(result.success).toBe(true);
   });
 
+  it("needs no confirmation: sign-up shows the password instead", () => {
+    const result = validateSignupCredentials({ email: "new.rider@example.com", password: "Pistl2026Pass" });
+    expect(result.success).toBe(true);
+  });
+
   it.each([
     ["too short", "Snow2026", "Snow2026"],
     ["no uppercase letter", "pistl2026pass", "pistl2026pass"],

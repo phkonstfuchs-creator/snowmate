@@ -29,14 +29,16 @@ export const newPasswordSchema = z
 const signupCredentialsSchema = loginCredentialsSchema
   .extend({
     password: newPasswordSchema,
-    confirmPassword: z.string().max(128, "v.passwordTooLong"),
+    /* Sign-up shows the password (eye button) instead of asking twice
+       (usability protocol, task 1). Checked only when a form sends it. */
+    confirmPassword: z.string().max(128, "v.passwordTooLong").optional(),
   })
   .refine(
     ({ password, email }) => !containsEmailName(password, email),
     { message: "v.passwordEmail", path: ["password"] },
   )
   .refine(
-    ({ password, confirmPassword }) => password === confirmPassword,
+    ({ password, confirmPassword }) => confirmPassword === undefined || password === confirmPassword,
     {
       message: "v.passwordMismatch",
       path: ["confirmPassword"],

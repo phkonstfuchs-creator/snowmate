@@ -174,8 +174,8 @@ describe("auth actions", () => {
   it.each([
     ["over_email_send_rate_limit", "Too many sign-up emails were sent in a short time. Wait a few minutes and try again."],
     ["weak_password", "Choose a stronger password. Common or leaked passwords are refused."],
-    ["something_else", "We could not create the account. Check the details and try again."],
-    [undefined, "We could not create the account. Check the details and try again."],
+    ["something_else", "We could not create the account right now. Your details are kept; try again in a moment."],
+    [undefined, "We could not create the account right now. Your details are kept; try again in a moment."],
   ])("explains the sign-up refusal %s and logs only its code", async (code, message) => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     auth.signUp.mockResolvedValue({ data: { session: null }, error: { code } });

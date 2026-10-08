@@ -36,6 +36,7 @@ export default function DemoLiftMeetupTryout() {
         {t("demo.meetup.title")}
       </h2>
       <p className="mt-2 text-sm" style={{ color: "var(--ink-1)" }}>{t("demo.meetup.lead")}</p>
+      <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("demo.meetup.safety")}</p>
 
       {friend ? (
         <>

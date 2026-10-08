@@ -76,10 +76,11 @@ export default function InviteScreen({
             {t("invite.signInLead")}
           </p>
           <div className="mt-6 flex flex-col gap-3">
-            <Link href="/onboarding" className="card-tap font-display px-6 py-3 text-lg" style={primary}>
+            {/* Straight to the sign-up steps: the invite is kept and opens again afterwards. */}
+            <Link href="/signup" className="card-tap font-display px-6 py-3 text-lg" style={primary}>
               {t("auth.createAccount")}
             </Link>
-            <Link href="/login" className="text-sm font-semibold underline" style={{ color: INK }}>
+            <Link href="/login" className="inline-flex min-h-11 items-center justify-center text-sm font-semibold underline" style={{ color: INK }}>
               {t("onb.haveAccount")}
             </Link>
           </div>

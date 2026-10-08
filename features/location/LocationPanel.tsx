@@ -123,7 +123,7 @@ export default function LocationPanel({
             </button>
           ) : canShare && (
             <button type="button" onClick={() => setSheetOpen(true)} disabled={busy} className="text-mono-label min-h-11 px-3 disabled:opacity-50"
-              style={{ background: INK, color: PAPER }}>
+              style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
               {t("loc.share")}
             </button>
           )}

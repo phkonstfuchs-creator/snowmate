@@ -31,7 +31,8 @@ import AccountSection from "./AccountSection";
 import LanguageSwitch from "./LanguageSwitch";
 import AgeSection from "./AgeSection";
 import SecuritySection from "./SecuritySection";
-import { useT } from "@/lib/i18n/client";
+import { useLocale, useT } from "@/lib/i18n/client";
+import { INTL_LOCALE } from "@/lib/i18n/locales";
 import { initialsFor, type OwnProfile } from "./profile-input";
 import type { AccountStats } from "./account-stats";
 import type { BlockedPerson } from "@/features/safety/reports";
@@ -146,6 +147,7 @@ const STAMP: Record<BadgeRarity, string> = {
 
 /* Mountain hut stamp: double ring, pressed slightly askew */
 function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index: number }) {
+  const t = useT();
   const color = STAMP[badge.rarity];
   const iconName = BADGE_ICON_NAME[badge.icon] ?? badge.icon;
   const tilt = [-7, 5, -3, 8, -5, 4, -8, 6, -4, 7][index % 10];
@@ -177,7 +179,7 @@ function Stamp({ badge, earned, index }: { badge: Badge; earned: boolean; index:
           color: earned ? INK : "var(--ink-3)",
         }}
       >
-        <span className="sr-only">{earned ? "Earned: " : "Locked: "}</span>
+        <span className="sr-only">{earned ? `${t("game.earned")}: ` : `${t("game.locked")}: `}</span>
         {badge.name}
       </span>
     </li>
@@ -217,6 +219,7 @@ export default function ProfileScreen({
 }) {
   const isLive = account !== undefined;
   const t = useT();
+  const locale = useLocale();
   const displayName = isLive ? account?.displayName ?? t("profile.newRider") : ME.name;
   const handle = isLive ? account?.handle ?? null : ME.handle;
   const initials = isLive ? initialsFor(account?.displayName ?? null, account?.handle ?? null) : ME.avatar;
@@ -279,7 +282,7 @@ export default function ProfileScreen({
               ? [account?.city ? t(CITY_LABEL[account.city]) : null, ...(account?.ridingStyles ?? []).map((style) => t(ABILITY_LABEL[style]))]
                   .filter(Boolean)
                   .join(" · ") || t("common.rider")
-              : `Level ${ME.level} · ${ME.levelTitle}`}
+              : t("demo.levelLine", { n: ME.level, title: ME.levelTitle })}
           </p>
         </div>
       </header>
@@ -329,10 +332,10 @@ export default function ProfileScreen({
         <div className="print-card px-4 py-4">
           <div className="flex items-baseline justify-between">
             <span className="text-mono-data-lg" style={{ color: INK }}>
-              {ME.xp.toLocaleString("en-GB")}
+              {ME.xp.toLocaleString(INTL_LOCALE[locale])}
             </span>
             <span className="text-mono-label" style={{ color: INK_2 }}>
-              / {ME.xpToNext.toLocaleString("en-GB")} XP
+              / {ME.xpToNext.toLocaleString(INTL_LOCALE[locale])} XP
             </span>
           </div>
 
@@ -340,7 +343,7 @@ export default function ProfileScreen({
             <div className="xp-bar-fill" style={{ transform: `scaleX(${pct / 100})` }} />
           </div>
           <p className="text-mono-label mt-2" style={{ color: INK_2 }}>
-            {(ME.xpToNext - ME.xp).toLocaleString("en-GB")} XP to level {ME.level + 1}
+            {t("demo.xpToLevel", { xp: (ME.xpToNext - ME.xp).toLocaleString(INTL_LOCALE[locale]), level: ME.level + 1 })}
           </p>
 
           <div className="mt-4 grid grid-cols-3" style={{ borderTop: "var(--rule-thin)" }}>
@@ -395,7 +398,7 @@ export default function ProfileScreen({
       <section className="pt-7">
         <div className="px-4">
           <SectionRule
-            label="Stamps"
+            label={t("game.badges")}
             right={
               <span className="text-mono-label" style={{ color: INK_2 }}>
                 {ME.badges.length}/{BADGES.length}
@@ -404,7 +407,7 @@ export default function ProfileScreen({
           />
         </div>
         <ul
-          aria-label="Stamps"
+          aria-label={t("game.badges")}
           className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1 outline-none focus-visible:ring-2 focus-visible:ring-rust"
           tabIndex={0}
         >
@@ -416,11 +419,11 @@ export default function ProfileScreen({
 
       {/* ── Streak ─────────────────────────────────────────── */}
       <section className="px-4 pt-7">
-        <SectionRule label="Streak" />
+        <SectionRule label={t("demo.statStreak")} />
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-mono-data-lg" style={{ color: INK }}>{ME.streakWeeks}</p>
-            <p className="text-sm mt-1" style={{ color: INK_2 }}>weeks in a row on the mountain</p>
+            <p className="text-sm mt-1" style={{ color: INK_2 }}>{t("demo.streakText")}</p>
           </div>
           <Icon name="flame" size={30} color={RUST} strokeWidth={1.8} />
         </div>
@@ -445,9 +448,9 @@ export default function ProfileScreen({
       {/* ── Season ranking ─────────────────────────────────── */}
       <section className="px-4 pt-7 pb-6">
         <SectionRule
-          label="Season ranking"
+          label={t("game.leaderboard")}
           right={
-            <div className="city-toggle-track" role="group" aria-label="Ranking region" style={{ width: 132 }}>
+            <div className="city-toggle-track" role="group" aria-label={t("common.region")} style={{ width: 132 }}>
               {(["innsbruck", "salzburg"] as const).map((c) => (
                 <button
                   key={c}
@@ -480,10 +483,10 @@ export default function ProfileScreen({
                       className="truncate text-[0.9375rem]"
                       style={{ color: INK, fontWeight: isMe ? 700 : 500 }}
                     >
-                      {isMe ? "You" : user.name}
+                      {isMe ? t("chat.you") : user.name}
                     </span>
                     <span className="text-mono-label flex-shrink-0" style={{ color: INK_2 }}>
-                      {entry.xp.toLocaleString("en-GB")}
+                      {entry.xp.toLocaleString(INTL_LOCALE[locale])}
                     </span>
                   </div>
                   <div className="mt-1" style={{ height: 10, background: "var(--paper-2)", border: "1px solid var(--border-hairline)" }}>
@@ -518,11 +521,11 @@ export default function ProfileScreen({
               >
                 <span className="text-mono-label w-5" style={{ color: INK_2 }}>{entry.rank}</span>
                 <span className="flex-1 truncate text-[0.9375rem]" style={{ color: INK, fontWeight: isMe ? 700 : 400 }}>
-                  {isMe ? "You" : user.name}
+                  {isMe ? t("chat.you") : user.name}
                 </span>
                 <span className="text-mono-label" style={{ color: INK_2 }}>{entry.days} days</span>
                 <span className="text-mono-label w-14 text-right" style={{ color: INK }}>
-                  {entry.xp.toLocaleString("en-GB")}
+                  {entry.xp.toLocaleString(INTL_LOCALE[locale])}
                 </span>
               </div>
             );
@@ -537,7 +540,7 @@ export default function ProfileScreen({
               <span className="flex-1 text-[0.9375rem] font-bold" style={{ color: INK }}>You</span>
               <span className="text-mono-label" style={{ color: INK_2 }}>{myRank.days} days</span>
               <span className="text-mono-label w-14 text-right" style={{ color: INK }}>
-                {myRank.xp.toLocaleString("en-GB")}
+                {myRank.xp.toLocaleString(INTL_LOCALE[locale])}
               </span>
             </div>
           )}
@@ -590,6 +593,9 @@ export default function ProfileScreen({
         <NextStep icon="sparkles" text={t("profile.noPosts")} action={t("next.toFeed")} href="/feed" />
       )}
 
+      {/* Notifications are wanted often enough to stay outside Settings. */}
+      {isLive && <div className="mt-6"><PushSettings /></div>}
+
       {/* Settings are needed rarely: one row that opens them. */}
       <details className="settings-disclosure mx-4 mt-6 mb-4" style={{ borderTop: "var(--rule-thin)" }}>
         <summary className="flex min-h-12 cursor-pointer items-center justify-between text-sm font-semibold" style={{ color: INK }}>
@@ -598,7 +604,6 @@ export default function ProfileScreen({
         </summary>
         <div className="-mx-4">
           {isLive && account && <AgeSection birthDate={account.birthDate} isMinor={account.isMinor} />}
-          {isLive && <PushSettings />}
           {isLive && account && leaderboardSettings !== undefined && <LeaderboardSettings initial={leaderboardSettings} isMinor={account.isMinor} />}
           <LanguageSwitch />
           {isLive && <SecuritySection mfaEnabled={mfaEnabled} />}

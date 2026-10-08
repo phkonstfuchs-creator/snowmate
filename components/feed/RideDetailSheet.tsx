@@ -105,7 +105,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
               <span className="text-xs font-bold" style={{ color: MUTED }}>@{author.handle} {profilesEnabled ? ` · Lv ${author.level}` : ""} · {post.postedAt}</span>
             </div>
           </PersonRow>
-          <button onClick={dismiss} aria-label={t("ride.closeDetails")} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
+          <button onClick={dismiss} aria-label={t("ride.closeDetails")} className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: BORDER }}>
             <Icon name="x" size={14} color={MUTED} strokeWidth={2} />
           </button>
         </div>

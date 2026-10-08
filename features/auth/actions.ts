@@ -132,7 +132,7 @@ export async function signUpAction(
   const input = {
     email: stringField(formData, "email"),
     password: stringField(formData, "password"),
-    confirmPassword: stringField(formData, "confirmPassword"),
+    confirmPassword: formData.has("confirmPassword") ? stringField(formData, "confirmPassword") : undefined,
   };
   const profileInput = {
     displayName: stringField(formData, "displayName"),

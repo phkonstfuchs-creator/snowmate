@@ -8,12 +8,19 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/events", useRouter: () 
 /* This screen is the first window facing outward, so the tests
    mainly cover what strangers may and may not see. */
 
+/* The Freshers Day event (Julia Mayer, 09:30, Axamer Lizum). */
 function openFirstEvent() {
-  fireEvent.click(screen.getAllByRole("button", { name: /Jan/ })[0]!);
+  fireEvent.click(screen.getAllByRole("button", { name: /Freshers Day Axamer Lizum/ })[0]!);
   return screen.getByRole("dialog");
 }
 
 describe("EventsScreen", () => {
+  it("leads from an empty region to the other one", () => {
+    render(<EventsScreen live={{ rides: [], defaultCity: "innsbruck" }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Show Salzburg" }));
+    expect(screen.getByRole("button", { name: "Show Innsbruck" })).toBeInTheDocument();
+  });
+
   it("states the visibility rule on the screen where it applies", () => {
     render(<EventsScreen />);
 

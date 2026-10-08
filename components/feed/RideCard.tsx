@@ -2,7 +2,7 @@
 
 import { RidePost, User } from "@/lib/types";
 import Avatar from "@/components/ui/Avatar";
-import Tag from "@/components/ui/Tag";
+import Tag, { STYLE_LABEL } from "@/components/ui/Tag";
 import Icon from "@/components/ui/Icon";
 import { useT } from "@/lib/i18n/client";
 import { isFull, openSpots } from "@/features/rides/capacity";
@@ -101,7 +101,14 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
             <button
               onClick={(e) => { e.stopPropagation(); onJoin?.(e); }}
               disabled={full && !isJoined && !isPending}
-              className="min-h-11 px-5 text-[0.9375rem] font-semibold transition-transform active:scale-[0.97]"
+              /* Several cards say "I'm in": the name says which ride. */
+              aria-label={t("card.actionFor", {
+                action: isJoined ? t("card.joined") : isPending ? t("card.asked") : t("card.join"),
+                resort: post.resort,
+                style: t(STYLE_LABEL[post.abilityLevel]),
+                time: post.meetTime,
+              })}
+              className="min-h-12 px-5 text-[0.9375rem] font-semibold transition-transform active:scale-[0.97]"
               style={
                 isJoined || isPending
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", borderRadius: 999 }

@@ -58,6 +58,15 @@ describe("ski-day tracking", () => {
     expect(resort).toBe("Nordkette");
   });
 
+  it("finishes with one tap and no browser dialog; saving is the second", async () => {
+    render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
+    expect(screen.getByText(/Keep Pistl open/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Start/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    expect(window.confirm).not.toHaveBeenCalled();
+    expect(await screen.findByRole("dialog")).toHaveTextContent("Your ski day");
+  });
+
   it("asks before throwing away an unsaved day", async () => {
     render(<TrackingProvider userId={USER}><TrackPanel /></TrackingProvider>);
     fireEvent.click(screen.getByRole("button", { name: /Start/ }));

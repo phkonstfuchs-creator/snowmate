@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import Switch from "@/components/ui/Switch";
@@ -9,6 +10,7 @@ import type { MessageKey } from "@/lib/i18n/translate";
 import { initialsFor } from "@/features/profile/profile-input";
 import { openDirectChatAction } from "@/features/chat/actions";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import ConversationThread from "@/features/demo/ConversationThread";
 import { deckAction, setDiscoverableAction, swipeAction } from "./actions";
 import { swipeDirection, type DeckCard, type SwipeOutcome } from "./discovery";
 
@@ -27,11 +29,15 @@ export default function DiscoverScreen({
   discoverable,
   hasBirthDate,
   isMinor,
+  demo = false,
 }: {
   initialDeck: DeckCard[] | null;
   discoverable: boolean | null;
   hasBirthDate: boolean;
   isMinor: boolean;
+  /* /demo: fixtures only, nothing goes to the server (ADR 0003). A like
+     with friends in common matches, to show the whole flow. */
+  demo?: boolean;
 }) {
   const t = useT();
   const [on, setOn] = useState(discoverable === true);
@@ -43,6 +49,11 @@ export default function DiscoverScreen({
 
   const toggle = (next: boolean) => {
     setError(null);
+    if (demo) {
+      setOn(next);
+      setDeck(next ? initialDeck : []);
+      return;
+    }
     startTransition(async () => {
       const ok = await setDiscoverableAction(next).catch(() => false);
       if (!ok) {
@@ -57,6 +68,10 @@ export default function DiscoverScreen({
   const decide = (card: DeckCard, liked: boolean) => {
     setError(null);
     setDeck((current) => current?.filter((item) => item.userId !== card.userId) ?? current);
+    if (demo) {
+      if (liked && card.mutualFriends > 0) setMatch(card);
+      return;
+    }
     startTransition(async () => {
       const outcome = await swipeAction(card.userId, liked).catch((): SwipeOutcome => "unavailable");
       if (outcome === "matched") setMatch(card);
@@ -65,7 +80,7 @@ export default function DiscoverScreen({
     });
   };
 
-  const reload = () => startTransition(async () => setDeck(await deckAction().catch(() => null)));
+  const reload = () => (demo ? setDeck(initialDeck) : startTransition(async () => setDeck(await deckAction().catch(() => null))));
   const top = deck?.[0] ?? null;
 
   return (
@@ -99,7 +114,13 @@ export default function DiscoverScreen({
         <div className="mx-4 mt-8 text-center">
           <p className="font-semibold" style={{ color: "var(--ink-0)" }}>{t("discover.empty")}</p>
           <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>{isMinor ? t("discover.emptyMinor") : t("discover.emptyAdult")}</p>
-          <button type="button" onClick={reload} className="mt-4 min-h-11 px-4 text-sm font-semibold" style={{ border: "var(--rule-thin)", color: "var(--ink-0)" }}>
+          {/* Under 18 the deck grows only with friends: invite one. */}
+          {isMinor && (
+            <Link href={demo ? "/demo/crew" : "/crew"} className="mt-4 flex min-h-12 items-center justify-center px-5 text-sm font-semibold" style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 999 }}>
+              {t("discover.inviteFriend")}
+            </Link>
+          )}
+          <button type="button" onClick={reload} className="mt-2 min-h-11 px-4 text-sm font-semibold" style={{ border: "var(--rule-thin)", color: "var(--ink-0)" }}>
             {t("discover.reload")}
           </button>
         </div>
@@ -109,10 +130,11 @@ export default function DiscoverScreen({
         <SwipeCard key={top.userId} card={top} onDecide={(liked) => decide(top, liked)} onReport={() => setReporting(top)} />
       )}
 
-      {match && <MatchSheet card={match} onClose={() => setMatch(null)} />}
+      {match && <MatchSheet card={match} demo={demo} onClose={() => setMatch(null)} />}
       {reporting && (
         <ReportBlockSheet
           target={{ userId: reporting.userId, name: reporting.name }}
+          demo={demo}
           onClose={() => {
             setDeck((current) => current?.filter((item) => item.userId !== reporting.userId) ?? current);
             setReporting(null);
@@ -204,9 +226,11 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
   );
 }
 
-function MatchSheet({ card, onClose }: { card: DeckCard; onClose: () => void }) {
+function MatchSheet({ card, demo, onClose }: { card: DeckCard; demo: boolean; onClose: () => void }) {
   const t = useT();
   const [busy, setBusy] = useState(false);
+  const [demoChat, setDemoChat] = useState(false);
+  if (demoChat) return <ConversationThread userId={card.userId} onClose={onClose} />;
   return (
     <>
       <div className="sheet-overlay" data-state="open" onClick={onClose} aria-hidden />
@@ -216,18 +240,30 @@ function MatchSheet({ card, onClose }: { card: DeckCard; onClose: () => void }) 
         </div>
         <h2 className="text-display-md mt-4">{t("discover.matchTitle")}</h2>
         <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>{t("discover.matchText", { name: card.name })}</p>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => {
-            setBusy(true);
-            void openDirectChatAction(card.userId).finally(() => setBusy(false));
-          }}
-          className="mt-5 flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
-          style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
-        >
-          {t("discover.writeMessage")}
-        </button>
+        {demo ? (
+          /* The demo thread works with any sample rider, so the match opens it here. */
+          <button
+            type="button"
+            onClick={() => setDemoChat(true)}
+            className="mt-5 flex min-h-12 w-full items-center justify-center text-sm font-semibold"
+            style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
+          >
+            {t("discover.writeMessage")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setBusy(true);
+              void openDirectChatAction(card.userId).finally(() => setBusy(false));
+            }}
+            className="mt-5 flex min-h-12 w-full items-center justify-center text-sm font-semibold disabled:opacity-50"
+            style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
+          >
+            {t("discover.writeMessage")}
+          </button>
+        )}
         <button type="button" onClick={onClose} className="mt-2 min-h-11 w-full text-sm font-semibold" style={{ color: "var(--ink-1)" }}>
           {t("discover.keepSwiping")}
         </button>

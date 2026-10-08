@@ -14,6 +14,7 @@ import type { MessageKey } from "@/lib/i18n/translate";
 import { checkHandleAction, signUpAction } from "./actions";
 import { initialAuthActionState, type AuthActionState, type HandleCheck } from "./action-state";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
+import { profileStepIssue, viennaToday } from "./signup-profile";
 
 const PAPER = "var(--paper-0)";
 const PAPER_1 = "var(--paper-1)";
@@ -178,7 +179,8 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
     maxWidth: 430,
   };
 
-  const profileComplete = name.trim().length >= 2 && HANDLE_RE.test(handle) && handleStatus !== "taken" && Boolean(birthDate);
+  const profileIssue = profileStepIssue({ name, handle, handleTaken: handleStatus === "taken", birthDate }, viennaToday());
+  const profileComplete = profileIssue === null;
 
   // ── Step 0: title page ─────────────────────────────────────
   if (step === 0) {
@@ -252,7 +254,11 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
             );
           })}
         </div>
-        <p className="px-4 pb-8 text-center text-mono-label" style={{ color: INK_2 }}>{t("onb.changeLater")}</p>
+        <p className="px-4 text-center text-mono-label" style={{ color: INK_2 }}>{t("onb.changeLater")}</p>
+        {/* Someone who lands here with an account can still sign in. */}
+        <button type="button" onClick={() => router.push("/login")} className="mx-auto mb-6 mt-1 min-h-11 px-4 text-sm font-semibold underline" style={{ color: INK_2 }}>
+          {t("onb.haveAccount")}
+        </button>
       </div>
     );
   }
@@ -357,12 +363,16 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
               value={birthDate}
               max={new Date().toISOString().slice(0, 10)}
               helper={t("onb.birthHint")}
-              error={state.profileErrors?.birthDate}
+              error={state.profileErrors?.birthDate ?? (profileIssue === "age.tooYoung" || profileIssue === "age.invalid" ? t(profileIssue) : undefined)}
               onChange={(event) => setBirthDate(event.target.value)}
             />
           </div>
         </div>
         <div className="px-4 pb-8">
+          {/* Handle and age problems already show at their field. */}
+          {profileIssue && !["v.handleTaken", "age.tooYoung", "age.invalid"].includes(profileIssue) && (
+            <p className="mb-2 text-center text-sm" style={{ color: INK_2 }}>{t(profileIssue)}</p>
+          )}
           <PrimaryButton disabled={!profileComplete} onClick={() => setStep(4)}>{t("common.next")}</PrimaryButton>
         </div>
       </div>
@@ -391,8 +401,6 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
               error={state.fieldErrors?.password?.[0]} disabled={pending} required />
             <PasswordStrengthMeter password={password} email={email} />
           </div>
-          <Input label={t("auth.confirmPassword")} name="confirmPassword" type="password" autoComplete="new-password"
-            error={state.fieldErrors?.confirmPassword?.[0]} disabled={pending} required />
         </div>
 
         {state.status === "error" && (

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import EventsScreen from "./EventsScreen";
 import { toLiveRide, type RideRow } from "./live-ride";
@@ -11,6 +11,7 @@ vi.mock("./actions", () => ({
   cancelRideAction: mocks.cancel,
   createRideAction: vi.fn(),
 }));
+vi.mock("@/features/notifications/PushSettings", () => ({ default: () => <div>push switch</div> }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/events",
   useRouter: () => ({ refresh: mocks.refresh }),
@@ -92,6 +93,20 @@ describe("EventsScreen with real data", () => {
     );
     expect(within(screen.getByRole("dialog")).getByText("Kinderland exit")).toBeInTheDocument();
     expect(within(screen.getByRole("dialog")).getByText("4/10")).toBeInTheDocument();
+  });
+
+  it("offers notifications after a first join, once the event sheet is closed", async () => {
+    window.localStorage.clear();
+    mocks.join.mockResolvedValue({ ok: true, message: "You are in." });
+    render(<EventsScreen live={live([row({})])} />);
+    fireEvent.click(screen.getByText("Freshers day"));
+    await act(async () => {
+      fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Join event" }));
+    });
+    expect(screen.queryByRole("dialog", { name: /Want to know/ })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close event" }));
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Want to know when your crew heads out?" })).toHaveTextContent("push switch"));
   });
 
   it("shows the join at once, before the refreshed list arrives", async () => {

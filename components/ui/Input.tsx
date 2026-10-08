@@ -48,7 +48,8 @@ export default function Input({
           borderRadius: 14,
           background: "var(--paper-2)",
           border: `1px solid ${error ? "var(--crimson)" : "var(--paper-3)"}`,
-          boxShadow: focused && !error ? "var(--glow-focus)" : "none",
+          /* A solid 2 px ring: the soft glow alone was under 3:1 (WCAG 1.4.11). */
+          boxShadow: focused && !error ? "0 0 0 2px var(--rust)" : "none",
           transition: "box-shadow var(--duration-fast) var(--ease-standard)",
           opacity: disabled ? 0.5 : 1,
         }}

@@ -4,6 +4,7 @@ import OnboardingDraftSync from "@/features/profile/OnboardingDraftSync";
 import PendingInviteSync from "@/features/crew/PendingInviteSync";
 import TrackingProvider from "@/features/tracking/TrackingProvider";
 import NativePushTaps from "@/features/notifications/NativePushTaps";
+import RegisterServiceWorker from "@/features/notifications/RegisterServiceWorker";
 import ResumeSharing from "@/features/location/ResumeSharing";
 import { getPendingCounts } from "@/features/crew/queries";
 import { getUnreadChatCount } from "@/features/chat/queries";
@@ -41,6 +42,7 @@ export default async function AppLayout({
       <OnboardingDraftSync />
       <RefreshOnResume />
       <NativePushTaps />
+      <RegisterServiceWorker />
       <ResumeSharing />
       <PendingInviteSync />
     </div>

@@ -20,7 +20,7 @@ describe("InviteScreen", () => {
   it("shows no name to signed-out visitors and remembers the invite", () => {
     render(<InviteScreen token={TOKEN} />);
     expect(screen.getByRole("heading")).toHaveTextContent("invited to a crew");
-    expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/onboarding");
+    expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/signup");
     expect(localStorage.getItem(PENDING_INVITE_KEY)).toBe(TOKEN);
   });
 

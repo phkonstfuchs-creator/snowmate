@@ -36,7 +36,7 @@ export default function AgeSection({ birthDate, isMinor }: { birthDate: string |
               type="submit"
               disabled={pending}
               className="px-4 font-display disabled:opacity-40"
-              style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
+              style={{ background: "var(--rust)", color: "var(--on-accent)" }}
             >
               {pending ? t("common.saving") : t("common.save")}
             </button>

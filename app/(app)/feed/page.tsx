@@ -2,9 +2,10 @@ import FeedScreen from "@/features/rides/FeedScreen";
 import { getOwnProfile } from "@/features/profile/queries";
 import { listRides } from "@/features/rides/queries";
 import { listPosts } from "@/features/posts/queries";
+import { getFriendGraph } from "@/features/crew/queries";
 
 export default async function FeedPage() {
-  const [result, profile, posts] = await Promise.all([listRides(), getOwnProfile(), listPosts()]);
+  const [result, profile, posts, graph] = await Promise.all([listRides(), getOwnProfile(), listPosts(), getFriendGraph()]);
 
   return (
     <FeedScreen
@@ -16,6 +17,7 @@ export default async function FeedPage() {
         profileComplete: profile?.onboardingCompleted ?? false,
         posts,
         viewerId: profile?.id,
+        friendIds: graph?.friends.map((friend) => friend.user_id) ?? [],
       }}
     />
   );

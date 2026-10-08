@@ -1,5 +1,5 @@
 import EventsScreen from "@/features/rides/EventsScreen";
 
 export default function DemoEventsPage() {
-  return <EventsScreen />;
+  return <EventsScreen referenceTime={new Date().toISOString()} />;
 }

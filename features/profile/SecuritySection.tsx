@@ -111,7 +111,7 @@ function TwoFactor({ enabled }: { enabled: boolean | null }) {
               {t("common.cancel")}
             </button>
             <button type="button" onClick={confirm} disabled={pending || code.replace(/\s/g, "").length !== 6}
-              className="text-mono-label min-h-11 flex-1 disabled:opacity-40" style={{ background: INK, color: "var(--paper-0)" }}>
+              className="text-mono-label min-h-11 flex-1 disabled:opacity-40" style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
               {t("mfa.activate")}
             </button>
           </div>
@@ -173,7 +173,7 @@ function ChangePassword() {
         </p>
       )}
       <button type="submit" disabled={pending} className="text-mono-label min-h-11 w-full disabled:opacity-50"
-        style={{ background: INK, color: "var(--paper-0)" }}>
+        style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
         {pending ? t("common.saving") : t("auth.savePassword")}
       </button>
     </form>
