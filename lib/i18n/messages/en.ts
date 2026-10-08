@@ -7,7 +7,7 @@ export const en = {
   // ── Shared ───────────────────────────────────────────────────────
   "discover.mutualOne": "{n} friend in common",
   "common.characterCount": "{n} / {max} characters",
-  "meetup.nearStation": "You are near the valley station of {lift}. Check the piste map for a safe route.",
+  "meetup.nearStation": "Your estimated location is near the valley station of {lift}. Check the piste map for a safe route.",
   "push.installShare": "Open Pistl in Safari and tap Share.",
   "push.installAdd": "Choose “Add to Home Screen” and confirm with “Add”.",
   "push.installOpen": "Open Pistl from your Home Screen and enable push in your profile.",

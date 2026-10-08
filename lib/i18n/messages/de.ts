@@ -6,7 +6,7 @@ export const de: Record<MessageKey, string> = {
   // ── Shared ───────────────────────────────────────────────────────
   "discover.mutualOne": "{n} gemeinsamer Freund",
   "common.characterCount": "{n} / {max} Zeichen",
-  "meetup.nearStation": "Du bist nahe der Talstation von {lift}. Prüfe die Pistenkarte für einen sicheren Weg.",
+  "meetup.nearStation": "Dein geschätzter Standort liegt nahe der Talstation von {lift}. Prüfe die Pistenkarte für einen sicheren Weg.",
   "push.installShare": "Öffne Pistl in Safari und tippe auf Teilen.",
   "push.installAdd": "Wähle „Zum Home-Bildschirm“ und bestätige mit „Hinzufügen“.",
   "push.installOpen": "Öffne Pistl vom Home-Bildschirm und aktiviere Push in deinem Profil.",
