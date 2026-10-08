@@ -216,8 +216,8 @@ able to use the whole app wherever the law and the App Store allow it.
 | PR | Contents | Status |
 |---|---|---|
 | 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | merged ([#74](https://github.com/phkonstfuchs-creator/snowmate/pull/74)) |
-| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | PR open |
-| 3 | Scale: #6, #12 | PR open |
+| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | merged ([#75](https://github.com/phkonstfuchs-creator/snowmate/pull/75)) |
+| 3 | Scale: #6, #12 | Prepared; checks and review pending |
 
 PR 3 in numbers (estimate, not measured in production):
 
@@ -232,8 +232,13 @@ PR 3 in numbers (estimate, not measured in production):
 - **Background reload:** an open tab reloads every 5 minutes instead of
   every 60 seconds. Coming back to the app still reloads at once.
 
-At about 1,500 active users this cuts finding #6's estimate of 7,000
-requests a minute to roughly 300. pgTAP: `nav_counts.test.sql` (14 checks).
+Assuming 1,500 visible tabs, the periodic navigation-count read alone
+would make roughly 300 calls per minute (1,500 / 5). This is not total
+backend traffic: page data, chat polling, writes and resume refreshes
+remain additional calls. Finding #6's earlier 7,000 figure was an
+unmeasured estimate; verify the actual total with load measurements and
+EXPLAIN ANALYZE before using it for cost planning.
+pgTAP: `nav_counts.test.sql` (28 checks).
 
 #18 (layout redirect) is not changed. The proxy already sends any failed
 identity check to `/login` on purpose ("fail closed"). Showing an error

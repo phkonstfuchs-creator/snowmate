@@ -48,6 +48,33 @@ describe("getNavCounts", () => {
     expect(mocks.rpc).toHaveBeenCalledWith("my_nav_counts");
   });
 
+
+  it("preserves malformed count fallback and rejects a non-boolean age flag", async () => {
+    mocks.rpc.mockResolvedValue({
+      data: [{ friend_requests: null, carpool_requests: "x", unread_chats: -3, age_outdated: "true" }],
+      error: null,
+    });
+    await expect(getNavCounts()).resolves.toEqual({
+      pending: { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 },
+      unreadChats: 0,
+      ageOutdated: false,
+    });
+  });
+
+  it.each([null, [], {}])("returns safe empty counts for a missing row: %j", async (data) => {
+    mocks.rpc.mockResolvedValue({ data, error: null });
+    await expect(getNavCounts()).resolves.toEqual({
+      pending: { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 }, unreadChats: 0, ageOutdated: false,
+    });
+  });
+
+  it("preserves the unread-count fallback when the RPC rejects", async () => {
+    mocks.rpc.mockRejectedValueOnce(new Error("offline"));
+    await expect(getNavCounts()).resolves.toEqual({
+      pending: { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 }, unreadChats: 0, ageOutdated: false,
+    });
+  });
+
   it("shows no badges and asks for no age write on failure", async () => {
     const empty = { pending: { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 }, unreadChats: 0, ageOutdated: false };
     mocks.rpc.mockResolvedValueOnce({ data: null, error: { code: "x" } });

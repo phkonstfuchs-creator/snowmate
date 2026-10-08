@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(14);
+select plan(28);
 
 -- me (1), friend (2), rider (3), stranger (4), blocked friend (5), a friend who asked (6)
 insert into auth.users (id, email)
@@ -77,6 +77,77 @@ set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000001';
 select is((select age_outdated from public.my_nav_counts()), true, 'an adult still marked minor needs a refresh');
 select lives_ok($$select public.refresh_my_age()$$, 'the refresh runs');
 select is((select age_outdated from public.my_nav_counts()), false, 'and is not needed again');
+
+-- Add scenarios only after original assertions, so their expectations
+-- and initial counters remain untouched.
+reset role;
+insert into public.messages (conversation_id, sender_id, body) values
+  ('9a1cc0de-0000-4000-8000-000000000001', '9a1c0000-0000-4000-8000-000000000001', 'Reply for the high side');
+insert into public.ride_participants (ride_id, user_id, status) values
+  ('9a1cf1de-0000-4000-8000-000000000002', '9a1c0000-0000-4000-8000-000000000003', 'accepted'),
+  ('9a1cf1de-0000-4000-8000-000000000001', '9a1c0000-0000-4000-8000-000000000006', 'pending');
+insert into public.messages (conversation_id, sender_id, body) values
+  ('9a1cc0de-0000-4000-8000-000000000004', '9a1c0000-0000-4000-8000-000000000003', 'Accepted rider update');
+
+set local role authenticated;
+set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000002';
+select results_eq(
+  $$select conversation_id from public.list_my_conversations() order by conversation_id$$,
+  $$values ('9a1cc0de-0000-4000-8000-000000000001'::uuid)$$,
+  'direct user_high sees their confirmed-friend conversation');
+select is((select unread_chats from public.my_nav_counts()), 1,
+  'direct user_high counts the other side reply');
+
+set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000004';
+select results_eq(
+  $$select conversation_id from public.list_my_conversations() order by conversation_id$$,
+  $$values ('9a1cc0de-0000-4000-8000-000000000004'::uuid)$$,
+  'ride host sees their own ride conversation');
+select is((select unread_chats from public.my_nav_counts()), 1,
+  'ride host counts accepted participant message, not own message');
+
+set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000006';
+select is((select count(*)::integer from public.list_my_conversations()), 0,
+  'pending rider sees no conversation');
+select is((select unread_chats from public.my_nav_counts()), 0,
+  'pending rider receives no unread badge');
+
+reset role;
+update public.ride_participants set status = 'accepted'
+where ride_id = '9a1cf1de-0000-4000-8000-000000000001'
+  and user_id = '9a1c0000-0000-4000-8000-000000000006';
+set local role authenticated;
+set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000006';
+select results_eq(
+  $$select conversation_id from public.list_my_conversations() order by conversation_id$$,
+  $$values ('9a1cc0de-0000-4000-8000-000000000003'::uuid)$$,
+  'accepted rider now sees precisely their ride conversation');
+select is((select unread_chats from public.my_nav_counts()), 1,
+  'accepted rider now counts the host message');
+
+reset role;
+delete from public.ride_participants
+where ride_id = '9a1cf1de-0000-4000-8000-000000000001'
+  and user_id = '9a1c0000-0000-4000-8000-000000000006';
+set local role authenticated;
+set local request.jwt.claim.sub = '9a1c0000-0000-4000-8000-000000000006';
+select is((select count(*)::integer from public.list_my_conversations()), 0,
+  'removed rider loses conversation listing');
+select is((select unread_chats from public.my_nav_counts()), 0,
+  'removed rider loses unread badge');
+
+set local request.jwt.claim.sub = '';
+select is((select count(*)::integer from public.list_my_conversations()), 0,
+  'authenticated role without session identity sees no conversations');
+select is((select count(*)::integer from public.my_nav_counts()), 0,
+  'authenticated role without session identity receives no count row');
+
+set local role anon;
+select throws_ok($$select * from public.my_nav_counts()$$, '42501', null,
+  'anonymous role cannot execute navigation count function');
+select throws_ok($$select * from public.list_my_conversations()$$, '42501', null,
+  'anonymous role cannot execute conversation listing function');
+reset role;
 
 select * from finish();
 rollback;
