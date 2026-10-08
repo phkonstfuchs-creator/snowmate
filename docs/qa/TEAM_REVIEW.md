@@ -130,6 +130,28 @@ English. Reporting takes 4 taps from a person or a post. A ride chat has
 no report button. Contact is a private mailbox. Adults can contact minors
 through public events and friend requests (owner decision).
 
+## Persona retest after the UX changes
+
+These are simulated persona opinions from `/demo`, not real user testing.
+The raw notes were preserved before removing the temporary handoff folder
+(commit `e8de020` and `/tmp/snowmate-pr75-handoff-backup/phase4-persona-notes.md`).
+The grades precede the additional small fixes; they have not been re-measured.
+
+| Persona | Grade before → after | Tomorrow? | Main remaining stuck point at retest |
+|---|---|---|---|
+| Jonas | 4 → 5 | yes, barely | Invite loop in the demo; offline tab switch in the demo (no service worker there) |
+| Lena | 6 → 7 | yes | Invite page shows no inviter; terms box cleared after an error |
+| Marco | 5 → 6 | probably | iOS push needs the home screen; no inviter name |
+| Sophie | 4 → 5 | yes (feed) | Legal pages and map attribution in German under English; no dark mode |
+| Tim | 6 → 6 | no (demo) | No ski day or push in the demo; no character counter |
+| Mother | 3 → 5 | would look, not allow | 14-year-olds on adults' events (owner decision); report entry not visible in the demo |
+
+Tap targets stayed met for task 3 (0 taps) and task 4 (1 tap). Chat
+improved from 4 to 3 taps. Tasks 6 and 8 could not be tested in the demo;
+code suggests 3–4 taps for a ski day and 2 for push. The fixed “174” was
+replaced by the actual friend graph. These observations are not proof of
+live backend usability or a legal/security approval.
+
 ## Team roles in brief
 
 - **Founder.** The core loop is: see your crew today, join with one tap.
