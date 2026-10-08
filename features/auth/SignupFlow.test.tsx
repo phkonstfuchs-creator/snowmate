@@ -31,6 +31,23 @@ describe("SignupFlow", () => {
     mocks.checkHandleAction.mockResolvedValue("available");
   });
 
+  it("explains a greyed-out Next and stops under 14 right on the profile step", async () => {
+    render(<SignupFlow startAtTitle={false} />);
+    fireEvent.click(screen.getByRole("button", { name: /Innsbruck/ }));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Chill/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.change(screen.getByPlaceholderText("Alex Rider"), { target: { value: "Lena Moser" } });
+    await waitFor(() => expect(screen.getByText("Available")).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByText("Add your birth date to continue.")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Birth date"), { target: { value: "2016-01-02" } });
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByText("Pistl is for riders aged 14 and over.")).toBeInTheDocument();
+  });
+
   it("starts with the cover and moves to the region", () => {
     render(<SignupFlow />);
     expect(screen.getByRole("heading", { name: "Find your crew" })).toBeInTheDocument();
@@ -87,7 +104,7 @@ describe("SignupFlow", () => {
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "lena@example.com" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "Fresh-Powder-2026" } });
     expect(screen.getByText(/Strength/)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Confirm password"), { target: { value: "Fresh-Powder-2026" } });
+    expect(screen.queryByLabelText("Confirm password")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "terms of use" })).toHaveAttribute("href", "/nutzungsbedingungen");
     fireEvent.click(screen.getByRole("checkbox", { name: /I accept the terms of use/ }));
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));

@@ -7,6 +7,9 @@ import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
+import { useLocale, useT } from "@/lib/i18n/client";
+import { formatPostedAt } from "@/features/rides/live-ride";
+import { fixtureTimestamp } from "@/features/rides/fixture-dates";
 
 interface Props {
   userId: string;
@@ -27,6 +30,8 @@ export default function ConversationThread({ userId, onClose }: Props) {
   }, []);
 
   useScrollLock();
+  const t = useT();
+  const locale = useLocale();
   const other = getUserById(userId);
   if (!other) return null;
 
@@ -37,7 +42,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       id: `new-${messages.length}`,
       senderId: "me",
       text,
-      sentAt: "Jetzt",
+      sentAt: "0 min ago",
       isRead: true,
     };
     setMessages((prev) => [...prev, newMsg]);
@@ -76,7 +81,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
       >
         <button
           onClick={onClose}
-          aria-label="Close conversation"
+          aria-label={t("chat.back")}
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
           style={{ background: "var(--bg-surface-2)" }}
         >
@@ -88,7 +93,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
           <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
             @{other.handle}
             {existing?.contextType === "ride" && (
-              <span style={{ color: "var(--sky)" }}> · via ride</span>
+              <span style={{ color: "var(--sky)" }}> · {t("demo.rideChat")}</span>
             )}
           </p>
         </div>
@@ -98,7 +103,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             className="card-tap text-[0.65rem] font-bold px-2 py-1 rounded-full"
-            style={{ background: "rgba(200,90,160,0.14)", color: "#e59ecb", border: "1px solid rgba(200,90,160,0.3)" }}
+            style={{ background: "var(--paper-2)", color: "var(--ink-1)" }}
           >
             IG
           </a>
@@ -110,7 +115,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         {existing?.contextType === "ride" && messages.length > 0 && (
           <div className="flex justify-center mb-1">
             <span className="text-mono-label px-3 py-1" style={{ background: "var(--accent-primary-subtle)", color: "var(--sky)" }}>
-              Ausfahrtskontext
+              {t("demo.rideChat")}
             </span>
           </div>
         )}
@@ -120,7 +125,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
             <Avatar id={other.id} initials={other.avatar} size={56} />
             <div>
               <p className="font-bold" style={{ color: "var(--text-primary)" }}>{other.name}</p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>No messages yet.</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>{t("chat.noMessages")}</p>
             </div>
           </div>
         )}
@@ -132,7 +137,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
               {!isMe && <Avatar id={other.id} initials={other.avatar} size={24} />}
               <div className={`flex flex-col gap-0.5 max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
                 <div className={isMe ? "msg-bubble-me" : "msg-bubble-them"}>{msg.text}</div>
-                <p className="text-[0.58rem] px-1" style={{ color: "var(--text-disabled)" }}>{msg.sentAt}</p>
+                <p className="text-[0.58rem] px-1" style={{ color: "var(--text-disabled)" }}>{formatPostedAt(fixtureTimestamp(msg.sentAt, new Date()), new Date(), locale)}</p>
               </div>
             </div>
           );
@@ -147,7 +152,8 @@ export default function ConversationThread({ userId, onClose }: Props) {
       >
         <input
           className="flex-1 form-input"
-          placeholder="Message …"
+          placeholder={t("chat.placeholder")}
+          aria-label={t("chat.placeholder")}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -160,7 +166,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
         <button
           onClick={send}
           disabled={!input.trim()}
-          aria-label="Send message"
+          aria-label={t("chat.send")}
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 flex-shrink-0"
           style={{ background: "var(--sky)" }}
         >

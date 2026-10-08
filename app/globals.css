@@ -581,6 +581,11 @@ h1, h2, .large-title, .text-display-hero, .text-display-lg, .text-display-md { o
   border-color: var(--rust);
   box-shadow: var(--glow-focus);
 }
+/* A keyboard user needs a 3:1 focus mark (WCAG 1.4.11); the glow is not. */
+.form-input:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 2px;
+}
 
 /* ─── Live dot ──────────────────────────────────────────────── */
 .pulse-dot {

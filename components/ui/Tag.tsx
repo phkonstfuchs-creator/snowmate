@@ -11,6 +11,13 @@ const LEVEL: Record<AbilityLevel, { label: MessageKey; cls: string; icon: string
   "off-piste": { label: "common.offPiste", cls: "badge-offpiste", icon: "mountain-snow" },
 };
 
+/* The riding style's name, e.g. for a button's accessible name. */
+export const STYLE_LABEL: Record<AbilityLevel, MessageKey> = {
+  chill: LEVEL.chill.label,
+  park: LEVEL.park.label,
+  "off-piste": LEVEL["off-piste"].label,
+};
+
 export default function Tag({ level, showIcon = true }: { level: AbilityLevel; showIcon?: boolean }) {
   const s = LEVEL[level];
   const t = useT();

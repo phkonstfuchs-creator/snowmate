@@ -62,7 +62,7 @@ export default function InviteLinkCard() {
         onClick={create}
         disabled={pending}
         className="card-tap text-mono-label mt-3 flex min-h-11 w-full items-center justify-center gap-2 disabled:opacity-50"
-        style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thin)" }}
+        style={{ background: "var(--rust)", color: "var(--on-accent)" }}
       >
         <Icon name="share" size={14} strokeWidth={2} />
         {pending ? t("invite.creating") : url ? t("invite.newLink") : t("invite.createLink")}

@@ -232,7 +232,7 @@ export default function ProfileEditSheet({
             type="submit"
             disabled={pending}
             className="card-tap w-full py-4 font-display text-xl disabled:opacity-40"
-            style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
+            style={{ background: "var(--rust)", color: "var(--on-accent)" }}
           >
             {pending ? t("common.saving") : t("common.save")}
           </button>

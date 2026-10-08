@@ -198,7 +198,7 @@ function EventDetailSheet({
               type="button"
               onClick={onEdit}
               className="card-tap mb-2 w-full py-4 font-display text-lg"
-              style={{ background: INK, color: "var(--paper-0)", border: "var(--rule-thick)" }}
+              style={{ background: "var(--rust)", color: "var(--on-accent)" }}
             >
               {t("events.edit")}
             </button>
@@ -408,6 +408,15 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
                 {t("events.emptyHint")}
               </p>
             </div>
+            {/* No dead end: one tap to the other region. */}
+            <button
+              type="button"
+              onClick={() => setCity(city === "innsbruck" ? "salzburg" : "innsbruck")}
+              className="mt-1 min-h-12 px-5 text-sm font-semibold"
+              style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 999 }}
+            >
+              {t("events.showOtherRegion", { region: city === "innsbruck" ? "Salzburg" : "Innsbruck" })}
+            </button>
           </div>
         )}
       </div>

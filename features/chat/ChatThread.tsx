@@ -193,7 +193,7 @@ export default function ChatThread({
                 <div
                   className="whitespace-pre-wrap break-words px-3 py-2 text-[0.9375rem] leading-snug"
                   style={message.isMine
-                    ? { background: INK, color: PAPER }
+                    ? { background: "var(--rust)", color: "var(--on-accent)" }
                     : { background: PAPER_1, color: INK, border: "var(--rule-thin)" }}
                 >
                   {message.kind === "location" ? <LocationBubble message={message} /> : message.body}

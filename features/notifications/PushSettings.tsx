@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n/client";
+import Switch from "@/components/ui/Switch";
 import {
   deleteNativePushTokenAction,
   deletePushSubscriptionAction,
@@ -175,21 +176,7 @@ export default function PushSettings() {
       <div className="mt-2 flex items-center justify-between gap-3">
         <p className="text-sm" style={{ color: "var(--ink-2)" }}>{hint}</p>
         {(canToggle || state === "busy") && (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={on}
-            aria-label={t("push.toggle")}
-            disabled={!canToggle}
-            onClick={() => void (on ? turnOff() : turnOn())}
-            className="relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50"
-            style={{ background: on ? "var(--rust)" : "var(--paper-2)", borderRadius: 9999, boxShadow: on ? "none" : "inset 0 0 0 1px var(--border-rule)" }}
-          >
-            <span
-              className="absolute top-1 h-5 w-5 rounded-full transition-all"
-              style={{ left: on ? "calc(100% - 1.5rem)" : "0.25rem", background: on ? "var(--on-accent)" : "var(--ink-2)", borderRadius: 9999 }}
-            />
-          </button>
+          <Switch on={on} label={t("push.toggle")} disabled={!canToggle} onChange={(next) => void (next ? turnOn() : turnOff())} />
         )}
       </div>
       {failed && <p role="status" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t("push.failed")}</p>}

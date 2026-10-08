@@ -167,12 +167,12 @@ function OfferModal({
 
 /* Fixture post → the database shape, with the prototype's local request
    state applied, so both paths share the screen below. */
-function fixtureToLiveCarpool(post: CarpoolPost, myRequest: RequestStatus | null): LiveCarpool | null {
+function fixtureToLiveCarpool(post: CarpoolPost, myRequest: RequestStatus | null, todayLabel: string): LiveCarpool | null {
   const author = getUserById(post.authorId);
   if (!author) return null;
   return {
     post,
-    dateLabel: "Today",
+    dateLabel: todayLabel,
     author,
     isAuthor: false,
     myRequest,
@@ -212,7 +212,7 @@ function RequestButton({
     <button
       onClick={onClick}
       disabled={pending || (full && pool.myRequest === null)}
-      className="w-full min-h-11 rounded-[14px] text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
+      className="w-full min-h-12 rounded-[14px] text-sm font-black transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
       style={
         pool.myRequest
           ? { background: "var(--accent-primary-subtle)", color: BRAND }
@@ -307,11 +307,11 @@ export default function CarpoolScreen({ live }: { live?: LiveCarpoolBoard }) {
     () =>
       (live
         ? live.carpools ?? []
-        : CARPOOL_POSTS.map((post) => fixtureToLiveCarpool(post, demoRequested.has(post.id) ? "pending" : null)).filter(
+        : CARPOOL_POSTS.map((post) => fixtureToLiveCarpool(post, demoRequested.has(post.id) ? "pending" : null, t("common.today"))).filter(
             (pool): pool is LiveCarpool => pool !== null,
           )
       ).filter((pool) => pool.post.city === city),
-    [live, demoRequested, city],
+    [live, demoRequested, city, t],
   );
   const drivers = pools.filter((p) => p.post.role === "driver");
   const riders = pools.filter((p) => p.post.role === "rider");

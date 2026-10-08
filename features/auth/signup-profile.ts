@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { profileInputSchema } from "@/features/profile/profile-input";
 import { ageOn, MAX_AGE, MIN_AGE, parseBirthDate } from "@/features/profile/birth-date";
+import type { MessageKey } from "@/lib/i18n/translate";
 
 /* Everything the onboarding asks before the account exists. The database
    applies the same rules again when it copies the values into the
@@ -63,4 +64,25 @@ export function toSignupMetadata(profile: SignupProfile) {
 /* Today in Vienna as YYYY-MM-DD, the day the database counts ages by. */
 export function viennaToday(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna" }).format(now);
+}
+
+const HANDLE = /^[a-z0-9_]{3,20}$/;
+
+/* Why "Next" on the profile step is still greyed out, as one sentence
+   under it, in the order of the fields. The age rule is checked here
+   too, so nobody under 14 types an e-mail and password first. */
+export function profileStepIssue(
+  step: { name: string; handle: string; handleTaken: boolean; birthDate: string },
+  today: string,
+): MessageKey | null {
+  if (step.name.trim().length < 2) return "onb.needName";
+  if (!HANDLE.test(step.handle)) return "onb.needHandle";
+  if (step.handleTaken) return "v.handleTaken";
+  if (!step.birthDate) return "onb.needBirthDate";
+  const date = parseBirthDate(step.birthDate);
+  if (!date) return "age.invalid";
+  const age = ageOn(date, today);
+  if (age < 0 || age > MAX_AGE) return "age.invalid";
+  if (age < MIN_AGE) return "age.tooYoung";
+  return null;
 }

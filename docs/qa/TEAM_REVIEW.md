@@ -193,8 +193,8 @@ able to use the whole app wherever the law and the App Store allow it.
 
 | PR | Contents | Status |
 |---|---|---|
-| 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | PR open |
-| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | open |
+| 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | merged ([#74](https://github.com/phkonstfuchs-creator/snowmate/pull/74)) |
+| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | PR open |
 | 3 | Scale: #6, #12 | open |
 
 #18 (layout redirect) is not changed. The proxy already sends any failed

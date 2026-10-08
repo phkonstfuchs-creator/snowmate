@@ -176,7 +176,8 @@ are not stored or shown to others. See
 
 ## Push notifications
 
-Opt-in per device, in the profile settings. The device's Web Push
+Opt-in per device, on the Profile tab, and offered once after the first
+ride someone joins. The device's Web Push
 subscription goes into `push_subscriptions`, which clients cannot read.
 Only endpoints of the browser push services (Google, Apple, Mozilla,
 Microsoft) are accepted, so the sender can never be pointed at another
@@ -214,6 +215,11 @@ next account that signs in on it; a live one cannot be taken over. The
 notice names only a sentence key and the sender's name; iOS words it in the
 phone's language from the app's `Localizable.strings`. The Apple signing
 key (`APNS_KEY`) lives only in the Supabase function secrets.
+
+The same service worker is registered in every signed-in browser so a
+lost connection shows an offline page with the tabs instead of the
+browser's error. It caches nothing; signed-in pages stay `no-store`
+([ADR 0035](adr/0035-offline-page-from-the-service-worker.md)).
 
 ## Live location
 

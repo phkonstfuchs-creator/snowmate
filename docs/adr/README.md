@@ -42,5 +42,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0032](0032-crew-whereabouts-from-shared-positions.md) | Crew whereabouts estimated from shared positions | Accepted |
 | [0033](0033-clean-surfaces-instead-of-frames.md) | Clean surfaces instead of frames; one part at a time on Map and Profile | Proposed |
 | [0034](0034-reports-hold-posts-and-friend-request-pauses.md) | Terms of use, held posts and pauses after declined requests | Proposed |
+| [0035](0035-offline-page-from-the-service-worker.md) | Offline page from the service worker, without a cache | Proposed |
 
 Template: context, options considered, decision, consequences, status.

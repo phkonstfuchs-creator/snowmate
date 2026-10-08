@@ -8,13 +8,13 @@ describe("CrewScreen (demo)", () => {
   it("keeps links inside the prototype and switches tabs", () => {
     render(<CrewScreen />);
 
-    expect(screen.getByRole("link", { name: "Find people" })).toHaveAttribute("href", "/demo/people");
+    expect(screen.getAllByRole("link", { name: "Discover" })[0]!).toHaveAttribute("href", "/demo/people");
 
     fireEvent.click(screen.getByRole("button", { name: "Squads" }));
-    expect(screen.getByText("Create new squad")).toBeInTheDocument();
+    expect(screen.getByText("Create a new squad")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /Chats/ }));
-    expect(screen.queryByText("Create new squad")).not.toBeInTheDocument();
+    expect(screen.queryByText("Create a new squad")).not.toBeInTheDocument();
   });
 
   it("opens a conversation from the crew list", () => {

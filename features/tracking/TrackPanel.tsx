@@ -1,6 +1,8 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Icon from "@/components/ui/Icon";
+import { isNativeApp } from "@/lib/native-app";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 import { formatDuration } from "./ski-day";
@@ -15,10 +17,15 @@ const ERRORS: Record<TrackerError, MessageKey> = {
   unavailable: "track.noSignal",
 };
 
+const noSubscription = () => () => {};
+
 /* On the map: start a ski day, watch its numbers, finish it. */
 export default function TrackPanel() {
   const t = useT();
   const tracker = useTracking();
+  /* The store apps keep recording with the screen off (ADR 0031); only a
+     browser needs the "keep it open" hint. The server assumes a browser. */
+  const inBrowser = useSyncExternalStore(noSubscription, () => !isNativeApp(navigator.userAgent), () => true);
   if (!tracker) return null;
   const { state, error, now, start, finish } = tracker;
 
@@ -28,6 +35,7 @@ export default function TrackPanel() {
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold" style={{ color: "var(--ink-0)" }}>{t("track.title")}</h2>
           <p className="text-xs" style={{ color: "var(--ink-2)" }}>{error ? t(ERRORS[error]) : t("track.pitch")}</p>
+          {!error && inBrowser && <p className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>{t("track.keepOpen")}</p>}
         </div>
         <button
           type="button"
@@ -41,10 +49,6 @@ export default function TrackPanel() {
     );
   }
 
-  const stop = () => {
-    if (window.confirm(t("track.confirmFinish"))) finish();
-  };
-
   return (
     <section className="mx-4 mt-3 space-y-3 px-4 py-3" style={{ background: "var(--paper-1)", border: "var(--rule-thin)" }} aria-label={t("track.title")} aria-live="polite">
       <div className="flex items-center justify-between gap-3">
@@ -53,7 +57,7 @@ export default function TrackPanel() {
         </p>
         <button
           type="button"
-          onClick={stop}
+          onClick={finish}
           className="flex min-h-11 items-center px-4 text-sm font-semibold"
           style={{ border: "var(--rule-thin)", color: "var(--ink-0)", background: "var(--paper-0)" }}
         >
@@ -67,7 +71,7 @@ export default function TrackPanel() {
         runs={runsSoFar(state)}
         lead={{ value: formatDuration(now - state.startedAt), label: t("track.time") }}
       />
-      <p className="text-xs" style={{ color: error ? "var(--crimson)" : "var(--ink-2)" }}>{error ? t(ERRORS[error]) : t("track.keepOpen")}</p>
+      <p className="text-xs" style={{ color: error ? "var(--crimson)" : "var(--ink-2)" }}>{error ? t(ERRORS[error]) : inBrowser ? t("track.keepOpen") : t("track.keepRunning")}</p>
     </section>
   );
 }

@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import FeedScreen from "./FeedScreen";
+import { I18nProvider } from "@/lib/i18n/client";
 import { toIsoDay, toLiveRide, type RideRow } from "./live-ride";
 
 const mocks = vi.hoisted(() => ({
@@ -21,6 +22,7 @@ vi.mock("./actions", () => ({
   updateRideAction: mocks.update,
   respondRideRequestAction: mocks.respond,
 }));
+vi.mock("@/features/notifications/PushSettings", () => ({ default: () => <div>push switch</div> }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/feed",
   useRouter: () => ({ refresh: mocks.refresh }),
@@ -89,12 +91,31 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
     });
 
     expect(mocks.join).toHaveBeenCalledWith("ride-1");
     expect(mocks.refresh).toHaveBeenCalled();
     expect(screen.getByText(/You are in/)).toBeInTheDocument();
+  });
+
+  it("offers notifications once, right after the first join", async () => {
+    window.localStorage.clear();
+    mocks.join.mockResolvedValue({ ok: true, message: "You are in." });
+    const { unmount } = render(<FeedScreen live={live([row({})])} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
+    });
+    expect(screen.getByRole("dialog", { name: "Want to know when your crew heads out?" })).toHaveTextContent("push switch");
+    fireEvent.click(screen.getByRole("button", { name: "Later" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: /Want to know/ })).not.toBeInTheDocument());
+    unmount();
+
+    render(<FeedScreen live={live([row({ id: "ride-2" })])} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
+    });
+    expect(screen.queryByRole("dialog", { name: /Want to know/ })).not.toBeInTheDocument();
   });
 
   it("counts only today's riders as out today", () => {
@@ -107,16 +128,27 @@ describe("FeedScreen with real data", () => {
     expect(screen.getByText("3 out today")).toBeInTheDocument();
   });
 
+  it("says which ride a join button is for", () => {
+    render(<FeedScreen live={live([row({})])} />);
+    expect(screen.getByRole("button", { name: "I'm in: Nordkette, Park, 09:00" })).toBeInTheDocument();
+  });
+
+  it("names the friends who are out today instead of a number", () => {
+    const participants = [{ id: "friend-2", display_name: "Julia Mayer", handle: "juli" }];
+    render(<FeedScreen live={{ ...live([row({ taken_spots: 1, participants })]), friendIds: ["host-1", "friend-2"] }} />);
+    expect(screen.getByText("Lena and Julia are out today")).toBeInTheDocument();
+  });
+
   it("recovers when the server cannot be reached", async () => {
     mocks.join.mockRejectedValue(new Error("offline"));
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
     });
 
     expect(screen.getByText("No connection. Try again in a moment.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "I'm in" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: /^I'm in/ })).toBeEnabled();
   });
 
   it("asks to join as a friend of a friend without the joined toast", async () => {
@@ -124,7 +156,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
     });
 
     expect(mocks.join).toHaveBeenCalledWith("ride-1");
@@ -135,8 +167,11 @@ describe("FeedScreen with real data", () => {
     mocks.leave.mockResolvedValue({ ok: true, message: "You left the ride." });
     render(<FeedScreen live={live([row({ my_status: "pending" })])} />);
 
+    /* A second tap on the card never withdraws: it opens the ride. */
+    fireEvent.click(screen.getByRole("button", { name: /^Asked/ }));
+    expect(mocks.leave).not.toHaveBeenCalled();
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Asked" }));
+      fireEvent.click(screen.getByRole("button", { name: "Asked · tap to withdraw" }));
     });
     expect(mocks.leave).toHaveBeenCalledWith("ride-1");
   });
@@ -172,8 +207,11 @@ describe("FeedScreen with real data", () => {
     mocks.leave.mockResolvedValue({ ok: true, message: "You left the ride." });
     render(<FeedScreen live={live([row({ is_joined: true, taken_spots: 1 })])} />);
 
+    /* A second tap on the card never leaves: it opens the ride. */
+    fireEvent.click(screen.getByRole("button", { name: /^Joined/ }));
+    expect(mocks.leave).not.toHaveBeenCalled();
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Joined" }));
+      fireEvent.click(screen.getByRole("button", { name: "You are in, tap to leave" }));
     });
 
     expect(mocks.leave).toHaveBeenCalledWith("ride-1");
@@ -184,7 +222,7 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({})])} />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "I'm in" }));
+      fireEvent.click(screen.getByRole("button", { name: /^I'm in/ }));
     });
 
     expect(screen.getByText("This ride is full.")).toBeInTheDocument();
@@ -354,11 +392,23 @@ describe("FeedScreen with real data", () => {
 });
 
 describe("FeedScreen demo", () => {
+  it("still finds today's demo rides in German, where 'Today' is translated", () => {
+    render(<I18nProvider locale="de"><FeedScreen /></I18nProvider>);
+    expect(screen.getByText(/sind heute unterwegs/)).toBeInTheDocument();
+    expect(screen.getAllByText("vor 23 Min.").length).toBeGreaterThan(0);
+  });
+
+  it("names demo friends and invents no rider count", () => {
+    render(<FeedScreen />);
+    expect(screen.queryByText(/174/)).not.toBeInTheDocument();
+    expect(screen.getByText(/are out today/)).toBeInTheDocument();
+  });
+
   it("still runs on fixtures and joins locally", () => {
     render(<FeedScreen />);
-    const joinButtons = screen.getAllByRole("button", { name: "I'm in" });
+    const joinButtons = screen.getAllByRole("button", { name: /^I'm in/ });
     fireEvent.click(joinButtons[0]!);
     expect(mocks.join).not.toHaveBeenCalled();
-    expect(screen.getAllByRole("button", { name: "Joined" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /^Joined/ }).length).toBeGreaterThan(0);
   });
 });

@@ -9,6 +9,8 @@ import { toggleSetValue } from "@/lib/collections";
 import { toVisibleRide } from "./visibility";
 import { isClosedTo } from "./capacity";
 import { LOCKED_MEET_POINT_LABEL, type LiveRide } from "./live-ride";
+import { localizeFixtureRide } from "./fixture-dates";
+import { useLocale } from "@/lib/i18n/client";
 import {
   cancelRideAction,
   createRideAction,
@@ -92,6 +94,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
   const [notice, setNotice] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const isLive = live !== undefined;
+  const locale = useLocale();
   /* The answer of a join or leave, shown at once until the refreshed
      list arrives. Tied to the list it was made for, so fresh data from
      the server always wins. */
@@ -102,13 +105,16 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
 
   const rides = useMemo(() => {
     if (!live) {
+      const now = new Date();
+      /* "Today" is read from the fixture before its date is translated. */
       return fixtures
         .map((post) => fixtureToLiveRide(post, demoJoined.has(post.id)))
-        .filter((ride): ride is LiveRide => ride !== null);
+        .filter((ride): ride is LiveRide => ride !== null)
+        .map((ride) => ({ ...ride, post: localizeFixtureRide(ride.post, now, locale) }));
     }
     if (overrides.base !== live) return live;
     return live.map((ride) => applyJoinState(ride, overrides.byRide[ride.post.id]));
-  }, [live, fixtures, demoJoined, overrides]);
+  }, [live, fixtures, demoJoined, overrides, locale]);
 
   const toggleJoin = useCallback(
     async (rideId: string) => {

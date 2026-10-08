@@ -11,7 +11,6 @@ export type BadgeRarity = "common" | "rare" | "epic";
    it (see features/rides/visibility.ts). */
 export type RideVisibility = "friends" | "public";
 
-export type FriendRequestState = "none" | "sent" | "accepted" | "declined";
 
 export interface User {
   id: string;

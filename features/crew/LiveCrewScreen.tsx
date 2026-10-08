@@ -60,7 +60,7 @@ function PersonRow({
           type="button"
           onClick={() => onSafety({ userId: row.user_id, name })}
           aria-label={t("ride.reportOrBlock", { name })}
-          className="flex h-11 w-8 items-center justify-center"
+          className="flex h-11 w-11 items-center justify-center"
         >
           <Icon name="more-horizontal" size={16} color={INK_2} strokeWidth={2} />
         </button>

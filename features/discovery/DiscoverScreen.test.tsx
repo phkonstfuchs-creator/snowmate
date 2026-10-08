@@ -62,3 +62,31 @@ describe("DiscoverScreen", () => {
     expect(mocks.swipe).toHaveBeenCalledWith(card(1).userId, true);
   });
 });
+
+describe("DiscoverScreen in the demo", () => {
+  it("works on fixtures without touching the server, and shows report and block", async () => {
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable={false} hasBirthDate isMinor={false} demo />);
+    fireEvent.click(screen.getByRole("switch", { name: "Take part in swiping" }));
+    expect(await screen.findByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
+    expect(mocks.setDiscoverable).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /Report or block/ }));
+    expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
+  });
+
+  it("matches on a like with friends in common and opens the demo crew to write", async () => {
+    render(<DiscoverScreen initialDeck={[card(1)]} discoverable hasBirthDate isMinor={false} demo />);
+    fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
+    expect(await screen.findByRole("dialog", { name: "It's a match!" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Write a message" })).toHaveAttribute("href", "/demo/crew");
+    expect(mocks.swipe).not.toHaveBeenCalled();
+    expect(mocks.openChat).not.toHaveBeenCalled();
+  });
+});
+
+describe("DiscoverScreen empty deck", () => {
+  it("offers an invite to a minor, whose deck grows only with friends", () => {
+    render(<DiscoverScreen initialDeck={[]} discoverable hasBirthDate isMinor />);
+    expect(screen.getByRole("link", { name: "Invite a friend" })).toHaveAttribute("href", "/crew");
+  });
+});

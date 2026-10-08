@@ -28,8 +28,8 @@ test.describe("signed-in journeys against local Supabase", () => {
     await createRide(a.page, caption);
     await b.page.goto("/feed");
     const card = b.page.getByRole("article").filter({ hasText: caption });
-    await card.getByRole("button", { name: "Bin dabei", exact: true }).click();
-    await expect(card.getByRole("button", { name: "Dabei", exact: true })).toBeVisible();
+    await card.getByRole("button", { name: /^Bin dabei:/ }).click();
+    await expect(card.getByRole("button", { name: /^Dabei:/ })).toBeVisible();
     for (const actor of [a, b]) {
       await actor.page.reload();
       const detail = await openRide(actor.page, caption);
@@ -37,8 +37,10 @@ test.describe("signed-in journeys against local Supabase", () => {
       await detail.getByRole("button", { name: "Ride-Details schließen", exact: true }).click();
       await expect(detail).toHaveCount(0);
     }
-    await card.getByRole("button", { name: "Dabei", exact: true }).click();
-    await expect(card.getByRole("button", { name: "Bin dabei", exact: true })).toBeVisible();
+    /* A second tap on the card opens the ride; leaving happens there. */
+    await card.getByRole("button", { name: /^Dabei:/ }).click();
+    await b.page.getByRole("button", { name: "Du bist dabei, tippen zum Verlassen", exact: true }).click();
+    await expect(card.getByRole("button", { name: /^Bin dabei:/ })).toBeVisible();
     for (const actor of [a, b]) {
       await actor.page.reload();
       const detail = await openRide(actor.page, caption);
