@@ -398,15 +398,15 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         </button>
         {location.sharingEnd && <button type="button" onClick={() => void location.stopSharing()} aria-label={t("map.stopSharing")} disabled={location.busy} className="col-span-2 min-h-11 rounded-full px-3 text-sm font-semibold disabled:opacity-50" style={{ color: "var(--crimson)", background: "var(--paper-1)" }}>{t("loc.stop")}</button>}
       </div>}
+      {live && panel === "day" && <div id="map-day-panel"><TrackPanel /></div>}
+      {location && panel === "share" && <div id="map-share-panel"><LocationPanel sharingEnd={location.sharingEnd} canShare={live?.canShare !== false} busy={location.busy}
+        error={location.error ? t(location.error) : null} friends={location.friends} showFriends={false} onShare={location.startSharing} onStop={() => void location.stopSharing()}
+        onFocusFriend={(friend) => focusOn(friend.lat, friend.lng, friend.userId)} /></div>}
       {location?.friends === null && <p role="status" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t("loc.friendsUnavailable")}</p>}
       {location && <CrewOnMap compact now={positionClock} selectedId={selectedFriendId} friends={location.friends} onFocus={focusOn} />}
       {location && meetups && <LiftMeetupPanel compact mine={meetups.mine} friends={meetups.friends} me={location.me} busy={meetups.busy} result={meetups.result}
         onStop={() => void meetups.stop()} onLocate={location.locate} canShare={live?.canShareLift === true} />}
       {!live && <div className="mx-4 mt-4"><DemoLiftMeetupTryout compact /></div>}
-      {live && panel === "day" && <div id="map-day-panel"><TrackPanel /></div>}
-      {location && panel === "share" && <div id="map-share-panel"><LocationPanel sharingEnd={location.sharingEnd} canShare={live?.canShare !== false} busy={location.busy}
-        error={location.error ? t(location.error) : null} friends={location.friends} showFriends={false} onShare={location.startSharing} onStop={() => void location.stopSharing()}
-        onFocusFriend={(friend) => focusOn(friend.lat, friend.lng, friend.userId)} /></div>}
       {location?.error && panel !== "share" && <p role="alert" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t(location.error)}</p>}
       {live && live.rides === null && <p role="status" className="mx-4 mt-3 rounded-2xl px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>{t("map.unavailable")}</p>}
       <ResortExplorer resorts={sorted} onSelect={openResort} conditions={live?.conditions} photos={live?.photos} isLive={isLive} />

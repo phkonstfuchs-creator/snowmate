@@ -61,7 +61,9 @@ describe("MapScreen", () => {
     expect(screen.queryByRole("region", { name: "Live location" })).not.toBeInTheDocument();
     fireEvent.click(sharing);
     expect(sharing).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByRole("region", { name: "Live location" })).toBeInTheDocument();
+    const details = screen.getByRole("region", { name: "Live location" });
+    expect(details).toBeInTheDocument();
+    expect(details.compareDocumentPosition(screen.getByRole("heading", { name: "Your crew on the mountain" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("opens on location sharing while it is on, so stopping is one tap away", () => {
