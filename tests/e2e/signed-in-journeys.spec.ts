@@ -52,13 +52,42 @@ test.describe("signed-in journeys against local Supabase", () => {
 
   test("A and B exchange chat messages; both messages survive reload on both phones", async ({ riders: { a, b } }) => {
     await inviteFriend(a, b);
-    const first = `Park at nine? ${randomUUID()}`;
-    const reply = `See you there! ${randomUUID()}`;
+    const first = `Park at nine? ${randomUUID()}\n${"Meeting point at the valley station.\n".repeat(20)}`.trim();
+    const reply = `See you there! ${randomUUID()}\n${"Bring your helmet and check the lift times.\n".repeat(20)}`.trim();
     await openChat(a.page, b.account);
     await sendMessage(a.page, first);
+    const avatarRequests: string[] = [];
+    b.page.on("request", (request) => {
+      if (new URL(request.url()).pathname === `/avatar/${a.account.id}`) avatarRequests.push(request.url());
+    });
     await openChat(b.page, a.account);
     await expect(b.page.locator("ol").getByText(first, { exact: true })).toBeVisible();
     await sendMessage(b.page, reply);
+    const thread = b.page.locator(".chat-thread");
+    await expect(thread.locator(".msg-bubble-them").filter({ hasText: first })).toBeVisible();
+    const profile = thread.locator("header").getByRole("button", { name: a.account.name, exact: true });
+    await expect.poll(() => avatarRequests.length).toBeGreaterThan(0);
+    expect(new URL(avatarRequests[0]!).pathname).toBe(`/avatar/${a.account.id}`);
+    await expect(profile.locator(".avatar-initials")).toBeVisible();
+    await profile.click();
+    await expect(b.page.getByRole("dialog")).toContainText(`@${a.account.handle}`);
+    await expect.poll(async () => {
+      const sheet = await b.page.getByRole("dialog").boundingBox();
+      return sheet ? Math.abs(sheet.y + sheet.height - b.page.viewportSize()!.height) : Infinity;
+    }).toBeLessThanOrEqual(2);
+    await b.page.getByRole("dialog").getByRole("button", { name: "Schließen", exact: true }).click();
+    const list = thread.getByRole("list");
+    const geometry = await list.evaluate((element) => ({ scrollHeight: element.scrollHeight, clientHeight: element.clientHeight }));
+    expect(geometry.scrollHeight).toBeGreaterThan(geometry.clientHeight);
+    await list.hover();
+    await b.page.mouse.wheel(0, -500);
+    await expect.poll(() => list.evaluate((element) => element.scrollTop)).toBeLessThan(geometry.scrollHeight - geometry.clientHeight);
+    expect(await b.page.evaluate(() => window.scrollY)).toBe(0);
+    const composer = await thread.locator("form").boundingBox();
+    const nav = await b.page.getByRole("navigation", { name: "Hauptnavigation" }).boundingBox();
+    expect(composer).not.toBeNull();
+    expect(nav).not.toBeNull();
+    expect(Math.abs(nav!.y - (composer!.y + composer!.height))).toBeLessThanOrEqual(8);
     for (const actor of [a, b]) {
       await actor.page.reload();
       for (const body of [first, reply]) {

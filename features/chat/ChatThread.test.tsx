@@ -31,6 +31,26 @@ describe("ChatThread", () => {
     await waitFor(() => expect(mocks.poll).toHaveBeenCalledWith(CONV, null));
   });
 
+  it("shows rounded messages and a protected avatar beside the profile action", () => {
+    const person = { id: "c4a70000-0000-4000-8000-000000000002", name: "Lena Moser", handle: "lena" };
+    render(<ChatThread conversationId={CONV} title="Lena Moser" initialMessages={[first, mine]} other={person} />);
+    expect(screen.getByText(first.body)).toHaveClass("msg-bubble-them");
+    expect(screen.getByText(mine.body)).toHaveClass("msg-bubble-me");
+    const profile = screen.getByRole("button", { name: "Lena Moser" });
+    expect(new URL(profile.querySelector("img")!.getAttribute("src")!, window.location.origin).pathname).toBe(`/avatar/${person.id}`);
+    fireEvent.click(profile);
+    expect(screen.getByRole("dialog")).toHaveTextContent("@lena");
+  });
+
+  it("scrolls only the bounded message list, never the page", () => {
+    const { container } = render(<ChatThread conversationId={CONV} title="Crew" initialMessages={[first]} />);
+    expect(container.firstElementChild).toHaveClass("chat-thread");
+    const list = screen.getByRole("list");
+    expect(list).toHaveClass("overflow-y-auto", "min-h-0", "overscroll-contain");
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    expect(container.querySelector("form")).not.toHaveStyle({ bottom: "calc(80px + env(safe-area-inset-bottom, 0px))" });
+  });
+
   it("sends a message and fetches it right away", async () => {
     mocks.send.mockResolvedValue("sent");
     mocks.poll.mockResolvedValueOnce([]).mockResolvedValueOnce([{ ...mine, id: "m3", body: "Servus", createdAt: "2026-10-05T10:02:00Z" }]);
@@ -85,6 +105,14 @@ describe("ChatThread", () => {
     expect(screen.queryByRole("button", { name: "Report or block Me" })).not.toBeInTheDocument();
   });
 
+  it("opens a group sender profile from their name and keeps sheets outside the clipped pane", () => {
+    const { container } = render(<ChatThread conversationId={CONV} title="Crew" initialMessages={[first]} />);
+    const name = screen.getAllByRole("button", { name: /^Lena$/ }).find((button) => button.textContent === "Lena")!;
+    fireEvent.click(name);
+    expect(screen.getByRole("dialog")).toHaveTextContent("Lena");
+    expect(container.querySelector(".chat-thread")).not.toContainElement(screen.getByRole("dialog"));
+  });
+
   it("explains the age rule for pins before asking for the position", () => {
     const getCurrentPosition = vi.fn();
     Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition }, configurable: true });
@@ -101,6 +129,23 @@ describe("ChatThread", () => {
     render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[pin, old]} />);
     expect(screen.getByRole("link", { name: /Location · show on map/ })).toHaveAttribute("href", "/map?lat=47.26346&lng=11.39432&label=Lena");
     expect(screen.getByText(/Location \(hidden after 24 h\)/)).toBeInTheDocument();
+  });
+
+  it("shows the newly sent location even when reading older messages", async () => {
+    const pin: ChatMessage = { ...mine, id: "pin-new", body: "📍", kind: "location", position: { lat: 47.2, lng: 11.3 } };
+    mocks.poll.mockResolvedValueOnce([]).mockResolvedValueOnce([pin]);
+    mocks.sendLocation.mockResolvedValue("sent");
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition: (ok: PositionCallback) => ok({ coords: { latitude: 47.2, longitude: 11.3, accuracy: 8 } } as GeolocationPosition) }, configurable: true });
+    render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[first]} />);
+    await waitFor(() => expect(mocks.poll).toHaveBeenCalledWith(CONV, null));
+    const list = screen.getByRole("list");
+    Object.defineProperties(list, { scrollHeight: { value: 1000 }, clientHeight: { value: 200 } });
+    list.scrollTop = 100;
+    fireEvent.scroll(list);
+    fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
+    await screen.findByRole("link", { name: /My location/ });
+    expect(list.scrollTop).toBe(1000);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
 
   it("sends the current position as a pin, and explains a refusal", async () => {
