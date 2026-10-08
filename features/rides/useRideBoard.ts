@@ -106,7 +106,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
   const rides = useMemo(() => {
     if (!live) {
       /* The demo route supplies the same instant to SSR and hydration. */
-      const now = new Date(referenceTime ?? Date.now());
+      const now = referenceTime ? new Date(referenceTime) : new Date();
       /* "Today" is read from the fixture before its date is translated. */
       return fixtures
         .map((post) => fixtureToLiveRide(post, demoJoined.has(post.id)))
