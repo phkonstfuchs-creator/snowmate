@@ -48,7 +48,7 @@ export interface LiveFeed {
 }
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
-export default function FeedScreen({ live }: { live?: LiveFeed }) {
+export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; referenceTime?: string }) {
   const basePath = useBasePath();
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
@@ -58,7 +58,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
-  const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS);
+  const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS, referenceTime);
   const unavailable = live !== undefined && live.rides === null;
 
   const [storyUser, setStoryUser] = useState<User | null>(null);

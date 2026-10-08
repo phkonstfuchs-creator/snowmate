@@ -87,7 +87,7 @@ function applyJoinState(ride: LiveRide, state: JoinState | undefined): LiveRide 
 
 /* `live` is undefined in the /demo prototype and the list from the
    database in the app. */
-export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly RidePost[]): RideBoard {
+export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly RidePost[], referenceTime?: string): RideBoard {
   const router = useRouter();
   const [demoJoined, setDemoJoined] = useState<Set<string>>(new Set());
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -105,7 +105,8 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
 
   const rides = useMemo(() => {
     if (!live) {
-      const now = new Date();
+      /* The demo route supplies the same instant to SSR and hydration. */
+      const now = new Date(referenceTime ?? Date.now());
       /* "Today" is read from the fixture before its date is translated. */
       return fixtures
         .map((post) => fixtureToLiveRide(post, demoJoined.has(post.id)))
@@ -114,7 +115,7 @@ export function useRideBoard(live: LiveRide[] | undefined, fixtures: readonly Ri
     }
     if (overrides.base !== live) return live;
     return live.map((ride) => applyJoinState(ride, overrides.byRide[ride.post.id]));
-  }, [live, fixtures, demoJoined, overrides, locale]);
+  }, [live, fixtures, demoJoined, overrides, locale, referenceTime]);
 
   const toggleJoin = useCallback(
     async (rideId: string) => {

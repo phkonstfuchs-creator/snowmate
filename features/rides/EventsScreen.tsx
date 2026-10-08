@@ -326,13 +326,13 @@ export interface LiveEvents {
 
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
-export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
+export default function EventsScreen({ live, referenceTime }: { live?: LiveEvents; referenceTime?: string } = {}) {
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [openEventId, setOpenEventId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
-  const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
+  const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS, referenceTime);
   const unavailable = live !== undefined && live.rides === null;
   const pushAsk = usePushAskAfterJoin(live !== undefined);
 
