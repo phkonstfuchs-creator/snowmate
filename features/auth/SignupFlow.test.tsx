@@ -134,6 +134,22 @@ describe("SignupFlow", () => {
     expect((mocks.signUpAction.mock.calls[1]?.[1] as FormData).get("acceptTerms")).toBe("2026-10-07");
   });
 
+  it("keeps consent when a profile error sends the rider back and they retry", async () => {
+    mocks.signUpAction.mockResolvedValueOnce({ status: "error", message: "Check the highlighted fields.", profileErrors: { handle: "That handle is taken." } }).mockResolvedValue({ status: "error", message: "Try again." });
+    render(<SignupFlow startAtTitle={false} />);
+    await toAccountStep();
+    fireEvent.click(screen.getByRole("checkbox", { name: /I accept the terms of use/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("That handle is taken.")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Handle"), { target: { value: "lena_new" } });
+    await waitFor(() => expect(mocks.checkHandleAction).toHaveBeenCalledWith("lena_new"));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("checkbox", { name: /I accept the terms of use/ })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+    await waitFor(() => expect(mocks.signUpAction).toHaveBeenCalledTimes(2));
+    expect((mocks.signUpAction.mock.calls[1]?.[1] as FormData).get("acceptTerms")).toBe("2026-10-07");
+  });
+
   it("goes back to the step with the problem the server found", async () => {
     mocks.signUpAction.mockResolvedValue({
       status: "error",
