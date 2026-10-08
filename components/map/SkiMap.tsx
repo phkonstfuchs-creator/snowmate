@@ -37,6 +37,7 @@ export interface MapPerson {
   initials: string;
   lat: number;
   lng: number;
+  stale?: boolean;
 }
 
 interface SkiMapProps {
@@ -278,6 +279,7 @@ export default function SkiMap({
       pin.type = "button";
       pin.className = "friend-pin";
       pin.setAttribute("aria-label", person.label);
+      pin.style.opacity = person.stale ? "0.55" : "1";
       const badge = document.createElement("span");
       badge.className = "friend-pin-badge";
       badge.textContent = person.initials;

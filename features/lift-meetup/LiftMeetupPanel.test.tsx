@@ -55,3 +55,25 @@ describe("LiftMeetupPanel", () => {
     expect(screen.getByRole("button", { name: "End" })).toBeEnabled();
   });
 });
+
+
+describe("compact lift meetup", () => {
+  it("keeps the primary action reachable and preserves its estimate", () => {
+    const onStartClick = vi.fn();
+    render(<LiftMeetupPanel {...defaults} compact canShare onStartClick={onStartClick} />);
+    const start = screen.getByRole("button", { name: "I'm taking a lift now" });
+    expect(start).toHaveClass("min-h-11");
+    fireEvent.click(start);
+    expect(onStartClick).toHaveBeenCalledOnce();
+    expect(screen.getByText(/Estimate based on lift time/)).toBeInTheDocument();
+  });
+
+  it("preserves stop, errors and change action for an active status", () => {
+    const onStop = vi.fn();
+    render(<LiftMeetupPanel {...defaults} compact mine={mine} friends={[]} result="too_young" canShare onStartClick={vi.fn()} onStop={onStop} />);
+    fireEvent.click(screen.getByRole("button", { name: "End" }));
+    expect(onStop).toHaveBeenCalledOnce();
+    expect(screen.getByRole("alert")).toHaveTextContent("from 16");
+    expect(screen.getByText(/You'll be at the top/)).toBeInTheDocument();
+  });
+});

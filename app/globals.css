@@ -809,3 +809,15 @@ body :is(button, a, label)[style*="background: var(--rust)"] {
    card's rounded corner instead of on it. */
 span.text-mono-label[style*="background"] { border-radius: var(--radius-pill); }
 .text-mono-label.absolute[style*="background"] { margin: 8px; }
+
+/* A single mountain surface: controls belong to the map, attribution stays clear. */
+.mountain-map-stage {
+  position: relative;
+  height: clamp(260px, 46dvh, 430px);
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--paper-2);
+  box-shadow: 0 8px 28px rgba(32, 45, 39, 0.10);
+  isolation: isolate;
+}
+.mountain-map-stage > div:not(.maplibregl-map) { z-index: 1; }

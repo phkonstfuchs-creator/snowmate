@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
@@ -24,15 +24,18 @@ import { resortCoordinates } from "@/lib/resorts";
 import { isNativeApp } from "@/lib/native-app";
 import { useLiveLocation } from "@/features/location/useLiveLocation";
 import LocationPanel from "@/features/location/LocationPanel";
+import { friendWhereabouts } from "@/features/location/whereabouts";
 import CrewOnMap from "@/features/location/CrewOnMap";
 import LiftStartSheet from "@/features/lift-meetup/LiftStartSheet";
 import TrackPanel from "@/features/tracking/TrackPanel";
 import { useTracking } from "@/features/tracking/TrackingProvider";
 import type { FriendLocation } from "@/features/location/location";
 import { initialsFor } from "@/features/profile/profile-input";
-import ConditionsPanel, { ConditionsLine } from "@/features/conditions/ConditionsPanel";
+import ConditionsPanel from "@/features/conditions/ConditionsPanel";
 import type { ResortConditions } from "@/features/conditions/conditions";
 import type { ResortPhoto } from "./resort-photo";
+import ResortExplorer from "./ResortExplorer";
+import DemoLiftMeetupTryout from "@/features/demo/DemoLiftMeetupTryout";
 import ResortPhotoCredit from "./ResortPhotoCredit";
 import Image from "next/image";
 import Link from "next/link";
@@ -270,7 +273,7 @@ export default function MapScreen({ live }: { live?: LiveMap }) {
 function LiveMapScreen({ live }: { live: LiveMap }) {
   const location = useLiveLocation({
     initialSharingEnd: live.sharingEnd ?? null,
-    initialFriends: live.friends ?? [],
+    initialFriends: live.friends === undefined ? [] : live.friends,
   });
   const meetups = useLiftMeetups(live.myLiftMeetup ?? null, live.friendLiftMeetups === undefined ? [] : live.friendLiftMeetups);
   return <MapBody live={live} location={location} meetups={meetups} />;
@@ -288,6 +291,11 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(
     pin ? { lat: pin.lat, lng: pin.lng, zoom: 15, key: 1 } : null,
   );
+  const [positionClock, setPositionClock] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setPositionClock(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const people = useMemo<MapPerson[]>(
     () =>
       (location?.friends ?? []).map((friend) => ({
@@ -296,10 +304,15 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         initials: initialsFor(friend.name, friend.handle),
         lat: friend.lat,
         lng: friend.lng,
+        stale: friendWhereabouts(friend, positionClock).stale,
       })),
-    [location?.friends],
+    [location?.friends, positionClock],
   );
-  const focusOn = (lat: number, lng: number) => setFocus({ lat, lng, zoom: 14, key: Date.now() });
+  const focusOn = (lat: number, lng: number, userId?: string) => {
+    setFocus((previous) => ({ lat, lng, zoom: 14, key: (previous?.key ?? 0) + 1 }));
+    setSelectedFriendId(userId ?? null);
+    mapStage.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
+  };
   /* Opening a resort also flies the map there, close enough to read its
      pistes once the sheet is closed. */
   const openResort = (resort: ResortStatus) => {
@@ -316,8 +329,10 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [locateRequest, setLocateRequest] = useState(0);
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
-  /* Sharing already on: open on it, so the person sees how to stop. */
-  const [panel, setPanel] = useState<"day" | "share">(live?.sharingEnd ? "share" : "day");
+  /* Keep both controls visible; active sharing also has a direct Stop. */
+  const [panel, setPanel] = useState<"day" | "share" | null>(null);
+  const mapStage = useRef<HTMLDivElement>(null);
+  const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const isLive = live !== undefined;
   const rides = live ? live.rides ?? [] : FIXTURE_RIDES;
 
@@ -336,183 +351,66 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
 
   return (
     <>
-      <header className="sticky top-0 z-50"
-        style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}>
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div>
-            <h1 className="large-title" style={{ color: INK }}>{t("map.title")}</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-              {t("map.summary", { n: totalRiders, riding: isLive ? t("map.ridingToday") : t("map.ridingNow"), resorts: resorts.length })}
-            </p>
-          </div>
-          {!isLive && (
-            <div className="text-right">
-              <p className="text-mono-data" style={{ color: INK }}>
-                {deepestSnow?.snowDepth ?? 0} cm
-              </p>
-              <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>
-                {t("map.deepestSnow")}
-              </p>
-            </div>
-          )}
-          {isLive && freshest && (
-            <div className="text-right">
-              <p className="text-mono-data" style={{ color: INK }}>
-                {freshest.conditions.newSnowCm} cm
-              </p>
-              <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>
-                {t("cond.mostNewSnow")} · {freshest.resort.name}
-              </p>
-            </div>
-          )}
+      <header className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: INK }}>{t("map.title")}</h1>
+          <p className="text-xs" style={{ color: MUTED }}>{t("map.summary", { n: totalRiders, riding: isLive ? t("map.ridingToday") : t("map.ridingNow"), resorts: resorts.length })}</p>
         </div>
-        <div className="px-4 pb-3">
-          <SegmentedControl
-            options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
-            value={city}
-            onChange={setCity}
-            ariaLabel={t("common.region")}
-          />
-        </div>
+        {!isLive && <div className="text-right text-xs" style={{ color: MUTED }}><strong className="block text-lg" style={{ color: INK }}>{deepestSnow?.snowDepth ?? 0} cm</strong>{t("map.deepestSnow")}</div>}
+        {isLive && freshest && <div className="max-w-[45%] text-right text-xs" style={{ color: MUTED }}><strong className="block text-lg" style={{ color: INK }}>{freshest.conditions.newSnowCm} cm</strong>{t("cond.mostNewSnow")} · {freshest.resort.name}</div>}
       </header>
 
-      {location && <CrewOnMap friends={location.friends} onFocus={focusOn} canStartLift={live?.canShareLift === true} />}
-
-      {location && meetups && (
-        <LiftMeetupPanel
-          mine={meetups.mine}
-          friends={meetups.friends}
-          me={location.me}
-          busy={meetups.busy}
-          result={meetups.result}
-          onStop={() => void meetups.stop()}
-          onLocate={location.locate}
-          canShare={live?.canShareLift === true}
-          onStartClick={() => setActiveSheet({ type: "lift" })}
-        />
-      )}
-
-      {/* Vector map (MapLibre) */}
-      <div style={{ height: location ? "52dvh" : 280, minHeight: 280, position: "relative", overflow: "hidden" }}>
-        <SkiMap
-          city={city}
-          resorts={resorts}
-          onSelect={openResort}
-          me={location?.me ?? null}
-          people={people}
+      <div ref={mapStage} className="mountain-map-stage mx-3" aria-label={t("map.title")}>
+        <SkiMap city={city} resorts={resorts} onSelect={openResort} me={location?.me ?? null} people={people}
           onPersonSelect={(id) => {
             const friend = location?.friends?.find((item) => item.userId === id);
-            if (friend) focusOn(friend.lat, friend.lng);
-          }}
-          focus={focus}
-          locateRequest={locateRequest}
-          pin={pin}
-          track={live ? tracking?.state?.track ?? null : null}
-        />
-        {location && (
-          <button
-            type="button"
-            onClick={() => {
-              setLocateRequest(Date.now());
-              locateMe();
-            }}
-            aria-label={t("loc.locateMe")}
-            className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full"
-            style={{ zIndex: 500, background: "var(--paper-0)", border: "var(--rule-thick)", boxShadow: "var(--shadow-print)" }}
-          >
-            <Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} strokeWidth={2.2} />
-          </button>
-        )}
-        {location?.locating && (
-          <p role="status" className="absolute bottom-3 left-3 px-2 py-1 text-xs font-semibold"
-            style={{ zIndex: 500, background: "var(--paper-0)", border: "var(--rule-thin)", color: INK }}>
-            {t("loc.locating")}
-          </p>
-        )}
-      </div>
-
-      {/* One panel at a time under the map: the ski day or location
-          sharing, never both stacked (design pass 2026-10-07). */}
-      {live && location && (
-        <div className="px-4 pt-4">
-          <SegmentedControl
-            options={[{ value: "day", label: t("map.tabDay") }, { value: "share", label: t("map.tabShare") }]}
-            value={panel}
-            onChange={setPanel}
-            ariaLabel={t("map.panels")}
-          />
+            if (friend) focusOn(friend.lat, friend.lng, friend.userId);
+          }} focus={focus} locateRequest={locateRequest} pin={pin} track={live ? tracking?.state?.track ?? null : null} />
+        <div className="absolute left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
+          <SegmentedControl options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]} value={city}
+            onChange={(next) => { setCity(next); setSelectedFriendId(null); setFocus(null); }} ariaLabel={t("common.region")} />
         </div>
-      )}
-      {live && panel === "day" && <TrackPanel />}
-
-      {location && (!live || panel === "share") && (
-        <LocationPanel
-          sharingEnd={location.sharingEnd}
-          canShare={live?.canShare !== false}
-          busy={location.busy}
-          error={location.error ? t(location.error) : null}
-          friends={location.friends}
-          onShare={location.startSharing}
-          onStop={() => void location.stopSharing()}
-          onFocusFriend={(friend) => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            focusOn(friend.lat, friend.lng);
-          }}
-        />
-      )}
-
-      {live && live.rides === null && (
-        <p role="status" className="mx-4 mt-3 px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>
-          {t("map.unavailable")}
-        </p>
-      )}
-
-      {live && !inNativeApp && <p className="px-4 pt-4 text-sm" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
-
-      {/* Resort list */}
-      <div className="px-4 pt-4 pb-6">
-        <p className="text-[0.65rem] font-black mb-3" style={{ color: MUTED }}>{t("map.allResorts")}</p>
-        <div className="space-y-2">
-          {sorted.map((resort, i) => (
-            <button
-              key={resort.name}
-              className="card-tap w-full flex items-center gap-3 p-0 rounded-[14px] overflow-hidden anim-fade-up text-left"
-              style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 40}ms` }}
-              onClick={() => openResort(resort)}
-            >
-              <div className="flex-1 min-w-0 py-3 pl-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-sm truncate" style={{ color: INK }}>{resort.name}</span>
-                  {!isLive && resort.conditions === "fresh" && (
-                    <span className="text-mono-label px-1.5 flex-shrink-0 badge-chill">{t("map.freshTag")}</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="pulse-dot" style={{ width: 5, height: 5 }} />
-                  <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{t("map.riding", { n: resort.ridersNow })}</span>
-                  {isLive && conditionsOf(resort.name) && (
-                    <>
-                      <span style={{ color: "var(--ink-3)" }}>·</span>
-                      <ConditionsLine conditions={conditionsOf(resort.name)!} />
-                    </>
-                  )}
-                  {!isLive && (
-                    <>
-                      <span style={{ color: "var(--ink-3)" }}>·</span>
-                      <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{resort.snowDepth} cm</span>
-                      <span style={{ color: "var(--ink-3)" }}>·</span>
-                      <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{t("map.lifts", { open: resort.liftsOpen, total: resort.totalLifts })}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="pr-3">
-                <Icon name="chevron-right" size={14} color={MUTED} strokeWidth={1.8} />
-              </div>
+        {location && <button type="button" onClick={() => { setLocateRequest(Date.now()); locateMe(); }} aria-label={t("loc.locateMe")}
+          className="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full"
+          style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}><Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} /></button>}
+        {location?.locating && <p role="status" className="absolute left-3 top-[72px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
+        {location && live?.canShareLift === true && <div className="absolute bottom-10 left-3 right-3">
+          <p className="mb-2 inline-block rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--paper-0)", color: INK }}>{t("meetup.title")}</p>
+          <div className="flex gap-2">
+            <button type="button" disabled={meetups?.busy} onClick={() => setActiveSheet({ type: "lift" })}
+              className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              style={{ background: "var(--rust)", color: "var(--on-accent)", boxShadow: "var(--shadow-card)" }}>
+              <Icon name="mountain" size={19} />{t(meetups?.mine ? "meetup.changeLift" : "meetup.quickStart")}
             </button>
-          ))}
-        </div>
+            {meetups?.mine && <button type="button" onClick={() => void meetups.stop()} disabled={meetups.busy} className="min-h-12 rounded-full px-4 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--paper-0)", color: "var(--crimson)" }}>{t("meetup.stop")}</button>}
+          </div>
+        </div>}
       </div>
+
+      {live && location && <div className="mx-3 mt-3 grid grid-cols-2 gap-2">
+        <button type="button" onClick={() => setPanel(panel === "day" ? null : "day")} aria-expanded={panel === "day"} aria-controls={panel === "day" ? "map-day-panel" : undefined}
+          className="flex min-h-12 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-semibold" style={{ background: "var(--paper-1)", color: INK }}>
+          <Icon name="route" size={18} />{t("map.tabDay")}{tracking?.state && <span className="pulse-dot h-2 w-2" aria-label={t("track.running")} />}
+        </button>
+        <button type="button" onClick={() => setPanel(panel === "share" ? null : "share")} aria-expanded={panel === "share"} aria-controls={panel === "share" ? "map-share-panel" : undefined}
+          className="flex min-h-12 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-semibold" style={{ background: location.sharingEnd ? "var(--accent-primary-subtle)" : "var(--paper-1)", color: INK }}>
+          <Icon name="radio" size={18} />{t("map.tabShare")}
+        </button>
+        {location.sharingEnd && <button type="button" onClick={() => void location.stopSharing()} aria-label={t("map.stopSharing")} disabled={location.busy} className="col-span-2 min-h-11 rounded-full px-3 text-sm font-semibold disabled:opacity-50" style={{ color: "var(--crimson)", background: "var(--paper-1)" }}>{t("loc.stop")}</button>}
+      </div>}
+      {live && panel === "day" && <div id="map-day-panel"><TrackPanel /></div>}
+      {location && panel === "share" && <div id="map-share-panel"><LocationPanel sharingEnd={location.sharingEnd} canShare={live?.canShare !== false} busy={location.busy}
+        error={location.error ? t(location.error) : null} friends={location.friends} showFriends={false} onShare={location.startSharing} onStop={() => void location.stopSharing()}
+        onFocusFriend={(friend) => focusOn(friend.lat, friend.lng, friend.userId)} /></div>}
+      {location?.friends === null && <p role="status" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t("loc.friendsUnavailable")}</p>}
+      {location && <CrewOnMap compact now={positionClock} selectedId={selectedFriendId} friends={location.friends} onFocus={focusOn} />}
+      {location && meetups && <LiftMeetupPanel compact mine={meetups.mine} friends={meetups.friends} me={location.me} busy={meetups.busy} result={meetups.result}
+        onStop={() => void meetups.stop()} onLocate={location.locate} canShare={live?.canShareLift === true} />}
+      {!live && <div className="mx-4 mt-4"><DemoLiftMeetupTryout compact /></div>}
+      {location?.error && panel !== "share" && <p role="alert" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t(location.error)}</p>}
+      {live && live.rides === null && <p role="status" className="mx-4 mt-3 rounded-2xl px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>{t("map.unavailable")}</p>}
+      <ResortExplorer resorts={sorted} onSelect={openResort} conditions={live?.conditions} photos={live?.photos} isLive={isLive} />
+      {live && !inNativeApp && <p className="px-4 pb-4 text-sm" style={{ color: MUTED }}><Link href="/demo/map" className="underline">{t("meetup.tryDemo")}</Link></p>}
 
       {activeSheet?.type === "resort" && (
         <ResortDetailSheet

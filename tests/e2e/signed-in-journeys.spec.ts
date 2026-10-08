@@ -7,9 +7,47 @@ import {
 test.describe("signed-in journeys against local Supabase", () => {
   test.skip(process.env.LOCAL_SUPABASE_E2E !== "1", "Requires the local Supabase stack used by CI integration.");
   // One file worker reuses two real accounts without raising Auth limits.
-  // Fresh contexts and relationship reset keep the seven tests independent.
+  // Fresh contexts and relationship reset keep the tests independent.
   test.describe.configure({ mode: "default" });
   test.setTimeout(90_000);
+
+  test("map keeps lift, ski day and explicit location consent independently reachable", async ({ riders: { a } }) => {
+    // No GPS fix arrives: exercise the explicit manual fallback deterministically.
+    await a.page.addInitScript(() => {
+      Object.defineProperty(navigator.geolocation, "getCurrentPosition", { value: () => undefined });
+    });
+    await a.page.goto("/map");
+    const stage = a.page.locator(".mountain-map-stage");
+    const lift = stage.getByRole("button", { name: "Ich fahr jetzt Lift", exact: true });
+    await expect(lift).toBeVisible();
+    const bounds = await stage.boundingBox();
+    expect(bounds!.y).toBeLessThan(150);
+    expect(bounds!.y + bounds!.height).toBeLessThan(a.page.viewportSize()!.height - 70);
+    const day = a.page.getByRole("button", { name: "Skitag", exact: true });
+    const location = a.page.getByRole("button", { name: "Mein Standort", exact: true });
+    await expect(day).toHaveAttribute("aria-expanded", "false");
+    await expect(location).toHaveAttribute("aria-expanded", "false");
+    await day.click();
+    await expect(a.page.getByRole("region", { name: "Skitag tracken", exact: true })).toBeVisible();
+    await location.click();
+    const sharing = a.page.getByRole("region", { name: "Live-Standort", exact: true });
+    await expect(sharing).toBeVisible();
+    await sharing.getByRole("button", { name: "Teilen", exact: true }).click();
+    const consent = a.page.getByRole("dialog", { name: "Standort teilen", exact: true });
+    await expect(consent.getByRole("button", { name: "Teilen starten", exact: true })).toBeEnabled();
+    await consent.getByRole("button", { name: "Schließen", exact: true }).click();
+    await expect(consent).toHaveCount(0);
+    await location.click();
+    await lift.click();
+    const picker = a.page.getByRole("dialog", { name: "Lift-Treffpunkt starten", exact: true });
+    const manual = picker.getByRole("button", { name: "Lift selbst wählen", exact: true });
+    await manual.click();
+    await expect(picker.getByRole("combobox", { name: "Skigebiet", exact: true })).toBeVisible();
+    await expect(picker.getByRole("combobox", { name: "Lift auswählen", exact: true })).toBeVisible();
+    const result = await a.account.client.rpc("my_location_sharing");
+    expect(result.error).toBeNull();
+    expect(result.data).toBeNull();
+  });
 
   test("A invites B by link; both see each other in their Crew after reload", async ({ riders: { a, b } }) => {
     await inviteFriend(a, b);

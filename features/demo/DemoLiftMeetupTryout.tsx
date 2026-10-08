@@ -9,7 +9,7 @@ import { useT } from "@/lib/i18n/client";
 
 const SAMPLE_LIFT = LIFTS.find((lift) => lift.id === "osm-way-25170582");
 
-export default function DemoLiftMeetupTryout() {
+export default function DemoLiftMeetupTryout({ compact = false }: { compact?: boolean }) {
   const t = useT();
   const [friend, setFriend] = useState<LiftMeetup | null>(null);
 
@@ -30,9 +30,9 @@ export default function DemoLiftMeetupTryout() {
   };
 
   return (
-    <section className="mx-4 mt-4 p-4" aria-labelledby="demo-lift-title"
-      style={{ border: "var(--rule-thick)", background: "var(--paper-1)" }}>
-      <h2 id="demo-lift-title" className="font-display text-xl" style={{ color: "var(--ink-0)" }}>
+    <section className={compact ? "space-y-2" : "mx-4 mt-4 p-4"} aria-labelledby="demo-lift-title"
+      style={compact ? undefined : { border: "var(--rule-thick)", background: "var(--paper-1)" }}>
+      <h2 id="demo-lift-title" className={`font-display ${compact ? "text-base" : "text-xl"}`} style={{ color: "var(--ink-0)" }}>
         {t("demo.meetup.title")}
       </h2>
       <p className="mt-2 text-sm" style={{ color: "var(--ink-1)" }}>{t("demo.meetup.lead")}</p>
@@ -44,6 +44,7 @@ export default function DemoLiftMeetupTryout() {
             {t("demo.meetup.position")}
           </p>
           <LiftMeetupPanel
+            compact={compact}
             mine={null}
             friends={[friend]}
             me={{ lat: SAMPLE_LIFT.bottomCoordinates[0], lng: SAMPLE_LIFT.bottomCoordinates[1], accuracy: 10 }}
