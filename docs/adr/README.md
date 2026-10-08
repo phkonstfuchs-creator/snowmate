@@ -43,5 +43,9 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0033](0033-clean-surfaces-instead-of-frames.md) | Clean surfaces instead of frames; one part at a time on Map and Profile | Proposed |
 | [0034](0034-reports-hold-posts-and-friend-request-pauses.md) | Terms of use, held posts and pauses after declined requests | Proposed |
 | [0035](0035-offline-page-from-the-service-worker.md) | Offline page from the service worker, without a cache | Proposed |
+| [0036](0036-adult-minor-contact-options.md) | Adults cannot start contact with riders under 16 | Accepted |
+| [0037](0037-public-events-without-automatic-stranger-chat.md) | Public events without automatic chat with strangers | Proposed |
+| [0038](0038-pistl-go-conditional-intents.md) | Pistl Go: conditional ride intents | Proposed |
+| [0039](0039-map-first-mountain-coordination.md) | Map-first mountain coordination | Proposed |
 
 Template: context, options considered, decision, consequences, status.

@@ -237,8 +237,9 @@ export default function DatenschutzPage() {
         bestätigte Freunde sichtbar. Den eigenen Standort teilen kann man erst ab 16; jüngere Nutzer sehen nur die
         Positionen ihrer Freunde. Auch einen eigenen Lift-Treffpunkt kann man erst ab 16 teilen. Öffentliche Rides
         kann man erst ab 18 veranstalten; ab 14 kann man ihnen beitreten und ist dann mit den anderen Mitfahrenden im
-        Ride-Chat. Jede Person dort lässt sich melden und blockieren. Das Alter ergibt sich aus dem Geburtsdatum, das
-        du bei der Registrierung angibst.
+        Ride-Chat. Jede Person dort lässt sich melden und blockieren. Erwachsene können dir unter 16 keine
+        Freundschaftsanfrage schicken; du kannst sie aber selbst anfragen. Das Alter ergibt sich aus dem Geburtsdatum,
+        das du bei der Registrierung angibst.
       </p>
 
       <p>Eltern, Minderjährige und Personen mit akuten Anliegen zum Jugendschutz erreichen uns unter{" "}
