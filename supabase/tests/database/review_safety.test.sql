@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(36);
+select plan(38);
 
 -- asker (1), decliner (2), reporter (3), second reporter (4), author (5)
 insert into auth.users (id, email)
@@ -94,6 +94,15 @@ select is(
 select is((select count(*)::int from public.list_post_feed()), 0, 'the reporter no longer sees the post');
 select is(public.post_photo_path_for((select id from held_post)), null, 'nor its photo path');
 select ok(not public.can_see_post_photo('7e710000-0000-4000-8000-000000000005/held.webp'), 'nor the photo file');
+
+select is(
+  public.report_user('7e710000-0000-4000-8000-000000000005', 'spam', null, null, false, (select id from held_post)),
+  'reported', 'reporting the same post again is accepted');
+reset role;
+select is(
+  (select count(*)::int from public.reports where post_id = (select id from held_post)),
+  1, 'but stored once, so one person never counts twice');
+set local role authenticated;
 
 set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000002';
 select is((select count(*)::int from public.list_post_feed()), 1, 'one report alone does not hide it from others');

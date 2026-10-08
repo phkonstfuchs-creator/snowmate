@@ -182,7 +182,9 @@ grant execute on function public.request_friendship(text) to authenticated;
 alter table public.reports
   add column post_id uuid references public.posts (id) on delete set null;
 
-create index reports_post_open on public.reports (post_id, reporter_id)
+-- One open report per person and post: a person counts once towards a
+-- hold, even after deleting their account (reporter_id becomes null).
+create unique index reports_post_open on public.reports (post_id, reporter_id)
   where post_id is not null and status = 'open';
 
 create or replace function private.post_is_held(p_id uuid, viewer uuid)
@@ -243,6 +245,17 @@ begin
     where r.reporter_id = me and r.created_at > now() - interval '1 day'
   ) >= 10 then
     return 'too_many';
+  end if;
+
+  -- The same post reported again by the same person adds nothing.
+  if post is not null and exists (
+    select 1 from public.reports r
+    where r.post_id = post and r.reporter_id = me and r.status = 'open'
+  ) then
+    if also_block then
+      perform public.block_user(target);
+    end if;
+    return 'reported';
   end if;
 
   insert into public.reports (reporter_id, reported_user_id, reported_handle, ride_id, post_id, reason, details)
