@@ -50,8 +50,14 @@ See [ADR 0002](adr/0002-stricter-carpool-visibility.md).
 - Twenty unanswered outgoing requests stop further ones.
 - After two declines by the same person the asker waits 7, then 14,
   then 28 days; after five declines they cannot ask that person again.
-  Withdrawals do not count. Requests to minors are not age-gated (owner
-  decision 2026-10-07, ADR 0034).
+  Withdrawals do not count.
+- Adults (18+) cannot send a friend request to anyone under 16 or without
+  a birth date; the answer looks like an unknown handle, so a request
+  cannot reveal who is young. The younger person can ask the adult.
+  16- and 17-year-olds are not affected, and existing friendships stay
+  (owner decisions 2026-10-08, ADR 0036,
+  `20261031090000_adults_cannot_ask_under_16.sql`, pgTAP
+  `adult_minor_contact.test.sql`).
 - Posting, joining and asking require a finished profile, so nobody meets
   an anonymous account. See [ADR 0005](adr/0005-require-finished-profile.md).
 
