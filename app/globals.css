@@ -540,6 +540,18 @@ h1, h2, .large-title, .text-display-hero, .text-display-lg, .text-display-md { o
   animation: pin-drop 0.3s var(--ease-standard) both;
 }
 
+/* Chat owns a bounded pane above the existing 60px floating navigation.
+   Only its message list scrolls; the composer stays in the pane's flow. */
+.chat-thread {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  left: max(0px, calc(50% - 215px));
+  width: min(100%, 430px);
+  background: var(--bg-canvas);
+  z-index: 30;
+}
+
 /* ─── Messages ──────────────────────────────────────────────── */
 .msg-bubble-me {
   background: var(--rust);

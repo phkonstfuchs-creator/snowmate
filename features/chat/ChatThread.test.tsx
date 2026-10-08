@@ -31,6 +31,26 @@ describe("ChatThread", () => {
     await waitFor(() => expect(mocks.poll).toHaveBeenCalledWith(CONV, null));
   });
 
+  it("shows rounded messages and a protected avatar beside the profile action", () => {
+    const person = { id: "c4a70000-0000-4000-8000-000000000002", name: "Lena Moser", handle: "lena" };
+    render(<ChatThread conversationId={CONV} title="Lena Moser" initialMessages={[first, mine]} other={person} />);
+    expect(screen.getByText(first.body)).toHaveClass("msg-bubble-them");
+    expect(screen.getByText(mine.body)).toHaveClass("msg-bubble-me");
+    const profile = screen.getByRole("button", { name: "Lena Moser" });
+    expect(new URL(profile.querySelector("img")!.getAttribute("src")!, window.location.origin).pathname).toBe(`/avatar/${person.id}`);
+    fireEvent.click(profile);
+    expect(screen.getByRole("dialog")).toHaveTextContent("@lena");
+  });
+
+  it("scrolls only the bounded message list, never the page", () => {
+    const { container } = render(<ChatThread conversationId={CONV} title="Crew" initialMessages={[first]} />);
+    expect(container.firstElementChild).toHaveClass("chat-thread");
+    const list = screen.getByRole("list");
+    expect(list).toHaveClass("overflow-y-auto", "min-h-0", "overscroll-contain");
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    expect(container.querySelector("form")).not.toHaveStyle({ bottom: "calc(80px + env(safe-area-inset-bottom, 0px))" });
+  });
+
   it("sends a message and fetches it right away", async () => {
     mocks.send.mockResolvedValue("sent");
     mocks.poll.mockResolvedValueOnce([]).mockResolvedValueOnce([{ ...mine, id: "m3", body: "Servus", createdAt: "2026-10-05T10:02:00Z" }]);
@@ -83,6 +103,14 @@ describe("ChatThread", () => {
     fireEvent.click(screen.getByRole("button", { name: "Report or block Lena" }));
     expect(screen.getByRole("dialog")).toHaveTextContent("Report Lena");
     expect(screen.queryByRole("button", { name: "Report or block Me" })).not.toBeInTheDocument();
+  });
+
+  it("opens a group sender profile from their name and keeps sheets outside the clipped pane", () => {
+    const { container } = render(<ChatThread conversationId={CONV} title="Crew" initialMessages={[first]} />);
+    const name = screen.getAllByRole("button", { name: /^Lena$/ }).find((button) => button.textContent === "Lena")!;
+    fireEvent.click(name);
+    expect(screen.getByRole("dialog")).toHaveTextContent("Lena");
+    expect(container.querySelector(".chat-thread")).not.toContainElement(screen.getByRole("dialog"));
   });
 
   it("explains the age rule for pins before asking for the position", () => {

@@ -1,3 +1,4 @@
+import { getFriendGraph } from "@/features/crew/queries";
 import ChatThread from "@/features/chat/ChatThread";
 import ChatUnavailable from "@/features/chat/ChatUnavailable";
 import { chatTitle } from "@/features/chat/chat-title";
@@ -29,7 +30,13 @@ export default async function ChatPage({
   }
 
   const { title, subtitle } = chatTitle(chat, t, locale);
-  const other = chat.kind === "direct" && chat.otherUserId ? { id: chat.otherUserId, name: title } : null;
+  const friend = chat.kind === "direct" && chat.otherUserId
+    ? (await getFriendGraph())?.friends.find((person) => person.user_id === chat.otherUserId)
+    : undefined;
+  const other = chat.kind === "direct" && chat.otherUserId ? {
+    id: chat.otherUserId, name: title, handle: friend?.handle ?? chat.otherHandle,
+    city: friend?.city, abilityLevel: friend?.ability_level,
+  } : null;
 
   return <ChatThread conversationId={chat.id} title={title} subtitle={subtitle} initialMessages={messages} other={other} canSharePosition={canSharePosition} />;
 }

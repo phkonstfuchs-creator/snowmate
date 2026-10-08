@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Avatar from "@/components/ui/Avatar";
+import { initialsFor } from "@/features/profile/profile-input";
+import ChatPersonSheet, { type ChatPerson } from "./ChatPersonSheet";
 import Icon from "@/components/ui/Icon";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { INTL_LOCALE } from "@/lib/i18n/locales";
@@ -61,7 +64,7 @@ export default function ChatThread({
   subtitle?: string;
   initialMessages: ChatMessage[];
   /* Direct chats: the other person, for report/block. */
-  other?: { id: string; name: string } | null;
+  other?: ChatPerson | null;
   /* False under 16 (ADR 0019): a pin is explained, not attempted. */
   canSharePosition?: boolean;
 }) {
@@ -72,7 +75,9 @@ export default function ChatThread({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const nearBottom = useRef(true);
+  const [profilePerson, setProfilePerson] = useState<ChatPerson | null>(null);
   const latest = useRef<string | null>(initialMessages.at(-1)?.createdAt ?? null);
 
   const time = new Intl.DateTimeFormat(INTL_LOCALE[locale], { hour: "2-digit", minute: "2-digit" });
@@ -94,7 +99,8 @@ export default function ChatThread({
   }, [conversationId, poll]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "end" });
+    const list = listRef.current;
+    if (list && nearBottom.current) list.scrollTop = list.scrollHeight;
   }, [messages.length]);
 
   const send = async () => {
@@ -106,6 +112,7 @@ export default function ChatThread({
     setSending(false);
     if (outcome === "sent") {
       setDraft("");
+      nearBottom.current = true;
       await poll();
     } else {
       setError(t(SEND_ERRORS[outcome] ?? "chat.sendFailed"));
@@ -144,15 +151,26 @@ export default function ChatThread({
   const remaining = MAX_MESSAGE_LENGTH - [...draft].length;
 
   return (
-    <div className="flex min-h-[calc(100dvh-84px)] flex-col">
-      <header className="sticky top-0 z-50 flex items-center gap-2 px-2 py-2" style={{ background: PAPER, borderBottom: "var(--rule-heavy)" }}>
+    <>
+    <div className="chat-thread flex flex-col overflow-hidden">
+      <header className="flex shrink-0 items-center gap-2 px-2 py-2" style={{ background: PAPER, borderBottom: "var(--rule-heavy)" }}>
         <Link href="/crew" aria-label={t("chat.back")} className="flex h-11 w-11 items-center justify-center">
           <Icon name="chevron-left" size={20} color={INK} strokeWidth={2.2} />
         </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-lg font-extrabold" style={{ color: INK }}>{title}</h1>
-          {subtitle && <p className="truncate text-xs font-semibold" style={{ color: INK_2 }}>{subtitle}</p>}
-        </div>
+        {other ? (
+          <button type="button" onClick={() => setProfilePerson(other)} aria-label={other.name} className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left">
+            <Avatar id={other.id} initials={initialsFor(other.name, other.handle ?? null)} size={40} />
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-lg font-extrabold" style={{ color: INK }}>{title}</h1>
+              {subtitle && <p className="truncate text-xs font-semibold" style={{ color: INK_2 }}>{subtitle}</p>}
+            </div>
+          </button>
+        ) : (
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate font-display text-lg font-extrabold" style={{ color: INK }}>{title}</h1>
+            {subtitle && <p className="truncate text-xs font-semibold" style={{ color: INK_2 }}>{subtitle}</p>}
+          </div>
+        )}
         {other && (
           <button
             type="button"
@@ -165,7 +183,10 @@ export default function ChatThread({
         )}
       </header>
 
-      <ol className="flex-1 space-y-2 px-4 py-4" aria-live="polite">
+      <ol ref={listRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-2 px-4 py-4" aria-live="polite" onScroll={() => {
+        const list = listRef.current;
+        if (list) nearBottom.current = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+      }}>
         {messages.length === 0 && (
           <li className="py-10 text-center text-sm" style={{ color: INK_2 }}>{t("chat.noMessages")}</li>
         )}
@@ -173,28 +194,24 @@ export default function ChatThread({
           const showName = !message.isMine && messages[index - 1]?.senderId !== message.senderId;
           return (
             <li key={message.id} className={message.isMine ? "flex justify-end" : "flex justify-start"}>
-              <div className="max-w-[80%]">
+              {!message.isMine && <button type="button" aria-label={message.senderName} onClick={() => setProfilePerson(other?.id === message.senderId ? other : { id: message.senderId, name: message.senderName })} className="mr-2 flex h-11 w-11 shrink-0 items-start justify-center">
+                <Avatar id={message.senderId} initials={initialsFor(message.senderName, null)} size={32} />
+              </button>}
+              <div className="min-w-0 max-w-[80%]">
                 {showName && (other
-                  ? <p className="mb-0.5 text-[0.7rem] font-bold" style={{ color: INK_2 }}>{message.senderName}</p>
+                  ? <button type="button" onClick={() => setProfilePerson(other)} className="mb-0.5 flex min-h-11 items-center text-[0.7rem] font-bold" style={{ color: INK_2 }}>{message.senderName}</button>
                   : (
                     /* Group chats: everyone who writes can be reported or
                        blocked from their message (App Store 1.2). */
-                    <button
-                      type="button"
-                      onClick={() => setSafetyTarget({ userId: message.senderId, name: message.senderName })}
-                      aria-label={t("chat.reportOrBlock", { name: message.senderName })}
-                      className="-my-3 flex min-h-11 items-center gap-1 text-[0.7rem] font-bold"
-                      style={{ color: INK_2 }}
-                    >
-                      {message.senderName}
-                      <Icon name="more-horizontal" size={14} color={INK_2} strokeWidth={2} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button type="button" onClick={() => setProfilePerson({ id: message.senderId, name: message.senderName })} className="min-h-11 text-[0.7rem] font-bold" style={{ color: INK_2 }}>{message.senderName}</button>
+                      <button type="button" onClick={() => setSafetyTarget({ userId: message.senderId, name: message.senderName })} aria-label={t("chat.reportOrBlock", { name: message.senderName })} className="flex h-11 w-11 items-center justify-center">
+                        <Icon name="more-horizontal" size={14} color={INK_2} strokeWidth={2} />
+                      </button>
+                    </div>
                   ))}
                 <div
-                  className="whitespace-pre-wrap break-words px-3 py-2 text-[0.9375rem] leading-snug"
-                  style={message.isMine
-                    ? { background: "var(--rust)", color: "var(--on-accent)" }
-                    : { background: PAPER_1, color: INK, border: "var(--rule-thin)" }}
+                  className={`${message.isMine ? "msg-bubble-me" : "msg-bubble-them"} whitespace-pre-wrap break-words`}
                 >
                   {message.kind === "location" ? <LocationBubble message={message} /> : message.body}
                 </div>
@@ -205,13 +222,11 @@ export default function ChatThread({
             </li>
           );
         })}
-        <div ref={endRef} />
       </ol>
 
       <form
-        className="sticky px-3 py-2"
-        /* Sits just above the floating tab bar. */
-        style={{ bottom: "calc(80px + env(safe-area-inset-bottom, 0px))", background: PAPER, borderTop: "var(--rule-thin)" }}
+        className="shrink-0 px-3 py-2"
+        style={{ background: PAPER, borderTop: "var(--rule-thin)" }}
         onSubmit={(event) => {
           event.preventDefault();
           void send();
@@ -258,7 +273,12 @@ export default function ChatThread({
         {remaining < 100 && <p className="mt-1 text-right text-[0.65rem]" style={{ color: INK_2 }}>{t("chat.remaining", { n: remaining })}</p>}
       </form>
 
-      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
     </div>
+      {profilePerson && <ChatPersonSheet person={profilePerson} onClose={() => setProfilePerson(null)} onSafety={(person) => {
+        setProfilePerson(null);
+        setSafetyTarget({ userId: person.id, name: person.name });
+      }} />}
+      {safetyTarget && <ReportBlockSheet target={safetyTarget} onClose={() => setSafetyTarget(null)} />}
+    </>
   );
 }
