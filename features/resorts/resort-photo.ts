@@ -15,7 +15,7 @@ export interface ResortPhoto {
 
 const API = "https://de.wikipedia.org/w/api.php";
 /* Wikimedia asks API clients to identify themselves with a contact. */
-export const WIKI_USER_AGENT = "Pistl/1.0 (https://pistl.app; Vfxphilipp@outlook.com)";
+export const WIKI_USER_AGENT = "Pistl/1.0 (https://pistl.app; support@pistl.app)";
 
 /* German Wikipedia article per resort. A missing or wrong title only
    means no photo: the illustration stays. */

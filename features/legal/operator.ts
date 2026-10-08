@@ -6,7 +6,10 @@ export const OPERATOR = {
   street: "In den Kiefern 3",
   city: "66271 Kleinblittersdorf",
   country: "Deutschland",
-  email: "Vfxphilipp@outlook.com",
+  support: "support@pistl.app",
+  report: "meldung@pistl.app",
+  privacy: "datenschutz@pistl.app",
+  youth: "jugendschutz@pistl.app",
   /* Data protection authority for Saarland. */
   authority: {
     name: "Unabhängiges Datenschutzzentrum Saarland",

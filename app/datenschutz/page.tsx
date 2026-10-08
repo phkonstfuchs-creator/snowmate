@@ -27,7 +27,7 @@ export default function DatenschutzPage() {
       <p>
         {OPERATOR.name}, {OPERATOR.street}, {OPERATOR.city}, {OPERATOR.country}
         <br />
-        E-Mail: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
+        E-Mail: <a href={`mailto:${OPERATOR.privacy}`}>{OPERATOR.privacy}</a>
       </p>
 
       <h2>2. Was Pistl ist</h2>
@@ -178,7 +178,8 @@ export default function DatenschutzPage() {
         </li>
         <li>
           <strong>Resend</strong> (USA): Versand der Bestätigungs- und Sicherheits-E-Mails, Versand über Server in
-          Irland.
+          Irland. Auch eingehende Kontakt-E-Mails laufen über Resend; der Empfang erfolgt über Amazon Web Services
+          in der Region eu-west-1 (Irland). Dabei werden deine E-Mail-Adresse und der Inhalt deiner Nachricht verarbeitet.
         </li>
         <li>
           <strong>OpenFreeMap</strong> und ersatzweise <strong>CARTO</strong>: Kartenkacheln. Dein Browser lädt sie
@@ -222,7 +223,7 @@ export default function DatenschutzPage() {
         Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21 DSGVO) sowie das Recht, eine Einwilligung jederzeit zu
         widerrufen. In der App kannst du unter <strong>Profil → Deine Daten</strong> alle gespeicherten Daten
         herunterladen und dein Konto selbst löschen; alles andere per E-Mail an{" "}
-        <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.
+        <a href={`mailto:${OPERATOR.privacy}`}>{OPERATOR.privacy}</a>.
       </p>
       <p>
         Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei der für uns zuständigen:{" "}
@@ -238,6 +239,10 @@ export default function DatenschutzPage() {
         kann man erst ab 18 veranstalten; ab 14 kann man ihnen beitreten und ist dann mit den anderen Mitfahrenden im
         Ride-Chat. Jede Person dort lässt sich melden und blockieren. Das Alter ergibt sich aus dem Geburtsdatum, das
         du bei der Registrierung angibst.
+      </p>
+
+      <p>Eltern, Minderjährige und Personen mit akuten Anliegen zum Jugendschutz erreichen uns unter{" "}
+        <a href={`mailto:${OPERATOR.youth}`}>{OPERATOR.youth}</a>.
       </p>
 
       <h2>9. Keine automatisierten Entscheidungen</h2>
