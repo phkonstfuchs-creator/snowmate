@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getNewDirectChat, getUnreadChatCount, listChatMessages, listMyChats } from "./queries";
+import { getNewDirectChat, listChatMessages, listMyChats } from "./queries";
 
 const rpc = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ rpc }) }));
@@ -25,18 +25,12 @@ describe("chat queries", () => {
     rpc.mockResolvedValue({ data: null, error: { code: "x" } });
     await expect(listMyChats()).resolves.toBeNull();
     await expect(listChatMessages(CONV)).resolves.toBeNull();
-    await expect(getUnreadChatCount()).resolves.toBe(0);
     rpc.mockRejectedValue(new Error("offline"));
     await expect(listMyChats()).resolves.toBeNull();
     await expect(listChatMessages(CONV)).resolves.toBeNull();
-    await expect(getUnreadChatCount()).resolves.toBe(0);
     await expect(listChatMessages("nope")).resolves.toEqual([]);
   });
 
-  it("counts unread chats", async () => {
-    rpc.mockResolvedValue({ data: 3, error: null });
-    await expect(getUnreadChatCount()).resolves.toBe(3);
-  });
 
   it("confirms a brand-new direct chat only through open_direct_chat", async () => {
     const FRIEND = "c4a70000-0000-4000-8000-000000000002";

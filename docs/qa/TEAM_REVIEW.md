@@ -130,6 +130,28 @@ English. Reporting takes 4 taps from a person or a post. A ride chat has
 no report button. Contact is a private mailbox. Adults can contact minors
 through public events and friend requests (owner decision).
 
+## Persona retest after the UX changes
+
+These are simulated persona opinions from `/demo`, not real user testing.
+The raw notes were preserved before removing the temporary handoff folder
+(commit `e8de020` and `/tmp/snowmate-pr75-handoff-backup/phase4-persona-notes.md`).
+The grades precede the additional small fixes; they have not been re-measured.
+
+| Persona | Grade before → after | Tomorrow? | Main remaining stuck point at retest |
+|---|---|---|---|
+| Jonas | 4 → 5 | yes, barely | Invite loop in the demo; offline tab switch in the demo (no service worker there) |
+| Lena | 6 → 7 | yes | Invite page shows no inviter; terms box cleared after an error |
+| Marco | 5 → 6 | probably | iOS push needs the home screen; no inviter name |
+| Sophie | 4 → 5 | yes (feed) | Legal pages and map attribution in German under English; no dark mode |
+| Tim | 6 → 6 | no (demo) | No ski day or push in the demo; no character counter |
+| Mother | 3 → 5 | would look, not allow | 14-year-olds on adults' events (owner decision); report entry not visible in the demo |
+
+Tap targets stayed met for task 3 (0 taps) and task 4 (1 tap). Chat
+improved from 4 to 3 taps. Tasks 6 and 8 could not be tested in the demo;
+code suggests 3–4 taps for a ski day and 2 for push. The fixed “174” was
+replaced by the actual friend graph. These observations are not proof of
+live backend usability or a legal/security approval.
+
 ## Team roles in brief
 
 - **Founder.** The core loop is: see your crew today, join with one tap.
@@ -194,8 +216,29 @@ able to use the whole app wherever the law and the App Store allow it.
 | PR | Contents | Status |
 |---|---|---|
 | 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | merged ([#74](https://github.com/phkonstfuchs-creator/snowmate/pull/74)) |
-| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | PR open |
-| 3 | Scale: #6, #12 | open |
+| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | merged ([#75](https://github.com/phkonstfuchs-creator/snowmate/pull/75)) |
+| 3 | Scale: #6, #12 | Prepared; checks and review pending |
+
+PR 3 in numbers (estimate, not measured in production):
+
+- **Calls per page:** each signed-in page makes one `my_nav_counts()` read
+  instead of three calls (`my_pending_counts`, `my_unread_chats`,
+  `refresh_my_age`). The write `refresh_my_age()` now runs only when
+  `age_outdated` says an 18th birthday has passed.
+- **Chat list:** `list_my_conversations` starts from the viewer's own
+  memberships and keeps the same audience check.
+- **Indexes:** two new ones, on `conversations(user_high)` for direct chats
+  and on `push_outbox(actor_id)`.
+- **Background reload:** an open tab reloads every 5 minutes instead of
+  every 60 seconds. Coming back to the app still reloads at once.
+
+Assuming 1,500 visible tabs, the periodic navigation-count read alone
+would make roughly 300 calls per minute (1,500 / 5). This is not total
+backend traffic: page data, chat polling, writes and resume refreshes
+remain additional calls. Finding #6's earlier 7,000 figure was an
+unmeasured estimate; verify the actual total with load measurements and
+EXPLAIN ANALYZE before using it for cost planning.
+pgTAP: `nav_counts.test.sql` (28 checks).
 
 #18 (layout redirect) is not changed. The proxy already sends any failed
 identity check to `/login` on purpose ("fail closed"). Showing an error

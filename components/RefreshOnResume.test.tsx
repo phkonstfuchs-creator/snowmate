@@ -31,12 +31,14 @@ describe("RefreshOnResume", () => {
     expect(refresh).toHaveBeenCalledTimes(1);
   });
 
-  it("refreshes once a minute while visible, never while hidden", () => {
+  it("refreshes every five minutes while visible, never while hidden", () => {
     render(<RefreshOnResume />);
     act(() => vi.advanceTimersByTime(60_000));
+    expect(refresh).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(4 * 60_000));
     expect(refresh).toHaveBeenCalledTimes(1);
     Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
-    act(() => vi.advanceTimersByTime(120_000));
+    act(() => vi.advanceTimersByTime(10 * 60_000));
     expect(refresh).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,12 +4,16 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const RESUME_AFTER_MS = 10_000;
-const WHILE_OPEN_MS = 60_000;
+/* Every write refreshes at once, a return from the background after 10 s
+   does too, and chats poll on their own; this is only the fallback for
+   a screen left open. The review estimated that once-a-minute refresh could account for
+   about two thirds of backend requests at peak (team review 2026-10-07, finding #6). */
+const WHILE_OPEN_MS = 5 * 60_000;
 
 /* A home-screen app is not reloaded when it comes back from the
    background; without this it keeps showing what it had, until a
    restart. Refreshes the data when the app returns after a while, and
-   once a minute while it is open and visible. */
+   every five minutes while it is open and visible. */
 export default function RefreshOnResume() {
   const router = useRouter();
 

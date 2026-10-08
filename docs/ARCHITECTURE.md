@@ -89,7 +89,7 @@ audience rules row by row and null out fields the caller may not see:
 | `list_rides()` | Visible rides; `meet_point` and participants only for people allowed in |
 | `list_carpools()` | Visible carpools; `departure_point` only for friends and confirmed riders |
 | `list_my_friendships()` | The caller's own friend graph |
-| `my_pending_counts()` | Requests waiting for the caller (navigation badges) |
+| `my_nav_counts()` | Every navigation badge (requests, unread chats) and whether the age flag needs a refresh, in one read-only call; replaces `my_pending_counts()` and `my_unread_chats()` in the app |
 | `list_my_conversations()`, `list_messages()` | The caller's chats and their messages, members only ([ADR 0017](adr/0017-chat-for-friends-and-ride-crews.md)) |
 | `export_my_data()` | Everything stored about the caller |
 

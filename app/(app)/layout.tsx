@@ -6,8 +6,7 @@ import TrackingProvider from "@/features/tracking/TrackingProvider";
 import NativePushTaps from "@/features/notifications/NativePushTaps";
 import RegisterServiceWorker from "@/features/notifications/RegisterServiceWorker";
 import ResumeSharing from "@/features/location/ResumeSharing";
-import { getPendingCounts } from "@/features/crew/queries";
-import { getUnreadChatCount } from "@/features/chat/queries";
+import { getNavCounts } from "@/features/crew/queries";
 import { refreshOwnAge } from "@/features/profile/queries";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -25,8 +24,11 @@ export default async function AppLayout({
   }
 
   /* Layouts persist across navigation; the counts refresh whenever an
-     action calls router.refresh(), which every write in the app does. */
-  const [pending, unreadChats] = await Promise.all([getPendingCounts(), getUnreadChatCount(), refreshOwnAge()]);
+     action calls router.refresh(), which every write in the app does.
+     One read-only call; the age write only when the 18th birthday has
+     passed (team review finding #6). */
+  const { pending, unreadChats, ageOutdated } = await getNavCounts();
+  if (ageOutdated) await refreshOwnAge();
 
   return (
     <div className="app-shell">
