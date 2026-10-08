@@ -71,9 +71,10 @@ test.describe("signed-in journeys against local Supabase", () => {
     await expect(profile.locator(".avatar-initials")).toBeVisible();
     await profile.click();
     await expect(b.page.getByRole("dialog")).toContainText(`@${a.account.handle}`);
-    const sheet = await b.page.getByRole("dialog").boundingBox();
-    expect(sheet).not.toBeNull();
-    expect(Math.abs(sheet!.y + sheet!.height - b.page.viewportSize()!.height)).toBeLessThanOrEqual(2);
+    await expect.poll(async () => {
+      const sheet = await b.page.getByRole("dialog").boundingBox();
+      return sheet ? Math.abs(sheet.y + sheet.height - b.page.viewportSize()!.height) : Infinity;
+    }).toBeLessThanOrEqual(2);
     await b.page.getByRole("dialog").getByRole("button", { name: "Schließen", exact: true }).click();
     const list = thread.getByRole("list");
     const geometry = await list.evaluate((element) => ({ scrollHeight: element.scrollHeight, clientHeight: element.clientHeight }));
