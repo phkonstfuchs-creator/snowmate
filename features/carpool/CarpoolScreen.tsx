@@ -143,7 +143,8 @@ function OfferModal({
           </div>
           <div>
             <label htmlFor="carpool-note" className={label} style={{ color: MUTED }}>{t("post.note")} {t("common.optional")}</label>
-            <textarea id="carpool-note" rows={2} maxLength={280} className="form-input resize-none" value={note} onChange={(e) => setNote(e.target.value)} />
+            <textarea id="carpool-note" aria-describedby="carpool-note-count" rows={2} maxLength={280} className="form-input resize-none" value={note} onChange={(e) => setNote(e.target.value)} />
+              <p id="carpool-note-count" className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>{t("common.characterCount", { n: note.length, max: 280 })}</p>
           </div>
           <p className="text-xs leading-snug" style={{ color: MUTED }}>
             {t("carpool.visibilityHint")}

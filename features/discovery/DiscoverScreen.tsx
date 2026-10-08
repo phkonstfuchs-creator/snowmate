@@ -194,7 +194,7 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
           <div className="min-w-0">
             <h2 className="truncate text-xl font-bold" style={{ color: "var(--ink-0)" }}>{card.name}</h2>
             {card.mutualFriends > 0 && (
-              <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t("discover.mutual", { n: card.mutualFriends })}</p>
+              <p className="text-sm" style={{ color: "var(--ink-2)" }}>{t(card.mutualFriends === 1 ? "discover.mutualOne" : "discover.mutual", { n: card.mutualFriends })}</p>
             )}
           </div>
         </div>

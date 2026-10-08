@@ -19,13 +19,15 @@ export default function LegalLinks({ className = "" }: { className?: string }) {
 
 /* Sign-up consent: the terms of use with zero tolerance (App Store 1.2,
    ADR 0034) and the privacy policy, both as links. The box is required in
-   the browser and checked again by the server. */
+   the browser and checked again by the server. Updating the native reset
+   baseline after each explicit choice preserves consent when a failed
+   React form action resets the uncontrolled fields. */
 export function TermsConsent({ className = "" }: { className?: string }) {
   const t = useT();
   const parts = t("onb.terms").split(/(\{terms\}|\{privacy\})/);
   return (
-    <label className={`flex items-start gap-3 text-left ${className}`} style={{ color: "var(--ink-2)" }}>
-      <input type="checkbox" name="acceptTerms" value={TERMS_VERSION} required className="mt-0.5 h-6 w-6 flex-shrink-0 accent-[var(--rust)]" />
+    <label className={`flex min-h-11 items-center gap-3 text-left ${className}`} style={{ color: "var(--ink-2)" }}>
+      <input type="checkbox" onChange={(event) => { event.currentTarget.defaultChecked = event.currentTarget.checked; }} name="acceptTerms" value={TERMS_VERSION} required className="mt-0.5 h-6 w-6 flex-shrink-0 accent-[var(--rust)]" />
       <span>
         {parts.map((part, index) => part === "{terms}" ? (
           <Link key={index} href="/nutzungsbedingungen" className="underline" target="_blank" rel="noopener">{t("legal.terms")}</Link>

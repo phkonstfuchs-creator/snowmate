@@ -129,6 +129,9 @@ describe("SignupFlow", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Try again.");
     expect(box).toBeChecked();
     expect(box.closest("label")).toHaveClass("min-h-11");
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+    await waitFor(() => expect(mocks.signUpAction).toHaveBeenCalledTimes(2));
+    expect((mocks.signUpAction.mock.calls[1]?.[1] as FormData).get("acceptTerms")).toBe("2026-10-07");
   });
 
   it("goes back to the step with the problem the server found", async () => {

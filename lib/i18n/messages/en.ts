@@ -5,6 +5,12 @@
    pass) and the landing page are not translated. */
 export const en = {
   // ── Shared ───────────────────────────────────────────────────────
+  "discover.mutualOne": "{n} friend in common",
+  "common.characterCount": "{n} / {max} characters",
+  "meetup.nearStation": "You are near the valley station of {lift}. Check the piste map for a safe route.",
+  "push.installShare": "Open Pistl in Safari and tap Share.",
+  "push.installAdd": "Choose “Add to Home Screen” and confirm with “Add”.",
+  "push.installOpen": "Open Pistl from your Home Screen and enable push in your profile.",
   "common.unavailable": "That did not work. Try again shortly.",
   "common.offline": "No connection. Try again in a moment.",
   "common.blockedText": "Please rephrase this without slurs or hate terms.",
@@ -275,7 +281,7 @@ export const en = {
   "feed.youAreIn": "You are in",
   "card.yourRide": "Your ride",
   "card.yourRideAsking": "Your ride · {n} asking",
-  "card.joined": "Joined",
+  "card.joined": "Joined ✓",
   "card.asked": "Asked",
   "card.join": "I'm in",
   "card.actionFor": "{action}: {resort}, {style}, {time}",
@@ -467,7 +473,7 @@ export const en = {
   "demo.level": "Level {n}",
   "demo.levelLine": "Level {n} · {title}",
   "demo.days": "{n} days",
-  "demo.discoverHint": "Swipe to meet riders, or share your invite link",
+  "demo.discoverHint": "Swipe to meet riders in the demo",
   "demo.members": "{n} members",
   "demo.planRide": "Plan a ride",
   "demo.newSquad": "Create a new squad",

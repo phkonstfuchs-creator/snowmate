@@ -223,7 +223,11 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({ is_joined: true, taken_spots: 1 })])} />);
 
     /* A second tap on the card never leaves: it opens the ride. */
-    fireEvent.click(screen.getByRole("button", { name: /^Joined/ }));
+    const joinedButton = screen.getByRole("button", { name: /^Joined/ });
+    expect(joinedButton).toHaveTextContent("Joined ✓");
+    expect(joinedButton).toBeEnabled();
+    expect(joinedButton).toHaveStyle({ background: "var(--pine)", color: "var(--on-accent)" });
+    fireEvent.click(joinedButton);
     expect(mocks.leave).not.toHaveBeenCalled();
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "You are in, tap to leave" }));

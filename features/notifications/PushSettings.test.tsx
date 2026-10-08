@@ -45,7 +45,7 @@ describe("PushSettings", () => {
     render(<PushSettings />);
     expect(await screen.findByRole("list")).toHaveProperty("tagName", "OL");
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
-    expect(screen.getByText(/Add to Home Screen/)).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")[1]).toHaveTextContent("Add to Home Screen");
     Object.defineProperty(navigator, "userAgent", { configurable: true, value: "jsdom" });
   });
 

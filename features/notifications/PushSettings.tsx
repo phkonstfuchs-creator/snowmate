@@ -179,6 +179,13 @@ export default function PushSettings() {
           <Switch on={on} label={t("push.toggle")} disabled={!canToggle} onChange={(next) => void (next ? turnOn() : turnOff())} />
         )}
       </div>
+      {state === "install" && (
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm" style={{ color: "var(--ink-2)" }}>
+          <li>{t("push.installShare")}</li>
+          <li>{t("push.installAdd")}</li>
+          <li>{t("push.installOpen")}</li>
+        </ol>
+      )}
       {failed && <p role="status" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t("push.failed")}</p>}
     </section>
   );
