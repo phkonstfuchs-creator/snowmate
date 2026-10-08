@@ -195,7 +195,23 @@ able to use the whole app wherever the law and the App Store allow it.
 |---|---|---|
 | 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | merged ([#74](https://github.com/phkonstfuchs-creator/snowmate/pull/74)) |
 | 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | PR open |
-| 3 | Scale: #6, #12 | open |
+| 3 | Scale: #6, #12 | PR open |
+
+PR 3 in numbers (estimate, not measured in production):
+
+- **Calls per page:** each signed-in page makes one `my_nav_counts()` read
+  instead of three calls (`my_pending_counts`, `my_unread_chats`,
+  `refresh_my_age`). The write `refresh_my_age()` now runs only when
+  `age_outdated` says an 18th birthday has passed.
+- **Chat list:** `list_my_conversations` starts from the viewer's own
+  memberships and keeps the same audience check.
+- **Indexes:** two new ones, on `conversations(user_high)` for direct chats
+  and on `push_outbox(actor_id)`.
+- **Background reload:** an open tab reloads every 5 minutes instead of
+  every 60 seconds. Coming back to the app still reloads at once.
+
+At about 1,500 active users this cuts finding #6's estimate of 7,000
+requests a minute to roughly 300. pgTAP: `nav_counts.test.sql` (14 checks).
 
 #18 (layout redirect) is not changed. The proxy already sends any failed
 identity check to `/login` on purpose ("fail closed"). Showing an error

@@ -26,23 +26,35 @@ export interface PendingCounts {
 
 const NONE: PendingCounts = { friendRequests: 0, carpoolRequests: 0, rideRequests: 0 };
 
-/* What is waiting for the caller, for the navigation badges. Zero on any
-   failure: a missing badge is better than a broken app shell. */
-export async function getPendingCounts(): Promise<PendingCounts> {
+export interface NavCounts {
+  pending: PendingCounts;
+  unreadChats: number;
+  /* The 18th birthday has passed but the stored flag still says minor:
+     only then is the write refresh_my_age() needed. */
+  ageOutdated: boolean;
+}
+
+const NO_COUNTS: NavCounts = { pending: NONE, unreadChats: 0, ageOutdated: false };
+
+/* Every navigation badge in one read-only call (my_nav_counts). No
+   badges on any failure, as above. */
+export async function getNavCounts(): Promise<NavCounts> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.rpc("my_pending_counts");
+    const { data, error } = await supabase.rpc("my_nav_counts");
     const row = Array.isArray(data) ? data[0] : null;
-
-    if (error || !row) return NONE;
-
+    if (error || !row) return NO_COUNTS;
     return {
-      friendRequests: Number(row.friend_requests) || 0,
-      carpoolRequests: Number(row.carpool_requests) || 0,
-      rideRequests: Number(row.ride_requests) || 0,
+      pending: {
+        friendRequests: Number(row.friend_requests) || 0,
+        carpoolRequests: Number(row.carpool_requests) || 0,
+        rideRequests: Number(row.ride_requests) || 0,
+      },
+      unreadChats: Math.max(0, Number(row.unread_chats) || 0),
+      ageOutdated: row.age_outdated === true,
     };
   } catch {
-    return NONE;
+    return NO_COUNTS;
   }
 }
 

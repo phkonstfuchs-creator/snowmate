@@ -67,13 +67,3 @@ export async function getNewDirectChat(conversationId: string, otherUserId: stri
   }
 }
 
-/* For the Crew tab badge; zero on any failure. */
-export async function getUnreadChatCount(): Promise<number> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("my_unread_chats");
-    return error ? 0 : Math.max(0, Number(data) || 0);
-  } catch {
-    return 0;
-  }
-}
