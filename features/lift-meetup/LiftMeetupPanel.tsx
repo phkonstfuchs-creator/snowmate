@@ -13,7 +13,7 @@ function timeAt(iso: string, locale: Intl.LocalesArgument): string {
   return new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
-export default function LiftMeetupPanel({ mine, friends, me, busy, result, onStop, onLocate, canShare, onStartClick }: {
+export default function LiftMeetupPanel({ mine, friends, me, busy, result, onStop, onLocate, canShare, onStartClick, compact = false }: {
   mine: LiftMeetup | null;
   friends: LiftMeetup[] | null;
   me: Position | null;
@@ -23,6 +23,7 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
   onLocate: () => void;
   canShare?: boolean;
   onStartClick?: () => void;
+  compact?: boolean;
 }) {
   const t = useT();
   const locale = INTL_LOCALE[useLocale()];
@@ -35,9 +36,9 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
   const activeFriends = friends?.filter((friend) => new Date(friend.expiresAt).getTime() > at.getTime()) ?? [];
 
   return (
-    <section className="px-4 pt-4" aria-labelledby="lift-meetup-title">
-      <div className="p-4" style={{ border: "var(--rule-thin)", background: "var(--paper-1)", borderRadius: 18 }}>
-        <h2 id="lift-meetup-title" className="text-lg font-semibold" style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
+    <section className={compact ? "px-4 pt-2" : "px-4 pt-4"} aria-labelledby="lift-meetup-title">
+      <div className={compact ? "p-3" : "p-4"} style={{ border: "var(--rule-thin)", background: "var(--paper-1)", borderRadius: 18 }}>
+        <h2 id="lift-meetup-title" className={`${compact ? "text-base" : "text-lg"} font-semibold`} style={{ color: "var(--ink-0)" }}>{t("meetup.title")}</h2>
         {mine && (
           /* The rider sees the same forecast their crew gets. Stop never
              depends on knowing the lift locally. */
@@ -58,7 +59,7 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
         )}
         {onStartClick && canShare && (
           <button type="button" onClick={onStartClick} disabled={busy}
-            className={`card-tap mt-3 flex w-full items-center justify-center gap-2 px-3 font-semibold disabled:opacity-50 ${mine ? "min-h-11 text-sm" : "min-h-14 text-base"}`}
+            className={`card-tap mt-3 flex w-full items-center justify-center gap-2 px-3 font-semibold disabled:opacity-50 ${mine || compact ? "min-h-11 text-sm" : "min-h-14 text-base"}`}
             style={mine
               ? { border: "var(--rule-thin)", color: "var(--ink-1)", borderRadius: 14 }
               : { background: "var(--rust)", color: "var(--on-accent)", borderRadius: 16 }}>
@@ -68,13 +69,13 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
         )}
         {onStartClick && !canShare && <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("meetup.from16")}</p>}
         {result && result !== "sharing" && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{t(START_MESSAGES[result])}</p>}
-        <p className="mt-2 text-xs" style={{ color: "var(--ink-2)" }}>{t("meetup.estimate")}</p>
+        <p className={`${compact ? "mt-1" : "mt-2"} text-xs`} style={{ color: "var(--ink-2)" }}>{t("meetup.estimate")}</p>
       </div>
 
       {friends === null ? (
         <p className="mt-3 text-sm" style={{ color: "var(--crimson)" }}>{t("meetup.unavailable")}</p>
       ) : activeFriends.length === 0 ? (
-        <p className="mt-3 text-sm" style={{ color: "var(--ink-2)" }}>{t("meetup.noFriends")}</p>
+        <p className={compact ? "mt-2 text-xs" : "mt-3 text-sm"} style={{ color: "var(--ink-2)" }}>{t("meetup.noFriends")}</p>
       ) : (
         <ul className="mt-3 space-y-2">
           {activeFriends.map((friend) => {

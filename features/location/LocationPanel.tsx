@@ -84,7 +84,9 @@ export default function LocationPanel({
   onShare,
   onStop,
   onFocusFriend,
+  showFriends = true,
 }: {
+  showFriends?: boolean;
   sharingEnd: string | null;
   /* false under 16: no share button, a note instead. */
   canShare?: boolean;
@@ -131,7 +133,7 @@ export default function LocationPanel({
         {error && <p role="alert" className="mt-2 text-sm" style={{ color: "var(--crimson)" }}>{error}</p>}
       </div>
 
-      <div className="mt-4">
+      {showFriends && <div className="mt-4">
         <p className="mb-2 text-[0.65rem] font-black" style={{ color: "var(--text-tertiary)" }}>
           {t("loc.friendsOnMap", { n: friends?.length ?? 0 })}
         </p>
@@ -163,7 +165,7 @@ export default function LocationPanel({
             })}
           </ul>
         )}
-      </div>
+      </div>}
 
       {sheetOpen && (
         <ShareSheet

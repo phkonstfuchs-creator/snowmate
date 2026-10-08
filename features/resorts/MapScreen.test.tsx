@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
 
-vi.mock("next/dynamic", () => ({ default: () => () => <div data-testid="map" /> }));
+const mapMock = vi.hoisted(() => ({ props: vi.fn() }));
+vi.mock("next/dynamic", () => ({ default: () => (props: object) => { mapMock.props(props); return <div data-testid="map" />; } }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const now = new Date();
@@ -37,11 +38,12 @@ const liveRide = toLiveRide(
 );
 
 describe("MapScreen", () => {
-  it("puts lift meetup before the map and opens a direct lift picker", () => {
+  Element.prototype.scrollIntoView = vi.fn();
+  it("keeps the lift action in the map surface and opens a direct lift picker", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
     const cta = screen.getByRole("button", { name: "I'm taking a lift now" });
     const map = screen.getByTestId("map");
-    expect(cta.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(cta.closest(".mountain-map-stage")).toContainElement(map);
     fireEvent.click(cta);
     const dialog = screen.getByRole("dialog", { name: "Choose your lift" });
     /* Without a position yet, picking by hand is one tap away. */
@@ -51,17 +53,36 @@ describe("MapScreen", () => {
     expect(within(dialog).getByRole("button", { name: "Tell my crew" })).toBeEnabled();
   });
 
-  it("shows one panel under the map: the ski day, or location sharing on demand", () => {
+  it("exposes ski day and location controls beside the map without coupling consent", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
+    const sharing = screen.getByRole("button", { name: "My location" });
+    expect(screen.getByRole("button", { name: "Ski day" })).toBeInTheDocument();
+    expect(sharing).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("region", { name: "Live location" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "My location" }));
+    fireEvent.click(sharing);
+    expect(sharing).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("region", { name: "Live location" })).toBeInTheDocument();
   });
 
   it("opens on location sharing while it is on, so stopping is one tap away", () => {
     const sharingEnd = new Date(Date.now() + 30 * 60_000).toISOString();
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true, sharingEnd }} />);
-    expect(screen.getByRole("region", { name: /Sharing until/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stop sharing" })).toBeInTheDocument();
+  });
+
+  it("reports unavailable friend positions instead of an empty crew", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", friends: null }} />);
+    expect(screen.getByText("Friends' positions could not be loaded.")).toBeInTheDocument();
+    expect(screen.queryByText("Nobody in your crew is sharing their location right now.")).not.toBeInTheDocument();
+  });
+
+  it("marks stale map positions and focuses the same person from their crew card", () => {
+    const friend = { userId: "friend", name: "Lena", handle: "lena", lat: 47.2, lng: 11.3, accuracy: 20, updatedAt: new Date(Date.now() - 20 * 60_000).toISOString() };
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", friends: [friend] }} />);
+    expect(mapMock.props.mock.lastCall![0].people[0]).toMatchObject({ id: "friend", stale: true });
+    fireEvent.click(screen.getByRole("button", { name: /Lena/ }));
+    expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ lat: friend.lat, lng: friend.lng });
+    expect(screen.getByRole("button", { name: /Lena/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("only offers lift sharing after an explicit age-eligibility check", () => {
