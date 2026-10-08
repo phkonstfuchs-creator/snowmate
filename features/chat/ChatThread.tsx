@@ -137,8 +137,10 @@ export default function ChatThread({
         const position = toPosition(geo);
         const outcome = await sendLocationAction(conversationId, position.lat, position.lng);
         setSending(false);
-        if (outcome === "sent") await poll();
-        else setError(t(SEND_ERRORS[outcome] ?? "chat.sendFailed"));
+        if (outcome === "sent") {
+          nearBottom.current = true;
+          await poll();
+        } else setError(t(SEND_ERRORS[outcome] ?? "chat.sendFailed"));
       },
       (geoError) => {
         setSending(false);

@@ -131,6 +131,23 @@ describe("ChatThread", () => {
     expect(screen.getByText(/Location \(hidden after 24 h\)/)).toBeInTheDocument();
   });
 
+  it("shows the newly sent location even when reading older messages", async () => {
+    const pin: ChatMessage = { ...mine, id: "pin-new", body: "📍", kind: "location", position: { lat: 47.2, lng: 11.3 } };
+    mocks.poll.mockResolvedValueOnce([]).mockResolvedValueOnce([pin]);
+    mocks.sendLocation.mockResolvedValue("sent");
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition: (ok: PositionCallback) => ok({ coords: { latitude: 47.2, longitude: 11.3, accuracy: 8 } } as GeolocationPosition) }, configurable: true });
+    render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[first]} />);
+    await waitFor(() => expect(mocks.poll).toHaveBeenCalledWith(CONV, null));
+    const list = screen.getByRole("list");
+    Object.defineProperties(list, { scrollHeight: { value: 1000 }, clientHeight: { value: 200 } });
+    list.scrollTop = 100;
+    fireEvent.scroll(list);
+    fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
+    await screen.findByRole("link", { name: /My location/ });
+    expect(list.scrollTop).toBe(1000);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
   it("sends the current position as a pin, and explains a refusal", async () => {
     const getCurrentPosition = vi.fn((ok: PositionCallback) =>
       ok({ coords: { latitude: 47.2, longitude: 11.3, accuracy: 8 } } as GeolocationPosition),
