@@ -258,26 +258,32 @@ begin
     return 'reported';
   end if;
 
-  insert into public.reports (reporter_id, reported_user_id, reported_handle, ride_id, post_id, reason, details)
-  values (
-    me,
-    target,
-    handle_snapshot,
-    -- Only a ride the reporter can actually see; anything else would let
-    -- a report probe for ride ids.
-    case when exists (
-      select 1 from public.rides r
-      join public.profiles hp on hp.id = r.host_id
-      where r.id = ride and private.can_see_ride(me, r, hp.is_minor)
-    ) then ride end,
-    -- Only a post by the reported person that the reporter can see.
-    case when exists (
-      select 1 from public.posts p
-      where p.id = post and p.author_id = target and private.can_see_posts_of(p.author_id, me)
-    ) then post end,
-    reason,
-    nullif(btrim(coalesce(details, '')), '')
-  );
+  -- Two reports of the same post at once both pass the check above; the
+  -- unique index stops the second, and the requested block still runs.
+  begin
+    insert into public.reports (reporter_id, reported_user_id, reported_handle, ride_id, post_id, reason, details)
+    values (
+      me,
+      target,
+      handle_snapshot,
+      -- Only a ride the reporter can actually see; anything else would let
+      -- a report probe for ride ids.
+      case when exists (
+        select 1 from public.rides r
+        join public.profiles hp on hp.id = r.host_id
+        where r.id = ride and private.can_see_ride(me, r, hp.is_minor)
+      ) then ride end,
+      -- Only a post by the reported person that the reporter can see.
+      case when exists (
+        select 1 from public.posts p
+        where p.id = post and p.author_id = target and private.can_see_posts_of(p.author_id, me)
+      ) then post end,
+      reason,
+      nullif(btrim(coalesce(details, '')), '')
+    );
+  exception when unique_violation then
+    null;
+  end;
 
   if also_block then
     perform public.block_user(target);
