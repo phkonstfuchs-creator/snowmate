@@ -5,6 +5,7 @@ import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
 import { dispatchPushSoon } from "@/lib/push/dispatch";
+import { isBlockedText } from "@/lib/server-action";
 import { validateRideEdit, validateRideInput } from "./ride-input";
 
 /* pending: the viewer asked to join and waits for the host. */
@@ -31,6 +32,9 @@ const JOIN_MESSAGES: Record<string, RideActionResult> = {
   not_found: { ok: false, message: "rides.notFound" },
   profile_incomplete: { ok: false, message: PROFILE_INCOMPLETE },
 };
+
+/* The database word filter refused the text: ask to rephrase, not retry. */
+const BLOCKED_TEXT: RideActionResult = { ok: false, message: "common.blockedText" };
 
 const UNAVAILABLE: RideActionResult = {
   ok: false,
@@ -71,6 +75,7 @@ async function createRideActionImpl(input: unknown): Promise<RideActionResult> {
       if (error.code === RLS_VIOLATION) {
         return { ok: false, message: PROFILE_INCOMPLETE };
       }
+      if (isBlockedText(error)) return BLOCKED_TEXT;
       return UNAVAILABLE;
     }
   } catch {
@@ -142,7 +147,7 @@ async function updateRideActionImpl(rideId: string, input: unknown): Promise<Rid
       new_caption: edit.caption,
     });
 
-    if (error) return UNAVAILABLE;
+    if (error) return isBlockedText(error) ? BLOCKED_TEXT : UNAVAILABLE;
     if (data === "below_taken") {
       return { ok: false, message: "rides.belowTaken" };
     }

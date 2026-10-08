@@ -54,6 +54,7 @@ export default function ChatThread({
   subtitle,
   initialMessages,
   other,
+  canSharePosition = true,
 }: {
   conversationId: string;
   title: string;
@@ -61,6 +62,8 @@ export default function ChatThread({
   initialMessages: ChatMessage[];
   /* Direct chats: the other person, for report/block. */
   other?: { id: string; name: string } | null;
+  /* False under 16 (ADR 0019): a pin is explained, not attempted. */
+  canSharePosition?: boolean;
 }) {
   const t = useT();
   const locale = useLocale();
@@ -112,6 +115,10 @@ export default function ChatThread({
   /* Asks the browser for the current position and sends it as a pin. */
   const sendLocation = () => {
     if (sending) return;
+    if (!canSharePosition) {
+      setError(t("loc.from16"));
+      return;
+    }
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       setError(t("loc.unsupported"));
       return;
@@ -167,7 +174,22 @@ export default function ChatThread({
           return (
             <li key={message.id} className={message.isMine ? "flex justify-end" : "flex justify-start"}>
               <div className="max-w-[80%]">
-                {showName && <p className="mb-0.5 text-[0.7rem] font-bold" style={{ color: INK_2 }}>{message.senderName}</p>}
+                {showName && (other
+                  ? <p className="mb-0.5 text-[0.7rem] font-bold" style={{ color: INK_2 }}>{message.senderName}</p>
+                  : (
+                    /* Group chats: everyone who writes can be reported or
+                       blocked from their message (App Store 1.2). */
+                    <button
+                      type="button"
+                      onClick={() => setSafetyTarget({ userId: message.senderId, name: message.senderName })}
+                      aria-label={t("chat.reportOrBlock", { name: message.senderName })}
+                      className="-my-3 flex min-h-11 items-center gap-1 text-[0.7rem] font-bold"
+                      style={{ color: INK_2 }}
+                    >
+                      {message.senderName}
+                      <Icon name="more-horizontal" size={14} color={INK_2} strokeWidth={2} />
+                    </button>
+                  ))}
                 <div
                   className="whitespace-pre-wrap break-words px-3 py-2 text-[0.9375rem] leading-snug"
                   style={message.isMine

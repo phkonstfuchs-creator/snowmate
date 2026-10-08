@@ -41,5 +41,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0031](0031-native-apps-with-capacitor.md) | Native iOS and Android apps: a Capacitor shell around app.pistl.app | Accepted |
 | [0032](0032-crew-whereabouts-from-shared-positions.md) | Crew whereabouts estimated from shared positions | Accepted |
 | [0033](0033-clean-surfaces-instead-of-frames.md) | Clean surfaces instead of frames; one part at a time on Map and Profile | Proposed |
+| [0034](0034-reports-hold-posts-and-friend-request-pauses.md) | Terms of use, held posts and pauses after declined requests | Proposed |
 
 Template: context, options considered, decision, consequences, status.

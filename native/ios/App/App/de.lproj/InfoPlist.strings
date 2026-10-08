@@ -1,0 +1,5 @@
+/* Berechtigungstexte auf Deutsch, für ein iPhone in deutscher Sprache. */
+"NSLocationWhenInUseUsageDescription" = "Pistl nutzt deinen Standort, um dich auf der Pistenkarte zu zeigen, ihn mit Freunden deiner Wahl zu teilen und deinen Skitag aufzuzeichnen. Du entscheidest jedes Mal.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Bei gesperrtem Bildschirm teilt Pistl deinen Standort weiter mit den Freunden, die du gewählt hast, bis die gewählte Zeit endet oder du stoppst, und zählt deine Abfahrten, während du einen Skitag aufzeichnest. Deine Route bleibt auf deinem Handy.";
+"NSCameraUsageDescription" = "Pistl nutzt die Kamera, wenn du ein Profilbild oder ein Foto für einen Post aufnimmst.";
+"NSPhotoLibraryUsageDescription" = "Pistl öffnet deine Fotos, wenn du ein Profilbild oder ein Foto für einen Post auswählst.";

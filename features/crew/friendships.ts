@@ -33,7 +33,9 @@ export type FriendRequestOutcome =
   | "not_found"
   | "self"
   | "profile_incomplete"
-  | "too_many_pending";
+  | "too_many_pending"
+  | "cooling_down"
+  | "declined_often";
 
 export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean; message: MessageKey }> = {
   requested: { ok: true, message: "crew.requestSent" },
@@ -43,5 +45,7 @@ export const FRIEND_REQUEST_MESSAGES: Record<FriendRequestOutcome, { ok: boolean
   not_found: { ok: false, message: "crew.noSuchHandle" },
   self: { ok: false, message: "crew.ownHandle" },
   too_many_pending: { ok: false, message: "crew.tooManyPending" },
+  cooling_down: { ok: false, message: "crew.coolingDown" },
+  declined_often: { ok: false, message: "crew.declinedOften" },
   profile_incomplete: { ok: false, message: "common.profileIncomplete" },
 };

@@ -175,5 +175,28 @@ through public events and friend requests (owner decision).
 
 ## Questions for the owner
 
-See the handover message for this session. The answers go into this file
-and, where a rule changes, into an ADR.
+Answers from 2026-10-07. The owner's guiding rule: young people should be
+able to use the whole app wherever the law and the App Store allow it.
+
+| # | Question | Answer | Consequence |
+|---|---|---|---|
+| 1 | Strangers and minors (requests, public events) | No age gate. Repeated requests after declines get a growing pause, then a block | Pause after 2 declines (7/14/28 days), no more requests after 5. Public events stay open from 14; everyone there can be reported (ADR 0034) |
+| 2 | Terms of use with zero tolerance | Yes, if needed | `/nutzungsbedingungen` plus a required box at sign-up; wording awaits legal review |
+| 3 | Photo screening | No external service; hide on report | A reported post is hidden for the reporter at once and for everyone after two reporters, until review |
+| 4 | "Every report within 24 hours" | Keep if the App Store or the law needs it | Kept: Apple expects action on reported content within 24 hours for apps with user content. The daily check stays an owner action |
+| 5 | Parental consent | Parental consent is a bad fit; unsure about 16+ | Sentence removed (no mechanism stood behind it). Minimum age stays 14; legal review of 14 vs. 16 open in ADR 0034 |
+| 6 | Friends leaderboard for minors on by default | Undecided | Kept on, copy made honest; the switch is in the profile |
+| 7 | Handle check open to signed-out visitors | Undecided | Kept for an easier sign-up; recorded as an accepted risk in ADR 0034 |
+| 8 | Growth (invite preview name, share image, weekend push, streak, dark mode) | Not now | Not in this pass |
+
+## Implementation
+
+| PR | Contents | Status |
+|---|---|---|
+| 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | PR open |
+| 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | open |
+| 3 | Scale: #6, #12 | open |
+
+#18 (layout redirect) is not changed. The proxy already sends any failed
+identity check to `/login` on purpose ("fail closed"). Showing an error
+page instead would change security code and needs its own decision.

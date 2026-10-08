@@ -16,6 +16,7 @@ import {
 } from "./credentials";
 import { toSignupMetadata, validateSignupProfile, viennaToday } from "./signup-profile";
 import { getT } from "@/lib/i18n/server";
+import { TERMS_VERSION } from "@/features/legal/terms";
 import { cookies } from "next/headers";
 import { PENDING_SIGNUP_COOKIE, pendingSignupCookieOptions } from "./pending-signup";
 import { getPendingSignupEmail } from "./queries";
@@ -140,7 +141,12 @@ export async function signUpAction(
     ridingStyles: formData.getAll("ridingStyles").filter((value): value is string => typeof value === "string"),
     birthDate: stringField(formData, "birthDate"),
   };
+  const acceptedTerms = stringField(formData, "acceptTerms") === TERMS_VERSION;
   const t = await getT();
+
+  if (!acceptedTerms) {
+    return { status: "error", message: t("auth.acceptTerms"), email: input.email };
+  }
 
   const validation = validateSignupCredentials(input);
   const profile = validateSignupProfile(profileInput, viennaToday());
@@ -181,7 +187,7 @@ export async function signUpAction(
       password: validation.data.password,
       options: {
         emailRedirectTo: new URL("/auth/confirm", getSiteUrl()).toString(),
-        data: toSignupMetadata(profile.data),
+        data: { ...toSignupMetadata(profile.data), terms_version: TERMS_VERSION },
       },
     });
 

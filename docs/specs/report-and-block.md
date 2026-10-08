@@ -22,6 +22,11 @@ about them, a single bad actor stays in a person's feed and requests.
   other) and optional details go to the operator. Reporting can block in
   the same step.
 - Profile lists blocked people and lets you unblock.
+- From a post, and from any sender in a group or ride chat, the same
+  sheet opens (2026-10-07). Every rider in a ride sheet can be reported,
+  not only the host.
+- A reported post is hidden for the reporter at once and for everyone
+  after two different reporters, until review (ADR 0034).
 
 ## Not included
 
@@ -46,6 +51,9 @@ about them, a single bad actor stays in a person's feed and requests.
    reports.
 5. Unblocking restores visibility but not the old friendship.
 6. An eleventh report in a day is refused.
+7. A reported post disappears for the reporter; one report does not hide
+   it from others; two reports from different people hide it for
+   everyone but the author.
 
 ## Evidence
 

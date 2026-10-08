@@ -77,6 +77,11 @@ describe("ride actions", () => {
       });
     });
 
+    it("asks to rephrase when the word filter refuses the text", async () => {
+      mocks.insert.mockResolvedValue({ error: { code: "PB001", message: "text contains a blocked term" } });
+      await expect(createRideAction(ride)).resolves.toEqual({ ok: false, message: "Please rephrase this without slurs or hate terms." });
+    });
+
     it("asks for a finished profile when the insert policy refuses", async () => {
       mocks.insert.mockResolvedValue({ error: { code: "42501", message: "new row violates row-level security policy" } });
       await expect(createRideAction(ride)).resolves.toMatchObject({ ok: false, message: expect.stringContaining("Finish your profile") });
@@ -157,6 +162,11 @@ describe("ride actions", () => {
     ])("explains %s", async (data, message) => {
       mocks.rpc.mockResolvedValue({ data, error: null });
       await expect(updateRideAction("r1", edit)).resolves.toEqual({ ok: false, message });
+    });
+
+    it("asks to rephrase an edit the word filter refuses", async () => {
+      mocks.rpc.mockResolvedValue({ data: null, error: { code: "PB001" } });
+      await expect(updateRideAction("r1", edit)).resolves.toEqual({ ok: false, message: "Please rephrase this without slurs or hate terms." });
     });
 
     it("rejects invalid input and failures", async () => {

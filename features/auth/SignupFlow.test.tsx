@@ -88,6 +88,8 @@ describe("SignupFlow", () => {
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "Fresh-Powder-2026" } });
     expect(screen.getByText(/Strength/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Confirm password"), { target: { value: "Fresh-Powder-2026" } });
+    expect(screen.getByRole("link", { name: "terms of use" })).toHaveAttribute("href", "/nutzungsbedingungen");
+    fireEvent.click(screen.getByRole("checkbox", { name: /I accept the terms of use/ }));
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => expect(mocks.signUpAction).toHaveBeenCalled());
@@ -97,6 +99,7 @@ describe("SignupFlow", () => {
     expect(sent.get("displayName")).toBe("Lena Moser");
     expect(sent.get("handle")).toBe("lena_moser");
     expect(sent.get("birthDate")).toBe("2008-01-02");
+    expect(sent.get("acceptTerms")).toBe("2026-10-07");
   });
 
   it("goes back to the step with the problem the server found", async () => {

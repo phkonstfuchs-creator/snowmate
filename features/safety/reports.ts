@@ -22,6 +22,8 @@ export interface SafetyTarget {
   userId: string;
   name: string;
   rideId?: string;
+  /* A reported post is hidden for the reporter at once (ADR 0034). */
+  postId?: string;
 }
 
 export interface BlockedPerson {

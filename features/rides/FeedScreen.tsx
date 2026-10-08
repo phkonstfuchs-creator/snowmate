@@ -38,6 +38,9 @@ export interface LiveFeed {
   profileComplete?: boolean;
   /* Ski-day posts from the viewer and their friends; null when unreachable. */
   posts?: Post[] | null;
+  /* The viewer's account id, so a ride sheet offers report and block for
+     everyone in it except the viewer. */
+  viewerId?: string;
 }
 
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
@@ -215,6 +218,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
           post={selectedRide.post}
           author={selectedRide.host}
           joinedUsers={selectedRide.participants}
+          viewerId={live?.viewerId}
           isJoined={selectedRide.isJoined}
           isPending={selectedRide.isPending}
           requests={selectedRide.requests}

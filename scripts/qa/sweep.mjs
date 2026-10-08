@@ -16,7 +16,7 @@ const OUT = process.argv[2] ?? "qa-sweep";
 mkdirSync(OUT, { recursive: true });
 
 const ROUTES = [
-  "/login", "/signup", "/onboarding", "/forgot-password", "/impressum", "/datenschutz", "/lizenzen",
+  "/login", "/signup", "/onboarding", "/forgot-password", "/impressum", "/datenschutz", "/lizenzen", "/nutzungsbedingungen",
   "/demo/feed", "/demo/map", "/demo/people", "/demo/crew", "/demo/profile", "/demo/carpool", "/demo/events",
   "/does-not-exist",
 ];

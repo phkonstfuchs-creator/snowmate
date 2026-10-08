@@ -2,7 +2,7 @@
 
 import { seasonLabel } from "@/lib/season";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { PrivacyConsent } from "@/features/legal/LegalLinks";
+import { TermsConsent } from "@/features/legal/LegalLinks";
 import { useRouter } from "next/navigation";
 import ResortScene from "@/components/ResortScene";
 import Wordmark from "@/components/ui/Wordmark";
@@ -400,10 +400,10 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
         )}
 
         <div className="mt-auto pt-6">
+          <TermsConsent className="mb-4 text-sm leading-snug" />
           <PrimaryButton type="submit" disabled={pending}>
             {pending ? t("auth.creating") : t("auth.createAccount")}
           </PrimaryButton>
-          <PrivacyConsent className="mt-3 text-center text-xs leading-relaxed" />
         </div>
       </form>
     </div>

@@ -15,6 +15,7 @@ export default async function FeedPage() {
         defaultCity: profile?.city ?? "innsbruck",
         profileComplete: profile?.onboardingCompleted ?? false,
         posts,
+        viewerId: profile?.id,
       }}
     />
   );

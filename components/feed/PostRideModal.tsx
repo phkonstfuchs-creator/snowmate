@@ -233,6 +233,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 type="text"
                 placeholder={t("post.meetingPointPlaceholder")}
                 value={meetPoint}
+                maxLength={120}
                 onChange={(e) => setMeetPoint(e.target.value)}
                 className="form-input"
               />
@@ -247,6 +248,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 placeholder={t("post.notePlaceholder")}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
+                maxLength={280}
                 rows={3}
                 className="form-input resize-none"
               />
@@ -258,7 +260,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
               </p>
               <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="post-ride-visibility-label">
                 {([
-                  { value: "friends", label: t("post.friends"), desc: t("post.friendsDesc") },
+                  { value: "friends", label: t("post.friends"), desc: t(mayGoPublic ? "post.friendsDesc" : "post.friendsDescMinor") },
                   { value: "public", label: t("post.public"), desc: t("post.publicDesc") },
                 ] as const).map((opt) => {
                   const active = visibility === opt.value;

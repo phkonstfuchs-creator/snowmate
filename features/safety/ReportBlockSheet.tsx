@@ -49,7 +49,7 @@ export default function ReportBlockSheet({ target, onClose }: { target: SafetyTa
     setPending(true);
     finish(
       await settle(
-        reportUserAction({ userId: target.userId, reason, details, alsoBlock, ...(target.rideId ? { rideId: target.rideId } : {}) }),
+        reportUserAction({ userId: target.userId, reason, details, alsoBlock, ...(target.rideId ? { rideId: target.rideId } : {}), ...(target.postId ? { postId: target.postId } : {}) }),
         OFFLINE,
       ),
     );

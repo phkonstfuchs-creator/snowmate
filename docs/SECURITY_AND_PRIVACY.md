@@ -48,6 +48,10 @@ See [ADR 0002](adr/0002-stricter-carpool-visibility.md).
   requests keep people out; a pass hides someone for 30 days; 100
   swipes a day.
 - Twenty unanswered outgoing requests stop further ones.
+- After two declines by the same person the asker waits 7, then 14,
+  then 28 days; after five declines they cannot ask that person again.
+  Withdrawals do not count. Requests to minors are not age-gated (owner
+  decision 2026-10-07, ADR 0034).
 - Posting, joining and asking require a finished profile, so nobody meets
   an anonymous account. See [ADR 0005](adr/0005-require-finished-profile.md).
 
@@ -65,15 +69,24 @@ See [ADR 0009](adr/0009-single-use-invite-links.md).
   requests answer as if the handle did not exist.
 - Reports go to the operator only (no client can read them), at most 10 a
   day per person, and are reviewed in the Supabase dashboard for now.
-- Entry points: ride and event sheets, carpool cards, every person on the
-  Crew tab. Blocked people can be unblocked from the Profile tab.
+- Entry points: ride and event sheets (the host and every rider),
+  carpool cards, every person on the Crew tab, every post, and every
+  sender in a group or ride chat. Blocked people can be unblocked from
+  the Profile tab.
+- A reported post disappears for the reporter at once and for everyone
+  once two different people reported it, until the operator sets the
+  reports to `reviewed`. The author still sees it (ADR 0034).
+- Sign-up requires accepting the terms of use (`/nutzungsbedingungen`,
+  zero tolerance for objectionable content); the version is stored with
+  the account.
 - The report sheet shows the operator's e-mail for abuse and promises a
   review within 24 hours (App Store guideline 1.2).
 - A small word filter in the database (`private.blocked_terms`) refuses
   severe slurs, hate slogans and calls to self-harm in posts, chat
   messages, profiles, rides and carpools. Triggers enforce it on every write
-  path; the app shows "please rephrase". It is a floor, not moderation:
-  reports still matter. Clients cannot read the list.
+  path; the app shows "please rephrase". Invisible format characters are
+  removed and spaced single letters joined before matching. It is a floor,
+  not moderation: reports still matter. Clients cannot read the list.
 
 See [ADR 0010](adr/0010-blocking-hides-both-ways.md) and
 [ADR 0031](adr/0031-native-apps-with-capacitor.md).

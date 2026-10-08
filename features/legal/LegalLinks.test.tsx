@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import LegalLinks, { PrivacyConsent } from "./LegalLinks";
+import LegalLinks, { TermsConsent } from "./LegalLinks";
 import LegalPage from "./LegalPage";
 import { OPERATOR } from "./operator";
 
@@ -11,10 +11,19 @@ describe("legal links", () => {
     expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/datenschutz");
   });
 
-  it("puts the privacy policy link inside the sign-up sentence", () => {
-    render(<PrivacyConsent />);
+  it("links the terms of use", () => {
+    render(<LegalLinks />);
+    expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/nutzungsbedingungen");
+  });
+
+  it("asks to accept the terms with both documents linked, and promises nothing it does not do", () => {
+    render(<TermsConsent />);
+    const box = screen.getByRole("checkbox", { name: /I accept the terms of use/ });
+    expect(box).toBeRequired();
+    expect(box).toHaveAttribute("name", "acceptTerms");
+    expect(screen.getByRole("link", { name: "terms of use" })).toHaveAttribute("href", "/nutzungsbedingungen");
     expect(screen.getByRole("link", { name: "privacy policy" })).toHaveAttribute("href", "/datenschutz");
-    expect(screen.getByText(/By creating an account you confirm/)).toHaveTextContent("Under 18?");
+    expect(screen.queryByText(/parents/)).not.toBeInTheDocument();
   });
 
   it("frames a legal page with its title and navigation", () => {

@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/server";
 import { translateValidation } from "@/lib/i18n/translate";
 import { revalidateApp } from "@/lib/revalidate";
 import { createClient } from "@/lib/supabase/server";
+import { isUuid } from "@/lib/server-action";
 import { MAX_REPORT_DETAILS, isReportReason } from "./reports";
 
 export type SafetyActionResult = { ok: boolean; message: string };
@@ -49,6 +50,7 @@ async function reportUserActionImpl(input: {
   reason: string;
   details?: string;
   rideId?: string;
+  postId?: string;
   alsoBlock?: boolean;
 }): Promise<SafetyActionResult> {
   if (!input.userId || !isReportReason(input.reason)) {
@@ -65,12 +67,14 @@ async function reportUserActionImpl(input: {
     details: details || null,
     ride: input.rideId ?? null,
     also_block: input.alsoBlock === true,
+    post: input.postId && isUuid(input.postId) ? input.postId : null,
   });
   if (!result) return UNAVAILABLE;
 
   switch (result.data) {
     case "reported":
-      if (input.alsoBlock) revalidateSocial();
+      /* A reported post disappears for the reporter at once (ADR 0034). */
+      if (input.alsoBlock || input.postId) revalidateSocial();
       return {
         ok: true,
         message: input.alsoBlock
@@ -105,6 +109,7 @@ export async function reportUserAction(input: {
   reason: string;
   details?: string;
   rideId?: string;
+  postId?: string;
   alsoBlock?: boolean;
 }): Promise<SafetyActionResult> {
   return localize(await reportUserActionImpl(input));

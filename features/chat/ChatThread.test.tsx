@@ -78,6 +78,23 @@ describe("ChatThread", () => {
     expect(screen.getByRole("dialog")).toHaveTextContent("Report Lena");
   });
 
+  it("lets anyone in a group chat report or block the person who wrote", () => {
+    render(<ChatThread conversationId={CONV} title="Nordkette Sat" initialMessages={[first, mine]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Report or block Lena" }));
+    expect(screen.getByRole("dialog")).toHaveTextContent("Report Lena");
+    expect(screen.queryByRole("button", { name: "Report or block Me" })).not.toBeInTheDocument();
+  });
+
+  it("explains the age rule for pins before asking for the position", () => {
+    const getCurrentPosition = vi.fn();
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition }, configurable: true });
+    render(<ChatThread conversationId={CONV} title="Lena" initialMessages={[first]} canSharePosition={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Send my location" }));
+    expect(screen.getByRole("alert")).toHaveTextContent(/from 16/);
+    expect(getCurrentPosition).not.toHaveBeenCalled();
+    expect(mocks.sendLocation).not.toHaveBeenCalled();
+  });
+
   it("shows a pin that opens the map, and an expired one without coordinates", () => {
     const pin: ChatMessage = { ...first, id: "p1", body: "📍", kind: "location", position: { lat: 47.26346, lng: 11.39432 } };
     const old: ChatMessage = { ...first, id: "p2", body: "📍", kind: "location", position: null, createdAt: "2026-10-05T10:03:00Z" };
