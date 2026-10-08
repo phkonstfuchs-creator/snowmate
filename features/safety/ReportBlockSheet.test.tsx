@@ -13,7 +13,6 @@ beforeEach(() => vi.clearAllMocks());
 describe("ReportBlockSheet", () => {
   it("offers the dedicated abuse mailbox", () => {
     render(<ReportBlockSheet target={target} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole("button", { name: /Report Max Rider/ }));
     expect(screen.getByRole("link", { name: "meldung@pistl.app" })).toHaveAttribute("href", "mailto:meldung@pistl.app?subject=Pistl%20Meldung");
   });
 
