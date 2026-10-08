@@ -244,7 +244,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 {t("post.note")} {t("common.optional")}
               </label>
               <textarea
-                id="post-ride-caption"
+                id="post-ride-caption" aria-describedby="post-ride-caption-count"
                 placeholder={t("post.notePlaceholder")}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
@@ -252,6 +252,7 @@ export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: Po
                 rows={3}
                 className="form-input resize-none"
               />
+              <p id="post-ride-caption-count" className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>{t("common.characterCount", { n: caption.length, max: 280 })}</p>
             </div>
 
             <div>

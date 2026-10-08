@@ -4,6 +4,12 @@ import type { MessageKey } from "./en";
    Keep every {placeholder} exactly as in en.ts. */
 export const de: Record<MessageKey, string> = {
   // ── Shared ───────────────────────────────────────────────────────
+  "discover.mutualOne": "{n} gemeinsamer Freund",
+  "common.characterCount": "{n} / {max} Zeichen",
+  "meetup.nearStation": "Dein geschätzter Standort liegt nahe der Talstation von {lift}. Prüfe die Pistenkarte für einen sicheren Weg.",
+  "push.installShare": "Öffne Pistl in Safari und tippe auf „Teilen“ (gegebenenfalls zuerst „Mehr“ oder das Seitenmenü).",
+  "push.installAdd": "Wähle „Zum Home-Bildschirm“. Lass „Als Web-App öffnen“ eingeschaltet, falls angezeigt, und tippe auf „Hinzufügen“.",
+  "push.installOpen": "Öffne Pistl vom Home-Bildschirm und aktiviere Push in deinem Profil.",
   "common.unavailable": "Das hat nicht geklappt. Versuch es gleich nochmal.",
   "common.offline": "Keine Verbindung. Versuch es gleich nochmal.",
   "common.blockedText": "Bitte formuliere das ohne Beleidigungen oder Hassbegriffe.",
@@ -274,7 +280,7 @@ export const de: Record<MessageKey, string> = {
   "feed.youAreIn": "Du bist dabei",
   "card.yourRide": "Dein Ride",
   "card.yourRideAsking": "Dein Ride · {n} fragen an",
-  "card.joined": "Dabei",
+  "card.joined": "Dabei ✓",
   "card.asked": "Angefragt",
   "card.join": "Bin dabei",
   "card.actionFor": "{action}: {resort}, {style}, {time}",
@@ -466,7 +472,7 @@ export const de: Record<MessageKey, string> = {
   "demo.level": "Level {n}",
   "demo.levelLine": "Level {n} · {title}",
   "demo.days": "{n} Tage",
-  "demo.discoverHint": "Swipen und Rider treffen, oder deinen Einladungslink teilen",
+  "demo.discoverHint": "Swipen und Rider in der Demo treffen",
   "demo.members": "{n} Mitglieder",
   "demo.planRide": "Ride planen",
   "demo.newSquad": "Neue Squad anlegen",

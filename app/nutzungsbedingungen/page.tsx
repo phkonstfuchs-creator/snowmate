@@ -50,7 +50,11 @@ function TermsDe() {
         Jede Person kannst du an ihrem Ride, ihrem Post, im Chat oder in deiner Crew melden oder blockieren. Ein
         gemeldeter Post verschwindet für dich sofort. Blockieren wirkt in beide Richtungen und beendet jede Verbindung.
         Im Notfall ruf 112 an. Für Missbrauch erreichst du uns unter{" "}
-        <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.
+        <a href={`mailto:${OPERATOR.report}`}>{OPERATOR.report}</a>.
+      </p>
+
+      <p>Für Eltern, Minderjährige und akute Jugendschutz-Anliegen:{" "}
+        <a href={`mailto:${OPERATOR.youth}`}>{OPERATOR.youth}</a>.
       </p>
 
       <h2>5. Treffen und Mitfahrgelegenheiten</h2>
@@ -113,7 +117,11 @@ function TermsEn() {
       <p>
         You can report or block anyone from their ride, their post, a chat or your crew. A post you report disappears
         for you at once. A block works both ways and ends every connection. In an emergency call 112. For abuse, write
-        to <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.
+        to <a href={`mailto:${OPERATOR.report}`}>{OPERATOR.report}</a>.
+      </p>
+
+      <p>For parents, minors and urgent youth protection concerns:{" "}
+        <a href={`mailto:${OPERATOR.youth}`}>{OPERATOR.youth}</a>.
       </p>
 
       <h2>5. Meeting up and carpools</h2>

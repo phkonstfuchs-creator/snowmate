@@ -133,8 +133,8 @@ through public events and friend requests (owner decision).
 ## Persona retest after the UX changes
 
 These are simulated persona opinions from `/demo`, not real user testing.
-The raw notes were preserved before removing the temporary handoff folder
-(commit `e8de020` and `/tmp/snowmate-pr75-handoff-backup/phase4-persona-notes.md`).
+The [raw persona notes](https://github.com/phkonstfuchs-creator/snowmate/blob/e8de020b1f8ab61778b0eb87b9a7153e2d58c8e0/docs/qa/handoff/phase4-persona-notes.md)
+are preserved in Git history after removing the temporary handoff folder.
 The grades precede the additional small fixes; they have not been re-measured.
 
 | Persona | Grade before → after | Tomorrow? | Main remaining stuck point at retest |
@@ -217,7 +217,7 @@ able to use the whole app wherever the law and the App Store allow it.
 |---|---|---|
 | 1 | Safety and honesty: #1, #3, #4, #14, #15 (messages and limits), #19, #13; terms, held posts, pause after declines | merged ([#74](https://github.com/phkonstfuchs-creator/snowmate/pull/74)) |
 | 2 | Core flow and UX: #2, #5, #7, #8, #9, #10, #11, #16, #17, #20 | merged ([#75](https://github.com/phkonstfuchs-creator/snowmate/pull/75)) |
-| 3 | Scale: #6, #12 | Prepared; checks and review pending |
+| 3 | Scale: #6, #12 | merged ([#77](https://github.com/phkonstfuchs-creator/snowmate/pull/77)) |
 
 PR 3 in numbers (estimate, not measured in production):
 
@@ -243,3 +243,26 @@ pgTAP: `nav_counts.test.sql` (28 checks).
 #18 (layout redirect) is not changed. The proxy already sends any failed
 identity check to `/login` on purpose ("fail closed"). Showing an error
 page instead would change security code and needs its own decision.
+
+
+## Small UX follow-up
+
+[#76](https://github.com/phkonstfuchs-creator/snowmate/pull/76) preserves
+terms acceptance through errors and step changes, makes its label at least
+44 px high, corrects the demo crew hint and singular mutual-friend copy,
+removes rounded zero-distance hints, makes the joined action visibly active,
+and adds note counters and iOS installation instructions. The grades above
+precede these fixes; no additional persona retest has been claimed.
+
+Combined validation: lint, typecheck, 902 unit/component tests (86.64 %
+statements), production build and mobile sweep. The sweep has no
+serious/critical axe violation, horizontal scroll, page error or HTTP 5xx;
+existing label findings, intentional 404 responses, WebGL warnings and
+aborted background requests remain in the raw report. PostgreSQL 16:
+40 pgTAP files, 743 assertions plus the 12-rider/3-spot race.
+
+ADRs 0036–0038 are Proposed and Pistl Go remains a draft specification:
+no new adult/minor contact policy, public-event chat policy or conditional
+ride feature is implemented. The owner must approve these decisions.
+Legal review, a staffed daily moderation process and the owner-run database
+migration deployment remain open actions.

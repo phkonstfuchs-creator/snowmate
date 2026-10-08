@@ -150,7 +150,7 @@ test('metadata, footer destinations, logo and custom 404 are usable', async ({ p
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     if (path === '/impressum') {
       await expect(page.locator('main')).toContainText('In den Kiefern 3');
-      await expect(page.getByRole('link', { name: 'vfxphilipp@outlook.com' })).toHaveAttribute('href', 'mailto:vfxphilipp@outlook.com');
+      await expect(page.getByRole('link', { name: 'support@pistl.app' })).toHaveAttribute('href', 'mailto:support@pistl.app');
       await expect(page.getByRole('link', { name: 'Hanken Grotesk' })).toHaveAttribute('href', '/licenses/hanken-grotesk.txt');
     }
   }
@@ -261,4 +261,17 @@ test('mobile hero keeps readable copy and uses vector arrows with scroll depth',
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect.poll(() => page.locator('.mountain-scene').evaluate((element) => Number(element.style.getPropertyValue('--scene-progress')))).toBe(0);
   expect(await page.locator('.mountain-world').evaluate((element) => getComputedStyle(element).transform)).toBe('none');
+});
+
+
+test('contact and privacy pages route mail to the dedicated teams', async ({ page }) => {
+  await page.goto('/kontakt');
+  await expect(page.getByRole('link', { name: 'support@pistl.app', exact: true })).toHaveAttribute('href', 'mailto:support@pistl.app');
+  await expect(page.getByRole('link', { name: 'meldung@pistl.app', exact: true })).toHaveAttribute('href', 'mailto:meldung@pistl.app');
+  await page.goto('/datenschutz');
+  const privacy = page.getByRole('link', { name: 'datenschutz@pistl.app', exact: true });
+  await expect(privacy).toHaveCount(2);
+  for (const link of await privacy.all()) await expect(link).toHaveAttribute('href', 'mailto:datenschutz@pistl.app');
+  await expect(page.locator('main')).toContainText('eu-west-1');
+  await expect(page.locator('main')).toContainText('eingehende');
 });

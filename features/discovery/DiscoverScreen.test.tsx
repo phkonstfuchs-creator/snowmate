@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DiscoverScreen from "./DiscoverScreen";
+import { I18nProvider } from "@/lib/i18n/client";
 import type { DeckCard } from "./discovery";
 import { MOCK_USERS } from "@/lib/data/mock-data";
 
@@ -22,6 +23,11 @@ const card = (n: number): DeckCard => ({
 beforeEach(() => vi.clearAllMocks());
 
 describe("DiscoverScreen", () => {
+  it("uses singular German copy for one mutual friend", () => {
+    render(<I18nProvider locale="de"><DiscoverScreen initialDeck={[{ ...card(1), mutualFriends: 1 }]} discoverable hasBirthDate isMinor={false} /></I18nProvider>);
+    expect(screen.getByText("1 gemeinsamer Freund")).toBeInTheDocument();
+  });
+
   it("asks for a birth date first", () => {
     render(<DiscoverScreen initialDeck={[]} discoverable={false} hasBirthDate={false} isMinor />);
     expect(screen.getByText(/add your date of birth/)).toBeInTheDocument();

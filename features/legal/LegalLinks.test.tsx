@@ -30,6 +30,9 @@ describe("legal links", () => {
     render(<LegalPage title="Impressum"><p>{OPERATOR.name}</p></LegalPage>);
     expect(screen.getByRole("heading", { level: 1, name: "Impressum" })).toBeInTheDocument();
     expect(screen.getByText("Philipp Fuchs")).toBeInTheDocument();
-    expect(OPERATOR.email).toMatch(/@/);
+    expect(OPERATOR.support).toBe("support@pistl.app");
+    expect(OPERATOR.report).toBe("meldung@pistl.app");
+    expect(OPERATOR.privacy).toBe("datenschutz@pistl.app");
+    expect(OPERATOR.youth).toBe("jugendschutz@pistl.app");
   });
 });

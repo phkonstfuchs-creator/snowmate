@@ -115,6 +115,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
   /* Result of the last availability check, tied to the handle it was for. */
   const [checked, setChecked] = useState<{ handle: string; result: HandleCheck } | null>(null);
   const [birthDate, setBirthDate] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   /* A profile problem found by the server sends the person back to the
@@ -408,7 +409,7 @@ export default function SignupFlow({ startAtTitle = true }: { startAtTitle?: boo
         )}
 
         <div className="mt-auto pt-6">
-          <TermsConsent className="mb-4 text-sm leading-snug" />
+          <TermsConsent accepted={acceptedTerms} onAcceptedChange={setAcceptedTerms} className="mb-4 text-sm leading-snug" />
           <PrimaryButton type="submit" disabled={pending}>
             {pending ? t("auth.creating") : t("auth.createAccount")}
           </PrimaryButton>

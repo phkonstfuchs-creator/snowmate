@@ -24,7 +24,7 @@ export default function ImpressumPage() {
 
       <h2>Kontakt</h2>
       <p>
-        E-Mail: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
+        E-Mail: <a href={`mailto:${OPERATOR.support}`}>{OPERATOR.support}</a>
       </p>
 
       <h2>Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV</h2>

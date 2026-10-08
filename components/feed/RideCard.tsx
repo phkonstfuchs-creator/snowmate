@@ -110,7 +110,9 @@ export default function RideCard({ post, author, joinedUsers, isJoined, isPendin
               })}
               className="min-h-12 px-5 text-[0.9375rem] font-semibold transition-transform active:scale-[0.97]"
               style={
-                isJoined || isPending
+                isJoined
+                  ? { background: "var(--pine)", color: "var(--on-accent)", borderRadius: 999 }
+                  : isPending
                   ? { background: "var(--paper-2)", color: "var(--ink-1)", borderRadius: 999 }
                   : full
                   ? { background: "var(--paper-2)", color: "var(--ink-3)", borderRadius: 999 }

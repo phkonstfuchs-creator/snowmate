@@ -1,5 +1,5 @@
 import LegalShell from "../../components/LegalShell";
-import { contactEmail, operatorAddress, operatorName, supervisoryAuthority } from "../../lib/site";
+import { privacyEmail, operatorAddress, operatorName, supervisoryAuthority } from "../../lib/site";
 
 export const metadata = { title: "Datenschutz", alternates: { canonical: "/datenschutz" } };
 
@@ -10,7 +10,7 @@ export default function Privacy() {
     <h2>Wer ist verantwortlich?</h2>
     <p>{operatorName}</p>
     <address>{operatorAddress}</address>
-    <p>E-Mail: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
+    <p>E-Mail: <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a></p>
 
     <h2>Warteliste und Early Access</h2>
     <p>Bei deiner Anmeldung speichern wir deine E-Mail-Adresse, ob du am Early Access interessiert bist, sowie Zeitpunkt und Version deiner Einwilligung. Danach schicken wir dir eine E-Mail mit einem Bestätigungslink (Double-Opt-in). Erst wenn du ihn nutzt, stehst du auf der Warteliste; den Zeitpunkt der Bestätigung speichern wir als Nachweis. Wir verwenden diese Angaben ausschließlich, um dich über den Start von Pistl zu informieren und, wenn du es angekreuzt hast, zum Testen einzuladen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).</p>
@@ -23,7 +23,7 @@ export default function Privacy() {
     <ul>
       <li><strong>Vercel</strong> (Vercel Inc., USA) betreibt die Website. Die serverseitige Verarbeitung der Warteliste läuft in Frankfurt am Main; Seiten können über weltweite Server ausgeliefert werden. Beim Aufruf verarbeitet Vercel technisch notwendige Verbindungsdaten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO, sicherer Betrieb).</li>
       <li><strong>Supabase</strong> (Supabase Inc., USA) speichert die Warteliste in einem Rechenzentrum in Frankfurt am Main.</li>
-      <li><strong>Resend</strong> (Resend, Inc., USA) verschickt die Bestätigungs-E-Mail über Server in Irland. Dafür erhält Resend deine E-Mail-Adresse und den Inhalt der E-Mail.</li>
+      <li><strong>Resend</strong> (Resend, Inc., USA) verschickt die Bestätigungs-E-Mail über Server in Irland. Auch eingehende Kontakt-E-Mails laufen über Resend; der Empfang erfolgt über Amazon Web Services in der Region eu-west-1 (Irland). Dafür erhält Resend deine E-Mail-Adresse und den Inhalt der E-Mail.</li>
     </ul>
     <p>Soweit dabei Daten in die USA gelangen, geschieht das auf Grundlage des EU-US Data Privacy Framework oder von EU-Standardvertragsklauseln (Art. 45, 46 DSGVO).</p>
 
@@ -34,7 +34,7 @@ export default function Privacy() {
     <p>Diese Website setzt keine Cookies, keine Analyse- oder Werbewerkzeuge und kein Besuchertracking. Schriftarten und Bilder werden von der Website selbst ausgeliefert. Formulareingaben werden nicht im Browser gespeichert.</p>
 
     <h2>Deine Rechte</h2>
-    <p>Du hast das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21 DSGVO) sowie das Recht, deine Einwilligung jederzeit zu widerrufen. Schreibe dafür an <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+    <p>Du hast das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21 DSGVO) sowie das Recht, deine Einwilligung jederzeit zu widerrufen. Schreibe dafür an <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a>.</p>
     <p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei der für uns zuständigen: {supervisoryAuthority.name}, {supervisoryAuthority.address}, <a href={supervisoryAuthority.url}>{supervisoryAuthority.url.replace("https://", "")}</a>.</p>
 
     <h2>Keine automatisierten Entscheidungen</h2>

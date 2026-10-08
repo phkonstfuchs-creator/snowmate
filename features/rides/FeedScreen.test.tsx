@@ -223,7 +223,11 @@ describe("FeedScreen with real data", () => {
     render(<FeedScreen live={live([row({ is_joined: true, taken_spots: 1 })])} />);
 
     /* A second tap on the card never leaves: it opens the ride. */
-    fireEvent.click(screen.getByRole("button", { name: /^Joined/ }));
+    const joinedButton = screen.getByRole("button", { name: /^Joined/ });
+    expect(joinedButton).toHaveTextContent("Joined ✓");
+    expect(joinedButton).toBeEnabled();
+    expect(joinedButton).toHaveStyle({ background: "var(--pine)", color: "var(--on-accent)" });
+    fireEvent.click(joinedButton);
     expect(mocks.leave).not.toHaveBeenCalled();
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "You are in, tap to leave" }));
@@ -394,6 +398,10 @@ describe("FeedScreen with real data", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByLabelText("Meeting point")).toHaveAttribute("maxLength", "120");
     expect(screen.getByLabelText(/^Note/)).toHaveAttribute("maxLength", "280");
+    const note = screen.getByLabelText(/^Note/);
+    expect(note).toHaveAccessibleDescription("0 / 280 characters");
+    fireEvent.change(note, { target: { value: "Powder" } });
+    expect(note).toHaveAccessibleDescription("6 / 280 characters");
   });
 
   it("tells an adult that friends of friends see a friends ride", () => {

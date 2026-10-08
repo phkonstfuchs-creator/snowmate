@@ -108,7 +108,8 @@ export default function EditRideSheet({
             <label htmlFor="edit-ride-note" className={label} style={{ color: INK }}>
               {t("post.note")} <span style={{ color: INK_2 }}>{t("common.optional")}</span>
             </label>
-            <textarea id="edit-ride-note" rows={3} maxLength={280} className="form-input resize-none" value={caption} onChange={(e) => setCaption(e.target.value)} />
+            <textarea id="edit-ride-note" aria-describedby="edit-ride-note-count" rows={3} maxLength={280} className="form-input resize-none" value={caption} onChange={(e) => setCaption(e.target.value)} />
+              <p id="edit-ride-note-count" className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>{t("common.characterCount", { n: caption.length, max: 280 })}</p>
           </div>
           <p className="text-xs leading-snug" style={{ color: INK_2 }}>
             {t("edit.hint")}

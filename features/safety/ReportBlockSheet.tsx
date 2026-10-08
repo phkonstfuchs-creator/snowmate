@@ -102,7 +102,7 @@ export default function ReportBlockSheet({ target, onClose, demo = false }: { ta
               </p>
               <p className="text-sm leading-relaxed" style={{ color: INK_2 }}>
                 {t("safety.contactBefore")}
-                <a href={`mailto:${OPERATOR.email}?subject=Pistl%20Meldung`} className="font-semibold underline">{OPERATOR.email}</a>
+                <a href={`mailto:${OPERATOR.report}?subject=Pistl%20Meldung`} className="font-semibold underline">{OPERATOR.report}</a>
                 {t("safety.contactAfter")}
               </p>
               <button

@@ -99,7 +99,7 @@ export default function LiftMeetupPanel({ mine, friends, me, busy, result, onSto
                       {t("meetup.yourRoute", { lift: route.lift.name, time: timeAt(route.arrivalAt.toISOString(), locale) })}
                     </p>
                     <p className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>
-                      {t("meetup.routeHint", { lift: route.lift.name, distance: Math.round(route.distanceToBottomMeters) })}
+                      {t(Math.round(route.distanceToBottomMeters) === 0 ? "meetup.nearStation" : "meetup.routeHint", { lift: route.lift.name, distance: Math.round(route.distanceToBottomMeters) })}
                     </p>
                   </>
                 ) : me && !precisePosition ? (
