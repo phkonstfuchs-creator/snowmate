@@ -118,6 +118,21 @@ describe("FeedScreen with real data", () => {
     expect(screen.queryByRole("dialog", { name: /Want to know/ })).not.toBeInTheDocument();
   });
 
+  it("waits with the notification offer until the ride sheet it was joined from is closed", async () => {
+    window.localStorage.clear();
+    mocks.join.mockResolvedValue({ ok: true, message: "You are in." });
+    render(<FeedScreen live={live([row({})])} />);
+    fireEvent.click(screen.getByText("Rails are set"));
+    const sheet = screen.getByRole("dialog");
+    await act(async () => {
+      fireEvent.click(within(sheet).getByRole("button", { name: /I'm in/ }));
+    });
+    expect(screen.queryByRole("dialog", { name: /Want to know/ })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close ride details" }));
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Want to know when your crew heads out?" })).toBeInTheDocument());
+  });
+
   it("counts only today's riders as out today", () => {
     const later = new Date(NOW.getTime() + 3 * 24 * 60 * 60 * 1000);
     render(

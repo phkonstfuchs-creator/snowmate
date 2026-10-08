@@ -29,7 +29,7 @@ import NextStep from "@/components/ui/NextStep";
 import { initialsFor } from "@/features/profile/profile-input";
 import CreateMenu from "./CreateMenu";
 import { crewOutLine } from "./crew-out";
-import PushAsk, { claimPushAsk } from "@/features/notifications/PushAsk";
+import PushAsk, { usePushAskAfterJoin } from "@/features/notifications/PushAsk";
 
 export interface LiveFeed {
   /* null when the backend could not be reached */
@@ -67,7 +67,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
      the animation mid-flight. A changing key remounts it and the toast
      starts over instead of being swallowed. */
   const [xpToast, setXpToast] = useState(0);
-  const [showPushAsk, setShowPushAsk] = useState(false);
+  const pushAsk = usePushAskAfterJoin(live !== undefined);
 
   /* The effect owns the timer, so each new toast cancels the previous
      one through the cleanup and unmounting cannot leave one running. */
@@ -103,7 +103,7 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
     const didJoin = await board.toggleJoin(postId);
     if (didJoin) {
       setXpToast((n) => n + 1);
-      if (live && claimPushAsk()) setShowPushAsk(true);
+      pushAsk.offer();
     }
   };
 
@@ -207,7 +207,6 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {live && <PostList posts={live.posts ?? []} title={t("posts.fromCrew")} />}
       {live && <div className="pb-4" />}
 
-      {showPushAsk && <PushAsk onClose={() => setShowPushAsk(false)} />}
 
       {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
 
@@ -281,6 +280,10 @@ export default function FeedScreen({ live }: { live?: LiveFeed }) {
       {/* Story user profile */}
       {storyUser && (
         <UserProfileSheet user={storyUser} onClose={() => setStoryUser(null)} />
+      )}
+
+      {pushAsk.pending && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
+        <PushAsk onClose={pushAsk.dismiss} />
       )}
 
       {/* XP toast */}

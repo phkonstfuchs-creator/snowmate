@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { localizeFixtureRide, fixtureDay, fixtureTimestamp } from "./fixture-dates";
+import { localizeFixtureRide, fixtureDay, fixtureMessageTime, fixtureTimestamp } from "./fixture-dates";
 
 /* Wednesday, 7 October 2026, 10:00 in Vienna. */
 const NOW = new Date("2026-10-07T08:00:00Z");
@@ -25,5 +25,11 @@ describe("fixture dates", () => {
     const post = { date: "Sat 12 Jan", postedAt: "1 hr ago" };
     expect(localizeFixtureRide(post, NOW, "de")).toEqual({ date: "Sa., 10. Okt.", postedAt: "vor 1 Std." });
     expect(localizeFixtureRide({ date: "Today", postedAt: "23 min ago" }, NOW, "en")).toEqual({ date: "Today", postedAt: "23 min ago" });
+  });
+
+  it("keeps the clock time of sample chat messages, so old ones never read as new", () => {
+    expect(fixtureMessageTime("Yesterday 21:14", NOW, "de")).toBe("Gestern 21:14");
+    expect(fixtureMessageTime("Today 09:12", NOW, "en")).toBe("Today 09:12");
+    expect(fixtureMessageTime("0 min ago", NOW, "de")).toBe("gerade eben");
   });
 });

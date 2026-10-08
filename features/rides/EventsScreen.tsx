@@ -11,6 +11,7 @@ import EditRideSheet from "./EditRideSheet";
 import { useT } from "@/lib/i18n/client";
 import { translateText } from "@/lib/i18n/translate";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import PushAsk, { usePushAskAfterJoin } from "@/features/notifications/PushAsk";
 import type { SafetyTarget } from "@/features/safety/reports";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useSheetDismiss } from "@/hooks/useSheetDismiss";
@@ -333,6 +334,7 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, PUBLIC_EVENTS);
   const unavailable = live !== undefined && live.rides === null;
+  const pushAsk = usePushAskAfterJoin(live !== undefined);
 
   /* Filtering runs through isDiscoverablePublicRide rather than a
      plain visibility comparison, so a wrongly flagged ride hosted by
@@ -425,7 +427,9 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
         <EventDetailSheet
           ride={openEvent}
           pending={board.pendingId === openEvent.post.id}
-          onJoin={() => { void board.toggleJoin(openEvent.post.id); }}
+          onJoin={() => {
+            void board.toggleJoin(openEvent.post.id).then((didJoin) => { if (didJoin) pushAsk.offer(); });
+          }}
           {...(board.isLive
             ? {
                 onSafety: () => {
@@ -456,6 +460,8 @@ export default function EventsScreen({ live }: { live?: LiveEvents } = {}) {
           onClose={() => setEditingEventId(null)}
         />
       )}
+
+      {pushAsk.pending && !openEvent && !safetyTarget && !editingEvent && <PushAsk onClose={pushAsk.dismiss} />}
     </>
   );
 }

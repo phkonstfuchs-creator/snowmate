@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n/locales";
+import { translator } from "@/lib/i18n/translate";
 import { formatPostedAt, formatRideDate, toIsoDay } from "./live-ride";
 
 /* The /demo fixtures say "Today", "Sat 12 Jan" or "23 min ago" in English.
@@ -25,6 +26,17 @@ export function fixtureTimestamp(ago: string, now: Date): string {
   const match = /^(\d+)\s*(min|hr|day)/.exec(ago.trim().toLowerCase());
   const ms = match ? Number(match[1]) * UNIT_MS[match[2]!]! : 0;
   return new Date(now.getTime() - ms).toISOString();
+}
+
+/* Sample chat times read "Today 09:12" or "Yesterday 21:14". They keep
+   their clock time, so a thread stays in order, with the day word in the
+   reader's language. Anything else is read as "n min ago". */
+export function fixtureMessageTime(label: string, now: Date, locale: Locale): string {
+  const match = /^(today|yesterday)\s+(\d{1,2}:\d{2})$/i.exec(label.trim());
+  if (!match) return formatPostedAt(fixtureTimestamp(label, now), now, locale);
+  const t = translator(locale);
+  const day = match[1]!.toLowerCase() === "today" ? t("common.today") : t("common.yesterday");
+  return `${day.charAt(0).toUpperCase()}${day.slice(1)} ${match[2]}`;
 }
 
 export function localizeFixtureRide<T extends { date: string; postedAt: string }>(post: T, now: Date, locale: Locale): T {

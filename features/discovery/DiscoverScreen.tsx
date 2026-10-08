@@ -10,6 +10,7 @@ import type { MessageKey } from "@/lib/i18n/translate";
 import { initialsFor } from "@/features/profile/profile-input";
 import { openDirectChatAction } from "@/features/chat/actions";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
+import ConversationThread from "@/features/demo/ConversationThread";
 import { deckAction, setDiscoverableAction, swipeAction } from "./actions";
 import { swipeDirection, type DeckCard, type SwipeOutcome } from "./discovery";
 
@@ -228,6 +229,8 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
 function MatchSheet({ card, demo, onClose }: { card: DeckCard; demo: boolean; onClose: () => void }) {
   const t = useT();
   const [busy, setBusy] = useState(false);
+  const [demoChat, setDemoChat] = useState(false);
+  if (demoChat) return <ConversationThread userId={card.userId} onClose={onClose} />;
   return (
     <>
       <div className="sheet-overlay" data-state="open" onClick={onClose} aria-hidden />
@@ -238,13 +241,15 @@ function MatchSheet({ card, demo, onClose }: { card: DeckCard; demo: boolean; on
         <h2 className="text-display-md mt-4">{t("discover.matchTitle")}</h2>
         <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>{t("discover.matchText", { name: card.name })}</p>
         {demo ? (
-          <Link
-            href="/demo/crew"
+          /* The demo thread works with any sample rider, so the match opens it here. */
+          <button
+            type="button"
+            onClick={() => setDemoChat(true)}
             className="mt-5 flex min-h-12 w-full items-center justify-center text-sm font-semibold"
             style={{ background: "var(--rust)", color: "var(--on-accent)", borderRadius: 12 }}
           >
             {t("discover.writeMessage")}
-          </Link>
+          </button>
         ) : (
           <button
             type="button"

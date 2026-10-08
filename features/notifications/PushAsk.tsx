@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Sheet from "@/components/ui/Sheet";
 import { useT } from "@/lib/i18n/client";
 import PushSettings from "./PushSettings";
@@ -16,6 +17,18 @@ export function claimPushAsk(): boolean {
   } catch {
     return false;
   }
+}
+
+/* The ask after a join, shared by the feed and events. It is claimed at
+   once but shown only when no other sheet is open, so it never sits
+   hidden behind the ride sheet it was triggered from. */
+export function usePushAskAfterJoin(enabled: boolean) {
+  const [pending, setPending] = useState(false);
+  return {
+    pending,
+    offer: () => { if (enabled && claimPushAsk()) setPending(true); },
+    dismiss: () => setPending(false),
+  };
 }
 
 export default function PushAsk({ onClose }: { onClose: () => void }) {

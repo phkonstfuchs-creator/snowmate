@@ -8,8 +8,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/Icon";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { formatPostedAt } from "@/features/rides/live-ride";
-import { fixtureTimestamp } from "@/features/rides/fixture-dates";
+import { fixtureMessageTime } from "@/features/rides/fixture-dates";
 
 interface Props {
   userId: string;
@@ -137,7 +136,7 @@ export default function ConversationThread({ userId, onClose }: Props) {
               {!isMe && <Avatar id={other.id} initials={other.avatar} size={24} />}
               <div className={`flex flex-col gap-0.5 max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
                 <div className={isMe ? "msg-bubble-me" : "msg-bubble-them"}>{msg.text}</div>
-                <p className="text-[0.58rem] px-1" style={{ color: "var(--text-disabled)" }}>{formatPostedAt(fixtureTimestamp(msg.sentAt, new Date()), new Date(), locale)}</p>
+                <p className="text-[0.58rem] px-1" style={{ color: "var(--text-disabled)" }}>{fixtureMessageTime(msg.sentAt, new Date(), locale)}</p>
               </div>
             </div>
           );

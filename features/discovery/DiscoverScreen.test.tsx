@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DiscoverScreen from "./DiscoverScreen";
 import type { DeckCard } from "./discovery";
+import { MOCK_USERS } from "@/lib/data/mock-data";
 
 const mocks = vi.hoisted(() => ({ swipe: vi.fn(), deck: vi.fn(), setDiscoverable: vi.fn(), openChat: vi.fn() }));
 vi.mock("./actions", () => ({ swipeAction: mocks.swipe, deckAction: mocks.deck, setDiscoverableAction: mocks.setDiscoverable }));
@@ -74,11 +75,15 @@ describe("DiscoverScreen in the demo", () => {
     expect(screen.getByRole("dialog", { name: "Report or block" })).toBeInTheDocument();
   });
 
-  it("matches on a like with friends in common and opens the demo crew to write", async () => {
-    render(<DiscoverScreen initialDeck={[card(1)]} discoverable hasBirthDate isMinor={false} demo />);
-    fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
+  it("matches on a like with friends in common and opens a chat with that rider", async () => {
+    /* jsdom has no layout, so no scrollIntoView */
+    Element.prototype.scrollIntoView = vi.fn();
+    const rider = MOCK_USERS.find((user) => user.id !== "me")!;
+    render(<DiscoverScreen initialDeck={[{ ...card(1), userId: rider.id, name: rider.name }]} discoverable hasBirthDate isMinor={false} demo />);
+    fireEvent.click(screen.getByRole("button", { name: `Ride with ${rider.name}` }));
     expect(await screen.findByRole("dialog", { name: "It's a match!" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Write a message" })).toHaveAttribute("href", "/demo/crew");
+    fireEvent.click(screen.getByRole("button", { name: "Write a message" }));
+    expect(screen.getByRole("dialog", { name: `Conversation with ${rider.name}` })).toBeInTheDocument();
     expect(mocks.swipe).not.toHaveBeenCalled();
     expect(mocks.openChat).not.toHaveBeenCalled();
   });
