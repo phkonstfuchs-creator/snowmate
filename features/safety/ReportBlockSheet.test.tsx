@@ -11,6 +11,12 @@ const target = { userId: "u1", name: "Max Rider", rideId: "r1" };
 beforeEach(() => vi.clearAllMocks());
 
 describe("ReportBlockSheet", () => {
+  it("offers the dedicated abuse mailbox", () => {
+    render(<ReportBlockSheet target={target} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Report Max Rider/ }));
+    expect(screen.getByRole("link", { name: "meldung@pistl.app" })).toHaveAttribute("href", "mailto:meldung@pistl.app?subject=Pistl%20Meldung");
+  });
+
   it("blocks after confirming", async () => {
     mocks.block.mockResolvedValue({ ok: true, message: "Blocked. You will not see each other anymore." });
     const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
