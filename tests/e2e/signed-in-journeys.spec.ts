@@ -12,6 +12,10 @@ test.describe("signed-in journeys against local Supabase", () => {
   test.setTimeout(90_000);
 
   test("map keeps lift, ski day and explicit location consent independently reachable", async ({ riders: { a } }) => {
+    // No GPS fix arrives: exercise the explicit manual fallback deterministically.
+    await a.page.addInitScript(() => {
+      Object.defineProperty(navigator.geolocation, "getCurrentPosition", { value: () => undefined });
+    });
     await a.page.goto("/map");
     const stage = a.page.locator(".mountain-map-stage");
     const lift = stage.getByRole("button", { name: "Ich fahr jetzt Lift", exact: true });
@@ -37,10 +41,8 @@ test.describe("signed-in journeys against local Supabase", () => {
     await lift.click();
     const picker = a.page.getByRole("dialog", { name: "Lift-Treffpunkt starten", exact: true });
     const manual = picker.getByRole("button", { name: "Lift selbst wählen", exact: true });
-    const resorts = picker.getByRole("combobox", { name: "Skigebiet", exact: true });
-    await expect(manual.or(resorts).first()).toBeVisible();
-    if (await manual.isVisible()) await manual.click();
-    await expect(resorts).toBeVisible();
+    await manual.click();
+    await expect(picker.getByRole("combobox", { name: "Skigebiet", exact: true })).toBeVisible();
     await expect(picker.getByRole("combobox", { name: "Lift auswählen", exact: true })).toBeVisible();
     const result = await a.account.client.rpc("my_location_sharing");
     expect(result.error).toBeNull();
