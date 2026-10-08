@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
@@ -291,6 +291,11 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [focus, setFocus] = useState<{ lat: number; lng: number; zoom: number; key: number } | null>(
     pin ? { lat: pin.lat, lng: pin.lng, zoom: 15, key: 1 } : null,
   );
+  const [positionClock, setPositionClock] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setPositionClock(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const people = useMemo<MapPerson[]>(
     () =>
       (location?.friends ?? []).map((friend) => ({
@@ -299,13 +304,13 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         initials: initialsFor(friend.name, friend.handle),
         lat: friend.lat,
         lng: friend.lng,
-        stale: friendWhereabouts(friend).stale,
+        stale: friendWhereabouts(friend, positionClock).stale,
       })),
-    [location?.friends],
+    [location?.friends, positionClock],
   );
-  const focusOn = (lat: number, lng: number) => {
+  const focusOn = (lat: number, lng: number, userId?: string) => {
     setFocus((previous) => ({ lat, lng, zoom: 14, key: (previous?.key ?? 0) + 1 }));
-    setSelectedFriendId(location?.friends?.find((friend) => friend.lat === lat && friend.lng === lng)?.userId ?? null);
+    setSelectedFriendId(userId ?? null);
     mapStage.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
   };
   /* Opening a resort also flies the map there, close enough to read its
@@ -359,7 +364,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         <SkiMap city={city} resorts={resorts} onSelect={openResort} me={location?.me ?? null} people={people}
           onPersonSelect={(id) => {
             const friend = location?.friends?.find((item) => item.userId === id);
-            if (friend) focusOn(friend.lat, friend.lng);
+            if (friend) focusOn(friend.lat, friend.lng, friend.userId);
           }} focus={focus} locateRequest={locateRequest} pin={pin} track={live ? tracking?.state?.track ?? null : null} />
         <div className="absolute left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
           <SegmentedControl options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]} value={city}
@@ -394,14 +399,14 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
         {location.sharingEnd && <button type="button" onClick={() => void location.stopSharing()} aria-label={t("map.stopSharing")} disabled={location.busy} className="col-span-2 min-h-11 rounded-full px-3 text-sm font-semibold disabled:opacity-50" style={{ color: "var(--crimson)", background: "var(--paper-1)" }}>{t("loc.stop")}</button>}
       </div>}
       {location?.friends === null && <p role="status" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t("loc.friendsUnavailable")}</p>}
-      {location && <CrewOnMap compact selectedId={selectedFriendId} friends={location.friends} onFocus={focusOn} />}
+      {location && <CrewOnMap compact now={positionClock} selectedId={selectedFriendId} friends={location.friends} onFocus={focusOn} />}
       {location && meetups && <LiftMeetupPanel compact mine={meetups.mine} friends={meetups.friends} me={location.me} busy={meetups.busy} result={meetups.result}
         onStop={() => void meetups.stop()} onLocate={location.locate} canShare={live?.canShareLift === true} />}
       {!live && <div className="mx-4 mt-4"><DemoLiftMeetupTryout compact /></div>}
       {live && panel === "day" && <div id="map-day-panel"><TrackPanel /></div>}
       {location && panel === "share" && <div id="map-share-panel"><LocationPanel sharingEnd={location.sharingEnd} canShare={live?.canShare !== false} busy={location.busy}
         error={location.error ? t(location.error) : null} friends={location.friends} showFriends={false} onShare={location.startSharing} onStop={() => void location.stopSharing()}
-        onFocusFriend={(friend) => focusOn(friend.lat, friend.lng)} /></div>}
+        onFocusFriend={(friend) => focusOn(friend.lat, friend.lng, friend.userId)} /></div>}
       {location?.error && panel !== "share" && <p role="alert" className="px-4 pt-3 text-sm" style={{ color: "var(--crimson)" }}>{t(location.error)}</p>}
       {live && live.rides === null && <p role="status" className="mx-4 mt-3 rounded-2xl px-3 py-2.5 text-sm" style={{ color: "var(--crimson)", border: "1px solid var(--crimson)" }}>{t("map.unavailable")}</p>}
       <ResortExplorer resorts={sorted} onSelect={openResort} conditions={live?.conditions} photos={live?.photos} isLive={isLive} />

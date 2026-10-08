@@ -12,7 +12,7 @@ describe("CrewOnMap", () => {
     const card = screen.getByRole("button", { name: /Lena/ });
     expect(card).toHaveTextContent("2 min ago");
     fireEvent.click(card);
-    expect(onFocus).toHaveBeenCalledWith(47.3247, 11.3867);
+    expect(onFocus).toHaveBeenCalledWith(47.3247, 11.3867, "u1");
   });
 
   it("says when nobody shares, and stays hidden before the first load", () => {
@@ -42,7 +42,7 @@ describe("compact crew controls", () => {
     expect(card).toHaveAttribute("aria-pressed", "true");
     expect(card).toHaveClass("min-h-11");
     fireEvent.click(card);
-    expect(onFocus).toHaveBeenCalledWith(47.3247, 11.3867);
+    expect(onFocus).toHaveBeenCalledWith(47.3247, 11.3867, "u1");
   });
 
   it("marks station guesses as estimates and suppresses stale lift claims", () => {

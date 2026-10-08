@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
@@ -74,6 +74,30 @@ describe("MapScreen", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", friends: null }} />);
     expect(screen.getByText("Friends' positions could not be loaded.")).toBeInTheDocument();
     expect(screen.queryByText("Nobody in your crew is sharing their location right now.")).not.toBeInTheDocument();
+  });
+
+  it("ages pins and crew together when no new position array arrives", () => {
+    vi.useFakeTimers();
+    try {
+      const friend = { userId: "u1", name: "Lena", handle: "lena", lat: 47.2, lng: 11.3, accuracy: 20, updatedAt: new Date(Date.now() - 14 * 60_000).toISOString() };
+      render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", friends: [friend] }} />);
+      expect(mapMock.props.mock.lastCall![0].people[0].stale).toBe(false);
+      act(() => vi.advanceTimersByTime(2 * 60_000));
+      expect(mapMock.props.mock.lastCall![0].people[0].stale).toBe(true);
+      expect(screen.getByRole("button", { name: /Lena/ })).toHaveTextContent("16 min ago");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("selects the clicked friend even when friends share identical coordinates", () => {
+    const friend = { userId: "u1", name: "Lena", handle: "lena", lat: 47.2, lng: 11.3, accuracy: 20, updatedAt: new Date().toISOString() };
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", friends: [friend, { ...friend, userId: "u2", name: "Max", handle: "max" }] }} />);
+    fireEvent.click(screen.getByRole("button", { name: /Max/ }));
+    expect(screen.getByRole("button", { name: /Max/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /Lena/ })).toHaveAttribute("aria-pressed", "false");
+    act(() => mapMock.props.mock.lastCall![0].onPersonSelect("u1"));
+    expect(screen.getByRole("button", { name: /Lena/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("marks stale map positions and focuses the same person from their crew card", () => {
