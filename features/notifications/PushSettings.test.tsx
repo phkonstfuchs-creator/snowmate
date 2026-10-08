@@ -36,6 +36,19 @@ afterEach(() => {
 });
 
 describe("PushSettings", () => {
+  it("shows ordered Home Screen steps on iOS browsers without push", async () => {
+    vi.stubGlobal("PushManager", undefined);
+    Object.defineProperty(window, "PushManager", { configurable: true, value: undefined });
+    Object.defineProperty(navigator, "userAgent", { configurable: true, value: "iPhone" });
+    delete (window as unknown as { PushManager?: unknown }).PushManager;
+    const PushSettings = await load();
+    render(<PushSettings />);
+    expect(await screen.findByRole("list")).toHaveProperty("tagName", "OL");
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(screen.getByText(/Add to Home Screen/)).toBeInTheDocument();
+    Object.defineProperty(navigator, "userAgent", { configurable: true, value: "jsdom" });
+  });
+
   it("is off until switched on, then subscribes and stores the device", async () => {
     const pushManager = browser("default");
     const PushSettings = await load();

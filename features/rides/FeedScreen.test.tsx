@@ -394,6 +394,10 @@ describe("FeedScreen with real data", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByLabelText("Meeting point")).toHaveAttribute("maxLength", "120");
     expect(screen.getByLabelText(/^Note/)).toHaveAttribute("maxLength", "280");
+    const note = screen.getByLabelText(/^Note/);
+    expect(note).toHaveAccessibleDescription("0 / 280 characters");
+    fireEvent.change(note, { target: { value: "Powder" } });
+    expect(note).toHaveAccessibleDescription("6 / 280 characters");
   });
 
   it("tells an adult that friends of friends see a friends ride", () => {

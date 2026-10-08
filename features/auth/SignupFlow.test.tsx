@@ -119,6 +119,18 @@ describe("SignupFlow", () => {
     expect(sent.get("acceptTerms")).toBe("2026-10-07");
   });
 
+  it("keeps consent checked after a server error and gives its label a 44px target", async () => {
+    mocks.signUpAction.mockResolvedValue({ status: "error", message: "Try again." });
+    render(<SignupFlow startAtTitle={false} />);
+    await toAccountStep();
+    const box = screen.getByRole("checkbox", { name: /I accept the terms of use/ });
+    fireEvent.click(box);
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Try again.");
+    expect(box).toBeChecked();
+    expect(box.closest("label")).toHaveClass("min-h-11");
+  });
+
   it("goes back to the step with the problem the server found", async () => {
     mocks.signUpAction.mockResolvedValue({
       status: "error",

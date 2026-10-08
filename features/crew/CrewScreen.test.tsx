@@ -8,6 +8,8 @@ describe("CrewScreen (demo)", () => {
   it("keeps links inside the prototype and switches tabs", () => {
     render(<CrewScreen />);
 
+    expect(screen.queryByText(/share your invite link/)).not.toBeInTheDocument();
+    expect(screen.getByText("Swipe to meet riders in the demo")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Discover" })[0]!).toHaveAttribute("href", "/demo/people");
 
     fireEvent.click(screen.getByRole("button", { name: "Squads" }));

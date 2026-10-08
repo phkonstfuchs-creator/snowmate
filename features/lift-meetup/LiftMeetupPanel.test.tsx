@@ -28,6 +28,8 @@ describe("LiftMeetupPanel", () => {
     render(<LiftMeetupPanel {...defaults} me={{ lat: lift.bottomCoordinates[0], lng: lift.bottomCoordinates[1], accuracy: 10 }} />);
     expect(screen.getByText(/For you: take/)).toBeInTheDocument();
     expect(screen.getByText(/Check the piste map/)).toBeInTheDocument();
+    expect(screen.queryByText(/about 0 m/)).not.toBeInTheDocument();
+    expect(screen.getByText(/near the valley station/)).toBeInTheDocument();
   });
 
   it("withholds a lift suggestion when the device position is imprecise", () => {
