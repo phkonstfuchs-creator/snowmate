@@ -822,6 +822,7 @@ export const en = {
   "meetup.durationEstimated": "Lift time based on an estimate from OSM length.",
   "demo.meetup.title": "Try the lift meetup",
   "demo.meetup.lead": "A trial with Lena, no account and no GPS.",
+  "demo.meetup.safety": "No account needed; no GPS, push notification, or saved data.",
   "demo.meetup.start": "Start sample",
   "demo.meetup.reset": "Reset sample",
   "demo.meetup.position": "Sample position: Seegrubenbahn valley station",

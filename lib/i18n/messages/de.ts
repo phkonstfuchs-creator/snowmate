@@ -821,6 +821,7 @@ export const de: Record<MessageKey, string> = {
   "meetup.durationEstimated": "Fahrzeit aus OSM-Länge geschätzt.",
   "demo.meetup.title": "Lift-Treffpunkt ausprobieren",
   "demo.meetup.lead": "Probelauf mit Lena, ohne Konto und ohne GPS.",
+  "demo.meetup.safety": "Kein Konto nötig; kein GPS, keine Push-Nachricht und keine gespeicherten Daten.",
   "demo.meetup.start": "Beispiel starten",
   "demo.meetup.reset": "Zurücksetzen",
   "demo.meetup.position": "Beispiel-Standort: Talstation Seegrubenbahn",
