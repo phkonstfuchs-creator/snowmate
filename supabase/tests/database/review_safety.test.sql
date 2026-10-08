@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(28);
+select plan(36);
 
 -- asker (1), decliner (2), reporter (3), second reporter (4), author (5)
 insert into auth.users (id, email)
@@ -20,6 +20,7 @@ select ok(private.has_blocked_term(E'ne​ger test'), 'a zero-width space inside
 select ok(private.has_blocked_term(E'ne­ger'), 'a soft hyphen inside the slur is caught');
 select ok(private.has_blocked_term(E'k﻿ys'), 'a byte-order mark inside a term is caught');
 select ok(private.has_blocked_term('k y s'), 'single letters with spaces are caught');
+select ok(private.has_blocked_term('k y s.'), 'spaced letters followed by a full stop are caught');
 select ok(private.has_blocked_term('h e i l hitler'), 'a spaced-out slogan is caught');
 select ok(not private.has_blocked_term('ski a b c heute'), 'single letters in normal text stay harmless');
 select ok(not private.has_blocked_term('Pulver am Stubai, wer kommt mit?'), 'normal ski talk passes');
@@ -73,9 +74,14 @@ insert into public.friendships (requester_id, addressee_id, status) values
   ('7e710000-0000-4000-8000-000000000005', '7e710000-0000-4000-8000-000000000003', 'accepted'),
   ('7e710000-0000-4000-8000-000000000005', '7e710000-0000-4000-8000-000000000004', 'accepted'),
   ('7e710000-0000-4000-8000-000000000005', '7e710000-0000-4000-8000-000000000002', 'accepted');
+insert into storage.objects (bucket_id, name)
+values ('post-photos', '7e710000-0000-4000-8000-000000000005/held.webp');
+insert into private.media_attestations (object_id, owner_id, bucket_id, name, key_id, issued_at)
+select o.id, '7e710000-0000-4000-8000-000000000005', o.bucket_id, o.name, 'v1', now()
+from storage.objects o where o.name = '7e710000-0000-4000-8000-000000000005/held.webp';
 set local role authenticated;
 set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000005';
-select is(public.create_post('Seht euch das an', null, null), 'created', 'the author posts');
+select is(public.create_post('Seht euch das an', null, '7e710000-0000-4000-8000-000000000005/held.webp'), 'created', 'the author posts with a photo');
 
 create temp table held_post as
   select p.id from public.list_post_feed(null, true) p;
@@ -86,6 +92,8 @@ select is(
   public.report_user('7e710000-0000-4000-8000-000000000005', 'harassment', null, null, false, (select id from held_post)),
   'reported', 'a friend reports the post');
 select is((select count(*)::int from public.list_post_feed()), 0, 'the reporter no longer sees the post');
+select is(public.post_photo_path_for((select id from held_post)), null, 'nor its photo path');
+select ok(not public.can_see_post_photo('7e710000-0000-4000-8000-000000000005/held.webp'), 'nor the photo file');
 
 set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000002';
 select is((select count(*)::int from public.list_post_feed()), 1, 'one report alone does not hide it from others');
@@ -97,9 +105,25 @@ select is(
 
 set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000002';
 select is((select count(*)::int from public.list_post_feed()), 0, 'two reports hold the post for everyone until review');
+select ok(not public.can_see_post_photo('7e710000-0000-4000-8000-000000000005/held.webp'), 'the photo is held too');
 
 set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000005';
 select is((select count(*)::int from public.list_post_feed(null, true)), 1, 'the author still sees their own post');
+select isnt(public.post_photo_path_for((select id from held_post)), null, 'and its photo');
+
+-- A reporter deleting their account does not release the hold.
+reset role;
+delete from auth.users where id = '7e710000-0000-4000-8000-000000000004';
+set local role authenticated;
+set local request.jwt.claim.sub = '7e710000-0000-4000-8000-000000000002';
+select is((select count(*)::int from public.list_post_feed()), 0, 'the hold stays when a reporter deletes their account');
+
+-- The operator's review brings it back.
+reset role;
+update public.reports set status = 'reviewed' where post_id = (select id from held_post);
+set local role authenticated;
+select is((select count(*)::int from public.list_post_feed()), 1, 'a reviewed post is visible again');
+select ok(public.can_see_post_photo('7e710000-0000-4000-8000-000000000005/held.webp'), 'with its photo');
 
 select * from finish();
 rollback;

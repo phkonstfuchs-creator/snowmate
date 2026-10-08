@@ -6,7 +6,8 @@
 -- "ne<zero-width space>ger" and "k y s" slipped through. Format
 -- characters (soft hyphen, zero-width space/joiners, bidi marks, word
 -- joiner, byte-order mark) are removed, and runs of single letters
--- separated by spaces are joined, before the terms are matched.
+-- separated by spaces are joined (also before punctuation, "k y s."),
+-- before the terms are matched.
 create or replace function private.normalize_for_filter(input text)
 returns text
 language sql
@@ -19,7 +20,7 @@ as $$
         lower(regexp_replace(input, '[­​-‏‪-‮⁠-⁤⁦-⁩﻿]', '', 'g')),
         '013457@$!', 'oieastasi'),
       '\s+', ' ', 'g'),
-    '(?<=(^|\s)\w) (?=\w(\s|$))', '', 'g');
+    '(?<=(^|\W)\w) (?=\w(\W|$))', '', 'g');
 $$;
 
 revoke all on function private.normalize_for_filter(text) from public, anon, authenticated;
@@ -195,7 +196,9 @@ as $$
     select 1 from public.reports r
     where r.post_id = p_id and r.status = 'open' and r.reporter_id = viewer
   ) or (
-    select count(distinct r.reporter_id) from public.reports r
+    -- A report whose author deleted their account keeps counting: the
+    -- hold must not lift without a review.
+    select count(distinct coalesce(r.reporter_id::text, r.id::text)) from public.reports r
     where r.post_id = p_id and r.status = 'open'
   ) >= 2;
 $$;

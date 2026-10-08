@@ -8,7 +8,7 @@
   [0012](0012-age-from-birth-date.md), [0031](0031-native-apps-with-capacitor.md)
 - **Spec:** [report-and-block.md](../specs/report-and-block.md), team review
   in [docs/qa/TEAM_REVIEW.md](../qa/TEAM_REVIEW.md)
-- **Checks:** `supabase/tests/database/review_safety.test.sql` (pgTAP, 28
+- **Checks:** `supabase/tests/database/review_safety.test.sql` (pgTAP, 36
   checks), `features/safety/*.test.*`, `features/chat/ChatThread.test.tsx`,
   `features/rides/FeedScreen.test.tsx`, `features/legal/LegalLinks.test.tsx`,
   `features/auth/actions.test.ts`, `features/crew/actions.test.ts`
