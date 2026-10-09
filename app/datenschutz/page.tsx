@@ -21,7 +21,7 @@ export default function DatenschutzPage() {
           uses no tracking or advertising, and you can download or delete everything in your profile at any time.
         </em>
       </p>
-      <p>Stand: {OPERATOR.updated}</p>
+      <p>Stand: 9. Oktober 2026</p>
 
       <h2>1. Verantwortlicher</h2>
       <p>
