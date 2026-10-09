@@ -1,6 +1,6 @@
 # Pistl – öffentliche Website
 
-Eigenständiges Next.js-Projekt für die Warteliste und Early Access. Die öffentliche Website heißt Pistl; die separat entwickelte App im übergeordneten Ordner ist noch nicht umbenannt. Node.js 24, Next.js 16, React 19 und Tailwind 4. Keine Browser-API-Schlüssel, keine Analyse-Cookies, lokale Schriftarten.
+Eigenständiges Next.js-Projekt für die Warteliste und Early Access. Website und App im übergeordneten Ordner heißen Pistl. Node.js 24, Next.js 16, React 19 und Tailwind 4. Keine Browser-API-Schlüssel, keine Analyse-Cookies, lokale Schriftarten.
 
 ## Lokal starten
 
@@ -15,25 +15,27 @@ Website: http://localhost:3001. Ohne Supabase-Konfiguration funktionieren alle I
 
 ## Warteliste aktivieren
 
-1. Die isolierte SQL-Migration `supabase/migrations/202610040001_pistl_website_waitlist.sql` im bestehenden Supabase-Projekt prüfen und ausführen. Sie legt zwei neue Tabellen und eine serverseitige Funktion an, verändert aber keine App-Tabellen.
-2. `SUPABASE_URL` und `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` bzw. serverseitig in Vercel setzen. Den Service-Key niemals mit `NEXT_PUBLIC_` benennen, in Git speichern oder im Browser ausliefern. Optional einen eigenen `WAITLIST_RATE_LIMIT_SECRET` setzen.
-3. Die übernommenen Angaben des Einzelunternehmens in `lib/site.js` mit dem eigenen Impressum abgleichen. Vor Aktivierung die tatsächlichen Hosting- und Datenbankregionen, die Vertragsunterlagen von Vercel und Supabase sowie den organisatorischen Löschablauf für Widerruf und Ende der Startphase prüfen.
-4. Mit einer eigenen Testadresse prüfen, dass eine Zeile in `pistl_website_waitlist` entsteht. Das Formular versendet derzeit keine automatischen Bestätigungsmails. Die Erfolgsmeldung bestätigt allein die gespeicherte Anmeldung.
-5. Vor jeder Startnachricht oder Testeinladung den Besitz der Adresse per Bestätigungslink (Double-Opt-in) nachweisen und nur bestätigte Datensätze anschreiben. Bis dieser Ablauf eingerichtet ist, keine Wartelisten-E-Mails versenden. Für Testeinladungen außerdem nur Datensätze mit `early_access = true` verwenden. Abmeldung/Widerruf wird vorerst manuell über die öffentliche Kontaktadresse verarbeitet. Kein allgemeiner Newsletter ist Teil dieser Einwilligung.
+1. Die Migration liegt in der Migrationskette der App: `supabase/migrations/20261009090700_website_waitlist_double_opt_in.sql` (Tests: `supabase/tests/database/website_waitlist.test.sql`). Nach Freigabe im Repository-Hauptverzeichnis mit `npx supabase db push` einspielen. Sie verändert keine App-Tabellen. Die ältere Datei unter `website/supabase/` bildet den heutigen Vertrag nicht ab und darf nicht zusätzlich eingespielt werden.
+2. Serverseitig in Vercel setzen (nie mit `NEXT_PUBLIC_`, nie in Git):
+   - `SUPABASE_URL` – Projekt-URL, z. B. `https://<ref>.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY` – der *Secret*/Service-Role-Key aus Supabase → Project Settings → API Keys. Nur im Website-Projekt, nicht im App-Projekt.
+   - `WAITLIST_RATE_LIMIT_SECRET` – 32+ zufällige Zeichen (`openssl rand -hex 32`).
+   - `NEXT_PUBLIC_SITE_URL` – die echte HTTPS-Domain der Website. Aus ihr entsteht der Bestätigungslink.
+   - `RESEND_API_KEY` – API-Key aus Resend (nur „Sending access“, auf die Domain beschränkt).
+   - `WAITLIST_FROM_EMAIL` – Absender auf der in Resend bestätigten Domain, z. B. `Pistl <hallo@pistl.app>`.
+3. Betreiberangaben stehen in `lib/site.js` (echte Angaben des Betreibers, per Umgebungsvariable überschreibbar).
+4. Mit einer eigenen Adresse testen: Es entsteht eine unbestätigte Zeile in `private.pistl_website_waitlist` und eine E-Mail mit Bestätigungslink. Der Link öffnet `/warteliste/bestaetigen`; erst der Button dort setzt `confirmed_at` (E-Mail-Scanner, die Links öffnen, bestätigen also nicht). Die Datenbank speichert nur den SHA-256-Wert des Links. Ein täglicher Job löscht unbestätigte Anmeldungen sieben Tage nach der letzten Anmeldeanfrage; pro Adresse geht höchstens alle fünf Minuten eine E-Mail raus. Early Access wird erst durch die Bestätigung der im Link hinterlegten Auswahl aktiviert; neue unbestätigte Anfragen ändern bestehende Zusagen nicht.
+5. Für Mails und Einladungen nur Datensätze mit `confirmed_at is not null` verwenden, für Early Access zusätzlich `early_access = true`. Die Tabelle ist im privaten Schema und hat keine direkten API-Freigaben; die Website nutzt ausschließlich drei serverseitige Service-Role-RPCs. Widerruf und Löschung durch den Betreiber per E-Mail an die Kontaktadresse bearbeiten. Zum öffentlichen App-Start das Löschdatum festhalten und spätestens zwölf Monate danach alle Einträge löschen; dieser Termin erfordert einen Betreiberprozess, da die Datenbank das Startdatum nicht kennt.
 
-Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entgegen. Validierung, Honeypot, 2-KB-Bodylimit, Same-Origin-Prüfung, Timeout und Datenbank-Anfragelimit sind enthalten. RLS sperrt öffentliche Zugriffe; nur die serverseitige Rolle darf die RPC ausführen. E-Mail-Duplikate werden ohne Offenlegung vorhandener Anmeldungen behandelt. Nachträgliches Early-Access-Interesse bekommt einen eigenen Einwilligungszeitpunkt.
-
-Auf Vercel wird der vom Hosting gesetzte Client-IP-Header gehasht; außerhalb Vercels verwenden Anfragen bewusst einen gemeinsamen Bucket (fünf pro Stunde). Für einen anderen Produktivhost muss zuerst ein vertrauenswürdiger Proxy-Header integriert werden. Alte Rate-Limit-Einträge werden bei angenommenen Anmeldungen bereinigt, wenn deren Zeitfenster mehr als 24 Stunden alt ist.
+Der API-Endpunkt nimmt `{ email, earlyAccess, consent: true, website: "" }` entgegen. Validierung, Honeypot, 2-KB-Bodylimit, Same-Origin-Prüfung, Timeout und Datenbank-Anfragelimit (fünf pro Stunde und Besucher) sind enthalten. Ohne Supabase- oder Resend-Konfiguration antwortet er ehrlich mit 503, ebenso wenn die Bestätigungs-E-Mail nicht verschickt werden konnte.
 
 ## Vercel
 
-- Neues Vercel-Projekt mit **Root Directory `website`** und Framework **Next.js**.
-- Node-Version 24, Build `npm run build`, Standard-Ausgabeverzeichnis.
-- Server-Umgebungsvariablen wie oben; `NEXT_PUBLIC_SITE_URL` auf die echte HTTPS-Domain setzen.
-- `PISTL_LAUNCH_READY=true` erst nach Prüfung der Betreiberangaben, Dienstleisterkonfiguration und Löschabläufe setzen und neu bauen. Bis dahin bleiben Robots/Metadaten auf `noindex`.
-- `npm run check:launch` zeigt fehlende Konfiguration, ohne Geheimnisse auszugeben.
+Domains: die Website läuft auf `pistl.app` (und `www.pistl.app`), die App im selben Repository auf `app.pistl.app`. Frühere App-Links auf `pistl.app` (Bestätigungs- und Einladungsmails, Homescreen-Icons) leitet `next.config.mjs` vorübergehend (307) an `app.pistl.app` weiter; abweichend per `PISTL_APP_URL`.
 
-Es wurde kein Deployment und keine Änderung an einer entfernten Datenbank durchgeführt.
+- Eigenes Vercel-Projekt mit **Root Directory `website`**, Framework Next.js, Node 24. Funktionen laufen in Frankfurt (`vercel.json`).
+- Umgebungsvariablen wie oben; `PISTL_LAUNCH_READY=true` erst setzen, wenn die Seite indexiert werden soll (sonst `noindex`).
+- `npm run check:launch` zeigt fehlende Konfiguration, ohne Werte auszugeben.
 
 ## Prüfen
 
@@ -44,15 +46,17 @@ npm run test:e2e
 npm run build
 ```
 
-Die End-to-End-Tests simulieren Antworten der Wartelisten-API und senden keine Adressen an Supabase. SQL ist separat gegen die Zielumgebung zu prüfen. Node-Testabdeckung: `node --test --experimental-test-coverage tests/*.test.mjs`.
+Die End-to-End-Tests simulieren Antworten der Wartelisten-API und senden keine Adressen an Supabase. Die SQL-Funktion ist mit pgTAP getestet (`supabase/tests/database/website_waitlist.test.sql`). Node-Testabdeckung: `node --test --experimental-test-coverage tests/*.test.mjs`.
 
 ## Projektstruktur
 
 ```text
 website/
   app/
-    api/waitlist/route.js     API zur Supabase-Warteliste
-    datenschutz/page.jsx     Datenschutzinformationen für Website und Warteliste
+    api/waitlist/route.js     API zur Supabase-Warteliste (Anmeldung + Bestätigungs-E-Mail)
+    api/waitlist/confirm/     Bestätigung per Button (Double-Opt-in)
+    warteliste/               Bestätigungsseiten
+    datenschutz/page.jsx     Datenschutzentwurf
     impressum/page.jsx       Anbieterkennzeichnung
     kontakt/page.jsx         Kontakt
     globals.css              Layout, mobile Ansichten, Animation
@@ -63,11 +67,10 @@ website/
     opengraph-image.jsx       Teilbares Vorschaubild
     page.jsx                 Öffentliche Landingpage
     robots.js / sitemap.js   Suchmaschinen-Konfiguration
-  components/                Hero, scroll reveal, Featureliste, Formular, Navigation
-  components/ui/             ActionButton, JadeSky-Verlauf
+  components/                Hero, bewegte Bergszene, App-Vorschau, Tabs, Formular, Navigation
+  components/ui/             ActionButton
   lib/                       Website-Konfiguration und Wartelistenlogik
-  public/                    Optimierte Bergillustration und Schriftlizenzen
-  supabase/migrations/       Isolierte SQL-Migration
+  public/                    Lokale Marke und optimierte Bergillustration
   tests/                     API-/Validierungs- und Browser-Tests
   scripts/check-launch.mjs   Konfigurationsprüfung vor dem Start
   docs/component-sources.md  Konkrete Komponentenquellen und Bildprompt

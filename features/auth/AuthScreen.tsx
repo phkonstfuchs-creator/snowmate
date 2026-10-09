@@ -6,11 +6,13 @@ import AuthForm from "./AuthForm";
 interface AuthScreenProps {
   mode: "login" | "signup";
   confirmationFailed?: boolean;
+  initialInviteToken?: string;
 }
 
 export default function AuthScreen({
   mode,
   confirmationFailed = false,
+  initialInviteToken = "",
 }: AuthScreenProps) {
   const isSignup = mode === "signup";
 
@@ -30,7 +32,7 @@ export default function AuthScreen({
         >
           <PenguinMascot size={26} />
           <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            Snowmate
+            Pistl
           </span>
         </Link>
 
@@ -94,7 +96,7 @@ export default function AuthScreen({
             </div>
           ) : null}
 
-          <AuthForm mode={mode} />
+          <AuthForm mode={mode} initialInviteToken={initialInviteToken} />
         </div>
       </div>
     </main>

@@ -47,6 +47,7 @@ describe("validateProfileInput", () => {
     ["Normaler Name", "admin"],
     ["Normaler Name", "support"],
     ["Normaler Name", "snowmate"],
+    ["Normaler Name", "pistl"],
   ])("rejects unsafe identity values", (displayName, handle) => {
     const result = validateProfileInput({
       displayName,

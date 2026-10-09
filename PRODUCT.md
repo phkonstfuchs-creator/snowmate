@@ -15,7 +15,7 @@ Three core personas:
 
 ## Product Purpose
 
-Snowmate is the social coordination layer of the mountain: "who's riding today, where, and can I join?" It is explicitly NOT a tracking app (like Strava) and NOT a generic location-sharing app (like Snapchat Map). It's ski-native, real-time, and crew-first. The live feed answers one question: which of the 13 ski areas around Innsbruck is your crew on today, and how do you join them?
+Pistl is the social coordination layer of the mountain: "who's riding today, where, and can I join?" It is explicitly NOT a tracking app (like Strava) and NOT a generic location-sharing app (like Snapchat Map). It's ski-native, real-time, and crew-first. The live feed answers one question: which of the 13 ski areas around Innsbruck is your crew on today, and how do you join them?
 
 Success = a young skier in Innsbruck opens the app on a Saturday morning, sees who's riding, posts a ride or joins one, finds a carpool seat, and is on the mountain with the right people — without sending a single WhatsApp message.
 

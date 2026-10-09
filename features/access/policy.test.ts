@@ -23,7 +23,7 @@ const minor: AccessContext = {
   ownerIsMinor: true,
 };
 
-describe("Snowmate visibility policy", () => {
+describe("Pistl visibility policy", () => {
   it("lets an adult friend-of-friend discover only broad social data", () => {
     const context: AccessContext = {
       ...adult,

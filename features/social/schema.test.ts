@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { friendshipRequestSchema, friendshipResponseSchema } from "./schema";
+import {
+  blockUserSchema,
+  createCrewSchema,
+  crewInvitationResponseSchema,
+  friendshipRequestSchema,
+  friendshipResponseSchema,
+  inviteCrewMemberSchema,
+  unblockUserSchema,
+} from "./schema";
 
 const uuid = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -36,5 +44,39 @@ describe("social command schemas", () => {
         idempotencyKey: uuid,
       }).success,
     ).toBe(false);
+  });
+
+  it("validates idempotent block and unblock commands", () => {
+    expect(
+      blockUserSchema.safeParse({ targetId: uuid, idempotencyKey: uuid }).success,
+    ).toBe(true);
+    expect(
+      unblockUserSchema.safeParse({ targetId: uuid, idempotencyKey: uuid })
+        .success,
+    ).toBe(true);
+  });
+
+  it("validates crew creation, invitation, and response commands", () => {
+    expect(
+      createCrewSchema.safeParse({
+        name: "  Weekend Crew  ",
+        city: "innsbruck",
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(true);
+    expect(
+      inviteCrewMemberSchema.safeParse({
+        crewId: uuid,
+        targetId: uuid,
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(true);
+    expect(
+      crewInvitationResponseSchema.safeParse({
+        invitationId: uuid,
+        accept: true,
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(true);
   });
 });

@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import {
+  PRIVACY_VERSION,
+  TERMS_VERSION,
+} from "@/features/compliance/versions";
 import type { AuthActionState } from "./action-state";
 import {
   validateLoginCredentials,
@@ -12,6 +16,10 @@ import {
 function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value : "";
+}
+
+function checkedField(formData: FormData, name: string): boolean {
+  return formData.get(name) === "on";
 }
 
 function invalidState(
@@ -88,6 +96,10 @@ export async function signUpAction(
     email: stringField(formData, "email"),
     password: stringField(formData, "password"),
     confirmPassword: stringField(formData, "confirmPassword"),
+    inviteToken: stringField(formData, "inviteToken"),
+    birthDate: stringField(formData, "birthDate"),
+    termsAccepted: checkedField(formData, "termsAccepted"),
+    privacyAccepted: checkedField(formData, "privacyAccepted"),
   };
   const validation = validateSignupCredentials(input);
 
@@ -103,6 +115,12 @@ export async function signUpAction(
       email: validation.data.email,
       password: validation.data.password,
       options: {
+        data: {
+          invite_token: validation.data.inviteToken,
+          birth_date: validation.data.birthDate,
+          terms_version: TERMS_VERSION,
+          privacy_version: PRIVACY_VERSION,
+        },
         emailRedirectTo: new URL("/auth/confirm", siteUrl).toString(),
       },
     });

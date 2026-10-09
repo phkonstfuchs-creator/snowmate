@@ -1,3 +1,4 @@
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import ActionButton from "./ui/ActionButton";
 import { JadeSky } from "./ui/JadeSky";
 import MountainScene from "./MountainScene";
@@ -7,10 +8,10 @@ export default function Hero() {
     <MountainScene />
     <JadeSky className="hero-jade-sky" />
     <div className="container hero-content">
-      <h1 id="hero-title">Wer fährt<br/>{" "}heute wohin?</h1>
-      <p className="hero-description">Finde deine Crew am Berg, teile eine Fahrt und mach aus der Idee einen Skitag.</p>
-      <ActionButton href="#waitlist">Pistl früh testen</ActionButton>
+      <h1 id="hero-title">Ab auf<br/>{" "}<span>den Berg.</span></h1>
+      <p className="hero-description">Plane deinen nächsten Skitag mit Freunden.<br className="desktop-break"/> Finde eine Mitfahrt und los geht’s.</p>
+      <ActionButton href="#waitlist">Pistl früh testen <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></ActionButton>
     </div>
-    <a href="#entdecken" className="hero-scroll">So funktioniert Pistl</a>
+    <a href="#entdecken" className="hero-scroll">Entdecke Pistl <ArrowDown size={17} aria-hidden="true" /></a>
   </section>;
 }

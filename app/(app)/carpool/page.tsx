@@ -1,258 +1,182 @@
-"use client";
-
-import { useState } from "react";
-import { City } from "@/lib/types";
-import { CARPOOL_POSTS, getUserById } from "@/lib/data";
-import { toggleSetValue } from "@/lib/collections";
-import ResortScene from "@/components/ResortScene";
-import PenguinMascot from "@/components/PenguinMascot";
-import { useDialogFocus } from "@/hooks/useDialogFocus";
-import { useScrollLock } from "@/hooks/useScrollLock";
+import Link from "next/link";
+import { getCarpoolFeed } from "@/features/rides/data";
+import { getCurrentProfileContext } from "@/features/profile/data";
 import Avatar from "@/components/ui/Avatar";
-import SegmentedControl from "@/components/ui/SegmentedControl";
-import Icon from "@/components/ui/Icon";
-import { useCurrentProfile } from "@/features/profile/CurrentProfileProvider";
-
-const D = "var(--bg-canvas)";
-const SURFACE = "var(--bg-surface-1)";
-const BORDER = "var(--border-subtle)";
-const MUTED = "var(--text-tertiary)";
-const INK = "var(--text-primary)";
-const BRAND = "var(--accent-primary)";
-
-function OfferModal({ onClose }: { onClose: () => void }) {
-  useScrollLock();
-  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
-  const [role, setRole] = useState<"driver" | "rider">("driver");
-  return (
-    <>
-      <div className="sheet-overlay" onClick={onClose} aria-hidden />
-      <div ref={dialogRef} className="sheet-panel" role="dialog" aria-modal="true" aria-label="Mitfahrt anbieten" tabIndex={-1} style={{ paddingBottom: "max(env(safe-area-inset-bottom,16px),28px)" }}>
-        <div className="flex justify-center pt-3 mb-4">
-          <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
-        </div>
-        <div className="flex items-center justify-between px-5 mb-4">
-          <h2 className="font-display" style={{ color: INK, fontSize: 20, fontWeight: 800 }}>Mitfahrt anbieten</h2>
-          <button type="button" onClick={onClose} aria-label="Dialog schließen" className="flex h-11 w-11 items-center justify-center">
-            <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
-          </button>
-        </div>
-
-        <div className="px-5 space-y-3 mb-5">
-          <SegmentedControl
-            options={[{ value: "driver", label: "Ich fahre" }, { value: "rider", label: "Ich suche Platz" }]}
-            value={role}
-            onChange={setRole}
-            ariaLabel="Rolle bei der Mitfahrt"
-          />
-          {[
-            { id: "carpool-from", label: "Abfahrt", placeholder: "z. B. Innsbruck Hbf" },
-            { id: "carpool-to", label: "Zielgebiet", placeholder: "z. B. Stubaier Gletscher" },
-            { id: "carpool-time", label: "Uhrzeit", placeholder: "08:00" },
-          ].map(({ id, label, placeholder }) => (
-            <div key={id}>
-              <label htmlFor={id} className="text-xs font-bold mb-1.5 block" style={{ color: MUTED }}>{label}</label>
-              <input id={id} className="form-input" placeholder={placeholder} />
-            </div>
-          ))}
-        </div>
-
-        <div className="px-5">
-          <button
-            onClick={onClose}
-            className="w-full py-4 rounded-none font-black text-base active:scale-95 transition-transform"
-            style={{ background: BRAND, color: D }}
-          >
-            Angebot veröffentlichen
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
-export default function CarpoolPage() {
-  const currentProfile = useCurrentProfile();
-  const [city, setCity] = useState<City>(currentProfile.city);
-  const [showOfferModal, setShowOfferModal] = useState(false);
-  const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
-
-  const posts = CARPOOL_POSTS.filter((p) => p.city === city);
-  const drivers = posts.filter((p) => p.role === "driver");
-  const riders = posts.filter((p) => p.role === "rider");
-
-  const toggle = (id: string) =>
-    setRequestedIds((previousIds) => toggleSetValue(previousIds, id));
-
+import ResortScene from "@/components/ResortScene";
+export default async function CarpoolPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    city?: string;
+    resort?: string;
+  }>;
+}) {
+  const [query, context] = await Promise.all([
+    searchParams,
+    getCurrentProfileContext(),
+  ]);
+  const city =
+    query.city === "salzburg" || query.city === "innsbruck"
+      ? query.city
+      : context.status === "authenticated" && context.profile?.city
+        ? context.profile.city
+        : "innsbruck";
+  const feed = await getCarpoolFeed(city);
+  const result =
+    feed.status === "ready" && query.resort
+      ? {
+          status: "ready" as const,
+          data: feed.data.filter((post) => post.resort.id === query.resort),
+        }
+      : feed;
   return (
     <>
       <header
-        className="sticky top-0 z-50"
-        style={{ background: "var(--paper-0)", borderBottom: "var(--rule-heavy)" }}
+        className="sticky top-0 z-50 px-4 pt-4 pb-3 space-y-3"
+        style={{
+          background: "var(--paper-0)",
+          borderBottom: "var(--rule-heavy)",
+        }}
       >
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display" style={{ color: INK, fontSize: 24, fontWeight: 800 }}>Mitfahrt</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>Mitfahren oder jemanden mitnehmen</p>
+            <h1 className="font-display text-2xl font-black">Mitfahrt</h1>
+            <p className="text-xs font-semibold">
+              Mitfahren oder jemanden mitnehmen
+            </p>
           </div>
-          <button
-            onClick={() => setShowOfferModal(true)}
-            className="flex items-center gap-1.5 text-sm font-black px-4 py-2 rounded-full active:scale-95 transition-transform"
-            style={{ background: BRAND, color: D }}
+          <Link
+            href={`/carpool/new?city=${city}`}
+            className="px-4 py-3 font-black text-sm"
+            style={{
+              background: "var(--accent-primary)",
+              color: "var(--text-on-accent)",
+            }}
           >
-            <Icon name="plus" size={14} strokeWidth={2.4} />
-            Inserat
-          </button>
+            + Inserat
+          </Link>
         </div>
-        <div className="px-4 pb-3">
-          <SegmentedControl
-            options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]}
-            value={city}
-            onChange={setCity}
-            ariaLabel="Region"
-          />
-        </div>
+
+        <nav aria-label="Region" className="flex gap-3">
+          {(["innsbruck", "salzburg"] as const).map((region) => (
+            <Link
+              key={region}
+              href={`/carpool?city=${region}`}
+              aria-current={region === city ? "page" : undefined}
+              className="flex-1 text-center py-2 font-bold"
+              style={{
+                background:
+                  region === city
+                    ? "var(--accent-primary-subtle)"
+                    : "var(--bg-surface-1)",
+              }}
+            >
+              {region === "innsbruck" ? "Innsbruck" : "Salzburg"}
+            </Link>
+          ))}
+        </nav>
       </header>
 
-      <div className="px-4 pt-4 pb-6 space-y-6">
-        {/* Drivers */}
-        {drivers.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--status-success)" }} />
-              <h2 className="font-black text-xs uppercase" style={{ color: "var(--status-success)" }}>
-                Plätze frei · {drivers.length}
-              </h2>
-            </div>
-            <div className="space-y-3 stagger">
-              {drivers.map((post, i) => {
-                const author = getUserById(post.authorId);
-                if (!author) return null;
-
-                const isReq = requestedIds.has(post.id);
-                return (
-                  <div
-                    key={post.id}
-                    className="rounded-none overflow-hidden anim-fade-up"
-                    style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
-                  >
-                    {/* Mini resort scene strip */}
-                    <div className="relative h-20 overflow-hidden">
-                      <ResortScene name={post.resort} className="absolute inset-0 w-full h-full" />
-                      <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)" }} />
-                      <div className="absolute inset-0 flex items-center px-4 gap-3">
-                        <Avatar id={author.id} initials={author.avatar} size={42} />
-                        <div>
-                          <p className="font-black text-white text-sm">{author.name}</p>
-                          <p className="text-white/70 text-xs font-semibold">{post.resort}</p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-1 bg-black/40 rounded-full px-2.5 py-1">
-                          <span className="text-xs font-black text-white font-mono">{post.availableSeats}</span>
-                          <Icon name="users" size={12} color="white" strokeWidth={2} />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="px-4 py-3">
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="flex items-center gap-1.5">
-                          <Icon name="map-pin" size={12} color={BRAND} strokeWidth={2} />
-                          <span className="text-sm font-bold" style={{ color: INK }}>{post.departurePoint}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Icon name="clock" size={12} color={MUTED} strokeWidth={2} />
-                          <span className="text-xs font-bold font-mono" style={{ color: MUTED }}>{post.departureTime}</span>
-                        </div>
-                      </div>
-                      {post.note && (
-                        <p className="text-xs mb-3 font-medium" style={{ color: MUTED }}>{post.note}</p>
-                      )}
-                      <button
-                        onClick={() => toggle(post.id)}
-                        disabled={post.availableSeats === 0 && !isReq}
-                        className="w-full py-2.5 rounded-none text-sm font-black active:scale-95 transition-all"
-                        style={isReq
-                          ? { background: "var(--accent-primary-subtle)", color: BRAND }
-                          : post.availableSeats === 0
-                          ? { background: "var(--bg-surface-2)", color: MUTED, opacity: 0.5 }
-                          : { background: BRAND, color: D }
-                        }
-                      >
-                        {isReq ? "Angefragt" : "Platz anfragen"}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* Riders seeking */}
-        {riders.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--rust)" }} />
-              <h2 className="font-black text-xs uppercase" style={{ color: "var(--rust)" }}>
-                Sucht Mitfahrt · {riders.length}
-              </h2>
-            </div>
-            <div className="space-y-2 stagger">
-              {riders.map((post, i) => {
-                const author = getUserById(post.authorId);
-                if (!author) return null;
-
-                const isOffered = requestedIds.has(post.id + "_offer");
-                return (
-                  <div
-                    key={post.id}
-                    className="rounded-none p-4 anim-fade-up"
-                    style={{ background: SURFACE, border: `1px solid ${BORDER}`, animationDelay: `${i * 55}ms` }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Avatar id={author.id} initials={author.avatar} size={38} />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-black text-sm" style={{ color: INK }}>{author.name}</span>
-                          <span className="text-[0.62rem] font-black px-2 py-0.5 rounded-full" style={{ background: "var(--accent-warm-subtle)", color: "var(--rust)" }}>
-                            Sucht Platz
-                          </span>
-                        </div>
-                        <p className="text-xs font-semibold mt-1" style={{ color: MUTED }}>
-                          {post.departurePoint} → {post.resort} · {post.departureTime}
-                        </p>
-                        {post.note && <p className="text-xs mt-1.5 font-medium" style={{ color: MUTED }}>{post.note}</p>}
-                        <button
-                          onClick={() => toggle(post.id + "_offer")}
-                          className="mt-3 w-full py-2 rounded-none text-sm font-black active:scale-95 transition-all"
-                          style={isOffered
-                            ? { background: "var(--accent-primary-subtle)", color: BRAND }
-                            : { border: `2px solid ${BRAND}`, color: BRAND, background: "transparent" }
-                          }
-                        >
-                          {isOffered ? "Angeboten" : "Fahrt anbieten"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {drivers.length === 0 && riders.length === 0 && (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <PenguinMascot size={64} />
-            <div>
-              <p className="font-black text-lg" style={{ color: INK }}>Noch keine Mitfahrten</p>
-              <p className="text-sm font-medium mt-1" style={{ color: MUTED }}>Biete eine Fahrt an oder frag nach einem Platz.</p>
-            </div>
+      <div className="px-4 py-5 space-y-6">
+        {result.status === "unavailable" ? (
+          <div role="alert">
+            <p className="font-bold">
+              Mitfahrten konnten nicht geladen werden.
+            </p>
+            <Link href={`/carpool?city=${city}`} className="underline">
+              Erneut laden
+            </Link>
           </div>
+        ) : result.data.length === 0 ? (
+          <div className="py-14 text-center">
+            <h2 className="font-black text-lg">Noch keine Mitfahrten</h2>
+            <p className="text-sm mt-2">
+              Biete eine Fahrt an oder suche einen Platz in deiner Crew.
+            </p>
+          </div>
+        ) : (
+          (["driver", "rider"] as const).map((role) => {
+            const posts = result.data.filter((post) => post.role === role);
+            return (
+              posts.length > 0 && (
+                <section key={role}>
+                  <h2 className="font-black text-xs uppercase mb-3">
+                    {role === "driver" ? "Fahrtangebote" : "Sucht Mitfahrt"} ·
+                    {posts.length}
+                  </h2>
+                  <div className="space-y-3">
+                    {posts.map((post) => (
+                      <article
+                        key={post.id}
+                        style={{
+                          background: "var(--bg-surface-1)",
+                          border: "1px solid var(--border-subtle)",
+                        }}
+                      >
+                        <div className="relative h-20 overflow-hidden">
+                          <ResortScene
+                            name={post.resort.name}
+                            className="absolute inset-0 w-full h-full"
+                          />
+                          <div
+                            className="absolute inset-0"
+                            style={{ background: "rgba(0,0,0,.55)" }}
+                          />
+                          <div className="absolute inset-0 flex items-center px-4 gap-3 text-white">
+                            <Avatar
+                              id={post.host.id}
+                              initials={post.host.displayName
+                                .slice(0, 2)
+                                .toUpperCase()}
+                              size={40}
+                            />
+                            <div>
+                              <p className="font-black">
+                                {post.host.displayName}
+                              </p>
+                              <p className="text-sm">{post.resort.name}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 space-y-2">
+                          <p className="text-sm font-bold">
+                            {new Date(post.departsAt).toLocaleString("de-AT", {
+                              timeZone: "Europe/Vienna",
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })}
+                          </p>
+                          <p className="text-xs">
+                            {role === "driver"
+                              ? `${post.availableSeats} von ${post.seatCapacity} Plätzen frei`
+                              : "Sucht einen Platz"}{" "}
+                            ·
+                            {post.audience === "friends"
+                              ? "Freunde"
+                              : "Freunde & deren Freunde"}
+                          </p>
+                          {post.note && <p className="text-sm">{post.note}</p>}
+                          <Link
+                            href={`/carpool/${post.id}`}
+                            className="block text-center py-3 font-black text-sm"
+                            style={{
+                              background: "var(--accent-primary)",
+                              color: "var(--text-on-accent)",
+                            }}
+                          >
+                            Details & Anfragen
+                          </Link>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              )
+            );
+          })
         )}
       </div>
-
-      {showOfferModal && <OfferModal onClose={() => setShowOfferModal(false)} />}
     </>
   );
 }

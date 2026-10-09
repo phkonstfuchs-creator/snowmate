@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createLocationUpdateSchema,
   startLocationSessionSchema,
+  stopLocationSessionSchema,
 } from "./schema";
 
 const now = new Date("2026-08-03T10:00:00.000Z");
@@ -12,7 +13,7 @@ describe("location command schemas", () => {
     expect(
       startLocationSessionSchema.parse({
         resortId: "stubai-glacier",
-        audience: "ride",
+        audience: "friends-of-friends",
         rideId: uuid,
         durationHours: 4,
         idempotencyKey: uuid,
@@ -39,6 +40,7 @@ describe("location command schemas", () => {
         longitude: 11.302,
         accuracyMeters: 25,
         capturedAt: "2026-08-03T09:59:30.000Z",
+        idempotencyKey: uuid,
       }).success,
     ).toBe(true);
   });
@@ -53,9 +55,41 @@ describe("location command schemas", () => {
 
     for (const update of invalidUpdates) {
       expect(
-        createLocationUpdateSchema(now).safeParse({ sessionId: uuid, ...update })
+        createLocationUpdateSchema(now).safeParse({
+          sessionId: uuid,
+          idempotencyKey: uuid,
+          ...update,
+        })
           .success,
       ).toBe(false);
     }
+  });
+
+  it("keeps ride binding separate from broad resort audience", () => {
+    expect(
+      startLocationSessionSchema.safeParse({
+        resortId: "stubai-glacier",
+        audience: "ride",
+        rideId: uuid,
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(false);
+    expect(
+      startLocationSessionSchema.safeParse({
+        resortId: "stubai-glacier",
+        audience: "friends",
+        rideId: uuid,
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("validates idempotent stop commands", () => {
+    expect(
+      stopLocationSessionSchema.safeParse({
+        sessionId: uuid,
+        idempotencyKey: uuid,
+      }).success,
+    ).toBe(true);
   });
 });

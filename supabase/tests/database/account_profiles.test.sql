@@ -54,7 +54,10 @@ values
   );
 
 select results_eq(
-  $$select count(*) from public.profiles$$,
+  $$select count(*) from public.profiles where id in (
+    '11111111-1111-4111-8111-111111111111',
+    '22222222-2222-4222-8222-222222222222'
+  )$$,
   array[2::bigint],
   'the auth trigger creates one profile per user'
 );
@@ -84,7 +87,10 @@ delete from auth.users
 where id = '22222222-2222-4222-8222-222222222222';
 
 select results_eq(
-  $$select count(*) from public.profiles$$,
+  $$select count(*) from public.profiles where id in (
+    '11111111-1111-4111-8111-111111111111',
+    '22222222-2222-4222-8222-222222222222'
+  )$$,
   array[1::bigint],
   'deleting an auth user cascades to the profile'
 );

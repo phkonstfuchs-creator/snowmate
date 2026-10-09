@@ -7,6 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
+    "website/**", // Standalone marketing project has its own lint configuration.
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",

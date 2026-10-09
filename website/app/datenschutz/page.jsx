@@ -1,39 +1,43 @@
 import LegalShell from "../../components/LegalShell";
-import {
-  contactEmail, operatorCountry, operatorName, operatorPostalCity, operatorStreet,
-} from "../../lib/site";
+import { contactEmail, operatorAddress, operatorName, supervisoryAuthority } from "../../lib/site";
 
-export const metadata = { title: "Datenschutz", robots: { index: false, follow: false } };
+export const metadata = { title: "Datenschutz", alternates: { canonical: "/datenschutz" } };
+
 export default function Privacy() {
   return <LegalShell title="Datenschutz">
-    <p>Diese Hinweise gelten für pistl.app und die Anmeldung zur Pistl-Warteliste. Stand: Oktober 2026.</p>
+    <p>Stand: 5. Oktober 2026. Diese Erklärung gilt für die öffentliche Website von Pistl und ihre Warteliste. Für die App gibt es eigene Datenschutzinformationen in der App.</p>
 
-    <h2>Verantwortlicher</h2>
-    <p>{operatorName}, Einzelunternehmen</p>
-    <address>{operatorStreet}<br/>{operatorPostalCity}<br/>{operatorCountry}</address>
+    <h2>Wer ist verantwortlich?</h2>
+    <p>{operatorName}</p>
+    <address>{operatorAddress}</address>
     <p>E-Mail: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
 
-    <h2>Aufruf der Website</h2>
-    <p>Beim Aufruf übermittelt dein Browser technische Daten, insbesondere IP-Adresse, aufgerufene Seite, Zeitpunkt sowie Browser- und Geräteinformationen. Unser Hostinganbieter Vercel verarbeitet diese Daten, um die Website auszuliefern, Fehler zu erkennen und Angriffe abzuwehren. Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren und funktionierenden Webangebot (Art. 6 Abs. 1 lit. f DSGVO).</p>
-
     <h2>Warteliste und Early Access</h2>
-    <p>Wenn du dich anmeldest, speichern wir deine E-Mail-Adresse, deine optionale Auswahl für Early Access, den Zeitpunkt der Einwilligung und deren Version. Wir verwenden die Daten nur für Informationen zum Pistl-Start und, bei gewähltem Early Access, für mögliche Testeinladungen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die E-Mail-Adresse ist für die Anmeldung nötig; Early Access ist freiwillig. Deine Anmeldung erstellt kein App-Konto und garantiert keine Einladung.</p>
-    <p>Du kannst die Einwilligung jederzeit mit Wirkung für die Zukunft per E-Mail an <a href={`mailto:${contactEmail}`}>{contactEmail}</a> widerrufen. Wir löschen deine Wartelistenangaben dann, soweit keine gesetzliche Pflicht entgegensteht. Ohne Widerruf speichern wir sie bis zum Abschluss der Startinformationen und Testeinladungen und löschen sie danach.</p>
+    <p>Bei deiner Anmeldung speichern wir deine E-Mail-Adresse, ob du am Early Access interessiert bist, sowie Zeitpunkt und Version deiner Einwilligung. Danach schicken wir dir eine E-Mail mit einem Bestätigungslink (Double-Opt-in). Erst wenn du ihn nutzt, stehst du auf der Warteliste; den Zeitpunkt der Bestätigung speichern wir als Nachweis. Wir verwenden diese Angaben ausschließlich, um dich über den Start von Pistl zu informieren und, wenn du es angekreuzt hast, zum Testen einzuladen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).</p>
+    <p>Early Access ist optional. Die Anmeldung erstellt kein Konto in der App und ist kein allgemeiner Newsletter. Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, eine formlose E-Mail an die oben genannte Adresse genügt.</p>
 
-    <h2>Schutz des Formulars</h2>
-    <p>Um automatisierte Anmeldungen zu begrenzen, bildet der Server aus der beim Hosting übermittelten IP-Adresse einen geheimnisbasierten Prüfwert. In einer separaten Tabelle speichern wir diesen Wert, den Beginn eines einstündigen Zeitfensters und die Zahl der Versuche. Die Wartelistentabelle enthält keine rohe IP-Adresse. Der Prüfwert dient ausschließlich der Missbrauchsabwehr (Art. 6 Abs. 1 lit. f DSGVO); Einträge mit einem Zeitfenster älter als 24 Stunden werden bei weiteren angenommenen Anmeldungen bereinigt.</p>
+    <h2>Speicherdauer</h2>
+    <p>Bestätigst du deine Anmeldung nicht, löscht eine tägliche Bereinigung sie sieben Tage nach deiner letzten Anmeldeanfrage. Eine bestätigte Anmeldung löschen wir, sobald du widerrufst oder die Löschung verlangst, spätestens aber zwölf Monate nach dem öffentlichen Start der App. Dieselbe tägliche Bereinigung entfernt technische Prüfwerte für das Anfragelimit, deren Zeitfenster mindestens 24 Stunden alt ist.</p>
 
-    <h2>Dienstleister und Übermittlungen</h2>
-    <p>Die Website läuft bei <a href="https://vercel.com/legal/privacy-notice">Vercel</a>. Wartelistenangaben werden über unseren Server an <a href="https://supabase.com/privacy">Supabase</a> als Datenbankanbieter übertragen. Eine Verarbeitung durch diese Dienstleister oder ihre Unterauftragnehmer außerhalb des Europäischen Wirtschaftsraums ist möglich. Für solche Übermittlungen sehen ihre Vertragsunterlagen EU-Standardvertragsklauseln vor. Informationen dazu findest du in den <a href="https://vercel.com/legal/dpa">Datenschutzbedingungen von Vercel</a> und im <a href="https://supabase.com/legal/customer-resources/data-processing-addendum">Datenverarbeitungszusatz von Supabase</a>.</p>
+    <h2>Hosting und Speicherung</h2>
+    <ul>
+      <li><strong>Vercel</strong> (Vercel Inc., USA) betreibt die Website. Die serverseitige Verarbeitung der Warteliste läuft in Frankfurt am Main; Seiten können über weltweite Server ausgeliefert werden. Beim Aufruf verarbeitet Vercel technisch notwendige Verbindungsdaten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO, sicherer Betrieb).</li>
+      <li><strong>Supabase</strong> (Supabase Inc., USA) speichert die Warteliste in einem Rechenzentrum in Frankfurt am Main.</li>
+      <li><strong>Resend</strong> (Resend, Inc., USA) verschickt die Bestätigungs-E-Mail über Server in Irland. Dafür erhält Resend deine E-Mail-Adresse und den Inhalt der E-Mail.</li>
+    </ul>
+    <p>Soweit dabei Daten in die USA gelangen, geschieht das auf Grundlage des EU-US Data Privacy Framework oder von EU-Standardvertragsklauseln (Art. 45, 46 DSGVO).</p>
 
-    <h2>Cookies und Tracking</h2>
-    <p>Diese Website verwendet keine Analyse- oder Werbe-Cookies und kein Besuchertracking. Schriften und Bilder werden von der Website selbst geladen. Formulareingaben speichern wir nicht dauerhaft in deinem Browser.</p>
+    <h2>Schutz vor Missbrauch</h2>
+    <p>Zum Schutz des Formulars bilden wir serverseitig einen pseudonymisierten Prüfwert aus deiner IP-Adresse und begrenzen damit die Zahl der Anmeldungen pro Stunde. Die rohe IP-Adresse wird nicht in der Warteliste gespeichert (Art. 6 Abs. 1 lit. f DSGVO).</p>
+
+    <h2>Cookies und lokale Speicherung</h2>
+    <p>Diese Website setzt keine Cookies, keine Analyse- oder Werbewerkzeuge und kein Besuchertracking. Schriftarten und Bilder werden von der Website selbst ausgeliefert. Formulareingaben werden nicht im Browser gespeichert.</p>
 
     <h2>Deine Rechte</h2>
-    <p>Du kannst Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit verlangen sowie einer Verarbeitung auf Grundlage berechtigter Interessen widersprechen. Eine erteilte Einwilligung kannst du jederzeit widerrufen. Schreibe an <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. Es findet keine automatisierte Entscheidung über dich statt.</p>
-    <p>Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren. Für uns ist das <a href="https://www.datenschutz.saarland.de/">Unabhängige Datenschutzzentrum Saarland</a>, Fritz-Dobisch-Straße 12, 66111 Saarbrücken.</p>
+    <p>Du hast das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21 DSGVO) sowie das Recht, deine Einwilligung jederzeit zu widerrufen. Schreibe dafür an <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+    <p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei der für uns zuständigen: {supervisoryAuthority.name}, {supervisoryAuthority.address}, <a href={supervisoryAuthority.url}>{supervisoryAuthority.url.replace("https://", "")}</a>.</p>
 
-    <h2>Website und App</h2>
-    <p>Die spätere Pistl-App erhält eigene Datenschutzinformationen für ihre Funktionen. Diese Seite beschreibt die öffentliche Website und die Warteliste.</p>
+    <h2>Keine automatisierten Entscheidungen</h2>
+    <p>Wir treffen keine automatisierten Entscheidungen im Sinne von Art. 22 DSGVO und erstellen keine Profile.</p>
   </LegalShell>;
 }

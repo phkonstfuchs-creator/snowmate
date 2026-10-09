@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Check, LoaderCircle, Copy } from "lucide-react";
+import { Check, LoaderCircle, Copy, ArrowUpRight } from "lucide-react";
 import ActionButton from "./ui/ActionButton";
 
 export default function WaitlistForm() {
@@ -23,7 +23,7 @@ export default function WaitlistForm() {
       const response = await fetch("/api/waitlist", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: values.get("email"), earlyAccess: values.get("earlyAccess") === "on", consent: values.get("consent") === "on", website: values.get("website") || "" }),
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(20000),
       });
       const data = await response.json();
       if (!response.ok || data.ok !== true) throw new Error(data.error || "Die Anmeldung hat gerade nicht geklappt. Bitte versuche es erneut.");
@@ -44,8 +44,8 @@ export default function WaitlistForm() {
 
   if (status === "success") return <div className="signup-success" role="status">
     <span className="success-check"><Check size={30} /></span>
-    <h3 ref={confirmation} tabIndex={-1}>Du stehst auf der Liste.</h3>
-    <p>Dein Interesse ist gespeichert. Wir melden uns per E-Mail, wenn es Neuigkeiten zum Start gibt. Für Early Access laden wir schrittweise zum Testen ein.</p>
+    <h3 ref={confirmation} tabIndex={-1}>Fast geschafft – schau in dein Postfach.</h3>
+    <p>Mit dem Link in unserer E-Mail bestätigst du deine Anmeldung. Erst dann stehst du auf der Warteliste. Keine Mail da? Schau im Spam-Ordner nach. Bist du schon bestätigt, musst du nichts weiter tun.</p>
     <button type="button" className="text-button" onClick={share}><Copy size={17} /> Mit deiner Crew teilen</button>
     <p className="form-note" aria-live="polite">{shareStatus}</p>
   </div>;
@@ -53,13 +53,14 @@ export default function WaitlistForm() {
   return <form method="post" action="/api/waitlist" onSubmit={submit} aria-label="Pistl Warteliste" className="waitlist-form" aria-busy={status === "pending"}>
     <label htmlFor="waitlist-email" className="input-label">Deine E-Mail-Adresse</label>
     <div className="signup-row">
-      <input id="waitlist-email" name="email" type="email" placeholder="du@beispiel.at" autoComplete="email" maxLength={254} required aria-describedby={error ? "signup-error" : "signup-note"} />
-      <ActionButton type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" /> Wird eingetragen …</> : "Auf die Warteliste"}</ActionButton>
+      <input id="waitlist-email" name="email" type="email" placeholder="du@beispiel.at" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} maxLength={254} required aria-describedby={error ? "signup-error" : "signup-note"} />
     </div>
     <div className="honeypot" aria-hidden="true"><label htmlFor="website-field">Website</label><input id="website-field" name="website" tabIndex={-1} autoComplete="off" /></div>
     <label className="checkbox-row"><input type="checkbox" name="earlyAccess" /><span>Ich möchte auch am Early Access teilnehmen.</span></label>
     <label className="checkbox-row consent-row"><input type="checkbox" name="consent" required /><span>Ich möchte per E-Mail über den Pistl-Start und ggf. Early Access informiert werden. Meine Einwilligung kann ich jederzeit widerrufen. <Link href="/datenschutz">Datenschutz</Link></span></label>
-    <p id="signup-note" className="form-note">Pistl startet zuerst im Browser.</p>
+    <ActionButton className="signup-submit" type="submit" disabled={status === "pending"}>{status === "pending" ? <><LoaderCircle size={18} className="loading-spinner" aria-hidden="true" /> Wird eingetragen …</> : <>Auf die Warteliste <ArrowUpRight className="button-arrow" size={20} aria-hidden="true" /></>}</ActionButton>
+    <noscript><style>{".signup-submit{display:none!important}"}</style><p>Für die Anmeldung aktiviere bitte JavaScript in deinem Browser.</p></noscript>
+    <p id="signup-note" className="form-note">Du bekommst eine E-Mail, um deine Anmeldung zu bestätigen.</p>
     {error && <p id="signup-error" role="alert" className="form-error">{error}</p>}
   </form>;
 }

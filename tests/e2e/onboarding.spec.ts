@@ -58,9 +58,9 @@ test("app responses include the baseline security headers", async ({ page }) => 
     "default-src 'self'",
   );
   expect(response?.headers()["permissions-policy"]).toBe(
-    "camera=(), microphone=(), geolocation=()",
+    "camera=(), microphone=(), geolocation=(self)",
   );
   expect(response?.headers()["strict-transport-security"]).toBe(
-    "max-age=31536000",
+    "max-age=31536000; includeSubDomains",
   );
 });

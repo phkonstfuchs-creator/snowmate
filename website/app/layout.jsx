@@ -5,10 +5,10 @@ import "./globals.css";
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "Pistl — Wer fährt mit?", template: "%s | Pistl" },
-  description: "Wer fährt heute wo, und kann ich mit? Pistl verbindet Skifahrer und Snowboarder rund um Innsbruck und Salzburg. Jetzt für Early Access vormerken.",
+  title: { default: "Pistl — Ab auf den Berg.", template: "%s | Pistl" },
+  description: "Plane deinen nächsten Skitag mit Freunden und finde eine Mitfahrt. Pistl für Skifahrer und Snowboarder rund um Innsbruck und Salzburg. Jetzt früh testen.",
   robots: { index: launchReady, follow: launchReady },
-  openGraph: { type: "website", locale: "de_AT", siteName: "Pistl", title: "Pistl — Wer fährt mit?", description: "Rides finden. Plätze teilen. Zusammen auf den Berg. Early Access startet bald." },
+  openGraph: { type: "website", locale: "de_AT", siteName: "Pistl", title: "Pistl — Ab auf den Berg.", description: "Rides finden. Plätze teilen. Zusammen auf den Berg. Early Access startet bald." },
   twitter: { card: "summary_large_image" },
 };
 export const viewport = { themeColor: "#f6f7f4" };

@@ -254,7 +254,7 @@ otp_expiry = 3600
 # content_path = "./supabase/templates/invite.html"
 
 [auth.email.template.confirmation]
-subject = "Confirm your Snowmate account"
+subject = "Confirm your Pistl account"
 content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize notification email template
@@ -285,9 +285,9 @@ max_frequency = "5s"
 # inactivity_timeout = "8h"
 
 # This hook runs before a new user is created and allows developers to reject the request based on the incoming user object.
-# [auth.hook.before_user_created]
-# enabled = true
-# uri = "pg-functions://postgres/auth/before-user-created-hook"
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/private/before_user_created_hook"
 
 # This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 # [auth.hook.custom_access_token]
@@ -390,6 +390,9 @@ policy = "per_worker"
 inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
+
+[functions.process-account-deletions]
+verify_jwt = false
 
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"

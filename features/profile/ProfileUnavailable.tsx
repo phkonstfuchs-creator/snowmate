@@ -18,7 +18,7 @@ export default function ProfileUnavailable() {
             className="mt-3 text-base leading-relaxed"
             style={{ color: "var(--ink-1)" }}
           >
-            Snowmate konnte deinen Profilstatus nicht sicher prüfen. Lade die
+            Pistl konnte deinen Profilstatus nicht sicher prüfen. Lade die
             Seite in einem Moment erneut.
           </p>
           <ProfileAccessActions />

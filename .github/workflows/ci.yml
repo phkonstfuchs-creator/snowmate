@@ -27,13 +27,48 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Audit dependencies
+        run: npm run audit:deps
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:coverage
+      - name: Check Supabase Edge Function formatting
+        run: npx -y deno@2.9.4 fmt --check supabase/functions
+      - name: Check Supabase Edge Functions
+        run: >-
+          npx -y deno@2.9.4 check
+          --config supabase/functions/deno.json
+          supabase/functions/process-account-deletions/index.ts
       - run: npm run build
+      - name: Install and check the website
+        run: |
+          npm ci --prefix website
+          node scripts/audit-dependencies.mjs website
+          npm run lint --prefix website
+          npm test --prefix website
+          npm run build --prefix website
+      - name: Check website browser journeys
+        run: |
+          npm exec --prefix website -- playwright install --with-deps chromium
+          npm run test:e2e --prefix website
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
+          GITLEAKS_VERSION: 8.30.1
 
   integration:
-    needs: quality
+    needs: [quality, secrets]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -45,8 +80,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Allow isolated integration-test confirmation emails
+        run: sed -i 's/^email_sent = 2$/email_sent = 100/' supabase/config.toml
       - run: npx supabase start
       - run: npx supabase db reset
+      - name: Harden extension-owned pg_net privileges
+        run: >-
+          docker exec -i supabase_db_snowmate-dev
+          psql -U supabase_admin -d postgres --single-transaction
+          -v ON_ERROR_STOP=1 < supabase/operations/harden-pg-net.sql
+      - run: npx supabase db lint --local --level warning --fail-on error
       - run: npm run test:db
       - name: Configure the app for local Supabase
         shell: bash
@@ -79,7 +122,7 @@ jobs:
           {
             printf 'NEXT_PUBLIC_SUPABASE_URL=%s\n' "$api_url"
             printf 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$public_key"
-            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://localhost:3000"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://127.0.0.1:3000"
             printf 'MAILPIT_URL=%s\n' "$mailpit_url"
             printf 'LOCAL_SUPABASE_E2E=%s\n' "1"
           } >> "$GITHUB_ENV"

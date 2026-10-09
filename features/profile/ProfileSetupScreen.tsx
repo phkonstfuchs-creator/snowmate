@@ -19,7 +19,7 @@ export default function ProfileSetupScreen({
         <div className="flex items-center gap-2 pt-6">
           <PenguinMascot size={26} />
           <span className="text-mono-label" style={{ color: "var(--ink-0)" }}>
-            Snowmate
+            Pistl
           </span>
         </div>
 
@@ -37,7 +37,7 @@ export default function ProfileSetupScreen({
             style={{ color: "var(--ink-1)" }}
           >
             Dein Login steht. Ergänze jetzt die Angaben, mit denen dich deine
-            Crew in Snowmate erkennt.
+            Crew in Pistl erkennt.
           </p>
 
           <div
