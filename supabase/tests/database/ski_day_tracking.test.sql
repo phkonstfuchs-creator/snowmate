@@ -8,8 +8,11 @@ insert into auth.users (id, email)
 select ('9058c000-0000-4000-8000-00000000000' || n)::uuid, 'track' || n || '@example.com'
 from generate_series(1, 2) n;
 
+-- Model an active authenticated session for the session-bound account export.
+insert into auth.sessions(id,user_id) select id,id from auth.users on conflict (id) do nothing;
 set local role authenticated;
 set local request.jwt.claim.sub = '9058c000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9058c000-0000-4000-8000-000000000001"}';
 
 select throws_ok($$select * from public.ski_days$$, '42501', null, 'ski days are not readable directly');
 select throws_ok($$insert into public.ski_days (user_id, started_at, ended_at, distance_m, vertical_m, max_speed_kmh, runs)
@@ -38,10 +41,12 @@ select is(public.save_ski_day(null, now() - interval '30 minutes', now(), 100, 0
 create temp table my_day as select id from public.list_my_ski_days() limit 1;
 grant select on my_day to authenticated;
 set local request.jwt.claim.sub = '9058c000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9058c000-0000-4000-8000-000000000002"}';
 select is((select count(*)::int from public.list_my_ski_days()), 0, 'nobody else sees my days');
 select ok(not public.delete_my_ski_day((select id from my_day)), 'nor deletes them');
 
 set local request.jwt.claim.sub = '9058c000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9058c000-0000-4000-8000-000000000001"}';
 select is(jsonb_array_length(public.export_my_data() -> 'ski_days'), 5, 'the export lists my days');
 select ok(public.delete_my_ski_day((select id from my_day)), 'I delete my own day');
 

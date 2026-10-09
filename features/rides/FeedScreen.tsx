@@ -7,6 +7,10 @@ import { goCandidates } from "@/features/go/go-candidates";
 import GoInterest from "@/features/go/GoInterest";
 import GoOverview from "@/features/go/GoOverview";
 import type { GoOverviewResult } from "@/features/go/go-status";
+import DayPlanSheet from "@/features/day-plans/DayPlanSheet";
+import DayPlanOverview from "@/features/day-plans/DayPlanOverview";
+import type { DayPlan, DayPlanResult } from "@/features/day-plans/day-plan";
+import type { RideFormInput } from "./ride-input";
 import { openRideChatAction } from "@/features/chat/actions";
 import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
@@ -41,6 +45,7 @@ export interface LiveFeed {
   /* null when the backend could not be reached */
   rides: LiveRide[] | null;
   goInterests?: GoOverviewResult;
+  dayPlans?: DayPlanResult;
   viewerIsMinor: boolean;
   defaultCity: City;
   /* Posting and joining need a finished profile (enforced in the database). */
@@ -64,6 +69,10 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showGoStart, setShowGoStart] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showDayPlan, setShowDayPlan] = useState(false);
+  const [editingDayPlan, setEditingDayPlan] = useState<DayPlan | undefined>();
+  const [demoPlans, setDemoPlans] = useState<DayPlan[]>([]);
+  const [rideDraft, setRideDraft] = useState<Pick<RideFormInput, "resort" | "rideDate" | "meetTime" | "meetPoint">>();
   const [showCreate, setShowCreate] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -75,6 +84,20 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS, referenceTime);
   const unavailable = live !== undefined && live.rides === null;
+  const dayPlans = live?.dayPlans ?? (!live ? { status: "ok" as const, plans: demoPlans } : undefined);
+  const openDayPlan = (plan?: DayPlan) => {
+    setEditingDayPlan(plan);
+    setShowDayPlan(true);
+  };
+  const openPostRide = () => {
+    setRideDraft(undefined);
+    setShowPostModal(true);
+  };
+  const useDayPlanForRide = (plan: DayPlan) => {
+    setCity(plan.city);
+    setRideDraft({ resort: plan.resort, rideDate: plan.planDate, meetTime: plan.meetTime, meetPoint: plan.meetingText });
+    setShowPostModal(true);
+  };
 
   const [storyUser, setStoryUser] = useState<User | null>(null);
   /* Counter, not a boolean: the hold time lives inside the keyframe,
@@ -183,6 +206,8 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         </Link>
       </section>
 
+      {dayPlans && <DayPlanOverview result={dayPlans} demo={!live} onOpen={openDayPlan} onShare={useDayPlanForRide} onRetry={() => router.refresh()} />}
+
       {live && live.profileComplete === false && (
         <Link
           href="/profile"
@@ -213,7 +238,7 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
 
       {/* Nothing today: say what to do instead of an empty screen. */}
       {todaysRides.length === 0 && !unavailable && (
-        <NextStep icon="plus" text={t("next.feed")} action={t("feed.postRide")} onAction={() => setShowPostModal(true)} />
+        <NextStep icon="plus" text={t("next.feed")} action={t("feed.postRide")} onAction={openPostRide} />
       )}
 
       {/* Feed */}
@@ -258,18 +283,31 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
           demo={!live}
           basePath={basePath}
           onSelect={openGoPlan}
-          onCreate={() => setShowPostModal(true)}
+          onCreate={openPostRide}
+          onPlan={() => openDayPlan()}
           onRetry={() => router.refresh()}
           onClose={() => setShowGoStart(false)}
         />
       )}
+
+      {showDayPlan && <DayPlanSheet
+        initial={editingDayPlan}
+        city={editingDayPlan?.city ?? city}
+        demo={!live}
+        onClose={() => { setShowDayPlan(false); if (live) router.refresh(); }}
+        onDeleted={(id) => { if (!live) setDemoPlans((plans) => plans.filter((plan) => plan.id !== id)); }}
+        onSaved={(plan) => {
+          if (!live) setDemoPlans((plans) => [...plans.filter((old) => old.id !== plan.id), plan]);
+          if (live) router.refresh();
+        }}
+      />}
 
       {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
 
       {showCreate && (
         <CreateMenu
           basePath={basePath}
-          onPostRide={() => setShowPostModal(true)}
+          onPostRide={openPostRide}
           onShareDay={live ? () => setShowComposer(true) : undefined}
           onClose={() => setShowCreate(false)}
         />
@@ -278,7 +316,8 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
       {showPostModal && (
         <PostRideModal
           city={city}
-          onClose={() => setShowPostModal(false)}
+          initialValues={rideDraft}
+          onClose={() => { setShowPostModal(false); setRideDraft(undefined); }}
           onPost={board.postRide}
           mayGoPublic={live ? !live.viewerIsMinor : canPostPublicRide(ME)}
         />
@@ -349,7 +388,7 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         <UserProfileSheet user={storyUser} onClose={() => setStoryUser(null)} />
       )}
 
-      {pushAsk.pending && !showGoStart && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
+      {pushAsk.pending && !showGoStart && !showDayPlan && !showPostModal && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
         <PushAsk onClose={pushAsk.dismiss} />
       )}
 

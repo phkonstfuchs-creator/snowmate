@@ -1,6 +1,6 @@
 # Pistl: Umbau für einen gemeinsamen Skitag
 
-- **Status:** Gesamtumbau geplant; Phase A am 2026-10-09 vom Nutzer gestartet und als isolierte Designvorschau umgesetzt. Produktive Backend-/Native-Phasen bleiben offen.
+- **Status:** Gesamtumbau geplant; Phase A am 2026-10-09 vom Nutzer gestartet und als isolierte Designvorschau umgesetzt. Private eigene Go-Skitage sind als erster produktiver Teil von Phase C umgesetzt; weitere Backend-/Native-Phasen bleiben offen.
 - **Stand:** 2026-10-09, ausgehend von Production `e13dfe072db44bfa9ca82db2396f33ce5bd569fa`.
 - **Auftrag:** Größerer Umbau ausdrücklich erlaubt. Pistl Go bleibt der Name; dauerhafte freiwillige Standortfreigabe für Freunde ist gewünscht.
 - **Planung:** Zwei gezielte GPT-6-Luna-Aufträge, Produktplanung und technische Bestandsprüfung. Keine Anbieter gebucht oder Nutzer kontaktiert.
@@ -155,7 +155,7 @@ Widgets folgen demselben geprüften Vertrag: iOS Live Activity für den aktiven 
 
 ## 6. Architektur, Migration und Fehlerfälle
 
-Neue Verträge: privater `DayPlan`, ausdrücklich geteilte Planinformationen/Teilnehmer, Treffpunkt mit stabiler Referenz und Zusagen, Freigabepräferenz/Laufberechtigung, versionierte Gebietsdaten und separate Status-/Zeitbelege. Namen sind Entwurf, keine bereits angelegten Tabellen.
+Neue Verträge: privater `DayPlan`, ausdrücklich geteilte Planinformationen/Teilnehmer, Treffpunkt mit stabiler Referenz und Zusagen, Freigabepräferenz/Laufberechtigung, versionierte Gebietsdaten und separate Status-/Zeitbelege. Der private `DayPlan` ist inzwischen umgesetzt; die übrigen neuen Verträge bleiben Entwurf.
 
 Zusätzlich: versioniertes privates lokales Tagesarchiv für Replay, ein Gebietspaket-Manifest mit Integritäts-/Downloadzustand und ein gepflegtes Webcam-Verzeichnis mit Betreiberlink, Standortreferenz, Medientyp und Aktualitätsinformationen. Replay und laufende Aufzeichnung teilen die Zeitdaten, nicht eine gemeinsame Start-/Stoppaktion. Private Daten sind nicht Teil eines verteilten statischen Gebietspakets.
 
@@ -220,3 +220,9 @@ Noch zu ermitteln: erlaubte Geometrie-/Status-/Offline-/Webcamquellen und Betrie
 Social-Daten, Zusagen, Standorttoggle und Replay sind sichtbar als Vorschau markiert. Go-Entwürfe leben ausschließlich im Speicher dieser offenen Seite; neue Entwürfe bewahren vorherige. Es gibt keine echten Einladungen, Standortfreigaben, GPS-Aufzeichnungen oder Offlinepakete aus dieser Vorschau. Die bestehenden produktiven Abläufe bleiben erhalten. [ADR 0041](../adr/0041-isolated-mountain-design-preview.md) dokumentiert die Grenze.
 
 Prüfbare Abläufe sind in `features/mountain-preview/*.test.tsx`, den Daten-/Importtests und `tests/e2e/mountain-preview.spec.ts` hinterlegt: Planung ohne Ausfahrt/Freunde, private Simulation, richtige Gebiets-/Treffpunktzuordnung, kein Verlust vorheriger Entwürfe, unabhängiges Replay, unbekannter Liftstatus, 320/390px, echte Touch-Tab-Gesten, Kartenanbieter-Ausfall und automatisierte Barrierefreiheit. Interviews/5-Sekunden-Tests mit echten Jugendlichen, GPS-/Akkuvergleich, Betreiberzuordnung aller Anlagen und physische Native-/Offline-Abnahme sind weiterhin ausstehend. Phase A ersetzt diese Nachweise nicht.
+
+## 12. Erster produktiver Go-Schritt
+
+Eigene private Skitage sind in `features/day-plans` umgesetzt: Gebiet, Wiener Datum, Uhrzeit, Anreiseabsicht und Treffpunkt, mit Speichern/Neuladen/Bearbeiten/Löschen. Heute zeigt den nächsten anstehenden Treffpunkt. Eine ausdrückliche Aktion bereitet das bestehende Ausfahrtformular vor; Veröffentlichung, Fahrstil, Kapazität und Audience bleiben darin eigene Entscheidungen. Bestehende Go-Wünsche bleiben erreichbar.
+
+[Die Spezifikation](go-day-plans.md) und [ADR 0042](../adr/0042-private-go-day-plans.md) halten Session/MFA, private Audience, Quoten, Wiederholungen, Ablauf, Export und Löschung fest. Die 3-Schritt-Demo ist nur bis zum Neuladen verfügbar. Gemeinsame Plan-Zusagen, echte permanente Standortfreigabe/Widgets, produktive Vektorpisten/Replays, vollständige Liftzuordnung und Offlinepakete sind dadurch noch nicht umgesetzt; ihre Ziele und Abnahmen oben bleiben erhalten.

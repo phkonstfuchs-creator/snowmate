@@ -4,6 +4,16 @@ import GoStartSheet from "./GoStartSheet";
 import { toLiveRide, type RideRow } from "@/features/rides/live-ride";
 const callbacks = () => ({ onSelect: vi.fn(), onCreate: vi.fn(), onRetry: vi.fn(), onClose: vi.fn() });
 const row: RideRow = { id: "r", host_id: "h", host_display_name: "Lena", host_handle: "lena", host_is_minor: false, resort: "Nordkette", city: "innsbruck", ability_level: "park", ride_date: "2026-10-10", meet_time: "11:00:00", meet_point: null, meet_point_locked: true, total_spots: 3, taken_spots: 0, caption: null, title: null, visibility: "friends", created_at: "2026-10-09T08:00:00Z", is_host: false, is_joined: false, participants: [] };
+it("lets a new rider plan independently even when existing rides are unavailable", async () => {
+  const cb = callbacks();
+  const onPlan = vi.fn();
+  render(<GoStartSheet rides={[]} unavailable demo={false} basePath="" onPlan={onPlan} {...cb} />);
+  fireEvent.click(screen.getByRole("button", { name: "Plan a ski day" }));
+  expect(onPlan).not.toHaveBeenCalled();
+  await waitFor(() => expect(onPlan).toHaveBeenCalledOnce());
+  expect(cb.onSelect).not.toHaveBeenCalled();
+  expect(cb.onCreate).not.toHaveBeenCalled();
+});
 it("opens only a selected visible ride after the chooser has finished dismissing", async () => {
   const cb = callbacks();
   render(<GoStartSheet rides={[toLiveRide(row, new Date(row.created_at))]} unavailable={false} demo={false} basePath="" {...cb} />);

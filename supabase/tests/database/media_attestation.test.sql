@@ -180,6 +180,8 @@ set local role anon;
 select throws_ok($$select public.attest_my_media('avatars', 'x', null, null, 'v1', null)$$,
   '42501', null, 'anonymous caller cannot execute attestation RPC');
 reset role;
+set local request.jwt.claim.sub = 'b0b0b0b0-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"b0b0b0b0-0000-4000-8000-000000000001"}';
 select is(jsonb_array_length((select public.export_my_data() from (select
   set_config('request.jwt.claim.sub', 'b0b0b0b0-0000-4000-8000-000000000001', true)) x)
   -> 'media_attestations'), 2, 'owner export includes both own certificates');
