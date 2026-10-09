@@ -60,11 +60,12 @@ export default function DayPlanSheet({ initial, city, onClose, onSaved, onDelete
   const planId = idRef.current;
   const planCity = initial?.city ?? city;
   const [today, setToday] = useState(() => viennaIsoDay(currentTimestamp()));
-  const retainedPastPlan = Boolean(initial && initial.planDate < today);
+  const [wasPastWhenOpened] = useState(() => Boolean(initial && initial.planDate < today));
   const initialExpiry = initial ? Date.parse(initial.expiresAt) : Number.POSITIVE_INFINITY;
   const [step, setStep] = useState(0);
   const [resort, setResort] = useState(initial?.resort ?? "");
   const [planDate, setPlanDate] = useState(initial?.planDate ?? today);
+  const retainedPastPlan = wasPastWhenOpened || Boolean(initial && initial.planDate < today && planDate < today);
   const [meetTime, setMeetTime] = useState(initial?.meetTime.slice(0, 5) ?? "09:00");
   const [transport, setTransport] = useState<DayPlanInput["transport"] | "">(initial?.transport ?? "");
   const [meetingText, setMeetingText] = useState(initial?.meetingText ?? "");

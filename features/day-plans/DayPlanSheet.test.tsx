@@ -150,13 +150,24 @@ describe("DayPlanSheet", () => {
     await act(async () => vi.advanceTimersByTimeAsync(2_000));
 
     expect(screen.getByLabelText(/date/i)).toBeEnabled();
-    expect(screen.queryByRole("note")).not.toHaveTextContent(/this day has passed and is read-only/i);
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
 
     expect(actions.save).toHaveBeenCalledWith(todayPlan.id, todayPlan.version, expect.objectContaining({ planDate: "2026-10-10" }));
     expect(onSaved).toHaveBeenCalledWith(tomorrowPlan);
+  });
+
+  it("keeps a future plan editable when its entered date needs correction", () => {
+    render(<DayPlanSheet city="innsbruck" initial={plan} onClose={vi.fn()} onSaved={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText(/date/i), { target: { value: "2026-10-08" } });
+
+    expect(screen.getByLabelText(/date/i)).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /where and when/i })).toBeInTheDocument();
   });
 
   it("closes an expired plan on focus and never offers deletion for it", async () => {
