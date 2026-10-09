@@ -97,7 +97,7 @@ describe("privacy consent persistence", () => {
           updatedAt: "2026-08-03T12:00:00.000Z",
         }),
       ],
-      [ANALYTICS_ID_STORAGE_KEY, "9fc1a0dc-b151-4df2-86cb-f3015badf019"],
+      [ANALYTICS_ID_STORAGE_KEY, "00000000-0000-4000-8000-000000000001"],
     ]);
     const failingStorage = {
       getItem: (key: string) => values.get(key) ?? null,
