@@ -138,6 +138,27 @@ describe("DayPlanSheet", () => {
     expect(actions.remove).toHaveBeenCalledWith(todayPlan.id, todayPlan.version);
   });
 
+  it("keeps an edited today plan editable when its new date is tomorrow at Vienna midnight", async () => {
+    vi.setSystemTime(new Date("2026-10-09T21:59:59.000Z"));
+    const todayPlan = { ...plan, planDate: "2026-10-09", expiresAt: "2026-10-13T22:00:00.000Z" };
+    const tomorrowPlan = { ...todayPlan, planDate: "2026-10-10" };
+    actions.save.mockResolvedValue({ ok: true, message: "dayPlan.saved", plan: tomorrowPlan });
+    const onSaved = vi.fn();
+    render(<DayPlanSheet city="innsbruck" initial={todayPlan} onClose={vi.fn()} onSaved={onSaved} />);
+
+    fireEvent.change(screen.getByLabelText(/date/i), { target: { value: "2026-10-10" } });
+    await act(async () => vi.advanceTimersByTimeAsync(2_000));
+
+    expect(screen.getByLabelText(/date/i)).toBeEnabled();
+    expect(screen.queryByRole("note")).not.toHaveTextContent(/this day has passed and is read-only/i);
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
+
+    expect(actions.save).toHaveBeenCalledWith(todayPlan.id, todayPlan.version, expect.objectContaining({ planDate: "2026-10-10" }));
+    expect(onSaved).toHaveBeenCalledWith(tomorrowPlan);
+  });
+
   it("closes an expired plan on focus and never offers deletion for it", async () => {
     const onClose = vi.fn();
     const expired = { ...plan, expiresAt: "2026-10-09T09:59:59.000Z" };
