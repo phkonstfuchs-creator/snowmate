@@ -1,0 +1,4 @@
+# Reviewed historical analytics UUID in a mocked consent test on the merged
+# website-import branch. This exact fingerprint is not an API credential.
+# All other commits, files, values and rules remain scanned.
+9d13f9db22c0d5b6518090fbb2847a90e24cd8ab:features/privacy/consent.test.ts:generic-api-key:100

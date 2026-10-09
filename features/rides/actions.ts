@@ -21,7 +21,13 @@ const PROFILE_INCOMPLETE = "common.profileIncomplete";
    policy condition a signed-in client can miss is the finished profile. */
 const RLS_VIOLATION = "42501";
 
+const GO_NOT_READY: RideActionResult = { ok: false, message: "go.notReady" };
+function goConditionsRefused(error: { code?: string; message?: string } | null): boolean {
+  return error?.code === "23514" && error.message === "go_conditions_not_ready";
+}
+
 const JOIN_MESSAGES: Record<string, RideActionResult> = {
+  go_conditions_not_ready: GO_NOT_READY,
   joined: { ok: true, message: "rides.joined" },
   requested: { ok: true, message: "rides.requested", pending: true },
   already_requested: { ok: true, message: "rides.alreadyRequested", pending: true },
@@ -96,6 +102,7 @@ async function callRideFunction(
     const supabase = await createClient();
     const { data, error } = await supabase.rpc(fn, { target_ride: rideId });
     if (!error && fn === "join_ride") await dispatchPushSoon(supabase);
+    if (fn === "join_ride" && goConditionsRefused(error)) return { data: "go_conditions_not_ready" };
     return error ? null : { data };
   } catch {
     return null;
@@ -181,7 +188,7 @@ async function respondRideRequestActionImpl(
       requester: requesterId,
       accept,
     });
-    if (error) return UNAVAILABLE;
+    if (error) return goConditionsRefused(error) ? GO_NOT_READY : UNAVAILABLE;
     revalidateRides();
     if (accept) await dispatchPushSoon(supabase);
     return RESPOND_MESSAGES[String(data)] ?? UNAVAILABLE;

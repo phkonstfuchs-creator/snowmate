@@ -98,6 +98,12 @@ describe("ride actions", () => {
     });
   });
 
+  it("explains a fresh database Go condition refusal on join and host acceptance", async () => {
+    mocks.rpc.mockResolvedValue({ data: null, error: { code: "23514", message: "go_conditions_not_ready" } });
+    await expect(joinRideAction("ride-1")).resolves.toMatchObject({ ok: false, message: "Your Pistl Go conditions are not met yet." });
+    await expect(respondRideRequestAction("ride-1", "user-1", true)).resolves.toMatchObject({ ok: false, message: "Your Pistl Go conditions are not met yet." });
+  });
+
   describe("joinRideAction", () => {
     it.each([
       ["joined", true, "You are in."],

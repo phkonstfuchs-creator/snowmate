@@ -73,6 +73,17 @@ export default function DatenschutzPage() {
         die Mitglieder dieses Chats, und nach 24 Stunden löschen wir die Koordinaten. Rechtsgrundlage: Art. 6 Abs. 1
         lit. b DSGVO.
       </p>
+      <h3>Pistl-Go-Wünsche</h3>
+      <p>
+        Wenn du zu einem bestehenden Ride einen Wunsch speicherst, speichern wir deine gewählte Mindestgruppe,
+        ob du einen bestätigten Mitfahrplatz brauchst, den zugehörigen Ride und die Zeitpunkte von Erstellung,
+        Änderung und Rückzug. Den Wunsch und seine Bedingungen siehst nur du. Wir prüfen dafür die bereits
+        bestätigten Teilnehmer und passende bestätigte Mitfahrplätze; ein Wunsch reserviert keinen Platz und
+        meldet dich nicht automatisch an. Nach dem Ride-Start oder einem Rückzug ist der Wunsch nicht mehr aktiv.
+        Sobald der Ride-Start oder Rückzug mindestens 24 Stunden zurückliegt, entfernen wir ihn beim nächsten
+        täglichen Bereinigungslauf. Bei der Kontolöschung wird er sofort mitgelöscht; solange gespeichert, ist er
+        in deinem Datenexport enthalten. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
       <h3>Live-Standort</h3>
       <p>
         Ab 16 Jahren und nur, wenn du ihn ausdrücklich einschaltest, für 1, 4 oder 12 Stunden. Gespeichert wird nur die letzte Position,
@@ -209,6 +220,7 @@ export default function DatenschutzPage() {
       <h2>6. Wie lange wir Daten speichern</h2>
       <ul>
         <li>Konto, Profil, Rides, Freundschaften und Chatnachrichten: bis du dein Konto löschst.</li>
+        <li>Pistl-Go-Wünsche: nach Ride-Start oder Rückzug sofort inaktiv; Löschung beim nächsten täglichen Lauf, sobald der entsprechende Zeitpunkt mindestens 24 Stunden zurückliegt, oder früher mit dem Konto.</li>
         <li>Live-Standort: höchstens bis zum Ende der gewählten Zeit (maximal 12 Stunden).</li>
         <li>Lift-Treffpunkt: höchstens 30 Minuten sichtbar, jederzeit vorher beendbar; abgelaufene Daten werden beim nächsten Statusabruf oder -start gelöscht.</li>
         <li>Standort, den du im Chat schickst: 24 Stunden, danach löschen wir die Koordinaten.</li>
