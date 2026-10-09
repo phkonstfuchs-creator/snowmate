@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { consumeMapAction } from "./map-entry";
 import clsx from "clsx";
 import { City, ResortStatus } from "@/lib/types";
 import { RESORT_STATUS, RIDE_POSTS } from "@/lib/data";
@@ -239,6 +241,7 @@ function ResortDetailSheet({
 }
 
 export interface LiveMap {
+  initialAction?: "lift" | null;
   /* null when the backend could not be reached */
   rides: LiveRide[] | null;
   defaultCity: City;
@@ -285,6 +288,15 @@ const noPosition = async () => null;
 function MapBody({ live, location, meetups }: { live?: LiveMap; location?: LocationState; meetups?: ReturnType<typeof useLiftMeetups> }) {
   const t = useT();
   const tracking = useTracking();
+  const router = useRouter();
+  const [requestedLiftEntry] = useState(() => live?.initialAction === "lift");
+  const entryConsumed = useRef(false);
+  useEffect(() => {
+    if (live?.initialAction !== "lift" || entryConsumed.current) return;
+    entryConsumed.current = true;
+    const nextUrl = consumeMapAction(window.location.href);
+    if (nextUrl) router.replace(nextUrl, { scroll: false });
+  }, [live?.initialAction, router]);
   /* The store apps have no demo (ADR 0031); false during server render. */
   const inNativeApp = useSyncExternalStore(noSubscription, () => isNativeApp(navigator.userAgent), () => false);
   const pin = live?.pin ?? null;
@@ -328,7 +340,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   /* Set on "show my location"; the map flies to the first fix after it. */
   const [locateRequest, setLocateRequest] = useState(0);
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
-  const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(null);
+  const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(() => live?.initialAction === "lift" && live.canShareLift === true ? { type: "lift" } : null);
   /* Keep both controls visible; active sharing also has a direct Stop. */
   const [panel, setPanel] = useState<"day" | "share" | null>(null);
   const mapStage = useRef<HTMLDivElement>(null);
@@ -375,7 +387,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}><Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} /></button>}
         {location?.locating && <p role="status" className="absolute left-3 top-[72px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
         {location && live?.canShareLift === true && <div className="absolute bottom-10 left-3 right-3">
-          <p className="mb-2 inline-block rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--paper-0)", color: INK }}>{t("meetup.title")}</p>
+          <p className="mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold" style={{ background: "var(--paper-0)", color: INK }}>{t("coord.liftTitle")}</p>
           <div className="flex gap-2">
             <button type="button" disabled={meetups?.busy} onClick={() => setActiveSheet({ type: "lift" })}
               className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
@@ -386,6 +398,8 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           </div>
         </div>}
       </div>
+
+      {requestedLiftEntry && live?.canShareLift !== true && <p role="status" className="mx-4 mt-3 rounded-2xl p-4 text-sm" style={{ background: "var(--paper-1)", color: INK }}>{t("meetup.from16")}</p>}
 
       {live && location && <div className="mx-3 mt-3 grid grid-cols-2 gap-2">
         <button type="button" onClick={() => setPanel(panel === "day" ? null : "day")} aria-expanded={panel === "day"} aria-controls={panel === "day" ? "map-day-panel" : undefined}
@@ -426,7 +440,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onClose={() => setActiveSheet(null)}
         />
       )}
-      {activeSheet?.type === "lift" && meetups && (
+      {activeSheet?.type === "lift" && live?.canShareLift === true && meetups && (
         <LiftStartSheet
           resortNames={resorts.map((resort) => resort.name)}
           requestPosition={location?.locateOnce ?? noPosition}

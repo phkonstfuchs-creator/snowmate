@@ -12,6 +12,8 @@ A person wants to join an existing visible ride only when enough people are conf
 
 The person saves a private wish on an existing ride, specifying a minimum group of 2–12 including themselves and an optional confirmed carpool requirement. Only the owner reads the wish. The existing ride, friendship, minor, block, session and capacity rules still apply. The group predicate includes the prospective participant; displayed counts list the host and actually accepted participants. A driver-authored offer only counts for its driver, and a rider's seat only counts once accepted on an uncancelled same-resort, same-Vienna-day carpool departing no later than the ride.
 
+The Today feed always shows a prominent Pistl Go entry below its header, including when no wish exists. It opens a chooser of visible future rides with room; selecting one opens the existing detail with the wish form before the hero. An empty chooser offers posting a ride, finding a crew and browsing events. Unavailable data offers retry and does not present candidates. Demo mode explains the feature without saving a wish.
+
 The feed shows the owner's upcoming plans, prioritizing confirmed participation with changed conditions, ready wishes, waiting wishes, requests and other confirmed participation. Opening a plan opens the existing ride detail sheet. Read errors visibly block new joining until retried; leaving and withdrawing existing participation remains available. The standard join action is always manual and the database checks conditions again on the new pending/accepted participation. It also checks again when the host accepts a request. A later condition loss warns the confirmed participant without automatically removing them.
 
 ## Not included
@@ -32,3 +34,5 @@ Inactive, cancelled or past rides have no actionable plan. Inactive wishes are r
 4. The own overview preserves real status and privacy without fixtures: `features/go/go-status.test.ts`, `queries.test.ts`, `GoOverview.test.tsx`.
 5. Later condition loss warns while preserving membership: component/database/browser tests.
 6. Existing demo, posts, chats, native tracking and translations retain their checks. Required lint, typecheck, coverage, build, database and browser checks are run before release; results recorded in the release handoff.
+
+7. Go and lift entries remain visible at 320 and 390 px without scrolling; selecting a future ride exposes its wish form immediately: `tests/e2e/coordination-entry.spec.ts`, `features/go/GoStartSheet.test.tsx`, `features/go/go-candidates.test.ts`, `features/rides/FeedScreen.test.tsx`.

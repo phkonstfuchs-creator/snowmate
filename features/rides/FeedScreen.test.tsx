@@ -69,6 +69,41 @@ function live(rows: RideRow[] | null, viewerIsMinor = false) {
 describe("FeedScreen with real data", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it("keeps Go and lift meetup above feed content, even without rides", () => {
+    render(<FeedScreen live={live([])} />);
+    const go = screen.getByRole("button", { name: /Pistl Go/ });
+    const lift = screen.getByRole("link", { name: /Lift meetup/ });
+    expect(lift).toHaveAttribute("href", "/map?action=lift");
+    expect(go.compareDocumentPosition(screen.getByRole("note")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(go);
+    const sheet = screen.getByRole("dialog", { name: "Pistl Go" });
+    expect(within(sheet).getByText(/Choose a ride and set/)).toBeInTheDocument();
+    expect(within(sheet).getByRole("link", { name: "Find your crew" })).toHaveAttribute("href", "/people");
+    expect(within(sheet).getByRole("link", { name: "Browse open events" })).toHaveAttribute("href", "/events");
+    expect(mocks.join).not.toHaveBeenCalled();
+  });
+
+  it("opens an eligible Go ride only after the chooser closes, without joining", async () => {
+    const tomorrow = toIsoDay(new Date(NOW.getTime() + 86400000));
+    render(<FeedScreen live={{ ...live([row({ ride_date: tomorrow }), row({ id: "own", is_host: true, ride_date: tomorrow, resort: "Stubai Glacier" })]), goInterests: { status: "ok", interests: [] } }} />);
+    fireEvent.click(screen.getByRole("button", { name: /Pistl Go/ }));
+    const chooser = screen.getByRole("dialog", { name: "Pistl Go" });
+    expect(within(chooser).queryByText("Stubai Glacier")).not.toBeInTheDocument();
+    fireEvent.click(within(chooser).getByRole("button", { name: /Nordkette/ }));
+    expect(screen.queryByRole("dialog", { name: "Ride details" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "Ride details" })).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Pistl Go" })).not.toBeInTheDocument();
+    expect(mocks.join).not.toHaveBeenCalled();
+  });
+
+  it("keeps the Go entry honest when live data is unavailable", () => {
+    render(<FeedScreen live={{ ...live(null), goInterests: { status: "unavailable" } }} />);
+    fireEvent.click(screen.getByRole("button", { name: /Pistl Go/ }));
+    const chooser = screen.getByRole("dialog", { name: "Pistl Go" });
+    expect(within(chooser).getByRole("alert")).toHaveTextContent("Pistl Go is unavailable");
+    expect(within(chooser).queryByRole("button", { name: /Nordkette/ })).not.toBeInTheDocument();
+  });
+
   it("shows friends rides of the region and leaves public events to their screen", () => {
     render(
       <FeedScreen
