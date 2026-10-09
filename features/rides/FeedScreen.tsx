@@ -298,7 +298,6 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         onDeleted={(id) => { if (!live) setDemoPlans((plans) => plans.filter((plan) => plan.id !== id)); }}
         onSaved={(plan) => {
           if (!live) setDemoPlans((plans) => [...plans.filter((old) => old.id !== plan.id), plan]);
-          setShowDayPlan(false);
           if (live) router.refresh();
         }}
       />}

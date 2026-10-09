@@ -1,6 +1,6 @@
 # Pistl Go: eigener privater Skitag
 
-- **Status:** Agreed for the next implementation stage by the owner’s “Mach weiter”, 2026-10-09, following the mountain rebuild plan.
+- **Status:** Implemented, 2026-10-09; authorized by the owner’s “Mach weiter” following the mountain rebuild plan.
 - **Related:** [Mountain rebuild plan](mountain-rebuild-plan.md), [existing Go wishes](pistl-go.md), ADR 0040/0041.
 
 ## Problem
@@ -36,4 +36,4 @@ sequence ids. All export data requires an active session and sufficient MFA.
 6. Export, deletion cascade, expiration and cleanup cover the new data. English/German copy stays in the dictionaries.
 7. Unit/component, pgTAP and real-stack browser tests; lint, typecheck, >=80% coverage, build and security review before release.
 
-Evidence links will be added with implementation.
+Evidence: pure/action/query/component tests in `features/day-plans`, integration in `features/rides/FeedScreen.test.tsx`, database checks in `supabase/tests/database/day_plans.test.sql`, persistent real-account journey in `tests/e2e/private-day-plans.spec.ts`, and temporary/demo/320px/Axe journey in `tests/e2e/demo-day-plans.spec.ts`. Independent security and automatic review findings on deletion retries, Vienna day boundaries, retained-plan navigation and live expiry were covered by regression tests before fixes. Release review is [PR 86](https://github.com/phkonstfuchs-creator/snowmate/pull/86).

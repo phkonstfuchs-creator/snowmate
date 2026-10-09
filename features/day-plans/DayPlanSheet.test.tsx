@@ -97,6 +97,7 @@ describe("DayPlanSheet", () => {
 
   it("lets a retained yesterday plan be viewed in all steps without editing or saving it", async () => {
     const yesterday = { ...plan, planDate: "2026-10-08", expiresAt: "2026-10-11T22:00:00.000Z" };
+    actions.remove.mockResolvedValue({ ok: true, message: "dayPlan.deleted" });
     render(<DayPlanSheet city="innsbruck" initial={yesterday} onClose={vi.fn()} onSaved={vi.fn()} />);
 
     expect(screen.getByLabelText(/date/i)).toHaveValue("2026-10-08");
@@ -108,7 +109,33 @@ describe("DayPlanSheet", () => {
     expect(screen.getByLabelText(/meeting point/i)).toHaveValue("At the main entrance");
     expect(screen.getByLabelText(/meeting point/i)).toBeDisabled();
     expect(screen.getByRole("button", { name: /save.*plan/i })).toBeDisabled();
-    expect(screen.getByRole("note")).toHaveTextContent(/past day is read-only/i);
+    expect(screen.getByRole("note")).toHaveTextContent(/this day has passed and is read-only/i);
+    expect(screen.getByRole("button", { name: /delete plan/i })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: /delete plan/i }));
+    fireEvent.click(screen.getByRole("button", { name: /confirm delete/i }));
+    await act(async () => Promise.resolve());
+    expect(actions.remove).toHaveBeenCalledWith(yesterday.id, yesterday.version);
+  });
+
+  it("switches an open plan to read-only at Vienna midnight and still allows deletion", async () => {
+    vi.setSystemTime(new Date("2026-10-09T21:59:59.000Z"));
+    actions.remove.mockResolvedValue({ ok: true, message: "dayPlan.deleted" });
+    const todayPlan = { ...plan, planDate: "2026-10-09", expiresAt: "2026-10-13T22:00:00.000Z" };
+    render(<DayPlanSheet city="innsbruck" initial={todayPlan} onClose={vi.fn()} onSaved={vi.fn()} />);
+
+    expect(screen.getByLabelText(/date/i)).toBeEnabled();
+    await act(async () => vi.advanceTimersByTimeAsync(2_000));
+
+    expect(screen.getByLabelText(/date/i)).toBeDisabled();
+    expect(screen.getByRole("note")).toHaveTextContent(/this day has passed and is read-only/i);
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    expect(screen.getByLabelText(/meeting point/i)).toBeDisabled();
+    expect(screen.getByRole("button", { name: /delete plan/i })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: /delete plan/i }));
+    fireEvent.click(screen.getByRole("button", { name: /confirm delete/i }));
+    await act(async () => Promise.resolve());
+    expect(actions.remove).toHaveBeenCalledWith(todayPlan.id, todayPlan.version);
   });
 
   it("closes an expired plan on focus and never offers deletion for it", async () => {
@@ -134,7 +161,7 @@ describe("DayPlanSheet", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
     expect(actions.save).toHaveBeenCalledOnce();
 
-    await act(async () => vi.advanceTimersByTimeAsync(5_000));
+    vi.setSystemTime(new Date("2026-10-09T10:00:05.000Z"));
     resolveSave({ ok: true, message: "dayPlan.saved", plan });
     await act(async () => Promise.resolve());
 

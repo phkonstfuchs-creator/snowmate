@@ -998,6 +998,7 @@ export const en = {
   "dayPlan.morePlans": "More planned days",
   "dayPlan.previousPlans": "Past planned days",
   "dayPlan.shareAsRide": "Prepare a ride",
+  "dayPlan.pastReadOnly": "This day has passed and is read-only. You can review the details here, but you can no longer edit or share it.",
 } as const;
 
 export type MessageKey = keyof typeof en;

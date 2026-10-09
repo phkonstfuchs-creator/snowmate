@@ -54,7 +54,7 @@ test.describe("private Pistl Go day planning", () => {
     await ride.getByRole("button", { name: /Park/ }).click();
     await ride.getByRole("button", { name: "Weiter", exact: true }).click();
     await expect(ride.getByLabel("Treffpunkt", { exact: true })).toHaveValue(`${meeting} Eingang`);
-    await expect(ride.getByLabel("Zeit", { exact: true })).toHaveValue("12:30");
+    await expect(ride.getByLabel("Uhrzeit", { exact: true })).toHaveValue("12:30");
     await expect(ride.locator("#post-ride-date")).toHaveValue(planDate);
     const after = await a.account.client.rpc("list_rides");
     expect(after.error).toBeNull();

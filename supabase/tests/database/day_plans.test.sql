@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(74);
+select plan(75);
 
 select has_table('private','day_plans','private day plans are stored outside public tables');
 select has_table('private','day_plan_tombstones','minimal deletion retry tombstones exist');
@@ -14,6 +14,7 @@ select ok(not has_table_privilege('authenticated','private.day_plans','INSERT'),
 select ok(not has_table_privilege('authenticated','private.day_plan_tombstones','SELECT'),'clients cannot inspect deletion tombstones');
 select ok(not has_table_privilege('authenticated','private.day_plan_tombstones','INSERT'),'clients cannot create deletion tombstones');
 select ok(not has_function_privilege('authenticated','private.cleanup_day_plans(timestamptz)','EXECUTE'),'clients cannot run cleanup');
+select ok(not has_function_privilege('authenticated','private.day_plan_expiry(date)','EXECUTE'),'clients cannot call the private expiry helper');
 select ok(exists(select 1 from cron.job where jobname='pistl-day-plan-retention' and schedule='27 3 * * *' and active),'daily cleanup is scheduled');
 
 insert into auth.users(id,email) values
@@ -181,7 +182,8 @@ select is(public.save_day_plan('d1d1d1d1-0000-4000-8000-000000000081',0,jsonb_bu
   'planDate',to_char((now() at time zone 'Europe/Vienna')::date+1,'YYYY-MM-DD'),'meetTime','09:15',
   'transport','own','meetingText','DST plan'))->>'status','saved','a dynamic upcoming plan saves');
 select is(((public.list_my_day_plans()->'plans'->0)->>'expiresAt')::timestamptz,
-  private.day_plan_expiry((now() at time zone 'Europe/Vienna')::date+1),'save RPC uses the same expiry helper');
+  (((now() at time zone 'Europe/Vienna')::date+3)::timestamp at time zone 'Europe/Vienna'),
+  'save RPC uses the Vienna calendar expiry rule');
 reset role;
 update private.day_plans set expires_at=now()-interval '1 second' where id='d1d1d1d1-0000-4000-8000-000000000081';
 set local role authenticated;

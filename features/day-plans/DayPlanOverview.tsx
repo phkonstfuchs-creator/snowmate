@@ -1,10 +1,29 @@
 "use client";
 
 import { CalendarDays, CarFront, ChevronRight, LockKeyhole, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { toIsoDay } from "@/features/rides/live-ride";
 import type { DayPlan, DayPlanResult } from "./day-plan";
 import styles from "./day-plans.module.css";
+
+function viennaDateTime(now: Date): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Vienna",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}.${String(now.getMilliseconds()).padStart(3, "0")}`;
+}
+
+function meetingDateTime(plan: DayPlan): string {
+  return `${plan.planDate}T${plan.meetTime}:00.000`;
+}
 
 export default function DayPlanOverview({ result, onOpen, onRetry, onShare, demo = false }: {
   result: DayPlanResult;
@@ -15,6 +34,33 @@ export default function DayPlanOverview({ result, onOpen, onRetry, onShare, demo
 }) {
   const t = useT();
   const locale = useLocale();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const refreshNow = () => setNow(Date.now());
+    window.addEventListener("focus", refreshNow);
+    document.addEventListener("visibilitychange", refreshNow);
+    return () => {
+      window.removeEventListener("focus", refreshNow);
+      document.removeEventListener("visibilitychange", refreshNow);
+    };
+  }, []);
+
+  const plansFromResult = result.status === "ok" ? result.plans : [];
+  const nearestExpiry = plansFromResult.reduce((nearest, plan) => {
+    const expiry = Date.parse(plan.expiresAt);
+    return Number.isFinite(expiry) && expiry > now ? Math.min(nearest, expiry) : nearest;
+  }, Number.POSITIVE_INFINITY);
+
+  useEffect(() => {
+    if (!Number.isFinite(nearestExpiry)) return;
+    // Browsers clamp delays above 2^31-1. Refresh periodically as well so
+    // plans still disappear promptly after a backgrounded tab is restored.
+    const untilExpiry = Math.max(0, nearestExpiry - Date.now());
+    const delay = Math.min(untilExpiry, 60_000, 2_147_483_647);
+    const timer = window.setTimeout(() => setNow(Date.now()), delay);
+    return () => window.clearTimeout(timer);
+  }, [nearestExpiry, now]);
 
   if (result.status === "unavailable") {
     return <div className={styles.overviewState}>
@@ -23,14 +69,16 @@ export default function DayPlanOverview({ result, onOpen, onRetry, onShare, demo
     </div>;
   }
 
-  const plans = [...result.plans].sort((left, right) =>
+  const plans = [...plansFromResult]
+    .filter((plan) => Date.parse(plan.expiresAt) > now)
+    .sort((left, right) =>
     `${left.planDate}T${left.meetTime}`.localeCompare(`${right.planDate}T${right.meetTime}`),
   );
   if (!plans.length) return <p className={styles.empty}>{t("dayPlan.empty")}</p>;
 
-  const today = toIsoDay(new Date());
-  const upcoming = plans.filter((plan) => plan.planDate >= today);
-  const previous = plans.filter((plan) => plan.planDate < today);
+  const currentViennaTime = viennaDateTime(new Date(now));
+  const upcoming = plans.filter((plan) => meetingDateTime(plan) >= currentViennaTime);
+  const previous = plans.filter((plan) => meetingDateTime(plan) < currentViennaTime);
   const [next, ...later] = upcoming;
   const formattedDate = (plan: DayPlan) => new Intl.DateTimeFormat(locale === "de" ? "de-AT" : "en-GB", {
     weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Vienna",

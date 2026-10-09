@@ -997,4 +997,5 @@ export const de: Record<MessageKey, string> = {
   "dayPlan.morePlans": "Weitere geplante Tage",
   "dayPlan.previousPlans": "Vergangene geplante Tage",
   "dayPlan.shareAsRide": "Ausfahrt vorbereiten",
+  "dayPlan.pastReadOnly": "Dieser Tag liegt zurück und ist schreibgeschützt. Du kannst die Angaben ansehen, aber nicht mehr bearbeiten oder teilen.",
 };

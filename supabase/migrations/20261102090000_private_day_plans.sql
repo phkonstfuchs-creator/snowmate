@@ -112,6 +112,15 @@ end;
 $$;
 revoke all on function private.valid_day_plan_input(jsonb,timestamptz) from public, anon, authenticated;
 
+-- Treat the plan date as a Vienna calendar day. Adding two local dates before
+-- converting midnight to timestamptz preserves the end-of-day-plus-24h rule
+-- across both daylight-saving transitions.
+create function private.day_plan_expiry(p_plan_date date)
+returns timestamptz language sql immutable set search_path='' as $$
+  select (p_plan_date+2)::timestamp at time zone 'Europe/Vienna';
+$$;
+revoke all on function private.day_plan_expiry(date) from public, anon, authenticated, service_role;
+
 create function public.save_day_plan(target_id uuid, expected_version integer, plan jsonb)
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare me uuid:=private.require_go_session(); existing private.day_plans; saved private.day_plans;
@@ -154,7 +163,7 @@ begin
     where l.user_id=me and l.saved_at>now()-interval '24 hours';
   if recent_count>=30 then return jsonb_build_object('status','rate_limited'); end if;
 
-  expires:=((plan->>'planDate')::date+2)::timestamp at time zone 'Europe/Vienna';
+  expires:=private.day_plan_expiry((plan->>'planDate')::date);
   if is_existing then
     update private.day_plans d set city=plan->>'city',resort=plan->>'resort',
       plan_date=(plan->>'planDate')::date,meet_time=(plan->>'meetTime')::time,

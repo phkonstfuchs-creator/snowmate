@@ -89,8 +89,8 @@ describe("DayPlanOverview", () => {
     expect(screen.getByRole("button", { name: /Kühtai/ }).firstChild).toHaveTextContent(/Private plan/);
     expect(screen.getByText("More planned days")).toBeInTheDocument();
     expect(screen.getByText("Past planned days")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Prepare a ride", exact: true })).toHaveLength(2);
-    fireEvent.click(screen.getAllByRole("button", { name: "Prepare a ride", exact: true })[0]!);
+    expect(screen.getAllByRole("button", { name: "Prepare a ride" })).toHaveLength(2);
+    fireEvent.click(screen.getAllByRole("button", { name: "Prepare a ride" })[0]!);
     expect(onShare).toHaveBeenCalledWith(futureToday);
   });
 

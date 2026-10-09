@@ -25,6 +25,10 @@ test("the English demo plans locally, edits and deletes the plan, and only prepa
 
   const planner = page.getByRole("dialog", { name: "Pistl Go", exact: true });
   await planner.locator("#day-plan-resort").selectOption("Nordkette");
+  const planDate = planner.locator("#day-plan-date");
+  const tomorrow = new Date(`${await planDate.inputValue()}T00:00:00.000Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  await planDate.fill(tomorrow.toISOString().slice(0, 10));
   await planner.locator("#day-plan-time").fill("10:45");
   await planner.getByRole("button", { name: "Next", exact: true }).click();
   await planner.getByRole("radio", { name: /I need a lift/ }).check();
