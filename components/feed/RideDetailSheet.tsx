@@ -71,6 +71,8 @@ export default function RideDetailSheet({ goContent, joinBlocked = false, post, 
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
 
+        {goContent}
+
         {/* Resort scene hero */}
         <div className="mx-5 mt-4" style={{ border: "var(--rule-thin)" }}>
           <div className="relative overflow-hidden" style={{ height: 108 }}>
@@ -235,7 +237,6 @@ export default function RideDetailSheet({ goContent, joinBlocked = false, post, 
           </div>
         )}
 
-        {goContent}
 
         {/* Join CTA */}
         <div className="px-5 pt-4">

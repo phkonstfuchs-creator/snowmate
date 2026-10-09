@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import GoStartSheet from "@/features/go/GoStartSheet";
+import { goCandidates } from "@/features/go/go-candidates";
 import GoInterest from "@/features/go/GoInterest";
 import GoOverview from "@/features/go/GoOverview";
 import type { GoOverviewResult } from "@/features/go/go-status";
@@ -60,6 +62,7 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
   const goResult = live?.goInterests;
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
+  const [showGoStart, setShowGoStart] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
@@ -153,6 +156,19 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         </div>
       </header>
 
+      <section aria-label={t("coord.quick")} className="grid grid-cols-2 gap-3 px-4 pt-4 pb-3">
+        <button type="button" onClick={() => setShowGoStart(true)} className="card-tap min-w-0 rounded-2xl border p-3 text-left" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
+          <Icon name="users" size={22} color="var(--rust)" />
+          <span className="mt-2 block font-bold">{t("go.title")}</span>
+          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.goHint")}</span>
+        </button>
+        <Link href={live ? `${basePath}/map?action=lift` : `${basePath}/map`} className="card-tap min-w-0 rounded-2xl border p-3" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
+          <Icon name="mountain" size={22} color="var(--rust)" />
+          <span className="mt-2 block font-bold">{t("coord.liftTitle")}</span>
+          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.liftHint")}</span>
+        </Link>
+      </section>
+
       {/* "Who's out today?" first: faces, not just a number. */}
       {outLine && (
         <section aria-label={t(outLine.key, outLine.values)} className="flex items-center gap-3 px-4 pt-4 pb-1">
@@ -234,6 +250,19 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
       {live && <PostList posts={live.posts ?? []} title={t("posts.fromCrew")} />}
       {live && <div className="pb-4" />}
 
+
+      {showGoStart && (
+        <GoStartSheet
+          rides={live && goResult?.status === "ok" && !unavailable ? goCandidates(board.rides, new Date()) : []}
+          unavailable={unavailable || (!!live && goResult?.status !== "ok")}
+          demo={!live}
+          basePath={basePath}
+          onSelect={openGoPlan}
+          onCreate={() => setShowPostModal(true)}
+          onRetry={() => router.refresh()}
+          onClose={() => setShowGoStart(false)}
+        />
+      )}
 
       {showComposer && <PostComposer city={city} onClose={() => setShowComposer(false)} />}
 
@@ -320,7 +349,7 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         <UserProfileSheet user={storyUser} onClose={() => setStoryUser(null)} />
       )}
 
-      {pushAsk.pending && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
+      {pushAsk.pending && !showGoStart && !selectedRide && !safetyTarget && !editingRide && !storyUser && (
         <PushAsk onClose={pushAsk.dismiss} />
       )}
 

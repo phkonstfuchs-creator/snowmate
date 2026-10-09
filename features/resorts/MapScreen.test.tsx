@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
 
-const mapMock = vi.hoisted(() => ({ props: vi.fn() }));
+const mapMock = vi.hoisted(() => ({ props: vi.fn(), replace: vi.fn() }));
 vi.mock("next/dynamic", () => ({ default: () => (props: object) => { mapMock.props(props); return <div data-testid="map" />; } }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), replace: mapMock.replace }) }));
 
 const now = new Date();
 const today = toIsoDay(now);
@@ -39,6 +39,28 @@ const liveRide = toLiveRide(
 
 describe("MapScreen", () => {
   Element.prototype.scrollIntoView = vi.fn();
+  it("opens the requested lift picker directly for eligible riders", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true, initialAction: "lift" }} />);
+    expect(screen.getByRole("dialog", { name: "Choose your lift" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop sharing" })).not.toBeInTheDocument();
+  });
+
+  it("explains an ineligible direct lift entry without mounting the picker", () => {
+    const view = render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false, initialAction: "lift" }} />);
+    view.rerender(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false, initialAction: null }} />);
+    expect(screen.queryByRole("dialog", { name: "Choose your lift" })).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("16");
+  });
+
+  it("consumes a direct entry without losing the pin or reopening on refresh", () => {
+    window.history.replaceState(null, "", "/map?action=lift&lat=47&lng=11&label=Top");
+    mapMock.replace.mockClear();
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true, initialAction: "lift" }} />);
+    expect(mapMock.replace).toHaveBeenCalledOnce();
+    expect(mapMock.replace).toHaveBeenCalledWith("/map?lat=47&lng=11&label=Top", { scroll: false });
+    window.history.replaceState(null, "", "/");
+  });
+
   it("keeps the lift action in the map surface and opens a direct lift picker", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true }} />);
     const cta = screen.getByRole("button", { name: "I'm taking a lift now" });

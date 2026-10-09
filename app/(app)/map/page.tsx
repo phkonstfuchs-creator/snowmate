@@ -1,3 +1,4 @@
+import { readMapAction } from "@/features/resorts/map-entry";
 import MapScreen from "@/features/resorts/MapScreen";
 import { getOwnProfile } from "@/features/profile/queries";
 import { listRides } from "@/features/rides/queries";
@@ -16,7 +17,8 @@ function readPin(params: Record<string, string | string[] | undefined>) {
 }
 
 export default async function MapPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pin = readPin(await searchParams);
+  const params = await searchParams;
+  const pin = readPin(params);
   const [result, profile, sharingEnd, friends, canShare, conditions, photos, myLiftMeetup, friendLiftMeetups, canShareLift] = await Promise.all([
     listRides(),
     getOwnProfile(),
@@ -44,6 +46,7 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
         friendLiftMeetups,
         canShareLift,
         pin,
+        initialAction: readMapAction(params.action),
       }}
     />
   );
