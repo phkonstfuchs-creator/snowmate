@@ -1,5 +1,7 @@
--- Apply manually in the EXISTING Supabase project's SQL editor after review.
--- This isolated migration does not alter any existing application tables.
+-- ARCHIVED PROTOTYPE: DO NOT APPLY.
+-- Superseded by the repository-root migration
+-- supabase/migrations/20261009090700_website_waitlist_double_opt_in.sql.
+-- This older direct-join contract does not implement email confirmation.
 begin;
 
 create table public.pistl_website_waitlist (

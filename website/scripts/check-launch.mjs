@@ -2,7 +2,10 @@ import nextEnv from '@next/env';
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
-const required = ['NEXT_PUBLIC_SITE_URL', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'];
+/* Operator details have real defaults in lib/site.js; only deployment
+   settings and the server-side Supabase and Resend credentials must be
+   provided. */
+const required = ['NEXT_PUBLIC_SITE_URL', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'WAITLIST_RATE_LIMIT_SECRET', 'RESEND_API_KEY', 'WAITLIST_FROM_EMAIL'];
 const missing = required.filter(key => !process.env[key]?.trim());
 if (missing.length) {
   console.error(`Noch einzurichten: ${missing.join(', ')}. Werte werden nicht ausgegeben.`);
@@ -17,4 +20,4 @@ if (process.env.PISTL_LAUNCH_READY !== 'true') {
   console.error('Die Website ist als Entwurf markiert und für Suchmaschinen gesperrt.');
   process.exitCode = 1;
 }
-if (!process.exitCode) console.log('Konfiguration vollständig. Supabase-Migration, tatsächliche Hosting-Regionen, Vertragsunterlagen und Löschablauf vor Veröffentlichung prüfen. Vor dem ersten E-Mail-Versand Adressbestätigung (Double-Opt-in) einrichten.');
+if (!process.exitCode) console.log('Konfiguration vollständig. SQL-Migration, Einwilligung, Löschablauf und rechtliche Texte müssen vor Veröffentlichung geprüft sein.');
