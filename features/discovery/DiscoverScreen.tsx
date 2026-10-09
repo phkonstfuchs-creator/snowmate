@@ -20,7 +20,7 @@ const OUTCOME_ERROR: Partial<Record<SwipeOutcome, MessageKey>> = {
   rate_limited: "discover.rateLimited",
   unauthenticated: "profile.sessionEnded",
   unavailable: "discover.failed",
-  invalid: "discover.failed",
+  invalid: "discover.riderUnavailable",
 };
 
 /* Meet riders by swiping (ADR 0028). Opt-in; separated by age; under 18
@@ -80,7 +80,7 @@ export default function DiscoverScreen({
       const message = OUTCOME_ERROR[outcome];
       if (message) {
         setError(t(message));
-        setDeck((current) => current && !current.some((item) => item.userId === card.userId) ? [card, ...current] : current);
+        if (outcome !== "invalid") setDeck((current) => current && !current.some((item) => item.userId === card.userId) ? [card, ...current] : current);
       }
     });
   };

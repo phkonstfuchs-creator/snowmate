@@ -21,7 +21,7 @@ Desired first glance: **who, where, when, next action**. A profile should make r
 | “Pistl Go” needs an explanation | Owner asked what it means; descriptive name absent | Visible title now “Mitfahren, wenn’s passt”; private conditional wish and explicit joining retained |
 | Crew faces appear below planning cards | FeedScreen order | Faces before cards whenever actual activity exists; Go/lift entries still near the top |
 | Discover feels button-first | Source has real swipes but dominant X/heart controls | Gesture hint, literal action buttons, existing accessible alternatives retained |
-| Failed swipe hides a rider | Failing component regression | Restore the same card on unavailable/rate-limited/invalid/session errors; block additional choices while saving |
+| Failed swipe hides a rider | Failing component regression | Restore the same card on temporary unavailable/rate-limited/session errors; move past ineligible riders with an explanation; block additional choices while saving |
 | Diagonal vertical scrolling can choose a rider | Failing pointer regression | Vertical intent cancels horizontal decision; cancel/short drags keep the card |
 | Initial map has an unexplained blank/shimmer phase | 320px baseline screenshot | Static status through dynamic import and base-source loading; slow-network message after 15s, no modal; optional piste/terrain tiles do not block base readiness |
 | Model time is not visible | ConditionsPanel + provider DTO | Display model timestamp above conditions; preserve Open-Meteo model attribution |

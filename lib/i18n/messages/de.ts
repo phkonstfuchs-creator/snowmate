@@ -612,6 +612,7 @@ export const de: Record<MessageKey, string> = {
   "discover.keepSwiping": "Weitere Rider ansehen",
   "discover.rateLimited": "Genug geswiped für heute.",
   "discover.failed": "Das hat nicht geklappt. Bitte versuch es nochmal.",
+  "discover.riderUnavailable": "Dieser Rider ist nicht mehr verfügbar. Du kannst weiterwischen.",
   "game.leaderboard": "Rangliste",
   "game.friends": "Freunde",
   "game.region": "Region",

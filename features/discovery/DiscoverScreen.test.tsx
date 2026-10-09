@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DiscoverScreen from "./DiscoverScreen";
 import { I18nProvider } from "@/lib/i18n/client";
@@ -66,6 +66,40 @@ describe("DiscoverScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("That did not work");
     expect(screen.getByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
+  });
+
+  it("moves past a rider who is no longer eligible", async () => {
+    mocks.swipe.mockResolvedValue("invalid");
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable hasBirthDate isMinor={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("That rider is no longer available");
+    expect(screen.queryByRole("heading", { name: "Rider 1" })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Ride with Rider 2" })).toBeEnabled());
+  });
+
+  it.each(["passed", "unavailable"] as const)("blocks buttons and gestures until a slow save returns %s", async (outcome) => {
+    let finish!: (value: string) => void;
+    const saving = new Promise<string>((resolve) => { finish = resolve; });
+    mocks.swipe.mockReturnValueOnce(saving);
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable hasBirthDate isMinor={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Skip Rider 1" }));
+    const next = screen.getByRole("button", { name: "Ride with Rider 2" });
+    expect(next).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Skip Rider 2" })).toBeDisabled();
+    fireEvent.click(next);
+    const surface = screen.getByText("Park laps all day").parentElement!;
+    surface.setPointerCapture = vi.fn();
+    fireEvent.pointerDown(surface, { clientX: 100, clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(surface, { clientX: 260, clientY: 100, pointerId: 1 });
+    fireEvent.pointerUp(surface, { clientX: 260, clientY: 100, pointerId: 1 });
+    expect(mocks.swipe).toHaveBeenCalledTimes(1);
+    await act(async () => { finish(outcome); await saving; });
+    const rider = outcome === "unavailable" ? "Rider 1" : "Rider 2";
+    const choice = screen.getByRole("button", { name: `Skip ${rider}` });
+    await waitFor(() => expect(choice).toBeEnabled());
+    mocks.swipe.mockResolvedValueOnce("passed");
+    fireEvent.click(choice);
+    await waitFor(() => expect(mocks.swipe).toHaveBeenCalledTimes(2));
   });
 
   it("does not choose a rider on a mostly vertical drag", () => {

@@ -613,6 +613,7 @@ export const en = {
   "discover.keepSwiping": "See more riders",
   "discover.rateLimited": "That's enough swiping for today.",
   "discover.failed": "That did not work. Please try again.",
+  "discover.riderUnavailable": "That rider is no longer available. Keep exploring.",
   "game.leaderboard": "Leaderboard",
   "game.friends": "Friends",
   "game.region": "Region",
