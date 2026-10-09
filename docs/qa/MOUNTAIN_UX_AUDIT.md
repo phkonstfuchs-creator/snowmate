@@ -2,6 +2,8 @@
 
 ## Decision and scope
 
+Follow-up owner direction, 2026-10-09: keep the name **Pistl Go**, make it useful without an existing ride, substantially rebuild the map and add persistent voluntary friend sharing. The [mountain rebuild plan](../specs/mountain-rebuild-plan.md) is the forward plan; observations and shipped fixes below remain the dated audit history.
+
 Pistl's main job is to get a young skier together with their crew: decide, travel, find each other, ride together. Recording and social posts support that job. The owner wants all publicly documented Slopes/Shredder capabilities considered, with a measurable advantage rather than untested claims of superiority.
 
 Three GPT-6-Luna agents audited youth usability, maps/swipes, and native location/widgets. The parent checked current primary competitor sources, inspected the supplied Slopes screenshots, and ran mobile browser checks. This is a code and automated walkthrough audit, **not interviews with real adolescents or a mountain GPS benchmark**. The screenshots are visual references, not specifications or proof of competitor accuracy. No other users were contacted.

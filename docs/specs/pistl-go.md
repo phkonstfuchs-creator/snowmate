@@ -4,6 +4,8 @@
 - **Owner:** Product owner
 - **Related:** [ADR 0040](../adr/0040-private-go-wishes-on-existing-rides.md), superseding the scope proposed in ADR 0038.
 
+- **Follow-up direction, 2026-10-09:** Keep the visible name Pistl Go and add useful day planning without an existing ride. The [mountain rebuild plan](mountain-rebuild-plan.md) proposes this extension; this document preserves the currently implemented private-wish contract.
+
 ## Problem
 
 A person wants to join an existing visible ride only when enough people are confirmed and, optionally, their own carpool seat is confirmed. A wish must never be represented as a booking or reserve capacity.
