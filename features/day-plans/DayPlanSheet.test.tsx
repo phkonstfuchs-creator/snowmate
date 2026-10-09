@@ -95,6 +95,54 @@ describe("DayPlanSheet", () => {
     expect(screen.getByLabelText(/meeting point/i)).toBeDisabled();
   });
 
+  it("lets a retained yesterday plan be viewed in all steps without editing or saving it", async () => {
+    const yesterday = { ...plan, planDate: "2026-10-08", expiresAt: "2026-10-11T22:00:00.000Z" };
+    render(<DayPlanSheet city="innsbruck" initial={yesterday} onClose={vi.fn()} onSaved={vi.fn()} />);
+
+    expect(screen.getByLabelText(/date/i)).toHaveValue("2026-10-08");
+    expect(screen.getByLabelText(/date/i)).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    expect(screen.getByRole("heading", { name: /how are you getting there/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/i need a lift|need transport|need a ride/i)).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    expect(screen.getByLabelText(/meeting point/i)).toHaveValue("At the main entrance");
+    expect(screen.getByLabelText(/meeting point/i)).toBeDisabled();
+    expect(screen.getByRole("button", { name: /save.*plan/i })).toBeDisabled();
+    expect(screen.getByRole("note")).toHaveTextContent(/past day is read-only/i);
+  });
+
+  it("closes an expired plan on focus and never offers deletion for it", async () => {
+    const onClose = vi.fn();
+    const expired = { ...plan, expiresAt: "2026-10-09T09:59:59.000Z" };
+    render(<DayPlanSheet city="innsbruck" initial={expired} onClose={onClose} onSaved={vi.fn()} />);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await act(async () => fireEvent.focus(window));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(actions.remove).not.toHaveBeenCalled();
+  });
+
+  it("does not report a save that finishes after the plan expiry", async () => {
+    let resolveSave!: (value: { ok: true; message: string; plan: typeof plan }) => void;
+    actions.save.mockReturnValue(new Promise((resolve) => { resolveSave = resolve; }));
+    const onClose = vi.fn();
+    const onSaved = vi.fn();
+    const shortLived = { ...plan, expiresAt: "2026-10-09T10:00:05.000Z" };
+    render(<DayPlanSheet city="innsbruck" initial={shortLived} onClose={onClose} onSaved={onSaved} />);
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
+    expect(actions.save).toHaveBeenCalledOnce();
+
+    await act(async () => vi.advanceTimersByTimeAsync(5_000));
+    resolveSave({ ok: true, message: "dayPlan.saved", plan });
+    await act(async () => Promise.resolve());
+
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("sends only one request when save is tapped repeatedly", async () => {
     actions.save.mockResolvedValue({ ok: true, message: "dayPlan.saved", plan });
     render(<DayPlanSheet city="innsbruck" onClose={vi.fn()} onSaved={vi.fn()} />);

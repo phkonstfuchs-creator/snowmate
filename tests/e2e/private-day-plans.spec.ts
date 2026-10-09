@@ -7,6 +7,7 @@ test.describe("private Pistl Go day planning", () => {
 
   test("saves, reloads and edits a private plan; sharing requires the existing publish form", async ({ riders: { a, b } }, testInfo) => {
     const meeting = `Seegrube ${randomUUID().slice(0, 8)}`;
+    const planDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Vienna", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(Date.now() + 36 * 60 * 60 * 1000));
     await a.page.goto("/feed");
     await a.page.getByRole("button", { name: /^Pistl Go/ }).click();
     const chooser = a.page.getByRole("dialog", { name: "Pistl Go", exact: true });
@@ -14,6 +15,7 @@ test.describe("private Pistl Go day planning", () => {
     const planner = a.page.getByRole("dialog", { name: "Pistl Go", exact: true });
     await expect(planner.locator("#day-plan-resort")).toBeVisible();
     await planner.locator("#day-plan-resort").selectOption("Nordkette");
+    await planner.locator("#day-plan-date").fill(planDate);
     await planner.locator("#day-plan-time").fill("12:30");
     await planner.getByRole("button", { name: "Weiter", exact: true }).click();
     await planner.getByRole("radio", { name: /^Ich brauche eine Mitfahrt/ }).check();
@@ -53,6 +55,7 @@ test.describe("private Pistl Go day planning", () => {
     await ride.getByRole("button", { name: "Weiter", exact: true }).click();
     await expect(ride.getByLabel("Treffpunkt", { exact: true })).toHaveValue(`${meeting} Eingang`);
     await expect(ride.getByLabel("Zeit", { exact: true })).toHaveValue("12:30");
+    await expect(ride.locator("#post-ride-date")).toHaveValue(planDate);
     const after = await a.account.client.rpc("list_rides");
     expect(after.error).toBeNull();
     expect(after.data).toEqual(before.data);

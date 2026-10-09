@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parseDayPlans, validateDayPlanInput } from "./day-plan";
 
 const NOW = new Date("2026-10-09T10:00:00.000Z");
@@ -10,6 +10,12 @@ const valid = {
   transport: "need",
   meetingText: "Innsbruck Hbf",
 };
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+});
+afterEach(() => vi.useRealTimers());
 
 describe("validateDayPlanInput", () => {
   it("accepts covered resort plans inside the Vienna 365-day window", () => {

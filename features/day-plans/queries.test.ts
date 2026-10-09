@@ -20,9 +20,14 @@ const plan = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-10-09T10:00:00.000Z"));
   mocks.createClient.mockResolvedValue({ rpc: mocks.rpc });
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+});
 
 describe("listMyDayPlans", () => {
   it("uses the owner-only RPC without accepting an owner id", async () => {

@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(71);
+select plan(74);
 
 select has_table('private','day_plans','private day plans are stored outside public tables');
 select has_table('private','day_plan_tombstones','minimal deletion retry tombstones exist');
@@ -8,6 +8,7 @@ select has_function('public','save_day_plan',array['uuid','integer','jsonb'],'ow
 select has_function('public','delete_day_plan',array['uuid','integer'],'owner-only delete RPC exists');
 select has_function('public','list_my_day_plans',array[]::text[],'owner-only list RPC exists');
 select has_function('private','cleanup_day_plans',array['timestamp with time zone'],'private expiration cleanup exists');
+select has_function('private','day_plan_expiry',array['date'],'Vienna plan expiry uses a shared private helper');
 select ok(not has_table_privilege('authenticated','private.day_plans','SELECT'),'clients cannot directly read plans');
 select ok(not has_table_privilege('authenticated','private.day_plans','INSERT'),'clients cannot directly create plans');
 select ok(not has_table_privilege('authenticated','private.day_plan_tombstones','SELECT'),'clients cannot inspect deletion tombstones');
@@ -168,14 +169,19 @@ select is(public.save_day_plan('d1d1d1d1-0000-4000-8000-000000000199',0,(select 
 select is(public.delete_day_plan('d1d1d1d1-0000-4000-8000-000000000101',1),'deleted','deleting a minor-owned plan records a tombstone');
 reset role;
 
+select is(private.day_plan_expiry(date '2026-10-24'),'2026-10-25 23:00:00+00'::timestamptz,
+  'autumn expiry is Vienna midnight after the DST transition');
+select is(private.day_plan_expiry(date '2027-03-27'),'2027-03-28 22:00:00+00'::timestamptz,
+  'spring expiry is Vienna midnight after the DST transition');
 set local role authenticated;
 set local request.jwt.claim.sub='d1d1d1d1-0000-4000-8000-000000000008';
 set local request.jwt.claims='{"role":"authenticated","sub":"d1d1d1d1-0000-4000-8000-000000000008","session_id":"d1d1d1d1-0000-4000-8000-000000000008"}';
 select is(public.save_day_plan('d1d1d1d1-0000-4000-8000-000000000081',0,jsonb_build_object(
-  'city','innsbruck','resort','Stubai Glacier','planDate','2026-10-24','meetTime','09:15',
-  'transport','own','meetingText','DST plan'))->>'status','saved','plan during DST transition saves');
+  'city','innsbruck','resort','Stubai Glacier',
+  'planDate',to_char((now() at time zone 'Europe/Vienna')::date+1,'YYYY-MM-DD'),'meetTime','09:15',
+  'transport','own','meetingText','DST plan'))->>'status','saved','a dynamic upcoming plan saves');
 select is(((public.list_my_day_plans()->'plans'->0)->>'expiresAt')::timestamptz,
-  '2026-10-25 23:00:00+00'::timestamptz,'expiry is Vienna midnight two calendar days later across DST');
+  private.day_plan_expiry((now() at time zone 'Europe/Vienna')::date+1),'save RPC uses the same expiry helper');
 reset role;
 update private.day_plans set expires_at=now()-interval '1 second' where id='d1d1d1d1-0000-4000-8000-000000000081';
 set local role authenticated;
