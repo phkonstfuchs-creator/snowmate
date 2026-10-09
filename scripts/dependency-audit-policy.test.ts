@@ -36,15 +36,31 @@ describe("bounded development dependency audit exception", () => {
     for (const item of [
       { ...high, severity: "critical" },
       { ...high, via: [{ ...advisory, severity: "critical" }] },
-      { ...high, via: [advisory, { ...advisory, url: "https://github.com/advisories/another" }] },
+      {
+        ...high,
+        via: [
+          advisory,
+          { ...advisory, url: "https://github.com/advisories/another" },
+        ],
+      },
       { ...high, nodes: [...high.nodes, "node_modules/runtime/braces"] },
     ]) {
-      const result = evaluateDependencyAudit({ auditReportVersion: 2, vulnerabilities: { braces: item } }, {
-        packages: { ...lock.packages, "node_modules/runtime/braces": { dev: false } },
-      }, now);
+      const result = evaluateDependencyAudit(
+        { auditReportVersion: 2, vulnerabilities: { braces: item } },
+        {
+          packages: {
+            ...lock.packages,
+            "node_modules/runtime/braces": { dev: false },
+          },
+        },
+        now,
+      );
       expect(result.failures.length).toBeGreaterThan(0);
     }
-    expect(evaluateDependencyAudit(report, lock, new Date("invalid")).failures.length).toBeGreaterThan(0);
+    expect(
+      evaluateDependencyAudit(report, lock, new Date("invalid")).failures
+        .length,
+    ).toBeGreaterThan(0);
   });
   it("accepts clean production and the one reviewed dev advisory before expiry", () => {
     expect(

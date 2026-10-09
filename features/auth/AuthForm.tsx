@@ -11,9 +11,13 @@ import { signInAction, signUpAction } from "./actions";
 
 interface AuthFormProps {
   mode: "login" | "signup";
+  initialInviteToken?: string;
 }
 
-export default function AuthForm({ mode }: AuthFormProps) {
+export default function AuthForm({
+  mode,
+  initialInviteToken = "",
+}: AuthFormProps) {
   const action = mode === "login" ? signInAction : signUpAction;
   const [state, formAction, isPending] = useActionState(
     action,
@@ -22,8 +26,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const isSignup = mode === "signup";
 
   const emailRef = useRef<HTMLInputElement>(null);
+  const inviteTokenRef = useRef<HTMLInputElement>(null);
+  const birthDateRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
+  const termsRef = useRef<HTMLInputElement>(null);
+  const privacyRef = useRef<HTMLInputElement>(null);
   const errorSummaryRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -36,12 +44,20 @@ export default function AuthForm({ mode }: AuthFormProps) {
   useEffect(() => {
     if (state.status !== "error" || isPending) return;
 
-    const firstInvalidField = state.fieldErrors?.email
-      ? emailRef.current
+    const firstInvalidField = state.fieldErrors?.inviteToken
+      ? inviteTokenRef.current
+      : state.fieldErrors?.email
+        ? emailRef.current
+        : state.fieldErrors?.birthDate
+          ? birthDateRef.current
       : state.fieldErrors?.password
         ? passwordRef.current
         : state.fieldErrors?.confirmPassword
           ? confirmPasswordRef.current
+          : state.fieldErrors?.termsAccepted
+            ? termsRef.current
+            : state.fieldErrors?.privacyAccepted
+              ? privacyRef.current
           : null;
 
     (firstInvalidField ?? errorSummaryRef.current)?.focus();
@@ -89,6 +105,18 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
+      {isSignup ? (
+        <Input
+          ref={inviteTokenRef}
+          label="Einladungscode"
+          name="inviteToken"
+          autoComplete="off"
+          defaultValue={initialInviteToken}
+          error={state.fieldErrors?.inviteToken?.[0]}
+          disabled={isPending}
+          required
+        />
+      ) : null}
       <Input
         ref={emailRef}
         label="E-Mail"
@@ -101,6 +129,18 @@ export default function AuthForm({ mode }: AuthFormProps) {
         disabled={isPending}
         required
       />
+      {isSignup ? (
+        <Input
+          ref={birthDateRef}
+          label="Geburtsdatum"
+          name="birthDate"
+          type="date"
+          autoComplete="bday"
+          error={state.fieldErrors?.birthDate?.[0]}
+          disabled={isPending}
+          required
+        />
+      ) : null}
       <Input
         ref={passwordRef}
         label="Passwort"
@@ -127,6 +167,80 @@ export default function AuthForm({ mode }: AuthFormProps) {
           disabled={isPending}
           required
         />
+      ) : null}
+
+      {isSignup ? (
+        <div className="space-y-3 pt-1">
+          <div>
+            <div className="flex items-start gap-3">
+              <input
+                ref={termsRef}
+                id="termsAccepted"
+                name="termsAccepted"
+                type="checkbox"
+                aria-label="Nutzungsbedingungen akzeptieren"
+                aria-invalid={state.fieldErrors?.termsAccepted ? true : undefined}
+                aria-describedby={
+                  state.fieldErrors?.termsAccepted ? "terms-error" : undefined
+                }
+                disabled={isPending}
+                required
+                className="mt-1 h-5 w-5 flex-shrink-0 accent-[var(--pine)]"
+              />
+              <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
+                Ich akzeptiere die{" "}
+                <Link
+                  href="/legal/nutzungsbedingungen"
+                  className="font-semibold underline"
+                  style={{ color: "var(--rust)" }}
+                >
+                  Nutzungsbedingungen
+                </Link>
+                .
+              </p>
+            </div>
+            {state.fieldErrors?.termsAccepted?.[0] ? (
+              <p id="terms-error" role="alert" className="mt-1 text-sm" style={{ color: "var(--crimson)" }}>
+                {state.fieldErrors.termsAccepted[0]}
+              </p>
+            ) : null}
+          </div>
+
+          <div>
+            <div className="flex items-start gap-3">
+              <input
+                ref={privacyRef}
+                id="privacyAccepted"
+                name="privacyAccepted"
+                type="checkbox"
+                aria-label="Datenschutzerklärung gelesen"
+                aria-invalid={state.fieldErrors?.privacyAccepted ? true : undefined}
+                aria-describedby={
+                  state.fieldErrors?.privacyAccepted ? "privacy-error" : undefined
+                }
+                disabled={isPending}
+                required
+                className="mt-1 h-5 w-5 flex-shrink-0 accent-[var(--pine)]"
+              />
+              <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
+                Ich habe die{" "}
+                <Link
+                  href="/legal/datenschutz"
+                  className="font-semibold underline"
+                  style={{ color: "var(--rust)" }}
+                >
+                  Datenschutzerklärung
+                </Link>{" "}
+                gelesen.
+              </p>
+            </div>
+            {state.fieldErrors?.privacyAccepted?.[0] ? (
+              <p id="privacy-error" role="alert" className="mt-1 text-sm" style={{ color: "var(--crimson)" }}>
+                {state.fieldErrors.privacyAccepted[0]}
+              </p>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {state.status === "error" ? (

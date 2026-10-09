@@ -14,11 +14,13 @@ export default defineConfig({
       provider: "v8",
       include: [
         "features/**/*.{ts,tsx}",
+        "supabase/functions/_shared/**/*.ts",
         "lib/collections.ts",
         "lib/supabase/config.ts",
         "lib/supabase/proxy.ts",
         "app/auth/confirm/route.ts",
         "components/ui/SegmentedControl.tsx",
+        "scripts/dependency-audit-policy.ts",
       ],
       thresholds: {
         branches: 80,

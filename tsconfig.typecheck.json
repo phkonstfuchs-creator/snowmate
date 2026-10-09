@@ -12,6 +12,8 @@
   ],
   "exclude": [
     "node_modules",
-    ".next/dev"
+    "website",
+    ".next/dev",
+    "supabase/functions/*/index.ts"
   ]
 }

@@ -42,6 +42,18 @@ function formData(values: Record<string, string>): FormData {
   return data;
 }
 
+function signupFormData(email = "new.rider@example.com"): FormData {
+  return formData({
+    email,
+    password: "Pistl2026Pass",
+    confirmPassword: "Pistl2026Pass",
+    inviteToken: "invite-token-00000000000000000001",
+    birthDate: "2000-01-01",
+    termsAccepted: "on",
+    privacyAccepted: "on",
+  });
+}
+
 describe("auth actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -104,11 +116,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      formData({
-        email: "new.rider@example.com",
-        password: "Snowmate2026Pass",
-        confirmPassword: "Snowmate2026Pass",
-      }),
+      signupFormData(),
     );
 
     expect(result).toEqual({
@@ -116,6 +124,19 @@ describe("auth actions", () => {
       message:
         "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
       email: "new.rider@example.com",
+    });
+    expect(auth.signUp).toHaveBeenCalledWith({
+      email: "new.rider@example.com",
+      password: "Pistl2026Pass",
+      options: {
+        data: {
+          invite_token: "invite-token-00000000000000000001",
+          birth_date: "2000-01-01",
+          terms_version: "terms-beta-2026-08-03",
+          privacy_version: "privacy-beta-2026-08-03",
+        },
+        emailRedirectTo: "http://localhost:3000/auth/confirm",
+      },
     });
   });
 
@@ -131,11 +152,7 @@ describe("auth actions", () => {
 
     const result = await signUpAction(
       initialAuthActionState,
-      formData({
-        email: "known.rider@example.com",
-        password: "Snowmate2026Pass",
-        confirmPassword: "Snowmate2026Pass",
-      }),
+      signupFormData("known.rider@example.com"),
     );
 
     expect(result).toEqual({
@@ -144,6 +161,20 @@ describe("auth actions", () => {
         "Wenn diese Adresse verwendet werden kann, erhältst du in Kürze eine Bestätigungs-E-Mail.",
       email: "known.rider@example.com",
     });
+  });
+
+  it("does not contact Supabase when invitation, age, or legal fields are missing", async () => {
+    const result = await signUpAction(
+      initialAuthActionState,
+      formData({
+        email: "new.rider@example.com",
+        password: "Pistl2026Pass",
+        confirmPassword: "Pistl2026Pass",
+      }),
+    );
+
+    expect(result.status).toBe("error");
+    expect(auth.signUp).not.toHaveBeenCalled();
   });
 
   it("signs out before redirecting to login", async () => {

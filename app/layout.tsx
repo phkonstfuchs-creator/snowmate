@@ -3,12 +3,13 @@ import "@fontsource-variable/jost";
 import "@fontsource-variable/hanken-grotesk";
 import "@fontsource/space-mono/400.css";
 import "@fontsource/space-mono/700.css";
+import PrivacyBootstrap from "@/features/privacy/PrivacyBootstrap";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Snowmate",
+  title: "Pistl",
   description: "Finde deine Crew. Heute.",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Snowmate" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Pistl" },
 };
 
 export const viewport: Viewport = {
@@ -27,7 +28,10 @@ export default function RootLayout({
       lang="de"
       data-scroll-behavior="smooth"
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <PrivacyBootstrap />
+      </body>
     </html>
   );
 }

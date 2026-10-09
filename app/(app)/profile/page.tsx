@@ -48,13 +48,13 @@ function PremiumSheet({ onClose }: { onClose: () => void }) {
         className="sheet-panel paper-grain"
         role="dialog"
         aria-modal="true"
-        aria-label="Snowmate Premium"
+        aria-label="Pistl Premium"
         tabIndex={-1}
         style={{ maxHeight: "90dvh", overflowY: "auto", paddingBottom: "max(env(safe-area-inset-bottom,16px),24px)" }}
       >
         <div className="px-5 pt-6 pb-5" style={{ borderBottom: "var(--rule-thin)" }}>
           <p className="text-mono-label mb-2" style={{ color: RUST }}>Ausgabe 01 · Saison 25/26</p>
-          <h2 className="text-display-md" style={{ color: INK }}>Snowmate<br />Premium</h2>
+          <h2 className="text-display-md" style={{ color: INK }}>Pistl<br />Premium</h2>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
             Für alle, die früher aufstehen und länger bleiben als der Rest.
           </p>

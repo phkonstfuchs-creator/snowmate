@@ -10,7 +10,7 @@ const abilityLevelSchema = z.enum(["chill", "park", "off-piste"], {
 });
 
 const unsafeDisplayNamePattern = /[\p{Cc}\u202A-\u202E\u2066-\u2069]/u;
-const reservedHandles = new Set(["admin", "support", "snowmate"]);
+const reservedHandles = new Set(["admin", "support", "snowmate", "pistl"]);
 
 const displayNameSchema = z
   .string()
@@ -36,7 +36,7 @@ const handleSchema = z
   )
   .refine(
     (value) => !reservedHandles.has(value),
-    "Dieses Handle ist für Snowmate reserviert.",
+    "Dieses Handle ist für Pistl reserviert.",
   );
 
 const profileSchema = z.object({

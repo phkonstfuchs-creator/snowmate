@@ -13,7 +13,7 @@ export const BADGES: Badge[] = [
   { id: "first_tracks", name: "First Tracks", description: "Rode before 8am on a powder day", rarity: "rare", icon: "sunrise" },
   { id: "storm_chaser", name: "Storm Chaser", description: "Posted a ride during a snowstorm", rarity: "epic", icon: "snowflake" },
   { id: "local_legend", name: "Local Legend", description: "10+ rides at the same resort", rarity: "rare", icon: "mountain" },
-  { id: "crew_builder", name: "Crew Builder", description: "Invited 5+ friends to Snowmate", rarity: "common", icon: "users" },
+  { id: "crew_builder", name: "Crew Builder", description: "Invited 5+ friends to Pistl", rarity: "common", icon: "users" },
   { id: "powder_hound", name: "Powder Hound", description: "20+ powder days logged", rarity: "epic", icon: "wind" },
   { id: "season_warrior", name: "Season Warrior", description: "30+ days in one season", rarity: "epic", icon: "trophy" },
   { id: "night_rider", name: "Night Rider", description: "5+ après sessions with crew", rarity: "common", icon: "moon" },

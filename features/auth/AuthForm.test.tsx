@@ -62,7 +62,24 @@ describe("AuthForm", () => {
   it("renders strong-password guidance for signup", () => {
     render(<AuthForm mode="signup" />);
 
+    expect(screen.getByLabelText("Einladungscode")).toBeInTheDocument();
+    expect(screen.getByLabelText("Geburtsdatum")).toHaveAttribute(
+      "type",
+      "date",
+    );
     expect(screen.getByLabelText("Passwort bestätigen")).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: /Nutzungsbedingungen akzeptieren/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: /Datenschutzerklärung gelesen/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Nutzungsbedingungen" }),
+    ).toHaveAttribute("href", "/legal/nutzungsbedingungen");
+    expect(
+      screen.getByRole("link", { name: "Datenschutzerklärung" }),
+    ).toHaveAttribute("href", "/legal/datenschutz");
     expect(
       screen.getByText(
         "Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben und einer Zahl",
@@ -71,6 +88,19 @@ describe("AuthForm", () => {
     expect(
       screen.getByRole("button", { name: "Account erstellen" }),
     ).toBeEnabled();
+  });
+
+  it("prefills a validated invitation from the signup link", () => {
+    render(
+      <AuthForm
+        mode="signup"
+        initialInviteToken="invite-token-00000000000000000001"
+      />,
+    );
+
+    expect(screen.getByLabelText("Einladungscode")).toHaveValue(
+      "invite-token-00000000000000000001",
+    );
   });
 
   it("shows field and action errors without exposing a password", () => {

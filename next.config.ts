@@ -1,42 +1,23 @@
 import type { NextConfig } from "next";
 import path from "path";
+import { createSecurityHeaders } from "./features/security/headers";
 
-const scriptPolicy =
-  process.env.NODE_ENV === "development"
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'";
+const ANALYTICS_ENABLED =
+  process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === "true";
 
-const SECURITY_HEADERS = [
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      scriptPolicy,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com",
-      "font-src 'self' data:",
-      "connect-src 'self'",
-      "form-action 'self'",
-      "base-uri 'self'",
-      "object-src 'none'",
-      "frame-src 'none'",
-      "frame-ancestors 'none'",
-      "worker-src 'self' blob:",
-      "manifest-src 'self'",
-    ].join("; "),
-  },
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=31536000",
-  },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
-  },
-] as const;
+const SECURITY_HEADERS = createSecurityHeaders({
+  nodeEnv: process.env.NODE_ENV,
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  posthogKey: ANALYTICS_ENABLED
+    ? process.env.NEXT_PUBLIC_POSTHOG_KEY
+    : undefined,
+  posthogHost: ANALYTICS_ENABLED
+    ? process.env.NEXT_PUBLIC_POSTHOG_HOST
+    : undefined,
+  posthogAssetHost: ANALYTICS_ENABLED
+    ? process.env.NEXT_PUBLIC_POSTHOG_ASSET_HOST
+    : undefined,
+});
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
