@@ -1,45 +1,34 @@
-# Pistl Go: conditional ride wishes
+# Pistl Go: private wishes on existing rides
 
-- **Status:** Draft; awaiting owner approval before implementation
+- **Status:** Approved for implementation and production release by the owner in this chat (2026-10-09: merge, then release).
 - **Owner:** Product owner
-- **Related:** ADR 0038; ADRs 0036/0037 remain unapproved
+- **Related:** [ADR 0040](../adr/0040-private-go-wishes-on-existing-rides.md), superseding the scope proposed in ADR 0038.
 
 ## Problem
 
-A skier wants to tell the crew they would go to a resort on a given day if conditions fit, without presenting that wish as a confirmed ride or occupied place.
+A person wants to join an existing visible ride only when enough people are confirmed and, optionally, their own carpool seat is confirmed. A wish must never be represented as a booking or reserve capacity.
 
-## Included (proposed MVP)
+## Included
 
-A person saves an intent with resort, Vienna calendar date, deadline and explicitly chosen conditions. Proposed audience is the owner and confirmed friends under existing visibility/block rules. The interface distinguishes waiting, conditions met, confirmation required, confirmed, cancelled and expired. A fresh qualifying forecast offers explicit confirmation; confirming goes through the existing authorized ride creation/join path. An intent does not reserve capacity. The person can cancel at any time before confirmation; an actual ride then uses its own cancellation rules.
+The person saves a private wish on an existing ride, specifying a minimum group of 2–12 including themselves and an optional confirmed carpool requirement. Only the owner reads the wish. The existing ride, friendship, minor, block, session and capacity rules still apply. The group predicate includes the prospective participant; displayed counts list the host and actually accepted participants. A driver-authored offer only counts for its driver, and a rider's seat only counts once accepted on an uncancelled same-resort, same-Vienna-day carpool departing no later than the ride.
+
+The feed shows the owner's upcoming plans, prioritizing confirmed participation with changed conditions, ready wishes, waiting wishes, requests and other confirmed participation. Opening a plan opens the existing ride detail sheet. Read errors visibly block new joining until retried; leaving and withdrawing existing participation remains available. The standard join action is always manual and the database checks conditions again on the new pending/accepted participation. It also checks again when the host accepts a request. A later condition loss warns the confirmed participant without automatically removing them.
 
 ## Not included
 
-Automatic commitment/publication, public stranger matching, new minor permissions, background GPS, payments, bookings and forecast guarantees.
+Forecast or weather predicates, new rides created from wishes, automatic joins, public wishes, extra notifications, wider audiences, booking, payment or changes to native tracking.
 
 ## Constraints
 
-Define condition fields, units, source/model, forecast issue time and freshness before approval. Missing, stale or invalid forecasts produce no activation. Display forecast uncertainty and last evaluation time. Server evaluation is deterministic and idempotent; retries and concurrent confirmation cannot duplicate rides or notifications. Recheck expiry/cancellation, capacity, membership, blocks and current session authorization at confirmation. Store only necessary preferences with a retention period chosen by the owner. Intent access uses security-definer RPCs and session identity, never caller-supplied actor IDs or direct client table reads. New migration only. Notifications require opt-in and current session/block checks and expose no sensitive conditions.
+Identity comes from the current server/database session, never client actor ids. Reads and commands use security-definer RPCs, no direct client table reads. New private preferences belong in export and cascade on account deletion. Withdrawal cancels the owner's pending ride request without cancelling confirmed participation. Inactive wishes no longer gate normal joining. Existing Vue-independent React live/demo screens, English/German dictionaries, native shells and all current product features remain intact.
 
-## Acceptance criteria (planned)
+Inactive, cancelled or past rides have no actionable plan. Inactive wishes are removed after a 24-hour post-ride threshold by the next daily cleanup batch; reads and writes also clean eligible rows. No forecast quality or tracking accuracy claim is made.
 
-1. A saved wish clearly says it is neither a booking nor a confirmed ride.
-2. Evaluation uses the specified Vienna day, units and fresh forecast; unknown/stale data leaves the intent waiting without notification.
-3. Qualifying conditions require explicit confirmation; no ride or capacity claim appears beforehand.
-4. Repeated evaluation and concurrent confirmation cause at most one authorized activation/notice.
-5. Cancelling or expiry prevents later activation, including queued retries.
-6. A stranger, blocked account or forged actor cannot read, modify or activate the intent. Existing minor visibility rules remain enforced.
-7. Disabled/revoked notification consent/session prevents delivery; forecast failure has an honest user-visible status.
-8. Full checks and pgTAP pass without weakened policies before release; only the owner performs db push.
+## Acceptance criteria and evidence
 
-## Evidence (planned, not yet run)
-
-| Criteria | Evidence to add after approval |
-|---|---|
-| 1, 3, 7 | Component/integration tests and mobile flow review |
-| 2, 4, 5 | Unit/integration boundary, stale-source, retry and concurrency tests |
-| 4, 5, 6, 7 | Negative pgTAP authorization, cancellation and notification tests |
-| 8 | lint, typecheck, coverage, build, sweep, local PostgreSQL 16 pgTAP and CI |
-
-## Owner decisions required
-
-Choose exact conditions (snowfall versus snow depth, wind or other metrics), source/freshness, confirmation model, audience and minor treatment, expiry/retention, notification cadence, cost budget and operational responsibility. Any automatic activation, broader audience or stranger communication needs separately approved scope. Until approval this remains a specification only.
+1. Saving is private and reserves no place: `features/go/GoInterest.test.tsx`, `supabase/tests/database/ride_go.test.sql`.
+2. Missing group or confirmed seat blocks new joining, including fresh server-side checks: database tests and `features/rides/actions.test.ts`.
+3. The owner explicitly joins or withdraws; withdrawn wishes unlock normal joining: component tests and `tests/e2e/pistl-go.spec.ts`.
+4. The own overview preserves real status and privacy without fixtures: `features/go/go-status.test.ts`, `queries.test.ts`, `GoOverview.test.tsx`.
+5. Later condition loss warns while preserving membership: component/database/browser tests.
+6. Existing demo, posts, chats, native tracking and translations retain their checks. Required lint, typecheck, coverage, build, database and browser checks are run before release; results recorded in the release handoff.

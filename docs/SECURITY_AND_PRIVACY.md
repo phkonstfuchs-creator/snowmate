@@ -323,6 +323,14 @@ must change with every new kind of data, processor or audience rule.
 
 ## Account rights (GDPR)
 
+Pistl Go wishes are private to their owner and use the current authenticated
+session. They never change ride audiences, reserve seats or join automatically.
+Joining and host acceptance recheck confirmed crew and transport in the database.
+Lost conditions warn an existing participant without removing their membership.
+Wishes are included in account export and cascade on deletion. A private daily
+database job purges wishes after ride start or withdrawal plus 24 hours at its
+next run; they are inactive immediately at start or withdrawal. See ADR 0040.
+
 - Art. 15 and 20: `/profile/export` downloads everything stored about the
   caller as JSON (`export_my_data()`).
 - Art. 17: "Delete account" removes the auth user; everything else cascades

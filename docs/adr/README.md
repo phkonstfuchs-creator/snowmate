@@ -45,7 +45,8 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0035](0035-offline-page-from-the-service-worker.md) | Offline page from the service worker, without a cache | Proposed |
 | [0036](0036-adult-minor-contact-options.md) | Adults cannot start contact with riders under 16 | Accepted |
 | [0037](0037-public-events-without-automatic-stranger-chat.md) | Public events without automatic chat with strangers | Proposed |
-| [0038](0038-pistl-go-conditional-intents.md) | Pistl Go: conditional ride intents | Proposed |
+| [0038](0038-pistl-go-conditional-intents.md) | Pistl Go: conditional ride intents | Superseded by 0040 |
 | [0039](0039-map-first-mountain-coordination.md) | Map-first mountain coordination | Proposed |
+| [0040](0040-private-go-wishes-on-existing-rides.md) | Private Go wishes on existing rides | Accepted |
 
 Template: context, options considered, decision, consequences, status.

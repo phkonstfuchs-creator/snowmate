@@ -1,6 +1,6 @@
 # 0038 Pistl Go conditional ride intents
 
-- **Status:** Proposed; no implementation approved
+- **Status:** Superseded by [ADR 0040](0040-private-go-wishes-on-existing-rides.md); this forecast proposal was never implemented
 - **Date:** 2026-10-08
 - **Spec:** [pistl-go.md](../specs/pistl-go.md)
 - **Builds on:** [0004](0004-vienna-day-boundaries.md), [0001](0001-read-social-data-through-functions.md)

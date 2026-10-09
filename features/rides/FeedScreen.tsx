@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import GoInterest from "@/features/go/GoInterest";
+import GoOverview from "@/features/go/GoOverview";
+import type { GoOverviewResult } from "@/features/go/go-status";
 import { openRideChatAction } from "@/features/chat/actions";
 import Link from "next/link";
 import { useBasePath } from "@/hooks/useBasePath";
@@ -34,6 +38,7 @@ import PushAsk, { usePushAskAfterJoin } from "@/features/notifications/PushAsk";
 export interface LiveFeed {
   /* null when the backend could not be reached */
   rides: LiveRide[] | null;
+  goInterests?: GoOverviewResult;
   viewerIsMinor: boolean;
   defaultCity: City;
   /* Posting and joining need a finished profile (enforced in the database). */
@@ -50,12 +55,19 @@ export interface LiveFeed {
 /* `live` is undefined in the /demo prototype, which runs on fixtures. */
 export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; referenceTime?: string }) {
   const basePath = useBasePath();
+  const router = useRouter();
+  const [goGate, setGoGate] = useState<{ rideId: string; blocked: boolean } | null>(null);
+  const goResult = live?.goInterests;
   const t = useT();
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [showPostModal, setShowPostModal] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const selectRide = (rideId: string | null) => {
+    setGoGate(null);
+    setSelectedPostId(rideId);
+  };
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const board = useRideBoard(live ? live.rides ?? [] : undefined, RIDE_POSTS, referenceTime);
@@ -79,7 +91,15 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
 
   /* Public events have their own screen; the feed is the crew's rides. */
   const rides = board.rides.filter((ride) => ride.post.city === city && ride.post.visibility === "friends");
-  const selectedRide = rides.find((ride) => ride.post.id === selectedPostId) ?? null;
+  const selectedRide = board.rides.find((ride) => ride.post.id === selectedPostId) ?? null;
+  const selectedId = selectedRide?.post.id;
+  const updateGoGate = useCallback((blocked: boolean) => {
+    if (selectedId) setGoGate({ rideId: selectedId, blocked });
+  }, [selectedId]);
+  const openGoPlan = (rideId: string) => {
+    const ride = board.rides.find((r) => r.post.id === rideId);
+    if (ride) { setCity(ride.post.city); selectRide(rideId); }
+  };
   const editingRide = rides.find((ride) => ride.post.id === editingPostId) ?? null;
   /* "Out today" means today: a ride next Saturday is in the list, but
      its riders are not on the mountain yet. */
@@ -97,7 +117,7 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
        A second tap on the card never takes you out by accident. */
     const ride = rides.find((candidate) => candidate.post.id === postId);
     if (ride && (ride.isJoined || ride.isPending) && selectedPostId !== postId) {
-      setSelectedPostId(postId);
+      selectRide(postId);
       return;
     }
     const didJoin = await board.toggleJoin(postId);
@@ -173,6 +193,8 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         </div>
       )}
 
+      {live && goResult && <GoOverview result={goResult} onOpen={openGoPlan} onRetry={() => router.refresh()} />}
+
       {/* Nothing today: say what to do instead of an empty screen. */}
       {todaysRides.length === 0 && !unavailable && (
         <NextStep icon="plus" text={t("next.feed")} action={t("feed.postRide")} onAction={() => setShowPostModal(true)} />
@@ -191,8 +213,13 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
             isHost={ride.isHost}
             requestCount={ride.requests.length}
             index={i}
-            onClick={() => setSelectedPostId(ride.post.id)}
-            onJoin={() => handleJoin(ride.post.id)}
+            onClick={() => selectRide(ride.post.id)}
+            onJoin={() => {
+              if (live && goResult && !ride.isJoined && !ride.isPending &&
+                (goResult.status === "unavailable" || goResult.interests.some(({ go }) => go.rideId === ride.post.id))) {
+                selectRide(ride.post.id);
+              } else { void handleJoin(ride.post.id); }
+            }}
           />
         ))}
 
@@ -231,6 +258,13 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
       {/* Ride Detail Sheet */}
       {selectedRide && !storyUser && (
         <RideDetailSheet
+          goContent={live && goResult && !selectedRide.isHost ? (
+            <GoInterest key={selectedRide.post.id} rideId={selectedRide.post.id}
+              totalSpots={selectedRide.post.totalSpots} isJoined={selectedRide.isJoined}
+              isPending={selectedRide.isPending} onGate={updateGoGate} />
+          ) : undefined}
+          joinBlocked={!!live && !!goResult && !selectedRide.isHost &&
+            (goGate?.rideId !== selectedRide.post.id || goGate.blocked)}
           post={selectedRide.post}
           author={selectedRide.host}
           joinedUsers={selectedRide.participants}
@@ -244,11 +278,11 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
           {...(board.isLive
             ? {
                 onSafety: (user: User) => {
-                  setSelectedPostId(null);
+                  selectRide(null);
                   setSafetyTarget({ userId: user.id, name: user.name, rideId: selectedRide.post.id });
                 },
                 onEdit: () => {
-                  setSelectedPostId(null);
+                  selectRide(null);
                   setEditingPostId(selectedRide.post.id);
                 },
                 ...(selectedRide.isHost || (selectedRide.isJoined && !selectedRide.isPending)
@@ -257,13 +291,17 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
                 onCancel: () => {
                   /* Cancelling also drops everyone who joined. */
                   if (!window.confirm(t("feed.confirmCancel"))) return;
-                  setSelectedPostId(null);
+                  selectRide(null);
                   void board.cancelRide(selectedRide.post.id);
                 },
               }
             : {})}
-          onClose={() => setSelectedPostId(null)}
-          onJoin={() => { void handleJoin(selectedRide.post.id); }}
+          onClose={() => selectRide(null)}
+          onJoin={() => {
+            if (live && goResult && !selectedRide.isJoined && !selectedRide.isPending &&
+              (goGate?.rideId !== selectedRide.post.id || goGate.blocked)) return;
+            void handleJoin(selectedRide.post.id);
+          }}
         />
       )}
 

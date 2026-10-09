@@ -18,6 +18,8 @@ const BRAND = "var(--accent-primary)";
 
 interface Props {
   post: RidePost;
+  goContent?: React.ReactNode;
+  joinBlocked?: boolean;
   author: User;
   joinedUsers: User[];
   onClose: () => void;
@@ -51,7 +53,7 @@ function PersonRow({ onOpen, className, children }: { onOpen?: () => void; class
   );
 }
 
-export default function RideDetailSheet({ post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile, onOpenChat, viewerId }: Props) {
+export default function RideDetailSheet({ goContent, joinBlocked = false, post, author, joinedUsers, onClose, onJoin, isJoined, isPending = false, requests = [], onRespond, isHost = false, onCancel, onEdit, onSafety, onOpenProfile, onOpenChat, viewerId }: Props) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
@@ -233,6 +235,8 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           </div>
         )}
 
+        {goContent}
+
         {/* Join CTA */}
         <div className="px-5 pt-4">
           {onOpenChat && (
@@ -268,7 +272,7 @@ export default function RideDetailSheet({ post, author, joinedUsers, onClose, on
           ) : (
           <button
             onClick={onJoin}
-            disabled={full && !isJoined && !isPending}
+            disabled={(full || joinBlocked) && !isJoined && !isPending}
             className="w-full py-4 font-black text-base transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px]"
             style={isJoined || isPending
               ? { background: "var(--accent-primary-subtle)", color: BRAND }
