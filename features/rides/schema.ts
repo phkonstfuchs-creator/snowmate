@@ -43,7 +43,7 @@ export function createRideInputSchema(now = new Date()) {
       "Treffpunkt muss 2–200 sichere Zeichen enthalten.",
     ),
     idempotencyKey: uuidSchema,
-  });
+  }).strict();
 }
 
 export function createCarpoolInputSchema(now = new Date()) {
@@ -63,6 +63,7 @@ export function createCarpoolInputSchema(now = new Date()) {
       ),
       idempotencyKey: uuidSchema,
     })
+    .strict()
     .superRefine((value, context) => {
       if (value.role === "rider" && value.totalSeats !== 1) {
         context.addIssue({
@@ -73,6 +74,33 @@ export function createCarpoolInputSchema(now = new Date()) {
       }
     });
 }
+
+export const requestRideInputSchema = z.object({
+  rideId: uuidSchema,
+  idempotencyKey: uuidSchema,
+}).strict();
+
+export const respondRideRequestInputSchema = z.object({
+  requestId: uuidSchema,
+  accept: z.boolean(),
+  idempotencyKey: uuidSchema,
+}).strict();
+
+export const requestCarpoolInputSchema = z.object({
+  carpoolId: uuidSchema,
+  idempotencyKey: uuidSchema,
+}).strict();
+
+export const respondCarpoolRequestInputSchema = z.object({
+  requestId: uuidSchema,
+  accept: z.boolean(),
+  idempotencyKey: uuidSchema,
+}).strict();
+
+export const leaveRideInputSchema = requestRideInputSchema;
+export const cancelRideInputSchema = requestRideInputSchema;
+export const leaveCarpoolInputSchema = requestCarpoolInputSchema;
+export const cancelCarpoolInputSchema = requestCarpoolInputSchema;
 
 export type CreateRideInput = z.infer<ReturnType<typeof createRideInputSchema>>;
 export type CreateCarpoolInput = z.infer<

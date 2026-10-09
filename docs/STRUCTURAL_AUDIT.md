@@ -1,6 +1,7 @@
 # Structural Audit
 
 Date: 2026-07-23
+Last updated: 2026-08-03
 
 ## Scope
 
@@ -89,17 +90,18 @@ than relying on client-side filtering.
 
 ## Verification
 
-The required local gates are:
+The required gates are:
 
 ```text
-lint -> typecheck -> unit/coverage -> build -> mobile E2E
+lint -> typecheck -> unit/coverage -> Deno check -> build
+Supabase reset -> database lint -> pgTAP -> mobile E2E -> secret scan
 ```
 
 Coverage is initially enforced on new domain logic and the changed shared
 control. The measured surface must expand as legacy prototype UI is converted
 into feature modules; it must not be reduced to keep the percentage green.
 
-## Deliberately deferred
+## Deferred in the original audit
 
 - Supabase packages, schema, migrations, auth clients, and `proxy.ts`
 - RLS policies, realtime channel authorization, and negative policy tests
@@ -109,9 +111,17 @@ into feature modules; it must not be reduced to keep the percentage green.
 - Conversation selection by conversation ID instead of only user ID
 - Validated server commands for posting, joining, messaging, and onboarding
 
-These belong to the backend implementation and must enforce the visibility
-decision above; they are not part of the structural cleanup of the mock
-prototype.
+This list records the July baseline. As of 2026-08-03, Supabase SSR/Auth,
+normalized migrations, forced RLS, relationship-aware RPCs, server DTO/DAL
+boundaries, rides/carpools, chat/moderation, foreground location, consent,
+export, retention, and account/provider deletion exist locally with pgTAP or
+TypeScript tests. The shared focus-trapping dialog primitive and the remaining
+prototype UI conversion are still frontend work.
+
+The new backend is not beta-approved merely because the files exist. The full
+migration reset, database lint, pgTAP matrix, hosted deployment, Vault/Edge
+Function configuration, observed provider-deletion run, external alerts,
+restore test, and legal/DPIA approvals remain mandatory gates.
 
 ## Residual dependency risk
 
@@ -149,7 +159,88 @@ Status updated on 2026-08-03:
   tests remain unexecuted until the local Supabase PostgreSQL stack is
   available.
 
-This follow-up secures account identity and profile completion only. It does not
-authorize social discovery, rides, messages, consent, or location. Those
-original backend blockers remain open and require their own migrations, DTOs,
-and negative RLS tests.
+This account follow-up was the first backend increment. Later local increments
+now cover social discovery, rides, carpools, messages, moderation, consent,
+location, export, retention, and deletion. None of those features is authorized
+for external testers until its migrations and negative pgTAP cases pass in a
+clean Supabase environment and the compliance gates in `docs/compliance/` are
+formally closed.
+
+## Persistent coordination increment — 2026-10-09
+
+The feed and carpool surfaces now use authenticated server data instead of ride
+and offer fixtures. Regional feeds, database resort selection, creation,
+permission-aware details, pending requests, explicit host acceptance/rejection,
+withdrawal, leaving and cancellation are connected to the existing RPC contracts.
+Ride details link to destination-filtered carpools. Counts represent accepted
+participants/seats; the former fabricated activity/date/XP indicators were removed
+from the feed. Crew, chat and map presentation still need their own integration.
+
+The new component/route regressions cover failure, privacy, identity, expiration,
+capacity and idempotent retries. A local mobile browser test uses two actual
+accounts to request and confirm both a ride and a seat, reload each account,
+leave and cancel. Test administrator access is restricted to the explicitly
+selected local stack. The existing auth browser test now provisions the required
+beta invitation and submits age and consent fields.
+
+Fresh database verification exposed pre-existing defects: own-profile policies
+called a revoked private predicate, historical group messages became accessible
+again after a block removed current membership, report deadline clocks differed,
+and location functions used the SQL keyword CURRENT_TIME as a timestamp variable.
+Additive migrations repair these behaviors without exposing private UUID-based
+predicates. pg_net objects belong to a privileged extension owner; an explicit
+owner-run operation now revokes and verifies client access. CI executes it after
+reset; hosted application needs the corresponding owner/admin step described in
+`docs/compliance/toms.md`.
+
+SQL regression fixtures were corrected to scope changes to their own users,
+use valid pgTAP expected queries, compare UUIDs with supported ordering, and
+avoid assumptions about transaction timestamps or an empty development database.
+Checks on the isolated local stack: all 628 database assertions passed and database
+lint reported no schema errors. The complete component/unit suite passed 354
+tests with 93.78% line and 82.19% branch coverage; all six mobile browser journeys,
+TypeScript, ESLint and production build passed. Hosted migrations/deployment and
+compliance release remain pending.
+This increment does not implement ski tracking or the conditional Pistl Go planner.
+
+## Pistl Go first increment — 2026-10-09
+
+Ride detail now supports private conditional interest: a minimum group including
+the prospective participant and optional confirmed transport. Readiness is
+evaluated from actual confirmed members and matching confirmed carpools, with
+explicit participation request and host acceptance still required. Open
+interests never reserve capacity. Both driver offers and accepted drivers for
+an own rider search count; a journey already underway remains valid. Changed
+conditions are shown without silently ejecting confirmed participants.
+
+The wish uses existing contact/minor/block policies, is included in export and
+account deletion, and expires with the ride. The existing daily retention job
+removes it 24 hours after the planned start. Migration905 implements this step;
+migration906 fixes responder foreign-key deletion that previously prevented a
+host account from being deleted after accepting a ride/carpool request.
+
+Validated on a fresh isolated local stack: 668 database assertions and SQL lint
+passed; 371 unit/component tests passed with 93.87% line and 83.18% branch coverage.
+All seven mobile browser journeys passed, including a multi-account Go flow.
+TypeScript, ESLint, production build and diff whitespace checks passed. These
+checks do not establish hosted deployment. Free time windows, multiple desired
+resorts, collective proposal generation and native ski tracking remain separate
+follow-up work.
+
+## Pre-push completion — 2026-10-09
+
+The marketing website's double opt-in API initially referenced three missing
+RPCs. Migration907 now supplies service-only request, confirm and token-release
+commands with private email/token-hash storage, cooldown, rate limiting and
+expiry cleanup; 31 pgTAP assertions validate this contract. Confirmation emails
+now state the selected Early Access scope explicitly. Website release settings
+remain draft/unconfigured; no real email dispatch or hosted migration was run.
+
+Compatible dependency updates include Next.js16.4, Vitest4.1.11, sharp0.35.5 and
+undici7.30. Production audits have no findings. The single unfixed development
+braces advisory is covered by the explicit, tested exception documented in the
+README, expiring after2026-10-30. CI verifies the app and website, including
+website browser journeys. The final local app suite passes376 tests with93.89%
+line/83.72% branch coverage; all699 database assertions and seven app browser
+journeys pass. Website20 unit tests and15 browser journeys, both builds, lint,
+types, Edge Function checks and the security review pass.
