@@ -122,7 +122,7 @@ jobs:
           {
             printf 'NEXT_PUBLIC_SUPABASE_URL=%s\n' "$api_url"
             printf 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$public_key"
-            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://localhost:3000"
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "http://127.0.0.1:3000"
             printf 'MAILPIT_URL=%s\n' "$mailpit_url"
             printf 'LOCAL_SUPABASE_E2E=%s\n' "1"
           } >> "$GITHUB_ENV"
