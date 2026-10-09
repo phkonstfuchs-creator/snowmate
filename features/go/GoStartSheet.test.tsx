@@ -8,7 +8,7 @@ it("lets a new rider plan independently even when existing rides are unavailable
   const cb = callbacks();
   const onPlan = vi.fn();
   render(<GoStartSheet rides={[]} unavailable demo={false} basePath="" onPlan={onPlan} {...cb} />);
-  fireEvent.click(screen.getByRole("button", { name: "Plan a ski day", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Plan a ski day" }));
   expect(onPlan).not.toHaveBeenCalled();
   await waitFor(() => expect(onPlan).toHaveBeenCalledOnce());
   expect(cb.onSelect).not.toHaveBeenCalled();

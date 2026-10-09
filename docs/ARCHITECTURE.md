@@ -106,6 +106,14 @@ in the app (`toIsoDay`). See [ADR 0004](adr/0004-vienna-day-boundaries.md).
 
 ## Enforced boundaries
 
+Private day plans live in `features/day-plans`: pure validation/DTO parsing,
+session-bound actions and queries, and the planner/overview UI. `FeedScreen`
+receives owner-only plans from its route. An explicit overview action passes
+four fields to `PostRideModal`; that form retains its existing publishing,
+style and audience choices. Planning does not create a ride or share location.
+The private-schema table has no client grants; only owner-bound RPCs can
+read/write it, with per-owner serialization and optimistic versions.
+
 `eslint.config.mjs` turns the "Must not" column above into errors, and
 `tests/unit/architecture.test.ts` checks that each rule still rejects a
 deliberate violation:

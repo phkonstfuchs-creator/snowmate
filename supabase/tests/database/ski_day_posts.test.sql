@@ -27,8 +27,11 @@ select o.id, '9057a000-0000-4000-8000-000000000001', o.bucket_id, o.name, 'v1', 
 from storage.objects o where o.name = '9057a000-0000-4000-8000-000000000001/a.webp';
 
 -- Closed table.
+-- Model an active authenticated session for the session-bound account export.
+insert into auth.sessions(id,user_id) select id,id from auth.users on conflict (id) do nothing;
 set local role authenticated;
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000001"}';
 select throws_ok($$select * from public.posts$$, '42501', null, 'posts are not readable directly');
 select throws_ok($$insert into public.posts (author_id, body) values (auth.uid(), 'x')$$, '42501', null, 'posts are not writable directly');
 
@@ -46,6 +49,7 @@ select results_eq($$select body from public.list_post_feed() order by created_at
 
 -- Audience.
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000002"}';
 select is((select count(*)::int from public.list_post_feed()), 2, 'a friend sees my posts');
 select isnt(public.post_photo_path_for((select id from public.list_post_feed() where has_photo)), null, 'a friend gets the photo path');
 select ok(public.can_see_post_photo('9057a000-0000-4000-8000-000000000001/a.webp'), 'a friend may read the photo file');
@@ -53,18 +57,23 @@ create temp table friend_post as select id from public.list_post_feed() where ha
 grant select on friend_post to authenticated;
 
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000003';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000003"}';
 select is((select count(*)::int from public.list_post_feed()), 0, 'a friend of a friend sees nothing');
 select is(public.post_photo_path_for((select id from friend_post)), null, 'nor the photo path');
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000004"}';
 select is((select count(*)::int from public.list_post_feed()), 0, 'a stranger sees nothing');
 select ok(not public.can_see_post_photo('9057a000-0000-4000-8000-000000000001/a.webp'), 'a stranger may not read the photo file');
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000005';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000005"}';
 select is((select count(*)::int from public.list_post_feed()), 0, 'a friend who blocked me sees nothing');
 
 -- Deleting.
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000002"}';
 select results_eq($$select deleted from public.delete_my_post((select id from friend_post))$$, $$values (false)$$, 'nobody deletes someone else''s post');
 set local request.jwt.claim.sub = '9057a000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"9057a000-0000-4000-8000-000000000001"}';
 select results_eq($$select deleted, photo_path from public.delete_my_post((select id from friend_post))$$,
   $$values (true, '9057a000-0000-4000-8000-000000000001/a.webp'::text)$$, 'I delete my post and learn its photo path');
 

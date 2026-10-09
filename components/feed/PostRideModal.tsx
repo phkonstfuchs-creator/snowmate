@@ -21,6 +21,7 @@ interface PostRideModalProps {
   /* Server-side the database refuses public rides by minors anyway;
      this only decides whether the toggle is offered. */
   mayGoPublic: boolean;
+  initialValues?: Pick<RideFormInput, "resort" | "rideDate" | "meetTime" | "meetPoint">;
 }
 
 const ABILITY_OPTIONS: { value: AbilityLevel; label: MessageKey; desc: MessageKey }[] = [
@@ -29,21 +30,21 @@ const ABILITY_OPTIONS: { value: AbilityLevel; label: MessageKey; desc: MessageKe
   { value: "off-piste", label: "common.offPiste", desc: "post.offPisteDesc" },
 ];
 
-export default function PostRideModal({ city, onClose, onPost, mayGoPublic }: PostRideModalProps) {
+export default function PostRideModal({ city, onClose, onPost, mayGoPublic, initialValues }: PostRideModalProps) {
   useScrollLock();
   const { state, dismiss } = useSheetDismiss(onClose);
   const dialogRef = useDialogFocus<HTMLDivElement>(dismiss);
   const t = useT();
   const [step, setStep] = useState<1 | 2>(1);
-  const [resort, setResort] = useState("");
+  const [resort, setResort] = useState(initialValues?.resort ?? "");
   /* Chosen per ride, not taken from the profile: today might be park. */
   const [abilityLevel, setAbilityLevel] = useState<AbilityLevel | null>(null);
-  const [meetTime, setMeetTime] = useState("09:00");
-  const [meetPoint, setMeetPoint] = useState("");
+  const [meetTime, setMeetTime] = useState(initialValues?.meetTime ?? "09:00");
+  const [meetPoint, setMeetPoint] = useState(initialValues?.meetPoint ?? "");
   const [totalSpots, setTotalSpots] = useState(4);
   const [caption, setCaption] = useState("");
   const [visibility, setVisibility] = useState<RideVisibility>("friends");
-  const [rideDate, setRideDate] = useState(() => toIsoDay(new Date()));
+  const [rideDate, setRideDate] = useState(() => initialValues?.rideDate ?? toIsoDay(new Date()));
   const [title, setTitle] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

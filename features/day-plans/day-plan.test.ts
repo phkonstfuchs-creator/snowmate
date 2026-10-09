@@ -52,7 +52,7 @@ describe("parseDayPlans", () => {
     meetingText: "Innsbruck Hbf",
     createdAt: "2026-10-09T10:00:00.000Z",
     updatedAt: "2026-10-09T10:00:00.000Z",
-    expiresAt: "2026-10-12T00:00:00.000Z",
+    expiresAt: "2026-10-11T22:00:00.000Z",
   };
 
   it("accepts a well-formed own-plan RPC envelope", () => {

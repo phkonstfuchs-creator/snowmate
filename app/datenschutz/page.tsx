@@ -73,6 +73,23 @@ export default function DatenschutzPage() {
         die Mitglieder dieses Chats, und nach 24 Stunden löschen wir die Koordinaten. Rechtsgrundlage: Art. 6 Abs. 1
         lit. b DSGVO.
       </p>
+      <h3>Private Skitag-Pläne in Pistl Go</h3>
+      <p>
+        Wenn du einen eigenen Skitag planst, speichern wir Region, Skigebiet, Datum, Uhrzeit,
+        deine Anreiseabsicht, deinen Treffpunkt sowie Erstellung, Änderung, Version und Ablaufzeit.
+        Nur du siehst den Plan. Eine ausdrückliche Aktion kann die Angaben in das Ausfahrtformular
+        übernehmen; erst dessen Veröffentlichung teilt sie mit der dort gewählten Zielgruppe.
+        Wir speichern keine Standortkoordinaten und keinen Verlauf früherer Treffpunkte.
+        Der Plan läuft um Mitternacht in Wien zwei Kalendertage nach dem geplanten Datum ab
+        und wird beim nächsten täglichen Bereinigungslauf gelöscht. Du kannst ihn vorher selbst löschen.
+        Mit deinem Konto wird er mitgelöscht; solange gespeichert, ist er in deinem Datenexport enthalten.
+        Zeitpunkte erfolgreicher Speicherungen bleiben zur Begrenzung von Missbrauch 24 Stunden gespeichert,
+        ohne Planinhalt. Nach einer Planlöschung speichern wir nur die Plan-ID, deine Konto-ID und
+        die Sperrfrist für verspätete Wiederholungen einer Speicheranfrage: bis zur ursprünglichen
+        Ablaufzeit oder 24 Stunden nach der Löschung, je nachdem, was später liegt. Auch diese Angaben
+        sind im Export enthalten und werden beim nächsten täglichen Lauf oder mit dem Konto gelöscht.
+        Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
       <h3>Pistl-Go-Wünsche</h3>
       <p>
         Wenn du zu einem bestehenden Ride einen Wunsch speicherst, speichern wir deine gewählte Mindestgruppe,
@@ -220,6 +237,7 @@ export default function DatenschutzPage() {
       <h2>6. Wie lange wir Daten speichern</h2>
       <ul>
         <li>Konto, Profil, Rides, Freundschaften und Chatnachrichten: bis du dein Konto löschst.</li>
+        <li>Private Skitag-Pläne: Ablauf um Mitternacht in Wien zwei Kalendertage nach dem geplanten Datum, danach Löschung beim nächsten täglichen Lauf; vorher jederzeit selbst löschbar. Speicherzeitpunkte zum Missbrauchsschutz: 24 Stunden, ohne Planinhalt.</li>
         <li>Pistl-Go-Wünsche: nach Ride-Start oder Rückzug sofort inaktiv; Löschung beim nächsten täglichen Lauf, sobald der entsprechende Zeitpunkt mindestens 24 Stunden zurückliegt, oder früher mit dem Konto.</li>
         <li>Live-Standort: höchstens bis zum Ende der gewählten Zeit (maximal 12 Stunden).</li>
         <li>Lift-Treffpunkt: höchstens 30 Minuten sichtbar, jederzeit vorher beendbar; abgelaufene Daten werden beim nächsten Statusabruf oder -start gelöscht.</li>

@@ -9,10 +9,10 @@ it("prefills the private plan without publishing or choosing a riding style", ()
   render(<PostRideModal city="innsbruck" mayGoPublic={false} onClose={vi.fn()} onPost={onPost}
     initialValues={{ resort: "Nordkette", rideDate: planDate, meetTime: "12:30", meetPoint: "Seegrube" }} />);
   expect(screen.getByRole("combobox", { name: "Resort" })).toHaveValue("Nordkette");
-  expect(screen.getByRole("button", { name: "Next", exact: true })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
   expect(onPost).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: /Park/ }));
-  fireEvent.click(screen.getByRole("button", { name: "Next", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
   expect(screen.getByLabelText("Day")).toHaveValue(planDate);
   expect(screen.getByLabelText("Time")).toHaveValue("12:30");
   expect(screen.getByLabelText("Meeting point")).toHaveValue("Seegrube");

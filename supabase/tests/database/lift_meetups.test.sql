@@ -32,8 +32,11 @@ insert into public.friendships (requester_id, addressee_id, status) values
   ('f1f1f1f1-0000-4000-8000-000000000004', 'f1f1f1f1-0000-4000-8000-000000000001', 'pending'),
   ('f1f1f1f1-0000-4000-8000-000000000006', 'f1f1f1f1-0000-4000-8000-000000000002', 'accepted');
 
+-- Model an active authenticated session for the session-bound account export.
+insert into auth.sessions(id,user_id) select id,id from auth.users on conflict (id) do nothing;
 set local role authenticated;
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000001"}';
 select throws_ok($$select * from private.lift_meetup_lifts$$, '42501', null,
   'client cannot read the private lift allowlist');
 select throws_ok($$select * from public.lift_meetups$$, '42501', null, 'client cannot read meetup table');
@@ -62,10 +65,12 @@ select is(public.start_my_lift_meetup('Nordkette', repeat('x', 101)), 'invalid',
 select is(public.start_my_lift_meetup('Nordkette', 'osm-way-99999999'), 'invalid', 'unknown OSM lift rejected');
 
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000002"}';
 select results_eq($$select handle from public.list_friend_lift_meetups()$$,
   $$values ('lift_1'::text)$$, 'confirmed friend sees meetup');
 select is(public.start_my_lift_meetup('Nordkette', 'osm-way-25170582'), 'sharing', 'friend can share in reverse direction');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000001"}';
 select is((select count(*)::int from public.list_friend_lift_meetups() where handle = 'lift_2'), 1,
   'accepted friendship works in both directions');
 reset role;
@@ -80,17 +85,22 @@ select is((select count(*)::int from public.lift_meetups where user_id = 'f1f1f1
   'read purges expired meetup from storage');
 set local role authenticated;
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000002"}';
 select is(public.start_my_lift_meetup('Nordkette', 'osm-way-25170582'), 'sharing',
   'expired meetup can be replaced');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000003';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000003"}';
 select is((select count(*)::int from public.list_friend_lift_meetups() where handle = 'lift_1'), 0,
   'friend of friend cannot see that meetup');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000004"}';
 select is((select count(*)::int from public.list_friend_lift_meetups()), 0, 'pending requester cannot see meetup');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000005';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000005"}';
 select is((select count(*)::int from public.list_friend_lift_meetups()), 0, 'stranger cannot see meetup');
 
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000006';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000006"}';
 select is(public.start_my_lift_meetup('Nordkette', 'osm-way-25170582'), 'too_young', 'under 16 cannot share');
 select is((select count(*)::int from public.list_friend_lift_meetups() where handle = 'lift_2'), 1,
   'under 16 can still see a confirmed friend');
@@ -103,6 +113,7 @@ set local role authenticated;
 select is((select count(*)::int from public.my_lift_meetup()), 0,
   'a previously stored under-16 status is hidden from its owner');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000002"}';
 select is((select count(*)::int from public.list_friend_lift_meetups() where handle = 'lift_6'), 0,
   'a previously stored under-16 status is hidden from friends');
 
@@ -111,6 +122,7 @@ delete from public.friendships where requester_id = 'f1f1f1f1-0000-4000-8000-000
   and addressee_id = 'f1f1f1f1-0000-4000-8000-000000000002';
 set local role authenticated;
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000001"}';
 select is((select count(*)::int from public.list_friend_lift_meetups() where handle = 'lift_2'), 0,
   'unfriending removes meetup visibility immediately');
 reset role;
@@ -122,8 +134,10 @@ insert into public.blocks (blocker_id, blocked_id)
 values ('f1f1f1f1-0000-4000-8000-000000000001', 'f1f1f1f1-0000-4000-8000-000000000002');
 set local role authenticated;
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000002"}';
 select is((select count(*)::int from public.list_friend_lift_meetups()), 0, 'blocked friend loses visibility immediately');
 set local request.jwt.claim.sub = 'f1f1f1f1-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"f1f1f1f1-0000-4000-8000-000000000001"}';
 select is((select count(*)::int from public.list_friend_lift_meetups()), 0, 'blocking acts in both directions');
 select is(public.export_my_data() -> 'lift_meetup' ->> 'lift_id', 'osm-way-25282282', 'own meetup is in export');
 select lives_ok($$select public.stop_my_lift_meetup()$$, 'owner can stop sharing');

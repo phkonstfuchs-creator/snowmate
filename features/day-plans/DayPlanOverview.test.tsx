@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DayPlanOverview from "./DayPlanOverview";
 
 const plans = [
@@ -31,6 +31,13 @@ const plans = [
   },
 ];
 
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-10-09T10:00:00.000Z"));
+});
+
+afterEach(() => vi.useRealTimers());
+
 describe("DayPlanOverview", () => {
   it("puts the next meeting first and keeps all later plans available", () => {
     const onOpen = vi.fn();
@@ -49,7 +56,7 @@ describe("DayPlanOverview", () => {
     render(<DayPlanOverview result={{ status: "unavailable" }} onOpen={vi.fn()} onRetry={onRetry} />);
 
     expect(screen.getByRole("alert")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
+    fireEvent.click(screen.getByRole("button", { name: /try again|retry/i }));
     expect(onRetry).toHaveBeenCalledOnce();
     expect(screen.queryByText(/no plans yet/i)).not.toBeInTheDocument();
   });
@@ -58,5 +65,17 @@ describe("DayPlanOverview", () => {
     render(<DayPlanOverview result={{ status: "ok", plans: [] }} onOpen={vi.fn()} onRetry={vi.fn()} />);
     expect(screen.getByText(/no private plans yet/i)).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("keeps past plans after current plans and never offers to publish one", () => {
+    const past = { ...plans[0]!, id: "past-plan", resort: "Stubai Glacier", planDate: "2026-10-08" };
+    const onShare = vi.fn();
+    render(<DayPlanOverview result={{ status: "ok", plans: [past] }} onOpen={vi.fn()} onRetry={vi.fn()} onShare={onShare} demo />);
+
+    expect(screen.getByText(/demo plans stay on this page until reload/i)).toBeInTheDocument();
+    expect(screen.getByText("Past planned days")).toBeInTheDocument();
+    expect(screen.getByText("Stubai Glacier")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /prepare a ride/i })).not.toBeInTheDocument();
+    expect(onShare).not.toHaveBeenCalled();
   });
 });

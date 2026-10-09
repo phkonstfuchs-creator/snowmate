@@ -23,8 +23,11 @@ insert into public.friendships (requester_id, addressee_id, status) values
 create temp table ids (name text primary key, id uuid);
 grant select, insert on ids to authenticated;
 
+-- Model an active authenticated session for the session-bound account export.
+insert into auth.sessions(id,user_id) select id,id from auth.users on conflict (id) do nothing;
 set local role authenticated;
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000001"}';
 insert into ids values ('direct', public.open_direct_chat('10ca7000-0000-4000-8000-000000000002'));
 insert into ids values ('young', public.open_direct_chat('10ca7000-0000-4000-8000-000000000003'));
 
@@ -37,6 +40,7 @@ select is(public.send_message((select id from ids where name = 'direct'), 'text 
 
 -- Reading.
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000002"}';
 select results_eq(
   $$select kind, lat, lng from public.list_messages((select id from ids where name = 'direct')) order by created_at, kind$$,
   $$values ('location'::text, 47.26346::double precision, 11.39432::double precision), ('text'::text, null::double precision, null::double precision)$$,
@@ -44,11 +48,13 @@ select results_eq(
 );
 
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000004';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000004"}';
 select is(public.send_location_message((select id from ids where name = 'direct'), 47, 11), 'forbidden', 'a stranger cannot send into the chat');
 select is((select count(*)::int from public.list_messages((select id from ids where name = 'direct'))), 0, 'a stranger reads nothing');
 
 -- Under 16.
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000003';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000003"}';
 select is(public.send_location_message((select id from ids where name = 'young'), 47, 11), 'too_young', 'someone under 16 cannot send a position');
 select is(public.send_message((select id from ids where name = 'young'), 'Servus'), 'sent', 'but can still write');
 
@@ -58,6 +64,7 @@ update public.messages set created_at = now() - interval '25 hours'
 where conversation_id = (select id from ids where name = 'direct') and kind = 'location';
 set local role authenticated;
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000002"}';
 select results_eq(
   $$select lat is null, lng is null from public.list_messages((select id from ids where name = 'direct')) where kind = 'location'$$,
   $$values (true, true)$$,
@@ -71,6 +78,7 @@ select is((select count(*)::int from public.messages where kind = 'location' and
 -- Export and shape.
 set local role authenticated;
 set local request.jwt.claim.sub = '10ca7000-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"10ca7000-0000-4000-8000-000000000001"}';
 select is((select count(*)::int from jsonb_array_elements(public.export_my_data() -> 'messages_sent') e where e ->> 'kind' = 'location'), 1,
   'the export lists my location messages');
 reset role;

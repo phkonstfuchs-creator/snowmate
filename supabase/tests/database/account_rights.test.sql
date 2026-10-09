@@ -31,8 +31,11 @@ select throws_ok($$select public.delete_my_account()$$, '42501', null, 'anon can
 select throws_ok($$select public.export_my_data()$$, '42501', null, 'anon cannot export data');
 reset role;
 
+-- Model an active authenticated session for the session-bound account export.
+insert into auth.sessions(id,user_id) select id,id from auth.users on conflict (id) do nothing;
 set local role authenticated;
 set local request.jwt.claim.sub = 'ffffffff-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"ffffffff-0000-4000-8000-000000000001"}';
 
 select results_eq(
   $$select friend_requests, carpool_requests from public.my_pending_counts()$$,
@@ -65,6 +68,7 @@ select is(
 );
 
 set local request.jwt.claim.sub = 'ffffffff-0000-4000-8000-000000000002';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"ffffffff-0000-4000-8000-000000000002"}';
 
 select is(
   (public.export_my_data() -> 'carpool_requests' -> 0 ->> 'status'),
@@ -73,6 +77,7 @@ select is(
 );
 
 set local request.jwt.claim.sub = 'ffffffff-0000-4000-8000-000000000001';
+set local request.jwt.claims = '{"role":"authenticated","session_id":"ffffffff-0000-4000-8000-000000000001"}';
 
 select is(public.delete_my_account(), true, 'a user can delete their own account');
 

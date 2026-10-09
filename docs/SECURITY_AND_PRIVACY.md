@@ -323,6 +323,21 @@ must change with every new kind of data, processor or audience rule.
 
 ## Account rights (GDPR)
 
+Private Pistl Go day plans are owner-only, including for confirmed friends.
+They contain region/resort, Vienna date, meeting time, transport intention and
+a bounded plain-text meeting point, with no coordinates or friend identifiers.
+Current sessions/MFA protect every RPC; table grants are revoked and RLS is
+forced. At most 20 active plans and 30 successful changed saves per rolling
+24 hours are serialized per owner. Stable client ids and integer versions
+make retries idempotent and unseen edits conflicts; deletion has no save quota.
+Plans expire at Vienna midnight two calendar days after their date and are
+hidden immediately, then purged daily. Save timestamps expire after 24 hours
+and contain no historical plan text. Deleted ids retain only owner/id/expiry
+until the later of original expiry and deletion plus 24 hours, preventing
+delayed create retries from restoring the plan. Export includes stored plans,
+these minimal deletion records and account
+deletion cascades them. See [the specification](specs/go-day-plans.md).
+
 Pistl Go wishes are private to their owner and use the current authenticated
 session. They never change ride audiences, reserve seats or join automatically.
 Joining and host acceptance recheck confirmed crew and transport in the database.

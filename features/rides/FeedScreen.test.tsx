@@ -71,12 +71,12 @@ describe("FeedScreen with real data", () => {
 
   it("keeps Go and lift meetup above feed content, even without rides", () => {
     render(<FeedScreen live={live([])} />);
-    const go = screen.getByRole("button", { name: /Join when it works for you/ });
+    const go = screen.getByRole("button", { name: /Pistl Go/ });
     const lift = screen.getByRole("link", { name: /Lift meetup/ });
     expect(lift).toHaveAttribute("href", "/map?action=lift");
     expect(go.compareDocumentPosition(screen.getByRole("note")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.click(go);
-    const sheet = screen.getByRole("dialog", { name: "Join when it works for you" });
+    const sheet = screen.getByRole("dialog", { name: "Pistl Go" });
     expect(within(sheet).getByText(/Choose a ride\. Set/)).toBeInTheDocument();
     expect(within(sheet).getByRole("link", { name: "Find your crew" })).toHaveAttribute("href", "/people");
     expect(within(sheet).getByRole("link", { name: "Browse open events" })).toHaveAttribute("href", "/events");
@@ -86,22 +86,46 @@ describe("FeedScreen with real data", () => {
   it("opens an eligible Go ride only after the chooser closes, without joining", async () => {
     const tomorrow = toIsoDay(new Date(NOW.getTime() + 86400000));
     render(<FeedScreen live={{ ...live([row({ ride_date: tomorrow }), row({ id: "own", is_host: true, ride_date: tomorrow, resort: "Stubai Glacier" })]), goInterests: { status: "ok", interests: [] } }} />);
-    fireEvent.click(screen.getByRole("button", { name: /Join when it works for you/ }));
-    const chooser = screen.getByRole("dialog", { name: "Join when it works for you" });
+    fireEvent.click(screen.getByRole("button", { name: /Pistl Go/ }));
+    const chooser = screen.getByRole("dialog", { name: "Pistl Go" });
     expect(within(chooser).queryByText("Stubai Glacier")).not.toBeInTheDocument();
     fireEvent.click(within(chooser).getByRole("button", { name: /Nordkette/ }));
     expect(screen.queryByRole("dialog", { name: "Ride details" })).not.toBeInTheDocument();
     expect(await screen.findByRole("dialog", { name: "Ride details" })).toBeInTheDocument();
-    expect(screen.queryByRole("dialog", { name: "Join when it works for you" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Pistl Go" })).not.toBeInTheDocument();
     expect(mocks.join).not.toHaveBeenCalled();
   });
 
   it("keeps the Go entry honest when live data is unavailable", () => {
     render(<FeedScreen live={{ ...live(null), goInterests: { status: "unavailable" } }} />);
-    fireEvent.click(screen.getByRole("button", { name: /Join when it works for you/ }));
-    const chooser = screen.getByRole("dialog", { name: "Join when it works for you" });
+    fireEvent.click(screen.getByRole("button", { name: /Pistl Go/ }));
+    const chooser = screen.getByRole("dialog", { name: "Pistl Go" });
     expect(within(chooser).getByRole("alert")).toHaveTextContent("Pistl Go is unavailable");
     expect(within(chooser).queryByRole("button", { name: /Nordkette/ })).not.toBeInTheDocument();
+  });
+
+  it("shows the owner's meeting prominently and prepares a ride without publishing", async () => {
+    const planDate = toIsoDay(new Date(NOW.getTime() + 86400000));
+    const plan = {
+      id: "550e8400-e29b-41d4-a716-446655440000", version: 1,
+      city: "salzburg" as const, resort: "Zell am See", planDate, meetTime: "12:30",
+      transport: "own" as const, meetingText: "Main entrance",
+      createdAt: NOW.toISOString(), updatedAt: NOW.toISOString(),
+      expiresAt: new Date(NOW.getTime() + 3 * 86400000).toISOString(),
+    };
+    render(<FeedScreen live={{ ...live([]), viewerIsMinor: true, dayPlans: { status: "ok", plans: [plan] } }} />);
+    const overview = screen.getByRole("region", { name: "Your private ski days" });
+    expect(within(overview).getByText("Main entrance")).toBeVisible();
+    fireEvent.click(within(overview).getByRole("button", { name: "Prepare a ride" }));
+    const modal = screen.getByRole("dialog", { name: "Post a ride" });
+    expect(within(modal).getByLabelText("Resort")).toHaveValue("Zell am See");
+    expect(within(modal).getByRole("button", { name: "Next" })).toBeDisabled();
+    fireEvent.click(within(modal).getByRole("button", { name: /Park/ }));
+    fireEvent.click(within(modal).getByRole("button", { name: "Next" }));
+    expect(within(modal).getByLabelText("Meeting point")).toHaveValue("Main entrance");
+    expect(within(modal).getByLabelText("Time")).toHaveValue("12:30");
+    expect(within(modal).getByLabelText("Day")).toHaveValue(planDate);
+    expect(mocks.create).not.toHaveBeenCalled();
   });
 
   it("shows friends rides of the region and leaves public events to their screen", () => {

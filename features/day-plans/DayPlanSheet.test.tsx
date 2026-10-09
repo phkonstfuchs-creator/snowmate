@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DayPlanSheet from "./DayPlanSheet";
 
 const actions = vi.hoisted(() => ({ save: vi.fn(), remove: vi.fn() }));
@@ -23,7 +23,14 @@ const plan = {
 describe("DayPlanSheet", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-09T10:00:00.000Z"));
     vi.spyOn(crypto, "randomUUID").mockReturnValue("new-plan-id");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("collects a private day plan and sends the client id with the save", async () => {
@@ -37,19 +44,19 @@ describe("DayPlanSheet", () => {
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
 
     fireEvent.click(screen.getByLabelText(/i need a lift|need transport|need a ride/i));
-    expect(screen.getByText(/doesn.t reserve a seat/i)).toBeInTheDocument();
+    expect(screen.getByText(/no seat is reserved/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
     fireEvent.change(screen.getByLabelText(/meeting point/i), { target: { value: "At the main entrance" } });
-    fireEvent.click(screen.getByRole("button", { name: /save plan/i }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
 
-    await waitFor(() => expect(actions.save).toHaveBeenCalledWith("new-plan-id", 0, {
+    expect(actions.save).toHaveBeenCalledWith("new-plan-id", 0, {
       city: "innsbruck",
       resort: "Axamer Lizum",
       planDate: "2026-10-12",
       meetTime: "09:30",
       transport: "need",
       meetingText: "At the main entrance",
-    }));
+    });
     expect(onSaved).toHaveBeenCalledWith(plan);
   });
 
@@ -65,12 +72,48 @@ describe("DayPlanSheet", () => {
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
     fireEvent.change(screen.getByLabelText(/meeting point/i), { target: { value: "At the main entrance" } });
 
-    fireEvent.click(screen.getByRole("button", { name: /save plan/i }));
-    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
+    expect(screen.getByRole("alert")).toBeInTheDocument();
 
     expect(screen.getByLabelText(/meeting point/i)).toHaveValue("At the main entrance");
     expect(onSaved).not.toHaveBeenCalled();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("turns a stale edit into a visible read-only state", async () => {
+    actions.save.mockResolvedValue({ ok: false, message: "dayPlan.conflict" });
+    render(<DayPlanSheet city="innsbruck" initial={plan} onClose={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByLabelText(/i need a lift|need transport|need a ride/i));
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(/changed elsewhere/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/editing is paused/i);
+    expect(screen.getByRole("button", { name: /save.*plan/i })).toBeDisabled();
+    expect(screen.getByLabelText(/meeting point/i)).toBeDisabled();
+  });
+
+  it("sends only one request when save is tapped repeatedly", async () => {
+    actions.save.mockResolvedValue({ ok: true, message: "dayPlan.saved", plan });
+    render(<DayPlanSheet city="innsbruck" onClose={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/resort/i), { target: { value: "Axamer Lizum" } });
+    fireEvent.change(screen.getByLabelText(/date/i), { target: { value: "2026-10-12" } });
+    fireEvent.change(screen.getByLabelText(/time/i), { target: { value: "09:30" } });
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByLabelText(/i have my own transport|own transport/i));
+    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.change(screen.getByLabelText(/meeting point/i), { target: { value: "At the main entrance" } });
+
+    await act(async () => {
+      const save = screen.getByRole("button", { name: /save.*plan/i });
+      fireEvent.click(save);
+      fireEvent.click(save);
+      await Promise.resolve();
+    });
+
+    expect(actions.save).toHaveBeenCalledTimes(1);
   });
 
   it("does not make server requests for a visibly local demo plan", async () => {
@@ -85,7 +128,7 @@ describe("DayPlanSheet", () => {
     fireEvent.click(screen.getByLabelText(/i have my own transport|own transport/i));
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
     fireEvent.change(screen.getByLabelText(/meeting point/i), { target: { value: "At the main entrance" } });
-    fireEvent.click(screen.getByRole("button", { name: /save plan/i }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /save.*plan/i })));
 
     expect(actions.save).not.toHaveBeenCalled();
     expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ id: expect.any(String), resort: "Axamer Lizum" }));
@@ -97,12 +140,13 @@ describe("DayPlanSheet", () => {
     render(<DayPlanSheet city="innsbruck" initial={plan} onClose={onClose} onSaved={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: /delete plan/i }));
-    const dialog = screen.getByRole("alertdialog");
+    const dialog = screen.getByRole("group", { name: /delete this plan/i });
     expect(within(dialog).getByText(/delete this plan/i)).toBeInTheDocument();
     expect(actions.remove).not.toHaveBeenCalled();
-    fireEvent.click(within(dialog).getByRole("button", { name: /confirm delete/i }));
+    await act(async () => fireEvent.click(within(dialog).getByRole("button", { name: /confirm delete/i })));
 
-    await waitFor(() => expect(actions.remove).toHaveBeenCalledWith("plan-1", 3));
+    expect(actions.remove).toHaveBeenCalledWith("plan-1", 3);
+    await act(async () => vi.advanceTimersByTimeAsync(160));
     expect(onClose).toHaveBeenCalled();
   });
 });

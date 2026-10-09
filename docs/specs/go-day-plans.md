@@ -19,6 +19,13 @@ An owner has at most 20 unexpired plans. Save commands are limited to 30 success
 
 Offline/failed writes retain form input and never show a successful save. A missing backend returns unavailable, not an empty list. Demo mode explains local simulated planning and makes no account requests. No ledger of old private meeting points or saved plan history is retained.
 
+Deletion retains only the owner, plan id and retry-blocking expiry until the
+later of the original plan expiry and 24 hours after deletion. During that
+window a delayed create retry cannot restore a deleted plan. These minimal
+records are included in export, cascade with the account and are purged daily.
+The export also includes the caller's retained save timestamps without internal
+sequence ids. All export data requires an active session and sufficient MFA.
+
 ## Acceptance criteria and evidence
 
 1. A new account creates a plan without a crew or ride; reload shows it, and its meeting point is reachable from Today.

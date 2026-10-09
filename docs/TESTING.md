@@ -38,6 +38,13 @@ It is a fast local check, not a replacement for `npm run test:db` in CI.
 
 ## Concurrency
 
+`day_plans.test.sql` checks private Go planning with active session/MFA,
+owner-only reads and export, bounded input, save/active-plan quotas, CAS,
+idempotent retries, deletion replay protection, Vienna DST expiry and cleanup.
+`private-day-plans.spec.ts` exercises save/reload/edit/delete and deliberate
+ride-form prefill against real isolated accounts; `demo-day-plans.spec.ts`
+checks the temporary public demo, narrow/short screens and Axe WCAG AA.
+
 pgTAP runs inside one rolled-back transaction, so it cannot race two
 sessions. `scripts/test-join-race.sh` commits a ride with three spots
 and lets twelve riders call `join_ride()` at the same moment, each in its

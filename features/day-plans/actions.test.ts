@@ -20,7 +20,7 @@ const plan = {
   ...input,
   createdAt: "2026-10-09T10:00:00.000Z",
   updatedAt: "2026-10-09T10:00:00.000Z",
-  expiresAt: "2026-10-12T00:00:00.000Z",
+  expiresAt: "2026-10-11T22:00:00.000Z",
 };
 
 beforeEach(() => {
@@ -50,6 +50,15 @@ describe("day plan actions", () => {
     await expect(saveDayPlan(id, 0, input)).resolves.toEqual({ ok: false, message: "dayPlan.limit" });
     mocks.rpc.mockResolvedValueOnce({ data: { status: "rate_limited" }, error: null });
     await expect(saveDayPlan(id, 0, input)).resolves.toEqual({ ok: false, message: "dayPlan.rateLimited" });
+  });
+
+  it("does not report a save when the RPC omits or malforms the saved DTO", async () => {
+    mocks.rpc.mockResolvedValueOnce({ data: { status: "saved" }, error: null });
+    await expect(saveDayPlan(id, 0, input)).resolves.toEqual({ ok: false, message: "common.unavailable" });
+    mocks.rpc.mockResolvedValueOnce({ data: { status: "saved", plan: { ...plan, userId: "leak" } }, error: null });
+    await expect(saveDayPlan(id, 0, input)).resolves.toEqual({ ok: false, message: "common.unavailable" });
+    mocks.rpc.mockResolvedValueOnce({ data: { status: "saved", plan: { ...plan, meetingText: "different saved value" } }, error: null });
+    await expect(saveDayPlan(id, 0, input)).resolves.toEqual({ ok: false, message: "common.unavailable" });
   });
 
   it("validates before making a database request and preserves i18n keys", async () => {
