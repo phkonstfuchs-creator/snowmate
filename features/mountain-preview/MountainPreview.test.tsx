@@ -6,6 +6,7 @@ vi.mock("next/dynamic", () => ({ default: () => () => <div aria-label="Pilotkart
 vi.mock("./data/catalog", () => ({ pilotFeatures: [
   { id: "osm:way:1", name: "Seegrubenbahn", kind: "lift", duration: "8 min" },
   { id: "osm:way:2", name: "Frau-Hitt-Warte", kind: "piste", difficulty: "intermediate" },
+  ...Array.from({ length: 9 }, (_, index) => ({ id: `osm:way:zweier-${index}`, name: "2 - Zweier Skiroute", kind: "piste", difficulty: "freeride" })),
 ] }));
 vi.mock("./GoPlanner", () => ({ default: ({ onComplete, onClose }: { onComplete: (plan: unknown) => void; onClose: () => void }) => <div role="dialog" aria-label="Pistl Go">
   <button onClick={() => onComplete({ resort: "Nordkette", date: "2026-12-12", time: "09:00", transport: "own", meeting: "Seegrube", crew: [] })}>Privaten Entwurf speichern</button>
@@ -15,6 +16,12 @@ vi.mock("./GoPlanner", () => ({ default: ({ onComplete, onClose }: { onComplete:
 afterEach(() => vi.useRealTimers());
 
 describe("Mountain preview journeys", () => {
+  it("keeps every matching ski-route section available in search", () => {
+    render(<MountainPreview />);
+    fireEvent.click(screen.getByRole("button", { name: "Berg" }));
+    fireEvent.change(screen.getByRole("searchbox", { name: "Piste oder Lift suchen" }), { target: { value: "Zweier" } });
+    expect(screen.getAllByRole("button", { name: "2 - Zweier Skiroute auswählen" })).toHaveLength(9);
+  });
   it("makes planning possible with no existing plan and labels the preview", () => {
     render(<MountainPreview />);
     expect(screen.getByText(/Designvorschau/)).toBeInTheDocument();

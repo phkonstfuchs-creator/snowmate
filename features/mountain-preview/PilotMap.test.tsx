@@ -19,6 +19,7 @@ const state = vi.hoisted(() => ({
   remove: vi.fn(),
   markerAddTo: vi.fn(),
   markerRemove: vi.fn(),
+  queryRenderedFeatures: vi.fn(),
   markerElement: null as HTMLElement | null,
 }));
 
@@ -41,7 +42,7 @@ vi.mock("maplibre-gl", () => ({
     fitBounds(...args: unknown[]) { state.fitBounds(...args); }
     setFilter(...args: unknown[]) { state.setFilter(...args); }
     setStyle(...args: unknown[]) { state.setStyle(...args); }
-    queryRenderedFeatures() { return []; }
+    queryRenderedFeatures = state.queryRenderedFeatures;
     resize() {}
     remove = state.remove;
   },
@@ -67,6 +68,18 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PilotMap lifecycle", () => {
+  it("selects geometry only in map mode, leaving replay framing alone", () => {
+    const onSelect = vi.fn();
+    state.queryRenderedFeatures.mockReturnValue([{ source: "nordkette-pilot", properties: pilotGeoJSON.features[0]?.properties }]);
+    const { rerender } = render(<PilotMap mode="map" selectedId={null} onSelect={onSelect} replayProgress={0} terrain={false} />);
+    ready();
+    act(() => state.events.get("click")?.({ point: { x: 10, y: 10 } }));
+    expect(onSelect).toHaveBeenCalledOnce();
+    onSelect.mockClear();
+    rerender(<PilotMap mode="day" selectedId={null} onSelect={onSelect} replayProgress={50} terrain={false} />);
+    act(() => state.events.get("click")?.({ point: { x: 10, y: 10 } }));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
   it("hides the sample route in map mode and enables DEM terrain when requested", () => {
     const { rerender } = render(<PilotMap mode="map" selectedId={null} onSelect={() => {}} replayProgress={0} terrain={false} />);
     ready();

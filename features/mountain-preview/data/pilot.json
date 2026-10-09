@@ -86,6 +86,7 @@
         "osm_id": 25170582,
         "osm_type": "way",
         "kind": "lift",
+        "osm_name": "Seegrubenbahn",
         "osm_version": 25,
         "osm_timestamp": "2026-02-18T17:18:15Z"
       },
@@ -149,6 +150,7 @@
         "osm_id": 25282282,
         "osm_type": "way",
         "kind": "lift",
+        "osm_name": "Hafelekarbahn",
         "osm_version": 11,
         "osm_timestamp": "2026-05-10T11:12:03Z"
       },
@@ -181,6 +183,7 @@
         "osm_id": 25750412,
         "osm_type": "way",
         "kind": "lift",
+        "osm_name": "Seegrube",
         "osm_version": 20,
         "osm_timestamp": "2026-05-10T11:12:40Z"
       },
@@ -294,7 +297,7 @@
         "incline": "down",
         "lit": "no",
         "mtb:scale:uphill": "1",
-        "name": "Bodenstein-Weg",
+        "name": "2 - Zweier Skiroute",
         "piste:difficulty": "intermediate",
         "piste:grooming": "backcountry",
         "piste:name": "2 - Zweier Skiroute",
@@ -306,6 +309,7 @@
         "osm_id": 48901223,
         "osm_type": "way",
         "kind": "piste",
+        "osm_name": "Bodenstein-Weg",
         "osm_version": 18,
         "osm_timestamp": "2025-04-19T18:40:03Z"
       },
@@ -1212,6 +1216,7 @@
         "osm_id": 227203761,
         "osm_type": "way",
         "kind": "lift",
+        "osm_name": "Frau-Hitt Warte",
         "osm_version": 5,
         "osm_timestamp": "2026-02-10T13:33:35Z"
       },
@@ -1463,7 +1468,7 @@
         "incline": "down",
         "lit": "no",
         "mtb:scale:uphill": "1",
-        "name": "Bodenstein-Weg",
+        "name": "2 - Zweier Skiroute",
         "piste:difficulty": "intermediate",
         "piste:grooming": "backcountry",
         "piste:name": "2 - Zweier Skiroute",
@@ -1475,6 +1480,7 @@
         "osm_id": 769092620,
         "osm_type": "way",
         "kind": "piste",
+        "osm_name": "Bodenstein-Weg",
         "osm_version": 6,
         "osm_timestamp": "2025-04-19T18:40:03Z"
       },
@@ -1507,7 +1513,7 @@
         "incline": "down",
         "lit": "no",
         "mtb:scale:uphill": "1",
-        "name": "Bodenstein-Weg",
+        "name": "2 - Zweier Skiroute",
         "piste:difficulty": "intermediate",
         "piste:grooming": "backcountry",
         "piste:name": "2 - Zweier Skiroute",
@@ -1519,6 +1525,7 @@
         "osm_id": 769092621,
         "osm_type": "way",
         "kind": "piste",
+        "osm_name": "Bodenstein-Weg",
         "osm_version": 7,
         "osm_timestamp": "2025-04-19T18:40:03Z"
       },

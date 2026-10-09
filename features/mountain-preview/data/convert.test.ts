@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { convertOverpass, featureBounds } from "./convert";
 
 describe("pilot map conversion", () => {
+  it("prefers the winter route name while keeping the summer source tags", () => {
+    const result = convertOverpass({ elements: [{ type: "way", id: 12, tags: { name: "Bodenstein-Weg", "piste:name": "2 - Zweier Skiroute", "piste:type": "downhill" }, geometry: [{ lat: 47.3, lon: 11.3 }, { lat: 47.31, lon: 11.31 }] }] });
+    expect(result.features[0]?.properties.name).toBe("2 - Zweier Skiroute");
+    expect(result.features[0]?.properties["piste:name"]).toBe("2 - Zweier Skiroute");
+    expect(result.features[0]?.properties.osm_name).toBe("Bodenstein-Weg");
+  });
   it("keeps source ids and tags while converting valid lifts and pistes", () => {
     const result = convertOverpass({
       elements: [

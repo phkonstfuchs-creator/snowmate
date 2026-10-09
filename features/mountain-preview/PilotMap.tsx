@@ -229,6 +229,7 @@ export default function PilotMap({ mode, selectedId, onSelect, replayProgress, t
       }
     });
     map.on("click", (event) => {
+      if (modeRef.current === "day") return;
       const layers = ["pilot-pistes", "pilot-lifts"].filter((id) => map.getLayer(id));
       if (layers.length === 0) return;
       const feature = map.queryRenderedFeatures(event.point, { layers }).find((item) => item.source === PILOT_SOURCE);

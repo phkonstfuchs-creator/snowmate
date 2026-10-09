@@ -99,3 +99,30 @@ test("main screens and planning sheet meet automated accessibility checks", asyn
   const result = await new AxeBuilder({ page }).include('[role="dialog"]').withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(result.violations).toEqual([]);
 });
+
+test("all winter route sections remain reachable in the scrollable search", async ({ page }) => {
+  await page.goto("/preview/mountain");
+  await page.getByRole("button", { name: "Berg", exact: true }).click();
+  await page.getByRole("searchbox", { name: "Piste oder Lift suchen" }).fill("Zweier");
+  const sections = page.getByRole("button", { name: "2 - Zweier Skiroute auswählen", exact: true });
+  await expect(sections).toHaveCount(12);
+  await sections.last().click();
+  await expect(page.getByRole("heading", { name: "2 - Zweier Skiroute", exact: true })).toBeVisible();
+});
+
+test("webcam, offline and meetup sheets stay reachable on short landscape screens", async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto("/preview/mountain");
+  for (const name of ["Webcams", "Offlinekarte", "Treffpunkt ansehen"]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    const bounds = await dialog.boundingBox();
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.height).toBeLessThanOrEqual(390);
+    await expect(dialog.getByRole("heading", { level: 2 })).toBeInViewport();
+    await expect(dialog.getByRole("button", { name: "Schließen", exact: true })).toBeInViewport();
+    await dialog.getByRole("button", { name: "Schließen", exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+  }
+});

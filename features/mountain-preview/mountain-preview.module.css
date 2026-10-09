@@ -90,7 +90,8 @@
 .search { display: flex; align-items: center; gap: 8px; padding: 0 13px; border-radius: 13px; background: #fffffff5; box-shadow: 0 3px 16px #2f4d4021; color: #62776e; min-height: 48px; }
 .search input { width: 100%; min-width: 0; min-height: 48px; font-size: 12px; color: #2e453b; outline-offset: 0; }
 .search input::placeholder { color: #5b746b; }
-.searchResults { margin-top: 5px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px #273c3124; }
+.searchResults { margin-top: 5px; background: white; border-radius: 12px; max-height: min(240px, 35dvh); overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 8px 20px #273c3124; }
+.previewSheet { max-height: min(92dvh, 820px); overflow-y: auto; overscroll-behavior: contain; }
 .searchResults button { display: flex; gap: 8px; align-items: center; min-height: 48px; font-size: 12px; width: 100%; padding: 10px; text-align: left; }
 .searchResults button span { flex: 1; }
 .searchResults p { padding: 12px; font-size: 12px; }
