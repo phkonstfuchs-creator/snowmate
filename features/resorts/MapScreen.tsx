@@ -45,10 +45,11 @@ import { LIFTS } from "@/lib/lifts";
 import { useLiftMeetups } from "@/features/lift-meetup/useLiftMeetups";
 import LiftMeetupPanel from "@/features/lift-meetup/LiftMeetupPanel";
 import { START_MESSAGES, type LiftMeetup, type StartResult } from "@/features/lift-meetup/meetup";
+import MapLoading from "@/components/map/MapLoading";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
-  loading: () => <div className="ski-map-placeholder" aria-hidden="true" />,
+  loading: () => <div className="ski-map-placeholder"><MapLoading /></div>,
 });
 
 const SURFACE = "var(--bg-surface-1)";

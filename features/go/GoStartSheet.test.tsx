@@ -15,7 +15,7 @@ it("opens only a selected visible ride after the chooser has finished dismissing
 it("offers a clear empty start and opens the create sheet only after close", async () => {
   const cb = callbacks();
   render(<GoStartSheet rides={[]} unavailable={false} demo={false} basePath="" {...cb} />);
-  expect(screen.getByText(/No suitable future ride yet/)).toBeInTheDocument();
+  expect(screen.getByText(/No suitable upcoming ride yet/)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Post a ride" }));
   expect(cb.onCreate).not.toHaveBeenCalled();
   await waitFor(() => expect(cb.onCreate).toHaveBeenCalledOnce());

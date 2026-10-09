@@ -12,7 +12,7 @@ test.describe("prominent coordination entries", () => {
     for (const width of [390, 320]) {
       await a.page.setViewportSize({ width, height: 844 });
       await a.page.goto("/feed");
-      const go = a.page.getByRole("button", { name: /^Pistl Go/ });
+      const go = a.page.getByRole("button", { name: /^Mitfahren, wenn’s passt/ });
       const lift = a.page.getByRole("link", { name: /^Lift-Treffpunkt/ });
       for (const entry of [go, lift]) {
         await expect(entry).toBeVisible();
@@ -24,7 +24,7 @@ test.describe("prominent coordination entries", () => {
       expect(await a.page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await a.page.screenshot({ path: testInfo.outputPath(`today-${width}.png`) });
       await go.click();
-      const chooser = a.page.getByRole("dialog", { name: /^Pistl Go/ });
+      const chooser = a.page.getByRole("dialog", { name: /^Mitfahren, wenn’s passt/ });
       await expect(chooser).toBeVisible();
       await expect(chooser.getByRole("link", { name: "Crew finden" })).toBeVisible();
       await chooser.getByRole("button", { name: "Schließen", exact: true }).click();
@@ -59,8 +59,8 @@ test.describe("prominent coordination entries", () => {
     });
     expect(created.error).toBeNull();
     await b.page.goto("/feed");
-    await b.page.getByRole("button", { name: /^Pistl Go/ }).click();
-    const chooser = b.page.getByRole("dialog", { name: /^Pistl Go/ });
+    await b.page.getByRole("button", { name: /^Mitfahren, wenn’s passt/ }).click();
+    const chooser = b.page.getByRole("dialog", { name: /^Mitfahren, wenn’s passt/ });
     await expect(chooser).toBeVisible();
     await chooser.getByRole("button", { name: /Nordkette/ }).click();
     await expect(chooser).toHaveCount(0);
@@ -76,5 +76,7 @@ test.describe("prominent coordination entries", () => {
     const rides = await b.account.client.rpc("list_rides");
     expect(rides.error).toBeNull();
     expect(rides.data.find((ride: { caption: string }) => ride.caption === caption).is_joined).toBe(false);
+    await detail.getByRole("button", { name: "Wunsch zurückziehen", exact: true }).click();
+    await expect(detail.getByText("Wunsch zurückgezogen.", { exact: true })).toBeVisible();
   });
 });

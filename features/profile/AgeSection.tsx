@@ -31,11 +31,11 @@ export default function AgeSection({ birthDate, isMinor }: { birthDate: string |
             {t("profile.birthDate")}
           </label>
           <div className="flex gap-2">
-            <input id="birth-date" name="birthDate" type="date" required className="form-input flex-1" autoComplete="bday" />
+            <input id="birth-date" name="birthDate" type="date" required className="form-input min-w-0 w-full flex-1" autoComplete="bday" />
             <button
               type="submit"
               disabled={pending}
-              className="px-4 font-display disabled:opacity-40"
+              className="min-h-12 shrink-0 px-4 font-display disabled:opacity-40"
               style={{ background: "var(--rust)", color: "var(--on-accent)" }}
             >
               {pending ? t("common.saving") : t("common.save")}

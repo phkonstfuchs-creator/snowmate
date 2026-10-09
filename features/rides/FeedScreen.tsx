@@ -156,19 +156,6 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
         </div>
       </header>
 
-      <section aria-label={t("coord.quick")} className="grid grid-cols-2 gap-3 px-4 pt-4 pb-3">
-        <button type="button" onClick={() => setShowGoStart(true)} className="card-tap min-w-0 rounded-2xl border p-3 text-left" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
-          <Icon name="users" size={22} color="var(--rust)" />
-          <span className="mt-2 block font-bold">{t("go.title")}</span>
-          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.goHint")}</span>
-        </button>
-        <Link href={live ? `${basePath}/map?action=lift` : `${basePath}/map`} className="card-tap min-w-0 rounded-2xl border p-3" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
-          <Icon name="mountain" size={22} color="var(--rust)" />
-          <span className="mt-2 block font-bold">{t("coord.liftTitle")}</span>
-          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.liftHint")}</span>
-        </Link>
-      </section>
-
       {/* "Who's out today?" first: faces, not just a number. */}
       {outLine && (
         <section aria-label={t(outLine.key, outLine.values)} className="flex items-center gap-3 px-4 pt-4 pb-1">
@@ -182,6 +169,19 @@ export default function FeedScreen({ live, referenceTime }: { live?: LiveFeed; r
           </span>
         </section>
       )}
+
+      <section aria-label={t("coord.quick")} className="grid grid-cols-2 gap-3 px-4 pt-4 pb-3">
+        <button type="button" onClick={() => setShowGoStart(true)} className="card-tap min-w-0 rounded-2xl border p-3 text-left" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
+          <Icon name="users" size={22} color="var(--rust)" />
+          <span className="mt-2 block font-bold">{t("go.title")}</span>
+          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.goHint")}</span>
+        </button>
+        <Link href={live ? `${basePath}/map?action=lift` : `${basePath}/map`} className="card-tap min-w-0 rounded-2xl border p-3" style={{ minHeight: 112, background: "var(--paper-1)", borderColor: "var(--ink-0)" }}>
+          <Icon name="mountain" size={22} color="var(--rust)" />
+          <span className="mt-2 block font-bold">{t("coord.liftTitle")}</span>
+          <span className="mt-1 block text-sm leading-snug" style={{ color: "var(--ink-1)" }}>{t("coord.liftHint")}</span>
+        </Link>
+      </section>
 
       {live && live.profileComplete === false && (
         <Link
