@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Map as MapLibreMap, Marker, setWorkerUrl, type GeoJSONSource, type StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import MapLoading from "./MapLoading";
 
 import type { ResortStatus } from "@/lib/types";
 import { useT } from "@/lib/i18n/client";
@@ -153,6 +154,8 @@ export default function SkiMap({
   const shownCity = useRef(city);
   const latestMe = useRef(me);
   const [styleReady, setStyleReady] = useState(false);
+  const [tilesReady, setTilesReady] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [failed, setFailed] = useState(false);
   const t = useT();
 
@@ -200,10 +203,22 @@ export default function SkiMap({
       map.setStyle(RASTER_FALLBACK_STYLE as StyleSpecification);
     };
     const timer = window.setTimeout(fallBack, STYLE_TIMEOUT_MS);
+    const readinessTimer = window.setTimeout(() => setSlow(true), 15_000);
+    const markReady = () => {
+      window.clearTimeout(readinessTimer);
+      setTilesReady(true);
+    };
+    let baseSources: readonly string[] = [];
+    map.once("idle", markReady);
+    map.on("sourcedata", (event) => {
+      if (baseSources.includes(event.sourceId) && event.sourceDataType === "idle" && event.isSourceLoaded) markReady();
+    });
 
     map.on("style.load", () => {
       loaded = true;
       window.clearTimeout(timer);
+      // Optional piste/terrain requests must not hold a usable base map hostage.
+      baseSources = Object.keys(map.getStyle()?.sources ?? {}).filter((id) => !["pistes", "terrain", ACCURACY_SOURCE, TRACK_SOURCE].includes(id));
       if (!fellBack) tintStyle(map);
       addSkiLayers(map);
       addAccuracyLayer(map);
@@ -221,6 +236,7 @@ export default function SkiMap({
 
     return () => {
       window.clearTimeout(timer);
+      window.clearTimeout(readinessTimer);
       observer.disconnect();
       map.remove();
       mapRef.current = null;
@@ -374,13 +390,16 @@ export default function SkiMap({
   }
 
   return (
-    <div
+    <div className="relative h-full w-full min-w-0">
+      <div
       ref={containerRef}
       role="region"
       aria-label={ariaLabel ?? t("map.region", { city: city === "innsbruck" ? "Innsbruck" : "Salzburg" })}
       className="ski-map"
-      data-ready={styleReady ? "true" : "false"}
+      data-ready={tilesReady ? "true" : "false"}
       style={{ width: "100%", height: "100%", minHeight: 260 }}
-    />
+      />
+      {!tilesReady && <MapLoading slow={slow} />}
+    </div>
   );
 }

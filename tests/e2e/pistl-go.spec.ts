@@ -24,7 +24,7 @@ test.describe("private Pistl Go against local Supabase", () => {
     await detail.getByRole("button", { name: "Wunsch speichern", exact: true }).click();
     await expect(detail.getByText("Wunsch gespeichert. Kein Platz reserviert.", { exact: true })).toBeVisible();
     await b.page.reload();
-    await expect(b.page.getByRole("heading", { name: "Deine Pistl-Go-Pläne", exact: true })).toBeVisible();
+    await expect(b.page.getByRole("heading", { name: "Deine Mitfahrwünsche", exact: true })).toBeVisible();
     const before = await b.account.client.rpc("list_rides");
     expect(before.error).toBeNull();
     expect(before.data.find((row: { id: string }) => row.id === rideId).is_joined).toBe(false);
@@ -37,7 +37,9 @@ test.describe("private Pistl Go against local Supabase", () => {
     await detail.getByRole("button", { name: "Wunsch zurückziehen", exact: true }).click();
     await expect(detail.getByText("Wunsch zurückgezogen.", { exact: true })).toBeVisible();
     await b.page.reload();
-    await expect(b.page.getByRole("heading", { name: "Deine Pistl-Go-Pläne", exact: true })).toHaveCount(0);
+    const remaining = await b.account.client.rpc("list_my_ride_go_interests");
+    expect(remaining.error).toBeNull();
+    expect(remaining.data.some((row: { ride: { id: string } }) => row.ride.id === rideId)).toBe(false);
     detail = await openRide(b.page, caption);
     await detail.getByRole("combobox", { name: "Mindestgruppe inklusive dir", exact: true }).selectOption("2");
     await detail.getByRole("checkbox", { name: "Ich brauche einen bestätigten Mitfahrplatz", exact: true }).check();

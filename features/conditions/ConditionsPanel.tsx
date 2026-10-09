@@ -44,6 +44,9 @@ export default function ConditionsPanel({ conditions }: { conditions: ResortCond
   ];
   return (
     <section className="px-5 mt-4" aria-label={t("cond.title")}>
+      <p className="mb-2 text-xs" style={{ color: MUTED }}>
+        <time dateTime={conditions.updatedAt}>{t("cond.updated", { time: conditions.updatedAt.replace("T", " · ") })}</time>
+      </p>
       <div className="flex items-center justify-between gap-3 p-3" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
         <div className="flex items-center gap-3">
           <Icon name={WEATHER_ICON[conditions.kind]} size={30} color={INK} />
@@ -57,7 +60,7 @@ export default function ConditionsPanel({ conditions }: { conditions: ResortCond
       </div>
       <div className="grid grid-cols-3 gap-3 mt-3">
         {stats.map(({ label, value }) => (
-          <div key={label} className="p-3 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+          <div key={label} className="min-w-0 break-words p-2 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
             <p className="font-black text-lg" style={{ color: INK }}>{value}</p>
             <p className="text-[0.65rem] font-semibold" style={{ color: MUTED }}>{label}</p>
           </div>

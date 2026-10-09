@@ -1,4 +1,11 @@
-# Usability protocol: "Jonas, 19"
+# Usability protocol: young mountain crews
+
+The primary persona is now **Lena, 16**: a local skier coordinating a mixed-ability
+crew, transport and a mountain rendezvous with one thumb and weak signal. Include
+Jonas, 15, to check the planning path without live-sharing eligibility, and a new
+adult arrival with no friend graph. See [the current audit and field-test plan](MOUNTAIN_UX_AUDIT.md).
+The Jonas, 19 walkthrough below is retained as historical evidence; it was not
+a real adolescent user study.
 
 Tests whether Pistl works for its laziest real user. Run it with the
 current TestFlight build, or app.pistl.app on a phone, never an old local

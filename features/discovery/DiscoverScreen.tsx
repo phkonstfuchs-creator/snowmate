@@ -3,11 +3,11 @@
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
-import Icon from "@/components/ui/Icon";
 import Switch from "@/components/ui/Switch";
 import { useT } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/translate";
 import { initialsFor } from "@/features/profile/profile-input";
+import AgeSection from "@/features/profile/AgeSection";
 import { openDirectChatAction } from "@/features/chat/actions";
 import ReportBlockSheet from "@/features/safety/ReportBlockSheet";
 import ConversationThread from "@/features/demo/ConversationThread";
@@ -20,6 +20,7 @@ const OUTCOME_ERROR: Partial<Record<SwipeOutcome, MessageKey>> = {
   rate_limited: "discover.rateLimited",
   unauthenticated: "profile.sessionEnded",
   unavailable: "discover.failed",
+  invalid: "discover.riderUnavailable",
 };
 
 /* Meet riders by swiping (ADR 0028). Opt-in; separated by age; under 18
@@ -66,6 +67,7 @@ export default function DiscoverScreen({
   };
 
   const decide = (card: DeckCard, liked: boolean) => {
+    if (pending) return;
     setError(null);
     setDeck((current) => current?.filter((item) => item.userId !== card.userId) ?? current);
     if (demo) {
@@ -76,7 +78,10 @@ export default function DiscoverScreen({
       const outcome = await swipeAction(card.userId, liked).catch((): SwipeOutcome => "unavailable");
       if (outcome === "matched") setMatch(card);
       const message = OUTCOME_ERROR[outcome];
-      if (message) setError(t(message));
+      if (message) {
+        setError(t(message));
+        if (outcome !== "invalid") setDeck((current) => current && !current.some((item) => item.userId === card.userId) ? [card, ...current] : current);
+      }
     });
   };
 
@@ -95,7 +100,10 @@ export default function DiscoverScreen({
       </header>
 
       {!hasBirthDate ? (
-        <p className="mx-4 mt-5 text-sm" style={{ color: "var(--ink-1)" }}>{t("discover.needsAge")}</p>
+        <div className="mt-5">
+          <p className="mx-4 mb-4 text-sm" style={{ color: "var(--ink-1)" }}>{t("discover.needsAge")}</p>
+          {!demo && <AgeSection birthDate={null} isMinor={isMinor} />}
+        </div>
       ) : (
         <section className="mx-4 mt-4 flex items-center justify-between gap-3 px-4 py-3" style={{ background: "var(--paper-1)", border: "var(--rule-thin)" }} aria-busy={pending}>
           <div className="min-w-0">
@@ -127,7 +135,7 @@ export default function DiscoverScreen({
       )}
 
       {hasBirthDate && on && top && (
-        <SwipeCard key={top.userId} card={top} onDecide={(liked) => decide(top, liked)} onReport={() => setReporting(top)} />
+        <SwipeCard key={top.userId} card={top} disabled={pending} onDecide={(liked) => decide(top, liked)} onReport={() => setReporting(top)} />
       )}
 
       {match && <MatchSheet card={match} demo={demo} onClose={() => setMatch(null)} />}
@@ -145,17 +153,18 @@ export default function DiscoverScreen({
   );
 }
 
-function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (liked: boolean) => void; onReport: () => void }) {
+function SwipeCard({ card, disabled, onDecide, onReport }: { card: DeckCard; disabled: boolean; onDecide: (liked: boolean) => void; onReport: () => void }) {
   const t = useT();
   const [dx, setDx] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const start = useRef<{ x: number; id: number } | null>(null);
+  const start = useRef<{ x: number; y: number; id: number; dx: number; vertical: boolean } | null>(null);
   const hint = swipeDirection(dx);
 
   return (
-    <section className="mx-4 mt-5" aria-label={card.name}>
+    <section className="mx-4 mt-5 overflow-x-clip" aria-label={card.name} aria-busy={disabled}>
+      <p className="mb-3 text-center text-xs" style={{ color: "var(--ink-2)" }}>{t("discover.swipeHint")}</p>
       <div
-        className="relative select-none px-5 py-6"
+        className="discovery-card relative select-none px-5 py-6"
         style={{
           background: "var(--paper-1)",
           border: "var(--rule-thin)",
@@ -164,19 +173,28 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
           touchAction: "pan-y",
         }}
         onPointerDown={(event) => {
-          start.current = { x: event.clientX, id: event.pointerId };
+          if (disabled || event.button > 0 || (event.target instanceof Element && event.target.closest("button, a, input, select"))) return;
+          start.current = { x: event.clientX, y: event.clientY, id: event.pointerId, dx: 0, vertical: false };
           setDragging(true);
           event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerMove={(event) => {
-          if (start.current?.id === event.pointerId) setDx(event.clientX - start.current.x);
+          const gesture = start.current;
+          if (!gesture || gesture.id !== event.pointerId) return;
+          const moveX = event.clientX - gesture.x;
+          const moveY = event.clientY - gesture.y;
+          const vertical = gesture.vertical || (Math.abs(moveY) > 8 && Math.abs(moveY) > Math.abs(moveX));
+          const nextDx = vertical ? 0 : Math.max(-240, Math.min(240, moveX));
+          start.current = { ...gesture, dx: nextDx, vertical };
+          setDx(nextDx);
         }}
-        onPointerUp={() => {
-          const decision = swipeDirection(dx);
+        onPointerUp={(event) => {
+          if (start.current?.id !== event.pointerId) return;
+          const decision = swipeDirection(start.current.dx);
           start.current = null;
           setDragging(false);
           setDx(0);
-          if (decision) onDecide(decision === "like");
+          if (decision && !disabled) onDecide(decision === "like");
         }}
         onPointerCancel={() => {
           start.current = null;
@@ -209,12 +227,12 @@ function SwipeCard({ card, onDecide, onReport }: { card: DeckCard; onDecide: (li
         )}
         {card.bio && <p className="mt-4 whitespace-pre-wrap break-words text-[0.95rem] leading-snug" style={{ color: "var(--ink-1)" }}>{card.bio}</p>}
       </div>
-      <div className="mt-4 flex items-center justify-center gap-6">
-        <button type="button" onClick={() => onDecide(false)} aria-label={t("discover.passLabel", { name: card.name })} className="flex h-16 w-16 items-center justify-center" style={{ border: "var(--rule-thin)", borderRadius: 999, background: "var(--paper-0)" }}>
-          <Icon name="x" size={26} color="var(--ink-1)" />
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <button type="button" disabled={disabled} onClick={() => onDecide(false)} aria-label={t("discover.passLabel", { name: card.name })} className="flex min-h-12 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold disabled:opacity-50" style={{ border: "var(--rule-thin)", background: "var(--paper-0)" }}>
+          {t("discover.pass")}
         </button>
-        <button type="button" onClick={() => onDecide(true)} aria-label={t("discover.likeLabel", { name: card.name })} className="flex h-16 w-16 items-center justify-center" style={{ background: "var(--rust)", borderRadius: 999 }}>
-          <Icon name="heart" size={26} color="var(--on-accent)" />
+        <button type="button" disabled={disabled} onClick={() => onDecide(true)} aria-label={t("discover.likeLabel", { name: card.name })} className="flex min-h-12 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--rust)", color: "var(--on-accent)" }}>
+          {t("discover.like")}
         </button>
       </div>
       <div className="mt-3 text-center">

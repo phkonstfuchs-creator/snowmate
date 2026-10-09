@@ -194,6 +194,7 @@ describe("MapScreen", () => {
     expect(within(dialog).getByText("123 cm")).toBeInTheDocument();
     expect(within(dialog).getByText(/13 cm expected/)).toBeInTheDocument();
     expect(within(dialog).getByText(/Open-Meteo/)).toBeInTheDocument();
+    expect(within(dialog).getByText("Weather model · As of 2026-12-20 · 10:00")).toHaveAttribute("datetime", conditions.updatedAt);
   });
 
   it("says when snow and weather are unavailable", () => {

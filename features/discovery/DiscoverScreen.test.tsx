@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DiscoverScreen from "./DiscoverScreen";
 import { I18nProvider } from "@/lib/i18n/client";
@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({ swipe: vi.fn(), deck: vi.fn(), setDiscoverable
 vi.mock("./actions", () => ({ swipeAction: mocks.swipe, deckAction: mocks.deck, setDiscoverableAction: mocks.setDiscoverable }));
 vi.mock("@/features/chat/actions", () => ({ openDirectChatAction: mocks.openChat }));
 vi.mock("@/features/safety/actions", () => ({ reportUserAction: vi.fn(), blockUserAction: vi.fn() }));
+vi.mock("@/features/profile/actions", () => ({ setBirthDateAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const card = (n: number): DeckCard => ({
@@ -30,8 +31,9 @@ describe("DiscoverScreen", () => {
 
   it("asks for a birth date first", () => {
     render(<DiscoverScreen initialDeck={[]} discoverable={false} hasBirthDate={false} isMinor />);
-    expect(screen.getByText(/add your date of birth/)).toBeInTheDocument();
+    expect(screen.getByText(/Add your date of birth/)).toBeInTheDocument();
     expect(screen.queryByRole("switch")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Birth date")).toBeInTheDocument();
   });
 
   it("is off until switched on and explains the rules for minors", async () => {
@@ -39,7 +41,7 @@ describe("DiscoverScreen", () => {
     mocks.deck.mockResolvedValue([card(1)]);
     render(<DiscoverScreen initialDeck={[]} discoverable={false} hasBirthDate isMinor />);
     expect(screen.getByText(/only meet friends of your friends/)).toBeInTheDocument();
-    const toggle = screen.getByRole("switch", { name: "Take part in swiping" });
+    const toggle = screen.getByRole("switch", { name: "Let other riders find me" });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     fireEvent.click(toggle);
     expect(await screen.findByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
@@ -53,9 +55,75 @@ describe("DiscoverScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Skip Rider 1" }));
     expect(mocks.swipe).toHaveBeenCalledWith(card(1).userId, false);
     fireEvent.click(await screen.findByRole("button", { name: "Ride with Rider 2" }));
-    expect(await screen.findByRole("dialog", { name: "It's a match!" })).toHaveTextContent("You and Rider 2 are now friends");
+    expect(await screen.findByRole("dialog", { name: "You both want to ride!" })).toHaveTextContent("You and Rider 2 are now friends");
     expect(mocks.swipe).toHaveBeenLastCalledWith(card(2).userId, true);
     expect(screen.getByText("Nobody new right now.")).toBeInTheDocument();
+  });
+
+  it("keeps the rider available when saving a choice fails", async () => {
+    mocks.swipe.mockResolvedValue("unavailable");
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable hasBirthDate isMinor={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("That did not work");
+    expect(screen.getByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
+  });
+
+  it("moves past a rider who is no longer eligible", async () => {
+    mocks.swipe.mockResolvedValue("invalid");
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable hasBirthDate isMinor={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ride with Rider 1" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("That rider is no longer available");
+    expect(screen.queryByRole("heading", { name: "Rider 1" })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Ride with Rider 2" })).toBeEnabled());
+  });
+
+  it.each(["passed", "unavailable"] as const)("blocks buttons and gestures until a slow save returns %s", async (outcome) => {
+    let finish!: (value: string) => void;
+    const saving = new Promise<string>((resolve) => { finish = resolve; });
+    mocks.swipe.mockReturnValueOnce(saving);
+    render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable hasBirthDate isMinor={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Skip Rider 1" }));
+    const next = screen.getByRole("button", { name: "Ride with Rider 2" });
+    expect(next).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Skip Rider 2" })).toBeDisabled();
+    fireEvent.click(next);
+    const surface = screen.getByText("Park laps all day").parentElement!;
+    surface.setPointerCapture = vi.fn();
+    fireEvent.pointerDown(surface, { clientX: 100, clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(surface, { clientX: 260, clientY: 100, pointerId: 1 });
+    fireEvent.pointerUp(surface, { clientX: 260, clientY: 100, pointerId: 1 });
+    expect(mocks.swipe).toHaveBeenCalledTimes(1);
+    await act(async () => { finish(outcome); await saving; });
+    const rider = outcome === "unavailable" ? "Rider 1" : "Rider 2";
+    const choice = screen.getByRole("button", { name: `Skip ${rider}` });
+    await waitFor(() => expect(choice).toBeEnabled());
+    mocks.swipe.mockResolvedValueOnce("passed");
+    fireEvent.click(choice);
+    await waitFor(() => expect(mocks.swipe).toHaveBeenCalledTimes(2));
+  });
+
+  it("does not choose a rider on a mostly vertical drag", () => {
+    render(<DiscoverScreen initialDeck={[card(1)]} discoverable hasBirthDate isMinor={false} />);
+    const surface = screen.getByText("Park laps all day").parentElement!;
+    surface.setPointerCapture = vi.fn();
+    fireEvent.pointerDown(surface, { clientX: 100, clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(surface, { clientX: 230, clientY: 300, pointerId: 1 });
+    fireEvent.pointerUp(surface, { clientX: 230, clientY: 300, pointerId: 1 });
+    expect(mocks.swipe).not.toHaveBeenCalled();
+  });
+
+  it("keeps the card after a cancelled or short swipe", () => {
+    render(<DiscoverScreen initialDeck={[card(1)]} discoverable hasBirthDate isMinor={false} />);
+    const surface = screen.getByText("Park laps all day").parentElement!;
+    surface.setPointerCapture = vi.fn();
+    fireEvent.pointerDown(surface, { clientX: 100, pointerId: 1 });
+    fireEvent.pointerMove(surface, { clientX: 230, pointerId: 1 });
+    fireEvent.pointerCancel(surface, { pointerId: 1 });
+    fireEvent.pointerDown(surface, { clientX: 100, pointerId: 1 });
+    fireEvent.pointerMove(surface, { clientX: 160, pointerId: 1 });
+    fireEvent.pointerUp(surface, { pointerId: 1 });
+    expect(mocks.swipe).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
   });
 
   it("swipes by dragging past the threshold", () => {
@@ -73,7 +141,7 @@ describe("DiscoverScreen", () => {
 describe("DiscoverScreen in the demo", () => {
   it("works on fixtures without touching the server, and shows report and block", async () => {
     render(<DiscoverScreen initialDeck={[card(1), card(2)]} discoverable={false} hasBirthDate isMinor={false} demo />);
-    fireEvent.click(screen.getByRole("switch", { name: "Take part in swiping" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Let other riders find me" }));
     expect(await screen.findByRole("heading", { name: "Rider 1" })).toBeInTheDocument();
     expect(mocks.setDiscoverable).not.toHaveBeenCalled();
 
@@ -87,7 +155,7 @@ describe("DiscoverScreen in the demo", () => {
     const rider = MOCK_USERS.find((user) => user.id !== "me")!;
     render(<DiscoverScreen initialDeck={[{ ...card(1), userId: rider.id, name: rider.name }]} discoverable hasBirthDate isMinor={false} demo />);
     fireEvent.click(screen.getByRole("button", { name: `Ride with ${rider.name}` }));
-    expect(await screen.findByRole("dialog", { name: "It's a match!" })).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "You both want to ride!" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Write a message" }));
     expect(screen.getByRole("dialog", { name: `Conversation with ${rider.name}` })).toBeInTheDocument();
     expect(mocks.swipe).not.toHaveBeenCalled();
