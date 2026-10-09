@@ -1,5 +1,7 @@
 # Ski-day tracking
 
+Follow-up owner direction, 2026-10-09: add a map mode for today's recorded route with own-avatar replay. The [mountain rebuild plan](mountain-rebuild-plan.md#kartenmodus-mein-tag) proposes timestamped private local retention after finishing; deletion-on-finish below remains the current implementation. No cloud track archive is introduced by this planning update.
+
 - **Status:** Agreed (owner, 2026-10-05: "seine fahrten tracken können", Etappe C confirmed 2026-10-06)
 - **Owner:** Philipp
 - **Related:** [ADR 0026](../adr/0026-ski-day-tracking.md)

@@ -48,5 +48,6 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0038](0038-pistl-go-conditional-intents.md) | Pistl Go: conditional ride intents | Superseded by 0040 |
 | [0039](0039-map-first-mountain-coordination.md) | Map-first mountain coordination | Proposed |
 | [0040](0040-private-go-wishes-on-existing-rides.md) | Private Go wishes on existing rides | Accepted |
+| [0041](0041-isolated-mountain-design-preview.md) | Isolated mountain design preview and sourced pilot geometry | Accepted for Phase A preview |
 
 Template: context, options considered, decision, consequences, status.

@@ -1,0 +1,1716 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "way/24559397",
+      "properties": {
+        "bicycle": "yes",
+        "foot": "yes",
+        "highway": "footway",
+        "incline": "down",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "source": "basemap.at MaxRes 2016",
+        "surface": "compacted",
+        "osm_id": 24559397,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 35,
+        "osm_timestamp": "2023-06-08T22:35:36Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3972595,
+            47.2871424
+          ],
+          [
+            11.3973108,
+            47.2871293
+          ],
+          [
+            11.3973193,
+            47.2871254
+          ],
+          [
+            11.3973263,
+            47.2871205
+          ],
+          [
+            11.397333,
+            47.2871135
+          ],
+          [
+            11.3973387,
+            47.2871052
+          ],
+          [
+            11.3974702,
+            47.2868987
+          ],
+          [
+            11.397492,
+            47.2868739
+          ],
+          [
+            11.3975327,
+            47.2868612
+          ],
+          [
+            11.3975823,
+            47.2868342
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/25170582",
+      "properties": {
+        "aerialway": "cable_car",
+        "aerialway:bicycle": "yes",
+        "aerialway:capacity": "800",
+        "aerialway:duration": "5.33",
+        "aerialway:occupancy": "95",
+        "name": "Seegrubenbahn",
+        "operator": "Innsbrucker Nordkettenbahnen Betriebs GmbH",
+        "ref": "Sektion II",
+        "website": "https://www.nordkette.com/",
+        "wikidata": "Q1635786",
+        "wikipedia": "de:Nordkettenbahn",
+        "osm_id": 25170582,
+        "osm_type": "way",
+        "kind": "lift",
+        "osm_version": 25,
+        "osm_timestamp": "2026-02-18T17:18:15Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3990069,
+            47.2861686
+          ],
+          [
+            11.39741,
+            47.2878451
+          ],
+          [
+            11.3904186,
+            47.2951844
+          ],
+          [
+            11.3854981,
+            47.300349
+          ],
+          [
+            11.384988,
+            47.3008844
+          ],
+          [
+            11.3843961,
+            47.3015057
+          ],
+          [
+            11.3837075,
+            47.3022285
+          ],
+          [
+            11.3813152,
+            47.3047393
+          ],
+          [
+            11.3797446,
+            47.3063876
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/25282282",
+      "properties": {
+        "aerialway": "cable_car",
+        "aerialway:bicycle": "no",
+        "aerialway:capacity": "625",
+        "aerialway:duration": "2",
+        "aerialway:occupancy": "69",
+        "name": "Hafelekarbahn",
+        "operator": "Innsbrucker Nordkettenbahnen Betriebs GmbH",
+        "ref": "Sektion III",
+        "website": "https://www.nordkette.com/",
+        "wikidata": "Q1635786",
+        "wikipedia": "de:Nordkettenbahn",
+        "osm_id": 25282282,
+        "osm_type": "way",
+        "kind": "lift",
+        "osm_version": 11,
+        "osm_timestamp": "2026-05-10T11:12:03Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3797879,
+            47.3065543
+          ],
+          [
+            11.3835664,
+            47.3119756
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/25750412",
+      "properties": {
+        "aerialway": "chair_lift",
+        "aerialway:bicycle": "yes",
+        "aerialway:capacity": "1440",
+        "aerialway:duration": "5.166666667",
+        "aerialway:occupancy": "2",
+        "loc_name": "Dreierstützenlift",
+        "name": "Seegrube",
+        "oneway": "yes",
+        "osm_id": 25750412,
+        "osm_type": "way",
+        "kind": "lift",
+        "osm_version": 20,
+        "osm_timestamp": "2026-05-10T11:12:40Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3835873,
+            47.3026998
+          ],
+          [
+            11.3834914,
+            47.3028101
+          ],
+          [
+            11.3831219,
+            47.303227
+          ],
+          [
+            11.3830022,
+            47.303362
+          ],
+          [
+            11.3827872,
+            47.3036045
+          ],
+          [
+            11.3825326,
+            47.3038916
+          ],
+          [
+            11.3819856,
+            47.3045086
+          ],
+          [
+            11.3814441,
+            47.3051194
+          ],
+          [
+            11.380976,
+            47.3056472
+          ],
+          [
+            11.380257,
+            47.3064582
+          ],
+          [
+            11.3801623,
+            47.3065781
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/37704717",
+      "properties": {
+        "foot": "yes",
+        "highway": "track",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "surface": "compacted",
+        "tracktype": "grade4",
+        "osm_id": 37704717,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 11,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3957481,
+            47.2894771
+          ],
+          [
+            11.3958835,
+            47.2887352
+          ],
+          [
+            11.3958281,
+            47.2883067
+          ],
+          [
+            11.3955987,
+            47.287932
+          ],
+          [
+            11.3955942,
+            47.2877845
+          ],
+          [
+            11.3957588,
+            47.287645
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901223",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "1",
+        "name": "Bodenstein-Weg",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 48901223,
+        "osm_type": "way",
+        "kind": "piste",
+        "osm_version": 18,
+        "osm_timestamp": "2025-04-19T18:40:03Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3844337,
+            47.3014133
+          ],
+          [
+            11.3842465,
+            47.3013217
+          ],
+          [
+            11.3841652,
+            47.3012783
+          ],
+          [
+            11.3838255,
+            47.3010004
+          ],
+          [
+            11.3832403,
+            47.3007418
+          ],
+          [
+            11.3827641,
+            47.3005543
+          ],
+          [
+            11.3826971,
+            47.3005016
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901320",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:name": "7 - Kurzes Tal",
+        "piste:type": "downhill",
+        "osm_id": 48901320,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "7 - Kurzes Tal",
+        "osm_version": 7,
+        "osm_timestamp": "2022-06-01T11:18:34Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3802678,
+            47.3047958
+          ],
+          [
+            11.3803042,
+            47.3040165
+          ],
+          [
+            11.3814845,
+            47.3034279
+          ],
+          [
+            11.3821821,
+            47.30308
+          ],
+          [
+            11.3830615,
+            47.3026414
+          ],
+          [
+            11.3834547,
+            47.3026547
+          ],
+          [
+            11.3834918,
+            47.302645
+          ],
+          [
+            11.3835146,
+            47.3026341
+          ],
+          [
+            11.3835341,
+            47.3026205
+          ],
+          [
+            11.3835448,
+            47.30261
+          ],
+          [
+            11.3835569,
+            47.3026018
+          ],
+          [
+            11.3835803,
+            47.3025959
+          ],
+          [
+            11.3836031,
+            47.3025973
+          ],
+          [
+            11.3836279,
+            47.3026032
+          ],
+          [
+            11.3836454,
+            47.30261
+          ],
+          [
+            11.3836588,
+            47.3026214
+          ],
+          [
+            11.3836615,
+            47.3026364
+          ],
+          [
+            11.3836507,
+            47.3026591
+          ],
+          [
+            11.383636,
+            47.3026782
+          ],
+          [
+            11.3836239,
+            47.3026859
+          ],
+          [
+            11.3835873,
+            47.3026998
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901321",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "2",
+        "piste:difficulty": "intermediate",
+        "piste:name": "7 - Kurzes Tal",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "surface": "gravel",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 48901321,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "7 - Kurzes Tal",
+        "osm_version": 14,
+        "osm_timestamp": "2025-05-28T10:31:38Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.382194,
+            47.3054329
+          ],
+          [
+            11.3821783,
+            47.3053213
+          ],
+          [
+            11.382164,
+            47.3051542
+          ],
+          [
+            11.3821239,
+            47.3050816
+          ],
+          [
+            11.3820245,
+            47.3050204
+          ],
+          [
+            11.3817285,
+            47.3049886
+          ],
+          [
+            11.38152,
+            47.3049783
+          ],
+          [
+            11.3815092,
+            47.3049777
+          ],
+          [
+            11.3813725,
+            47.3049928
+          ],
+          [
+            11.381181,
+            47.3050496
+          ],
+          [
+            11.3809715,
+            47.3050949
+          ],
+          [
+            11.3806961,
+            47.3050869
+          ],
+          [
+            11.3805357,
+            47.3050309
+          ],
+          [
+            11.3804348,
+            47.3049579
+          ],
+          [
+            11.3802678,
+            47.3047958
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901417",
+      "properties": {
+        "piste:difficulty": "advanced",
+        "piste:name": "8 - Kasermandl-Talerle",
+        "piste:type": "downhill",
+        "osm_id": 48901417,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "8 - Kasermandl-Talerle",
+        "osm_version": 5,
+        "osm_timestamp": "2020-02-02T11:19:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3783396,
+            47.3060338
+          ],
+          [
+            11.3794888,
+            47.3047149
+          ],
+          [
+            11.3803042,
+            47.3040165
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901470",
+      "properties": {
+        "patrolled": "yes",
+        "piste:difficulty": "freeride",
+        "piste:grooming": "backcountry",
+        "piste:lit": "no",
+        "piste:name": "6 - Seilbahnrinne",
+        "piste:type": "downhill",
+        "osm_id": 48901470,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "6 - Seilbahnrinne",
+        "osm_version": 16,
+        "osm_timestamp": "2026-05-10T10:31:27Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3838611,
+            47.312002
+          ],
+          [
+            11.3839012,
+            47.3117494
+          ],
+          [
+            11.3830935,
+            47.3117522
+          ],
+          [
+            11.382257,
+            47.3104401
+          ],
+          [
+            11.3820476,
+            47.3091781
+          ],
+          [
+            11.3822973,
+            47.3080594
+          ],
+          [
+            11.3834519,
+            47.3072058
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901576",
+      "properties": {
+        "lit": "no",
+        "patrolled": "yes",
+        "piste:difficulty": "freeride",
+        "piste:grooming": "backcountry",
+        "piste:name": "5 - Karrinne",
+        "piste:type": "downhill",
+        "osm_id": 48901576,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "5 - Karrinne",
+        "osm_version": 11,
+        "osm_timestamp": "2026-02-01T22:24:28Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3802516,
+            47.3121155
+          ],
+          [
+            11.3786171,
+            47.3105403
+          ],
+          [
+            11.3782549,
+            47.3084397
+          ],
+          [
+            11.3776061,
+            47.3073629
+          ],
+          [
+            11.3778365,
+            47.3068029
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/48901698",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "6 - Langes Tal",
+        "piste:type": "downhill",
+        "osm_id": 48901698,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "6 - Langes Tal",
+        "osm_version": 9,
+        "osm_timestamp": "2020-02-02T11:19:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3834519,
+            47.3072058
+          ],
+          [
+            11.3835926,
+            47.3071888
+          ],
+          [
+            11.3838701,
+            47.3067311
+          ],
+          [
+            11.38458,
+            47.3055048
+          ],
+          [
+            11.3832969,
+            47.3042633
+          ],
+          [
+            11.3832947,
+            47.3040221
+          ],
+          [
+            11.3829836,
+            47.3036947
+          ],
+          [
+            11.3821821,
+            47.30308
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/104626229",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "lit": "no",
+        "mtb:scale:uphill": "2",
+        "piste:difficulty": "intermediate",
+        "piste:name": "7 - Kurzes Tal",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "surface": "compacted",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 104626229,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "7 - Kurzes Tal",
+        "osm_version": 13,
+        "osm_timestamp": "2025-11-13T12:47:35Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3790415,
+            47.3065042
+          ],
+          [
+            11.379539,
+            47.3066909
+          ],
+          [
+            11.3796992,
+            47.306753
+          ],
+          [
+            11.3799794,
+            47.3068615
+          ],
+          [
+            11.3801662,
+            47.3069646
+          ],
+          [
+            11.3802565,
+            47.3070145
+          ],
+          [
+            11.3803823,
+            47.307044
+          ],
+          [
+            11.380473,
+            47.3070251
+          ],
+          [
+            11.3805746,
+            47.306965
+          ],
+          [
+            11.3807264,
+            47.3068752
+          ],
+          [
+            11.3811954,
+            47.3067727
+          ],
+          [
+            11.3814527,
+            47.3067164
+          ],
+          [
+            11.3817231,
+            47.3066365
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/104626230",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:name": "7 - Kurzes Tal",
+        "piste:type": "downhill",
+        "osm_id": 104626230,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "7 - Kurzes Tal",
+        "osm_version": 7,
+        "osm_timestamp": "2020-02-02T11:19:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3809875,
+            47.3057987
+          ],
+          [
+            11.3817099,
+            47.3056884
+          ],
+          [
+            11.382194,
+            47.3054329
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/116380636",
+      "properties": {
+        "piste:difficulty": "easy",
+        "piste:name": "4 - Übungshang",
+        "piste:type": "downhill",
+        "osm_id": 116380636,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "4 - Übungshang",
+        "osm_version": 6,
+        "osm_timestamp": "2022-06-01T11:18:34Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3757999,
+            47.3058452
+          ],
+          [
+            11.3757335,
+            47.3058345
+          ],
+          [
+            11.3756935,
+            47.3058418
+          ],
+          [
+            11.3756495,
+            47.3058732
+          ],
+          [
+            11.3755319,
+            47.3060845
+          ],
+          [
+            11.3757205,
+            47.3065826
+          ],
+          [
+            11.3762569,
+            47.3070555
+          ],
+          [
+            11.3767451,
+            47.3073029
+          ],
+          [
+            11.3772413,
+            47.3072992
+          ],
+          [
+            11.3775873,
+            47.3070901
+          ],
+          [
+            11.3778365,
+            47.3068029
+          ],
+          [
+            11.3785667,
+            47.3065141
+          ],
+          [
+            11.3785964,
+            47.3062723
+          ],
+          [
+            11.3783396,
+            47.3060338
+          ],
+          [
+            11.3782479,
+            47.3059995
+          ],
+          [
+            11.3780278,
+            47.3059818
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/117017646",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "2",
+        "piste:difficulty": "intermediate",
+        "piste:name": "7 - Kurzes Tal",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "surface": "unpaved",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 117017646,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "7 - Kurzes Tal",
+        "osm_version": 7,
+        "osm_timestamp": "2025-05-28T10:31:38Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3817231,
+            47.3066365
+          ],
+          [
+            11.3817038,
+            47.3065503
+          ],
+          [
+            11.3815082,
+            47.3064051
+          ],
+          [
+            11.3811967,
+            47.3062448
+          ],
+          [
+            11.3808651,
+            47.3060802
+          ],
+          [
+            11.3805127,
+            47.3059053
+          ],
+          [
+            11.3804924,
+            47.305875
+          ],
+          [
+            11.3805367,
+            47.305854
+          ],
+          [
+            11.3806606,
+            47.3058563
+          ],
+          [
+            11.380894,
+            47.3057943
+          ],
+          [
+            11.3809373,
+            47.3057963
+          ],
+          [
+            11.3809875,
+            47.3057987
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/148049129",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "osm_id": 148049129,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 12,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3826971,
+            47.3005016
+          ],
+          [
+            11.3840669,
+            47.299698
+          ],
+          [
+            11.3851871,
+            47.299262
+          ],
+          [
+            11.3864801,
+            47.298303
+          ],
+          [
+            11.3873352,
+            47.2976837
+          ],
+          [
+            11.3879996,
+            47.2975213
+          ],
+          [
+            11.3893002,
+            47.2967493
+          ],
+          [
+            11.3898147,
+            47.2967263
+          ],
+          [
+            11.3906146,
+            47.2964642
+          ],
+          [
+            11.3907219,
+            47.2963841
+          ],
+          [
+            11.3906891,
+            47.2962775
+          ],
+          [
+            11.3903299,
+            47.2962038
+          ],
+          [
+            11.3900888,
+            47.2960211
+          ],
+          [
+            11.3900674,
+            47.2950016
+          ],
+          [
+            11.3901961,
+            47.2948561
+          ],
+          [
+            11.3903792,
+            47.2948213
+          ],
+          [
+            11.3908333,
+            47.2948166
+          ],
+          [
+            11.3925981,
+            47.2945809
+          ],
+          [
+            11.3935786,
+            47.2946043
+          ],
+          [
+            11.3946525,
+            47.2948297
+          ],
+          [
+            11.3948036,
+            47.2948187
+          ],
+          [
+            11.3947649,
+            47.294707
+          ],
+          [
+            11.3923758,
+            47.293393
+          ],
+          [
+            11.3922949,
+            47.293244
+          ],
+          [
+            11.393264,
+            47.2922615
+          ],
+          [
+            11.3936348,
+            47.2918675
+          ],
+          [
+            11.3953897,
+            47.2899835
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/227198921",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "osm_id": 227198921,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 6,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3830615,
+            47.3026414
+          ],
+          [
+            11.3835347,
+            47.3024552
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/227198922",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "1 - Osthang",
+        "piste:type": "downhill",
+        "osm_id": 227198922,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "1 - Osthang",
+        "osm_version": 5,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3783396,
+            47.3060338
+          ],
+          [
+            11.3779915,
+            47.3054956
+          ],
+          [
+            11.3779358,
+            47.3046364
+          ],
+          [
+            11.378534,
+            47.3033799
+          ],
+          [
+            11.3799745,
+            47.303327
+          ],
+          [
+            11.3814845,
+            47.3034279
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/227203761",
+      "properties": {
+        "aerialway": "chair_lift",
+        "aerialway:capacity": "1000",
+        "aerialway:duration": "1.66",
+        "aerialway:occupancy": "2",
+        "name": "Frau-Hitt Warte",
+        "osm_id": 227203761,
+        "osm_type": "way",
+        "kind": "lift",
+        "osm_version": 5,
+        "osm_timestamp": "2026-02-10T13:33:35Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3780278,
+            47.3059818
+          ],
+          [
+            11.377873,
+            47.3059723
+          ],
+          [
+            11.3768336,
+            47.3059086
+          ],
+          [
+            11.3760495,
+            47.3058605
+          ],
+          [
+            11.3757999,
+            47.3058452
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/706193014",
+      "properties": {
+        "aerialway": "magic_carpet",
+        "aerialway:capacity": "1000",
+        "aerialway:duration": "1.8333",
+        "osm_id": 706193014,
+        "osm_type": "way",
+        "kind": "lift",
+        "name": "OSM lift 706193014",
+        "osm_version": 2,
+        "osm_timestamp": "2026-02-10T13:33:35Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3790633,
+            47.3066432
+          ],
+          [
+            11.3782045,
+            47.3068429
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/706636480",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "2",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 706636480,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 7,
+        "osm_timestamp": "2026-05-07T10:17:46Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3835347,
+            47.3024552
+          ],
+          [
+            11.3837953,
+            47.3025424
+          ],
+          [
+            11.3839823,
+            47.3027273
+          ],
+          [
+            11.3842448,
+            47.3029403
+          ],
+          [
+            11.384502,
+            47.3032001
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/768968946",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "source": "basemap.at MaxRes 2016",
+        "osm_id": 768968946,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 5,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.384502,
+            47.3032001
+          ],
+          [
+            11.3848328,
+            47.3031087
+          ],
+          [
+            11.3851852,
+            47.3026835
+          ],
+          [
+            11.3852714,
+            47.3020401
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/769027330",
+      "properties": {
+        "bicycle": "no",
+        "highway": "path",
+        "lit": "no",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "6 - Langes Tal",
+        "piste:type": "downhill",
+        "surface": "unpaved",
+        "osm_id": 769027330,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "6 - Langes Tal",
+        "osm_version": 4,
+        "osm_timestamp": "2025-11-20T11:54:23Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3817231,
+            47.3066365
+          ],
+          [
+            11.3818077,
+            47.306638
+          ],
+          [
+            11.3819375,
+            47.3067319
+          ],
+          [
+            11.3820746,
+            47.3068779
+          ],
+          [
+            11.3822725,
+            47.3069747
+          ],
+          [
+            11.382556,
+            47.3070189
+          ],
+          [
+            11.3828991,
+            47.3070878
+          ],
+          [
+            11.3834519,
+            47.3072058
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/769092618",
+      "properties": {
+        "foot": "yes",
+        "highway": "track",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "tracktype": "grade4",
+        "osm_id": 769092618,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 3,
+        "osm_timestamp": "2022-11-20T11:41:24Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3953897,
+            47.2899835
+          ],
+          [
+            11.3954341,
+            47.2898996
+          ],
+          [
+            11.3957481,
+            47.2894771
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/769092620",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "1",
+        "name": "Bodenstein-Weg",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 769092620,
+        "osm_type": "way",
+        "kind": "piste",
+        "osm_version": 6,
+        "osm_timestamp": "2025-04-19T18:40:03Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3845697,
+            47.3014936
+          ],
+          [
+            11.3844958,
+            47.3014445
+          ],
+          [
+            11.3844337,
+            47.3014133
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/769092621",
+      "properties": {
+        "bicycle": "yes",
+        "bicycle:conditional": "no @ (Nov-Mar)",
+        "foot": "yes",
+        "highway": "track",
+        "incline": "down",
+        "lit": "no",
+        "mtb:scale:uphill": "1",
+        "name": "Bodenstein-Weg",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "sac_scale": "hiking",
+        "tracktype": "grade3",
+        "traffic_sign": "AT:FKV_1.9",
+        "vehicle": "forestry",
+        "osm_id": 769092621,
+        "osm_type": "way",
+        "kind": "piste",
+        "osm_version": 7,
+        "osm_timestamp": "2025-04-19T18:40:03Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3852714,
+            47.3020401
+          ],
+          [
+            11.3851012,
+            47.3018184
+          ],
+          [
+            11.385053,
+            47.3017934
+          ],
+          [
+            11.3848712,
+            47.3016993
+          ],
+          [
+            11.384794,
+            47.3016466
+          ],
+          [
+            11.3845697,
+            47.3014936
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/832990319",
+      "properties": {
+        "foot": "yes",
+        "highway": "service",
+        "oneway": "no",
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "source": "basemap.at MaxRes 2016",
+        "surface": "compacted",
+        "osm_id": 832990319,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 3,
+        "osm_timestamp": "2023-06-08T22:35:36Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3975823,
+            47.2868342
+          ],
+          [
+            11.3975914,
+            47.2868151
+          ],
+          [
+            11.3975999,
+            47.2868016
+          ],
+          [
+            11.3976122,
+            47.2867868
+          ],
+          [
+            11.397627,
+            47.2867731
+          ],
+          [
+            11.3976477,
+            47.2867592
+          ],
+          [
+            11.3976674,
+            47.2867502
+          ],
+          [
+            11.3976863,
+            47.2867451
+          ],
+          [
+            11.397708,
+            47.2867419
+          ],
+          [
+            11.3977289,
+            47.28674
+          ],
+          [
+            11.3977927,
+            47.2867424
+          ],
+          [
+            11.3978695,
+            47.2867481
+          ],
+          [
+            11.3978905,
+            47.2867485
+          ],
+          [
+            11.3979093,
+            47.2867469
+          ],
+          [
+            11.3979255,
+            47.2867439
+          ],
+          [
+            11.397944,
+            47.2867382
+          ],
+          [
+            11.3979609,
+            47.2867289
+          ],
+          [
+            11.3980397,
+            47.2866855
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/1115691994",
+      "properties": {
+        "piste:difficulty": "intermediate",
+        "piste:grooming": "backcountry",
+        "piste:name": "2 - Zweier Skiroute",
+        "piste:type": "downhill",
+        "osm_id": 1115691994,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "2 - Zweier Skiroute",
+        "osm_version": 2,
+        "osm_timestamp": "2023-03-11T20:36:12Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3957588,
+            47.287645
+          ],
+          [
+            11.3969569,
+            47.287426
+          ],
+          [
+            11.3972595,
+            47.2871424
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "way/1268853933",
+      "properties": {
+        "patrolled": "yes",
+        "piste:difficulty": "freeride",
+        "piste:grooming": "backcountry",
+        "piste:type": "downhill",
+        "osm_id": 1268853933,
+        "osm_type": "way",
+        "kind": "piste",
+        "name": "OSM piste 1268853933",
+        "osm_version": 2,
+        "osm_timestamp": "2026-02-01T22:24:28Z"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.3820476,
+            47.3091781
+          ],
+          [
+            11.3802565,
+            47.3070145
+          ]
+        ]
+      }
+    }
+  ]
+}

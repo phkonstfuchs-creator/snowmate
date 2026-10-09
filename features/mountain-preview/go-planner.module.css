@@ -1,0 +1,401 @@
+.sheet {
+  width: min(100%, 520px);
+  max-height: min(92dvh, 820px);
+  overflow-y: auto;
+  padding-bottom: max(env(safe-area-inset-bottom, 16px), 20px);
+  border-radius: 26px 26px 0 0;
+  background: var(--paper-0);
+  color: var(--ink-0);
+  overscroll-behavior: contain;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 2px;
+}
+
+.topline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stepLabel {
+  flex: none;
+  color: var(--sky-ink);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.stepTrack {
+  height: 4px;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--paper-3);
+}
+
+.stepTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--pine);
+  transition: width 180ms ease;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.introIcon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--pine) 10%, var(--paper-1));
+  color: var(--pine);
+}
+
+.heading {
+  margin: -3px 0 -8px;
+  color: var(--ink-0);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+
+.copy {
+  max-width: 36ch;
+  margin: 0;
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  color: var(--ink-0);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.choiceRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.choice,
+.crewOption,
+.transportOption,
+.meetingChoice {
+  min-height: 52px;
+  border: 1px solid var(--paper-3);
+  color: var(--ink-0);
+  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 16px;
+  background: var(--paper-1);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.selected,
+.crewSelected,
+.meetingSelected {
+  border-color: var(--pine);
+  background: color-mix(in srgb, var(--pine) 7%, var(--paper-1));
+  box-shadow: 0 0 0 1px var(--pine);
+}
+
+.dateTime {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(100px, .8fr);
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.field input,
+.field select,
+.customInput {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--paper-3);
+  border-radius: 14px;
+  background: var(--paper-1);
+  padding: 0 12px;
+  color: var(--ink-0);
+  font: var(--text-body);
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.customInput:focus-visible,
+.choice:focus-visible,
+.actions button:focus-visible,
+.crewOption:focus-within,
+.transportOption:focus-within,
+.meetingChoice:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--sky) 40%, transparent);
+  outline-offset: 2px;
+}
+
+.sampleNote {
+  margin: -3px 0 9px;
+  color: var(--sky-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.crewRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.crewOption {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  background: var(--paper-1);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crewOption input,
+.transportOption input,
+.meetingChoice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sky) 14%, var(--paper-1));
+  color: var(--sky-ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.crewOption small {
+  display: block;
+  color: var(--ink-2);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.crewCheck {
+  margin-left: auto;
+  color: var(--pine);
+}
+
+.transportOptions {
+  display: grid;
+  gap: 8px;
+}
+
+.transportOption {
+  position: relative;
+  display: flex;
+  min-height: 49px;
+  align-items: center;
+  gap: 11px;
+  padding: 0 13px;
+  border-radius: 14px;
+  background: var(--paper-1);
+  color: var(--ink-1);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.transportOption:has(input:checked) {
+  border-color: var(--sky);
+  background: color-mix(in srgb, var(--sky) 8%, var(--paper-1));
+  box-shadow: 0 0 0 1px var(--sky);
+  color: var(--sky-ink);
+}
+
+.transitIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.meetingChoices {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.meetingChoice {
+  position: relative;
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  border-radius: 14px;
+  background: var(--paper-1);
+  color: var(--ink-1);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.meetingSelected {
+  color: var(--pine);
+}
+
+.meetingCheck {
+  margin-left: auto;
+}
+
+.customInput {
+  margin-top: -5px;
+}
+
+.summary {
+  padding: 14px 15px;
+  border-radius: 17px;
+  background: var(--paper-1);
+}
+
+.summary > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink-0);
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.summary > div span + span {
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.summary p {
+  margin: 5px 0 0;
+  color: var(--ink-1);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.privacyNote {
+  margin: -4px 0 0;
+  color: var(--sky-ink);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.error {
+  margin: -6px 0 0;
+  color: var(--crimson);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.actions button {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.backButton {
+  padding: 0 12px;
+  background: transparent;
+  color: var(--ink-1);
+}
+
+.primaryButton {
+  min-width: 148px;
+  margin-left: auto;
+  padding: 0 17px;
+  background: var(--pine);
+  color: var(--paper-1);
+  box-shadow: 0 4px 10px rgb(41 90 69 / 15%);
+}
+
+.previewFootnote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: -10px 0 0;
+  color: var(--ink-2);
+  font-size: 11px;
+}
+
+@media (min-width: 640px) {
+  .sheet {
+    align-self: center;
+    border-radius: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepTrack span,
+  .choice,
+  .crewOption,
+  .transportOption,
+  .meetingChoice {
+    transition: none;
+  }
+}
+.resortCheck { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; color: #315d47; font-size: 12px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }

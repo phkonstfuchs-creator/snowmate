@@ -1,0 +1,89 @@
+.root {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 130px;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0;
+  background: linear-gradient(145deg, #dce9e8, #e9eadf 54%, #d5dfd9);
+}
+.map { position: absolute; inset: 0; }
+.state, .failure {
+  position: absolute;
+  z-index: 3;
+  inset: 14px auto auto 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 28px);
+  padding: 11px 15px;
+  border: 1px solid rgb(255 255 255 / 80%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 93%);
+  color: #344a48;
+  box-shadow: 0 5px 22px rgb(37 54 47 / 12%);
+  font: 600 12px/1.3 var(--font-hanken, sans-serif);
+  white-space: nowrap;
+}
+.failure {
+  top: 50%;
+  width: min(330px, calc(100% - 32px));
+  transform: translate(-50%, -50%);
+  align-items: flex-start;
+  flex-direction: column;
+  white-space: normal;
+  border-radius: 18px;
+}
+.failure span { color: #63716e; font-weight: 450; }
+.spinner { width: 14px; height: 14px; border: 2px solid #d6dfd8; border-top-color: #547c69; border-radius: 50%; animation: spin .75s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.replayTag {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid rgb(255 255 255 / 78%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 94%);
+  color: #67523e;
+  box-shadow: 0 4px 15px rgb(37 54 47 / 12%);
+  font: 700 10px/1.15 var(--font-hanken, sans-serif);
+  letter-spacing: .05em;
+}
+.replayTag span { width: 7px; height: 7px; border-radius: 50%; background: #d49359; }
+.fallbackNote {
+  position: absolute;
+  z-index: 2;
+  bottom: 42px;
+  left: 14px;
+  right: 14px;
+  max-width: calc(100% - 28px);
+  padding: 9px 12px;
+  border: 1px solid rgb(255 255 255 / 86%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 95%);
+  color: #53655c;
+  box-shadow: 0 4px 16px rgb(37 54 47 / 12%);
+  font: 600 11px/1.25 var(--font-hanken, sans-serif);
+}
+.mapAvatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 3px solid #fffdf8;
+  border-radius: 50%;
+  background: #456a59;
+  color: #fff;
+  box-shadow: 0 2px 9px rgb(29 46 37 / 28%);
+  font: 700 13px/1 var(--font-hanken, sans-serif);
+}
+.root :global(.maplibregl-ctrl-attrib) { max-width: calc(100% - 12px); font-size: 9px; line-height: 1.4; }
+.root :global(.maplibregl-ctrl-logo) { display: none; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }

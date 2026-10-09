@@ -1,6 +1,8 @@
 # Live location
 
 - **Status:** Agreed (owner asked for it on 2026-10-04); details Proposed
+
+- **Follow-up direction, 2026-10-09:** The owner requested persistent voluntary friend sharing until switched off. The [mountain rebuild plan](mountain-rebuild-plan.md#5-standort-dauerhaft-für-freunde) proposes an additional native mode; the timed sharing below remains the current implementation.
 - **Related:** [ADR 0015](../adr/0015-live-location-for-confirmed-friends.md), [ADR 0019](../adr/0019-live-location-from-16.md), [ADR 0032](../adr/0032-crew-whereabouts-from-shared-positions.md) (amendment 2026-10-07, owner request), [SECURITY_AND_PRIVACY.md](../SECURITY_AND_PRIVACY.md#live-location)
 
 ## Problem
