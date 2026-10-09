@@ -72,8 +72,14 @@ test("Pistl Go rechecks crew and confirmed transport without automatically joini
     await page.goto("/feed");
     const overview = page.getByRole("region", { name: "Deine Pistl-Go-Pläne" });
     await expect(overview).toBeVisible();
-    await expect(overview.getByText("Dein bestätigter Mitfahrplatz fehlt noch.")).toBeVisible();
-    await expect(overview.getByText("1 bereits bestätigt · Mindestgruppe 3 inklusive dir.")).toBeVisible();
+    await expect(
+      overview.getByText("Dein bestätigter Mitfahrplatz fehlt noch."),
+    ).toBeVisible();
+    await expect(
+      overview.getByText(
+        "1 bereits bestätigt · Mindestgruppe 3 inklusive dir.",
+      ),
+    ).toBeVisible();
     await page.goto(`/feed/${rideId}`);
 
     const request = await command(friend.client, "request_ride", {
@@ -110,7 +116,11 @@ test("Pistl Go rechecks crew and confirmed transport without automatically joini
     ).toBeVisible();
 
     await page.goto("/feed");
-    await expect(overview.getByRole("link", { name: "Teilnahme anfragen: Stubai Glacier" })).toBeVisible();
+    await expect(
+      overview.getByRole("link", {
+        name: "Teilnahme anfragen: Stubai Glacier",
+      }),
+    ).toBeVisible();
     await page.goto(`/feed/${rideId}`);
     await expect(
       page.getByText("Du bist bestätigt dabei.", { exact: true }),

@@ -137,6 +137,12 @@ requests, and host acceptance; no automatic request, membership, or seat booking
 is created. Lost conditions are displayed without silently removing a confirmed
 participant. The feature uses `20261009090500_ride_go_interests.sql`; wishes are
 included in account export/deletion and cleaned up after expiry.
+The personal Go overview on Today lists only the caller's currently authorized
+upcoming wishes. Changed conditions on confirmed plans appear first, followed by
+ready and still-open wishes. Every card explains the confirmed group and
+transport state and links to an explicit next step; it neither requests nor
+joins automatically. `20261009090800_own_ride_go_overview.sql` supplies the
+bounded, own-only summary without exact locations or other people's wishes.
 No social, minor,
 chat, or location data may be used with external testers until a clean Supabase
 reset, database lint, all pgTAP tests, hosted deployment, operational tests, and

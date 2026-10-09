@@ -3,6 +3,8 @@ import { getCurrentProfileContext } from "@/features/profile/data";
 import { getRideFeed } from "@/features/rides/data";
 import type { City } from "@/lib/types";
 import PenguinMascot from "@/components/PenguinMascot";
+import GoOverview from "@/features/go/GoOverview";
+import { getOwnGoInterests } from "@/features/go/data";
 export default async function FeedPage({
   searchParams,
 }: {
@@ -20,7 +22,10 @@ export default async function FeedPage({
       : context.status === "authenticated"
         ? (context.profile?.city ?? "innsbruck")
         : "innsbruck";
-  const result = await getRideFeed(city);
+  const [result, interests] = await Promise.all([
+    getRideFeed(city),
+    getOwnGoInterests(),
+  ]);
   return (
     <>
       <header
@@ -60,6 +65,7 @@ export default async function FeedPage({
           ))}
         </nav>
       </header>
+      <GoOverview result={interests} />
       <section className="p-4 space-y-3" aria-label="Ausfahrten">
         {result.status === "unavailable" ? (
           <div

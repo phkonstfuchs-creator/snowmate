@@ -244,3 +244,21 @@ website browser journeys. The final local app suite passes376 tests with93.89%
 line/83.72% branch coverage; all699 database assertions and seven app browser
 journeys pass. Website20 unit tests and15 browser journeys, both builds, lint,
 types, Edge Function checks and the security review pass.
+
+## Personal Pistl Go overview — 2026-10-09
+
+Today now shows the caller's upcoming conditional wishes, including confirmed
+plans whose conditions changed. The own-only RPC reevaluates authorization and
+conditions before ordering and limiting the result. Blocked, no-longer-visible,
+withdrawn and expired wishes are excluded. No meeting points, participant
+identities, transport identifiers or other people's wishes are exposed.
+Strict DTO validation also rejects duplicate/mismatched rides and impossible
+group/capacity combinations. Cards explain the remaining conditions and link
+to the existing detail flow, keeping requests and confirmations explicit.
+
+Migration908 adds this read-only overview. Its14 authorization/ordering/privacy
+assertions pass as part of all713 database checks. The full app suite passes389
+tests; the extended multi-account browser flow confirms the personal feed
+overview persists and offers the manual request only when conditions are ready.
+The historical Gitleaks finding was an analytics identity UUID in a test, with
+an exact commit/file/rule/line suppression and a low-entropy future fixture.
