@@ -228,7 +228,7 @@ describe("map network readiness", () => {
     act(() => emitLayer("mountain-piste-hit", { features: [{ properties: { osm_id: 24559397, kind: "piste" } }] }));
     expect(onFeatureSelect).not.toHaveBeenCalled();
   });
-  it("hides raster detail only inside the pilot bounds at high zoom and restores it outside or in Salzburg", () => {
+  it("keeps wider raster coverage at every zoom while the selectable inventory is partial", () => {
     const { rerender } = render(<SkiMap city="innsbruck" resorts={[]} onSelect={() => {}} />);
     act(() => emit("style.load"));
     map.center = { lng: 11.38, lat: 47.3 };
@@ -236,7 +236,7 @@ describe("map network readiness", () => {
     expect(map.layout).toHaveBeenLastCalledWith("pistes", "visibility", "visible");
     map.zoom = 14;
     act(() => emit("move"));
-    expect(map.layout).toHaveBeenLastCalledWith("pistes", "visibility", "none");
+    expect(map.layout).toHaveBeenLastCalledWith("pistes", "visibility", "visible");
 
     map.center = { lng: 11.32, lat: 47.22 };
     act(() => emit("move"));

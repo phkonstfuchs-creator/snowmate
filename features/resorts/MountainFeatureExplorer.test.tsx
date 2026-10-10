@@ -3,6 +3,17 @@ import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "@/lib/i18n/client";
 import MountainFeatureExplorer from "./MountainFeatureExplorer";
 
+vi.mock("@/features/mountain-data/catalog", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/features/mountain-data/catalog")>();
+  const fixtureId = actual.mountainFeatures.find((feature) => feature.kind === "piste" && feature.id !== "way/24559397")?.id;
+  return {
+    ...actual,
+    mountainFeatures: actual.mountainFeatures.map((feature) =>
+      feature.id === fixtureId ? { ...feature, difficulty: "novice" } : feature,
+    ),
+  };
+});
+
 function renderExplorer(locale: "en" | "de" = "en") {
   const onSelect = vi.fn();
   render(
@@ -59,5 +70,21 @@ describe("MountainFeatureExplorer", () => {
     expect(screen.getByRole("button", { name: "Pistes" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "Lifts" })).toHaveAttribute("aria-pressed", "false");
     expect(within(screen.getByRole("dialog")).getByRole("list")).toBeInTheDocument();
+  });
+
+  it("shows recognized freeride and novice levels in English and German", () => {
+    const english = vi.fn();
+    const { unmount } = render(
+      <I18nProvider locale="en">
+        <MountainFeatureExplorer onSelect={english} onClose={vi.fn()} />
+      </I18nProvider>,
+    );
+    expect(screen.getAllByText("Freeride", { exact: true }).length).toBeGreaterThan(0);
+    expect(screen.getByText("Novice", { exact: true })).toBeInTheDocument();
+    unmount();
+
+    renderExplorer("de");
+    expect(screen.getAllByText("Freeride", { exact: true }).length).toBeGreaterThan(0);
+    expect(screen.getByText("Anfänger", { exact: true })).toBeInTheDocument();
   });
 });

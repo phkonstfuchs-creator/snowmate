@@ -76,6 +76,19 @@ describe("MountainFeatureSheet", () => {
     expect(screen.getByText("Wartezeit nicht verfügbar")).toBeInTheDocument();
   });
 
+  it.each([
+    { difficulty: "freeride", english: "Freeride", german: "Freeride" },
+    { difficulty: "novice", english: "Novice", german: "Anfänger" },
+  ])("translates the $difficulty OSM difficulty for both locales", ({ difficulty, english, german }) => {
+    const feature = { ...piste, difficulty };
+    const { unmount } = renderSheet(feature, "en");
+    expect(screen.getByText(english, { exact: true })).toBeInTheDocument();
+    unmount();
+
+    renderSheet(feature, "de");
+    expect(screen.getByText(german, { exact: true })).toBeInTheDocument();
+  });
+
   it("offers the optional inventory browse action and closes through the shared sheet", async () => {
     const { onClose, onBrowse } = renderSheet(piste);
     fireEvent.click(screen.getByRole("button", { name: "Browse all pistes and lifts" }));

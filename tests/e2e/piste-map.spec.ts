@@ -98,3 +98,16 @@ test("tapping the rendered lift opens its canonical details", async ({ page }, t
   await expect(page.getByRole("dialog", { name: "Seegrubenbahn", exact: true })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(1);
 });
+
+test("resort scene keeps its snow-depth badge in front", async ({ page }) => {
+  await page.context().addCookies([{ name: "sm_locale", value: "en", domain: "127.0.0.1", path: "/" }]);
+  await page.goto("/demo/map");
+  await page.getByRole("region", { name: "All resorts", exact: true }).getByRole("button", { name: "Nordkette", exact: true }).click();
+  const detail = page.getByRole("dialog", { name: /Nordkette/ });
+  const badge = detail.getByText("85 cm", { exact: true });
+  await expect(badge).toBeVisible();
+  await expect.poll(() => badge.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return element.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+  })).toBe(true);
+});
