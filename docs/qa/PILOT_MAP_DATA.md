@@ -16,6 +16,47 @@ The operator's [current lifts and slopes inventory](https://nordkette.com/en/lif
 
 The importer first attempted public Overpass, but the sandbox could not resolve `overpass-api.de`; escalated retries received connection failure or HTTP 500 from public instances. The official OSM API's small read-only map endpoint succeeded. The checked-in snapshot was converted from its XML nodes/ways using the shared converter and contains no hand-drawn or endpoint-interpolated lines.
 
+## Operator facility/time review — 2026-10-10
+
+The [German operator inventory](https://nordkette.com/lifte-pisten/) again lists six facilities.
+`features/mountain-data/facilities.ts` records all six separately from map ways:
+
+| Facility | Snapshot association and evidence |
+|---|---|
+| Hungerburgbahn | Missing geometry; original box excludes most of the city approach. |
+| Seegrubenbahn | `way/25170582`: matching name, operator and Sektion II ref. |
+| Hafelekarbahn | `way/25282282`: matching name, operator and Sektion III ref. Operator inventory abbreviates it to Hafelekar. |
+| Sessellift 3er Stütze | `way/25750412`: `loc_name=Dreierstützenlift`; OSM general name is Seegrube. |
+| Sessellift Frau-Hitt-Warte | `way/227203761`: matching Frau-Hitt Warte name and chairlift type. |
+| Förderband Zauberteppich | Candidate only `way/706193014`: magic-carpet type, no name/ref/operator proves identity. |
+
+These are curated identity associations, not a surveyed geometric-accuracy
+or complete-coverage result. The candidate source way remains unassigned.
+There is no station-node evidence in the bundled geometry.
+
+The [operator technical page](https://nordkette.com/top-of-innsbruck/technik/)
+publishes Seegrubenbahn **minimum 6.5 minutes**, Hafelekarbahn **just under
+four minutes**, and Hungerburgbahn **approximately six minutes**. The
+[Hungerburgbahn page](https://nordkette.com/top-of-innsbruck/hungerburgbahn/)
+says **eight minutes**. Keep the Hungerburg figures conflicting; do not
+replace them with a supposedly validated single duration. The
+[timetable](https://nordkette.com/anlagen-fahrplan/) lists the first three
+sections and says departures every 15 minutes, continuously at high demand.
+Its table heading "Fahrzeit" contains operating hours, not journey duration.
+No chairlift/carpet interval, actual queue, next departure or arrival ETA
+is established by these sources. Published values are not field measurements.
+
+During review the status widget first returned a midnight timestamp with
+closed values, then 15:56 with the first three facilities open. No live
+status was ingested or persisted from this changing web page.
+
+The converter and both import filters now accept `railway=funicular`; the
+Overpass query box expands to `47.265,11.365,47.32,11.42`. Attempts against
+overpass-api.de, private.coffee and kumi.systems returned connection failure
+or HTTP 500; none produced usable data. **The geometry snapshot is unchanged
+and still dated 2026-10-09.** Future imports need separately sourced station
+nodes and explicit way membership before station markers can be claimed.
+
 ## Rights, cost and runtime
 
 OpenStreetMap data is © OpenStreetMap contributors and available under the [ODbL](https://www.openstreetmap.org/copyright). Attribution is shown on the map. A distributed derived database must follow ODbL share-alike requirements. Re-import only when needed and follow the [OSM API usage policy](https://operations.osmfoundation.org/policies/api/); the API extract used here was about 5.3 MB. No paid account or key was used.

@@ -47,7 +47,10 @@ export function convertOverpass(payload: unknown): MountainGeoCollection {
   const features = payload.elements.flatMap((raw): MountainGeoFeature[] => {
     if (!isRecord(raw) || raw.type !== "way" || typeof raw.id !== "number" || !Number.isSafeInteger(raw.id) || raw.id <= 0 || !Array.isArray(raw.geometry)) return [];
     const tags = isRecord(raw.tags) ? raw.tags : {};
-    const isLift = typeof tags.aerialway === "string" && PASSENGER_LIFTS.has(tags.aerialway);
+    const inactiveFunicular = ["disused", "abandoned", "construction"].some((lifecycle) =>
+      tags[lifecycle] === "yes" || tags[`${lifecycle}:railway`] === "funicular",
+    );
+    const isLift = (typeof tags.aerialway === "string" && PASSENGER_LIFTS.has(tags.aerialway)) || (tags.railway === "funicular" && !inactiveFunicular);
     const pisteType = tags["piste:type"];
     const isPiste = typeof pisteType === "string" && ROUTE_TYPES.has(pisteType) && typeof tags["disused:piste:type"] !== "string";
     if (!isLift && !isPiste) return [];

@@ -55,6 +55,33 @@ Evidence: shared catalog and converter tests, `components/map/SkiMap.test.tsx`,
 `tests/e2e/piste-map.spec.ts` cover source identity, selection, source failure,
 localized inventory/details, region boundaries, 320/390px and accessibility.
 
+## Nordkette facility inventory and published times — 2026-10-10
+
+The normal map inventory lists the six facilities on the operator's dated
+inventory even when geometry is missing. Four name/local-name associations
+resolve to existing source ways; Hungerburgbahn is missing and the unnamed
+magic carpet is an unconfirmed Zauberteppich candidate. Candidate/missing
+entries open details and operator links without inventing a map focus.
+The unnamed OSM lift remains separately selectable. Piste fragment counts
+remain separate from operator facility counts.
+
+Published operator durations retain their meaning: Seegrubenbahn minimum
+6.5 minutes; Hafelekarbahn approximately four minutes (source says just
+under four); Hungerburgbahn six versus eight minutes on two operator pages,
+therefore unresolved. The first three transport sections have a published
+15-minute departure interval, with continuous operation possible at high
+demand. Chairlifts/carpet have no inferred interval or operator duration.
+OSM estimates, queue time and operational status remain distinct. Review
+date is 10 October; the unchanged geometry snapshot remains 9 October.
+
+Both import paths accept `railway=funicular`; the Overpass query now covers
+the city approach. No successful refresh was available in this slice, so
+the 30-way snapshot is unchanged. No station positions or meetup ids are
+derived from this inventory. [ADR 0043](../adr/0043-source-backed-mountain-facilities.md)
+records the boundary. Tests must cover six discoverable facilities,
+missing/candidate details, no invented focus, source-qualified times,
+search/filter behaviour and 320/390px accessibility.
+
 ## Constraints
 
 - No user data goes to the weather provider; tiles are fetched by the

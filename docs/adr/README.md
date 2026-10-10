@@ -50,4 +50,7 @@ Status is **Proposed** until the owner approves it, then **Accepted**.
 | [0040](0040-private-go-wishes-on-existing-rides.md) | Private Go wishes on existing rides | Accepted |
 | [0041](0041-isolated-mountain-design-preview.md) | Isolated mountain design preview and sourced pilot geometry | Accepted for Phase A preview |
 
+| [0042](0042-private-go-day-plans.md) | Private day plans before publishing a ride | Accepted |
+| [0043](0043-source-backed-mountain-facilities.md) | Operator facilities separately from OSM ways | Accepted within mountain rebuild |
+
 Template: context, options considered, decision, consequences, status.
