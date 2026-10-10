@@ -6,6 +6,7 @@ for (const width of [320, 390]) {
     await page.context().addCookies([{ name: "sm_locale", value: "en", domain: "127.0.0.1", path: "/" }]);
     await page.setViewportSize({ width, height: 844 });
     await page.goto("/demo/map");
+    await expect(page.locator(".maplibregl-canvas")).toBeVisible();
     const entry = page.getByRole("button", { name: "Pistes & lifts", exact: true });
     await expect(entry).toBeInViewport();
     await entry.click();
@@ -39,6 +40,7 @@ test("the static inventory remains useful when map providers fail and stops at i
   await page.route("https://tiles.openfreemap.org/**", (route) => route.abort());
   await page.route("https://*.tile.openstreetmap.org/**", (route) => route.abort());
   await page.goto("/demo/map");
+  await expect(page.locator(".maplibregl-canvas")).toBeVisible();
   await page.getByRole("button", { name: "Pistes & lifts", exact: true }).click();
   const inventory = page.getByRole("dialog", { name: "Pistes & lifts", exact: true });
   await inventory.getByRole("searchbox").fill("Zweier");
