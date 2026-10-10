@@ -54,13 +54,6 @@ export default function MountainFeatureSheet({
           </section>
         ) : (
           <>
-            {duration && (
-              <section className={styles.detailCard}>
-                <span className={styles.detailLabel}>{t("mountain.durationLabel")}</span>
-                <strong>{duration}</strong>
-                <small>{t("mountain.durationCaveat")}</small>
-              </section>
-            )}
             {facility?.rideTime && (
               <section className={styles.detailCard}>
                 <span className={styles.detailLabel}>{t("mountain.operatorRideTime")}</span>
@@ -90,6 +83,13 @@ export default function MountainFeatureSheet({
                 <a href={facility.departureInterval.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.sourceLink}>
                   {t("mountain.timetable.source")}
                 </a>
+              </section>
+            )}
+            {duration && (
+              <section className={styles.detailCard}>
+                <span className={styles.detailLabel}>{t("mountain.durationLabel")}</span>
+                <strong>{duration}</strong>
+                <small>{t("mountain.durationCaveat")}</small>
               </section>
             )}
             <p className={styles.unknownStatus}>{t("mountain.queueUnknown")}</p>

@@ -23,6 +23,8 @@ for (const width of [320, 390]) {
     await expect(page.getByRole("dialog")).toHaveCount(1);
     await expect(detail.getByText("Operational status unavailable", { exact: true })).toBeVisible();
     await expect(detail.getByText("Queue time unavailable", { exact: true })).toBeVisible();
+    await expect(detail.getByText("Minimum 6.5 min", { exact: true })).toBeVisible();
+    await expect(detail.getByText(/departures every 15 min.*high demand.*may run continuously/iu)).toBeVisible();
     await expect(detail.getByRole("link", { name: "Nordkette webcams" })).toHaveAttribute("href", "https://nordkette.com/en/cams/");
     await expect(detail.getByRole("link", { name: "View on OpenStreetMap" })).toHaveAttribute("href", "https://www.openstreetmap.org/way/25170582");
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
@@ -111,3 +113,43 @@ test("resort scene keeps its snow-depth badge in front", async ({ page }) => {
     return element.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
   })).toBe(true);
 });
+
+for (const width of [320, 390]) {
+  test(`missing and candidate facilities have useful honest details at ${width}px`, async ({ page }, testInfo) => {
+    await page.context().addCookies([{ name: "sm_locale", value: "en", domain: "127.0.0.1", path: "/" }]);
+    await page.setViewportSize({ width, height: 844 });
+    await page.route("https://tiles.openfreemap.org/**", (route) => route.abort());
+    await page.goto("/demo/map");
+    await page.getByRole("button", { name: "Pistes & lifts", exact: true }).click();
+    const inventory = page.getByRole("dialog", { name: "Pistes & lifts", exact: true });
+    await inventory.getByRole("button", { name: "Lifts", exact: true }).click();
+    for (const name of ["Hungerburgbahn", "Seegrubenbahn", "Hafelekarbahn", "Sessellift 3er Stütze", "Sessellift Frau-Hitt-Warte", "Förderband Zauberteppich"]) {
+      await expect(inventory.getByRole("button", { name: new RegExp(name, "u") })).toHaveCount(1);
+    }
+    await inventory.getByRole("searchbox").fill("Hungerburg");
+    await inventory.getByRole("button", { name: /Hungerburgbahn/u }).click();
+    const hungerburg = page.getByRole("dialog", { name: "Hungerburgbahn", exact: true });
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    await expect(hungerburg.getByText("No mapped geometry", { exact: true })).toBeVisible();
+    await expect(hungerburg.getByText(/6 min.*8 min/u)).toBeVisible();
+    await expect(hungerburg.getByText(/sources disagree.*no verified ride time/iu)).toBeVisible();
+    await expect(hungerburg.getByRole("link", { name: "Timetable source", exact: true })).toHaveAttribute("href", "https://nordkette.com/anlagen-fahrplan/");
+    const a11y = await new AxeBuilder({ page }).include('[role="dialog"]').withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(a11y.violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await page.screenshot({ path: testInfo.outputPath(`hungerburg-${width}.png`) });
+    await hungerburg.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(hungerburg).toHaveCount(0);
+    await page.getByRole("button", { name: "Pistes & lifts", exact: true }).click();
+    const nextInventory = page.getByRole("dialog", { name: "Pistes & lifts", exact: true });
+    await nextInventory.getByRole("searchbox").fill("Zauberteppich");
+    await nextInventory.getByRole("button", { name: /Förderband Zauberteppich/u }).click();
+    const carpet = page.getByRole("dialog", { name: "Förderband Zauberteppich", exact: true });
+    await expect(carpet.getByText("Possible geometry match · unconfirmed", { exact: true })).toBeVisible();
+    await expect(carpet.getByText("Ride time unavailable", { exact: true })).toBeVisible();
+    await expect(carpet.getByRole("link", { name: "Candidate OpenStreetMap way 706193014" })).toHaveAttribute("href", "https://www.openstreetmap.org/way/706193014");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    const carpetA11y = await new AxeBuilder({ page }).include('[role="dialog"]').withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(carpetA11y.violations).toEqual([]);
+  });
+}
