@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import sharp from "sharp";
 
 for (const width of [320, 390]) {
   test(`a rider finds a sourced lift and webcam without sharing at ${width}px`, async ({ page }, testInfo) => {
@@ -82,7 +83,13 @@ test("tapping the rendered lift opens its canonical details", async ({ page }, t
   const center = { lng: (11.3797446 + 11.3990069) / 2, lat: (47.2861686 + 47.3063876) / 2 };
   const point = { lng: 11.3904186, lat: 47.2951844 };
   const scale = 512 * 2 ** 10;
-  await page.screenshot({ path: testInfo.outputPath("rendered-lift.png") });
+  const screenshot = await page.screenshot({ path: testInfo.outputPath("rendered-lift.png") });
+  const pixels = await sharp(screenshot).removeAlpha().raw().toBuffer();
+  let highlightedPixels = 0;
+  for (let i = 0; i < pixels.length; i += 3) {
+    if (pixels[i] > 230 && pixels[i + 1] > 140 && pixels[i + 1] < 190 && pixels[i + 2] < 100) highlightedPixels++;
+  }
+  expect(highlightedPixels, "The selected lift must remain visibly highlighted after closing its details").toBeGreaterThan(30);
   await page.mouse.click(box.x + box.width / 2 + (point.lng - center.lng) / 360 * scale,
     box.y + box.height / 2 + (mercatorY(point.lat) - mercatorY(center.lat)) * scale);
   await expect(page.getByRole("dialog", { name: "Seegrubenbahn", exact: true })).toBeVisible();
