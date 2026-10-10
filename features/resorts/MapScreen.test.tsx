@@ -53,6 +53,32 @@ describe("MapScreen", () => {
     expect(within(details).queryByRole("button", { name: "Tell my crew" })).not.toBeInTheDocument();
     expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
     expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ zoom: expect.any(Number) });
+    expect(within(details).getByText("Minimum 6.5 min")).toBeInTheDocument();
+    expect(within(details).getByText(/departures every 15 min/i)).toBeInTheDocument();
+  });
+
+  it("shows an unsourced facility without highlighting or focusing candidate geometry", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Pistes & lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Hungerburgbahn/u }));
+
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByRole("dialog", { name: "Hungerburgbahn" })).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toBeNull();
+  });
+
+  it("keeps the candidate carpet way unhighlighted when its facility facts are opened", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Pistes & lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Förderband Zauberteppich/u }));
+
+    const details = screen.getByRole("dialog", { name: "Förderband Zauberteppich" });
+    expect(within(details).getByText("Possible geometry match · unconfirmed")).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toBeNull();
   });
 
   it("resolves map selections from the known catalog and ignores unknown ids", () => {
