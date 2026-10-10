@@ -47,8 +47,10 @@ import LiftMeetupPanel from "@/features/lift-meetup/LiftMeetupPanel";
 import { START_MESSAGES, type LiftMeetup, type StartResult } from "@/features/lift-meetup/meetup";
 import MapLoading from "@/components/map/MapLoading";
 import { mountainFeatureById, mountainFeatureFocus } from "@/features/mountain-data/catalog";
+import { mountainFacilityById } from "@/features/mountain-data/facilities";
 import MountainFeatureExplorer from "./MountainFeatureExplorer";
 import MountainFeatureSheet from "./MountainFeatureSheet";
+import MountainFacilitySheet from "./MountainFacilitySheet";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
@@ -64,7 +66,7 @@ const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
   fresh: "map.fresh", groomed: "map.groomed", icy: "map.icy", slushy: "map.slushy",
 };
 
-type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | { type: "mountain-list" } | { type: "mountain-feature"; featureId: string } | null;
+type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | { type: "mountain-list" } | { type: "mountain-feature"; featureId: string } | { type: "mountain-facility"; facilityId: string } | null;
 
 function ResortDetailSheet({
   resort,
@@ -348,6 +350,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(() => live?.initialAction === "lift" && live.canShareLift === true ? { type: "lift" } : null);
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const selectedFeature = activeSheet?.type === "mountain-feature" ? mountainFeatureById(activeSheet.featureId) : null;
+  const selectedFacility = activeSheet?.type === "mountain-facility" ? mountainFacilityById(activeSheet.facilityId) : null;
   const openMountainFeature = (id: string) => {
     if (city !== "innsbruck") return;
     const feature = mountainFeatureById(id);
@@ -357,6 +360,15 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
     setSelectedFeatureId(feature.id);
     setFocus((previous) => ({ ...featureView, key: (previous?.key ?? 0) + 1 }));
     setActiveSheet({ type: "mountain-feature", featureId: feature.id });
+    mapStage.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
+  };
+  const openMountainFacility = (id: string) => {
+    if (city !== "innsbruck") return;
+    const facility = mountainFacilityById(id);
+    if (!facility || facility.geometry.status === "matched") return;
+    setSelectedFriendId(null);
+    setSelectedFeatureId(null);
+    setActiveSheet({ type: "mountain-facility", facilityId: facility.id });
     mapStage.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
   };
   /* Keep both controls visible; active sharing also has a direct Stop. */
@@ -474,8 +486,9 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onClose={() => setActiveSheet(null)}
         />
       )}
-      {activeSheet?.type === "mountain-list" && <MountainFeatureExplorer onSelect={openMountainFeature} onClose={() => setActiveSheet(null)} />}
+      {activeSheet?.type === "mountain-list" && <MountainFeatureExplorer onSelect={openMountainFeature} onSelectFacility={openMountainFacility} onClose={() => setActiveSheet(null)} />}
       {selectedFeature && <MountainFeatureSheet feature={selectedFeature} onClose={() => setActiveSheet(null)} onBrowse={() => setActiveSheet({ type: "mountain-list" })} />}
+      {selectedFacility && <MountainFacilitySheet facility={selectedFacility} onClose={() => setActiveSheet(null)} onBrowse={() => setActiveSheet({ type: "mountain-list" })} />}
     </>
   );
 }
