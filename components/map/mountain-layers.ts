@@ -1,6 +1,6 @@
 import type { ExpressionSpecification, LineLayerSpecification } from "maplibre-gl";
 import { featureBounds } from "@/features/mountain-data/convert";
-import { mountainGeoJSON } from "@/features/mountain-data/catalog";
+import { mountainFeatureById, mountainGeoJSON } from "@/features/mountain-data/catalog";
 
 export const MOUNTAIN_SOURCE = "mountain-features";
 export const MOUNTAIN_PISTE_LAYER = "mountain-pistes";
@@ -35,7 +35,10 @@ const hitWidth = ["interpolate", ["linear"], ["zoom"], 10, 12, 13, 14, 16, 16] a
 const liftWidth = ["interpolate", ["linear"], ["zoom"], 10, 3, 13, 4, 16, 5] as ExpressionSpecification;
 
 function selectionFilter(id: string | null | undefined): ExpressionSpecification {
-  return ["==", ["id"], id ?? ""];
+  const feature = id ? mountainFeatureById(id) : null;
+  // MVT serialization only preserves integer feature IDs. Match the sourced
+  // property instead of a top-level string such as "way/25170582".
+  return ["==", ["get", "osm_id"], feature ? Number(feature.id.slice(4)) : -1];
 }
 
 export function mountainLayers(selectedFeatureId: string | null | undefined): LineLayerSpecification[] {

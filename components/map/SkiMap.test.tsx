@@ -171,7 +171,7 @@ describe("map network readiness", () => {
     act(() => emitLayer("mountain-piste-hit", { features: [{ properties: { osm_id: 24559397, kind: "piste" } }] }));
     expect(onFeatureSelect).toHaveBeenCalledWith("way/24559397");
     rerender(<SkiMap city="innsbruck" resorts={[]} onSelect={() => {}} onFeatureSelect={onFeatureSelect} selectedFeatureId="way/25170582" />);
-    expect(map.filters).toHaveBeenLastCalledWith("mountain-selected-lift", ["all", ["==", ["get", "kind"], "lift"], ["==", ["id"], "way/25170582"]]);
+    expect(map.filters).toHaveBeenLastCalledWith("mountain-selected-lift", ["all", ["==", ["get", "kind"], "lift"], ["==", ["get", "osm_id"], 25170582]]);
     act(() => emitLayer("mountain-lift-hit", { features: [{ properties: { osm_id: 25170582, kind: "lift" } }] }));
     expect(onFeatureSelect).toHaveBeenLastCalledWith("way/25170582");
     act(() => emitLayer("mountain-piste-hit", { features: [{ properties: { osm_id: 42, kind: "piste" } }] }));
@@ -224,7 +224,7 @@ describe("map network readiness", () => {
     rerender(<SkiMap city="salzburg" resorts={[]} onSelect={() => {}} onFeatureSelect={onFeatureSelect} selectedFeatureId={null} />);
     expect(map.sources.get("mountain-features")).toMatchObject({ data: { type: "FeatureCollection", features: [] } });
     expect(screen.queryByText("Piste lines unavailable. You can still use the piste list.")).not.toBeInTheDocument();
-    expect(map.filters).toHaveBeenLastCalledWith("mountain-selected-lift", ["all", ["==", ["get", "kind"], "lift"], ["==", ["id"], ""]]);
+    expect(map.filters).toHaveBeenLastCalledWith("mountain-selected-lift", ["all", ["==", ["get", "kind"], "lift"], ["==", ["get", "osm_id"], -1]]);
     act(() => emitLayer("mountain-piste-hit", { features: [{ properties: { osm_id: 24559397, kind: "piste" } }] }));
     expect(onFeatureSelect).not.toHaveBeenCalled();
   });

@@ -87,7 +87,10 @@ test("tapping the rendered lift opens its canonical details", async ({ page }, t
   const pixels = await sharp(screenshot).removeAlpha().raw().toBuffer();
   let highlightedPixels = 0;
   for (let i = 0; i < pixels.length; i += 3) {
-    if (pixels[i] > 230 && pixels[i + 1] > 140 && pixels[i + 1] < 190 && pixels[i + 2] < 100) highlightedPixels++;
+    const red = pixels[i] ?? 0;
+    const green = pixels[i + 1] ?? 0;
+    const blue = pixels[i + 2] ?? 0;
+    if (red > 230 && green > 140 && green < 190 && blue < 100) highlightedPixels++;
   }
   expect(highlightedPixels, "The selected lift must remain visibly highlighted after closing its details").toBeGreaterThan(30);
   await page.mouse.click(box.x + box.width / 2 + (point.lng - center.lng) / 360 * scale,

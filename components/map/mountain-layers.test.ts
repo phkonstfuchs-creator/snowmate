@@ -39,10 +39,10 @@ describe("MapLibre mountain layers", () => {
   it("highlights a selected feature by its canonical GeoJSON id", () => {
     const layers = mountainLayers("way/25170582");
     expect(layers.find(({ id }) => id === "mountain-selected-piste")?.filter).toEqual([
-      "all", ["==", ["get", "kind"], "piste"], ["==", ["id"], "way/25170582"],
+      "all", ["==", ["get", "kind"], "piste"], ["==", ["get", "osm_id"], 25170582],
     ]);
     expect(layers.find(({ id }) => id === "mountain-selected-lift")?.filter).toEqual([
-      "all", ["==", ["get", "kind"], "lift"], ["==", ["id"], "way/25170582"],
+      "all", ["==", ["get", "kind"], "lift"], ["==", ["get", "osm_id"], 25170582],
     ]);
   });
 
