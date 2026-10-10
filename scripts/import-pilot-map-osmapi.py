@@ -27,7 +27,7 @@ def main() -> int:
     missing_refs = 0
     for way in root.findall("way"):
         tags = {tag.attrib["k"]: tag.attrib["v"] for tag in way.findall("tag")}
-        if not ("aerialway" in tags or "piste:type" in tags or "piste:difficulty" in tags):
+        if not ("aerialway" in tags or tags.get("railway") == "funicular" or "piste:type" in tags or "piste:difficulty" in tags):
             continue
         refs = [node.attrib["ref"] for node in way.findall("nd")]
         missing_refs += sum(ref not in nodes for ref in refs)

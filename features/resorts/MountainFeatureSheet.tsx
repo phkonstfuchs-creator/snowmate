@@ -5,6 +5,7 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import type { MountainFeature } from "@/features/mountain-data/catalog";
 import { formatMountainDuration } from "@/features/mountain-data/duration";
 import { MOUNTAIN_SNAPSHOT_DATE } from "@/features/mountain-data/catalog";
+import { mountainFacilityForFeature } from "@/features/mountain-data/facilities";
 import styles from "./mountain-features.module.css";
 
 function osmUrl(id: string): string | null {
@@ -17,7 +18,7 @@ function formatDate(value: string | null | undefined, locale: "en" | "de"): stri
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(locale === "de" ? "de-AT" : "en-GB", {
+  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", {
     dateStyle: "medium",
     timeZone: "UTC",
   }).format(date);
@@ -36,11 +37,13 @@ export default function MountainFeatureSheet({
   const locale = useLocale();
   const sourceDate = formatDate(feature.osmTimestamp, locale);
   const duration = feature.kind === "lift" ? formatMountainDuration(feature.duration, locale) : null;
+  const facility = feature.kind === "lift" ? mountainFacilityForFeature(feature.id) : null;
   const osm = osmUrl(feature.id);
   const snapshotDate = formatDate(`${MOUNTAIN_SNAPSHOT_DATE}T00:00:00Z`, locale);
+  const operatorCheckedDate = facility ? formatDate(facility.checkedAt, locale) : null;
 
   return (
-    <Sheet title={feature.name} subtitle={t(`mountain.kind.${feature.kind}`)} onClose={onClose} className={styles.sheet}>
+    <Sheet title={facility?.name ?? feature.name} subtitle={t(`mountain.kind.${feature.kind}`)} onClose={onClose} className={styles.sheet}>
       <article className={styles.details}>
         <p className={styles.resort}>{feature.resort}</p>
 
@@ -51,6 +54,37 @@ export default function MountainFeatureSheet({
           </section>
         ) : (
           <>
+            {facility?.rideTime && (
+              <section className={styles.detailCard}>
+                <span className={styles.detailLabel}>{t("mountain.operatorRideTime")}</span>
+                {facility.rideTime.kind === "minimum" && (
+                  <strong>{t("mountain.rideTime.minimum", { duration: formatFacilityMinutes(facility.rideTime.minutes, locale) })}</strong>
+                )}
+                {facility.rideTime.kind === "approximate" && (
+                  <strong>{t("mountain.rideTime.approximate", { duration: formatFacilityMinutes(facility.rideTime.minutes, locale) })}</strong>
+                )}
+                {facility.rideTime.kind === "conflicting" && (
+                  <>
+                    <strong>{facility.rideTime.values.map((value) => formatFacilityMinutes(value, locale)).join(" · ")}</strong>
+                    <small>{t("mountain.rideTime.conflicting")}</small>
+                  </>
+                )}
+                {facility.rideTime.kind !== "conflicting" && (
+                  <a href={facility.rideTime.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.sourceLink}>
+                    {t("mountain.rideTime.source")}
+                  </a>
+                )}
+              </section>
+            )}
+            {facility?.departureInterval && (
+              <section className={styles.detailCard}>
+                <span className={styles.detailLabel}>{t("mountain.timetable")}</span>
+                <strong>{t("mountain.departureNote", { minutes: facility.departureInterval.minutes })}</strong>
+                <a href={facility.departureInterval.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.sourceLink}>
+                  {t("mountain.timetable.source")}
+                </a>
+              </section>
+            )}
             {duration && (
               <section className={styles.detailCard}>
                 <span className={styles.detailLabel}>{t("mountain.durationLabel")}</span>
@@ -67,6 +101,10 @@ export default function MountainFeatureSheet({
         <section className={styles.sourceCard} aria-label={t("mountain.sourceTitle")}>
           <strong>{t("mountain.sourceTitle")}</strong>
           <p>{t("mountain.snapshotDetail", { date: snapshotDate ?? MOUNTAIN_SNAPSHOT_DATE })}</p>
+          {facility && operatorCheckedDate && (
+            <p>{t("mountain.operatorChecked", { date: operatorCheckedDate })}</p>
+          )}
+          {facility && facility.name !== feature.name && <p>{t("mountain.osmFeatureName", { name: feature.name })}</p>}
           <p>{sourceDate
             ? t("mountain.osmRevision", { version: feature.osmVersion ?? t("mountain.versionUnknown"), date: sourceDate })
             : t("mountain.osmRevisionUnknown")}</p>
@@ -101,6 +139,11 @@ export default function MountainFeatureSheet({
       </article>
     </Sheet>
   );
+}
+
+function formatFacilityMinutes(minutes: number, locale: "en" | "de"): string {
+  const value = new Intl.NumberFormat(locale === "de" ? "de-AT" : "en-GB", { maximumFractionDigits: 1 }).format(minutes);
+  return locale === "de" ? `${value} Min.` : `${value} min`;
 }
 
 function difficultyLabel(value: string, t: ReturnType<typeof useT>): string {

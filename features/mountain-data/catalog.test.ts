@@ -26,6 +26,7 @@ describe("shared Nordkette mountain catalog", () => {
       expect(mountainFeatureById(feature.id)).toEqual(feature);
     }
 
+    expect(mountainFeatureById("way/706193014")).toMatchObject({ aerialwayType: "magic_carpet" });
     expect(mountainFeatureById("way/25170582")).toMatchObject({ id: "way/25170582", name: "Seegrubenbahn", kind: "lift", osmVersion: 25 });
     expect(mountainFeatureById("way/24559397")).toMatchObject({ id: "way/24559397", name: "2 - Zweier Skiroute", kind: "piste", osmVersion: 35 });
   });

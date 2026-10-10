@@ -53,6 +53,47 @@ describe("MapScreen", () => {
     expect(within(details).queryByRole("button", { name: "Tell my crew" })).not.toBeInTheDocument();
     expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
     expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ zoom: expect.any(Number) });
+    expect(within(details).getByText("Minimum 6.5 min")).toBeInTheDocument();
+    expect(within(details).getByText(/departures every 15 min/i)).toBeInTheDocument();
+    expect(within(details).getByText(/Operator information checked.*10 Oct 2026/u)).toBeInTheDocument();
+    expect(within(details).getByText(/Inventory snapshot from 9 Oct 2026/u)).toBeInTheDocument();
+  });
+
+  it("shows an unsourced facility without highlighting or focusing candidate geometry", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Pistes & lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Hungerburgbahn/u }));
+
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByRole("dialog", { name: "Hungerburgbahn" })).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toBeNull();
+  });
+
+  it("keeps the candidate carpet way unhighlighted when its facility facts are opened", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Pistes & lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Förderband Zauberteppich/u }));
+
+    const details = screen.getByRole("dialog", { name: "Förderband Zauberteppich" });
+    expect(within(details).getByText("Possible geometry match · unconfirmed")).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toBeNull();
+  });
+
+  it("clears an old mapped highlight before opening an unrelated facility without moving the camera", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
+    const priorFocus = mapMock.props.mock.lastCall![0].focus;
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Seegrubenbahn" })).getByRole("button", { name: "Browse all pistes and lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Hungerburgbahn/u }));
+
+    expect(screen.getByRole("dialog", { name: "Hungerburgbahn" })).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toEqual(priorFocus);
   });
 
   it("resolves map selections from the known catalog and ignores unknown ids", () => {
