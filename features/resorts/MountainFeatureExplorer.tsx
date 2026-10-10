@@ -42,8 +42,11 @@ export default function MountainFeatureExplorer({
       const kind = row.type === "facility" || row.feature.kind === "lift" ? "lift" : "piste";
       if (filter !== "all" && kind !== filter) return false;
       if (!normalizedQuery) return true;
+      const sourceFeature = row.type === "facility" && row.facility.geometry.status === "matched"
+        ? mountainFeatures.find(({ id }) => id === row.facility.geometry.featureId)
+        : undefined;
       const searchable = row.type === "facility"
-        ? `${row.facility.name} ${row.facility.id} ${row.facility.geometry.featureId ?? ""}`
+        ? `${row.facility.name} ${sourceFeature?.name ?? ""} ${row.facility.id} ${row.facility.geometry.featureId ?? ""}`
         : `${row.feature.name} ${row.feature.id}`;
       return searchable.toLocaleLowerCase(locale).includes(normalizedQuery);
     });
@@ -127,8 +130,11 @@ export default function MountainFeatureExplorer({
               const nameTotal = nameTotals.get(feature.name) ?? 1;
               const nameOrdinal = nameOrdinals.get(feature.id) ?? 1;
               const section = nameTotal > 1 ? t("mountain.sectionOrdinal", { index: nameOrdinal, total: nameTotal }) : null;
+              const isUnnamedConveyor = feature.aerialwayType === "magic_carpet"
+                && feature.name === `OSM lift ${feature.id.replace(/^way\//u, "")}`;
+              const displayName = isUnnamedConveyor ? t("mountain.unassignedWayName") : feature.name;
               const label = row.unassigned
-                ? `${t("mountain.unassignedWayName")}, ${t("mountain.unassignedWay", { id: feature.id.replace(/^way\//u, "") })}`
+                ? `${displayName}, ${t("mountain.unassignedWay", { id: feature.id.replace(/^way\//u, "") })}`
                 : section ? `${feature.name}, ${section}` : feature.name;
               return (
                 <li key={`feature:${feature.id}`}>
@@ -139,7 +145,7 @@ export default function MountainFeatureExplorer({
                     onClick={() => onSelect(feature.id)}
                   >
                     <span className={styles.featureMain}>
-                      <strong>{row.unassigned ? t("mountain.unassignedWayName") : feature.name}</strong>
+                      <strong>{displayName}</strong>
                       <small>
                         {feature.kind === "piste" ? t("mountain.kind.piste") : t("mountain.kind.lift")}
                         {section && <span className={styles.sectionOrdinal}>{section}</span>}

@@ -7,6 +7,7 @@ export interface MountainFeature {
   id: string;
   name: string;
   kind: "lift" | "piste";
+  aerialwayType?: string;
   difficulty?: string;
   duration?: string;
   osmVersion: number | null;
@@ -20,10 +21,12 @@ function toMountainFeature(feature: MountainGeoFeature): MountainFeature {
   const { properties } = feature;
   const difficulty = properties["piste:difficulty"];
   const duration = properties["aerialway:duration"] ?? properties.duration;
+  const aerialwayType = properties.aerialway;
   return {
     id: feature.id,
     name: properties.name,
     kind: properties.kind,
+    ...(typeof aerialwayType === "string" ? { aerialwayType } : {}),
     ...(typeof difficulty === "string" ? { difficulty } : {}),
     ...(typeof duration === "string" ? { duration } : {}),
     osmVersion: properties.osm_version,
