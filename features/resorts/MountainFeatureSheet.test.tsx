@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "@/lib/i18n/client";
 import type { MountainFeature } from "@/features/mountain-data/catalog";
+import { mountainFeatureById } from "@/features/mountain-data/catalog";
 import MountainFeatureSheet from "./MountainFeatureSheet";
 
 const piste: MountainFeature = {
@@ -60,6 +61,15 @@ describe("MountainFeatureSheet", () => {
     expect(screen.getByText(/estimated duration.*OpenStreetMap.*unverified/i)).toBeInTheDocument();
     expect(screen.getByText("Queue time unavailable")).toBeInTheDocument();
     expect(screen.queryByText(/open now|closed now/i)).not.toBeInTheDocument();
+  });
+
+  it("uses the operator facility name for a mapped chairlift and preserves its OSM feature name", () => {
+    const mappedChair = mountainFeatureById("way/25750412");
+    expect(mappedChair).not.toBeNull();
+    renderSheet(mappedChair!);
+
+    expect(screen.getByRole("dialog", { name: "Sessellift 3er Stütze" })).toBeInTheDocument();
+    expect(screen.getByText(mappedChair!.name, { exact: true })).toBeInTheDocument();
   });
 
   it("omits malformed durations and invalid OSM IDs instead of creating unsupported links", () => {
