@@ -99,6 +99,16 @@ describe("MountainFeatureExplorer", () => {
     expect(within(inventory).getByRole("button", { name: /OSM lift 706193014.*unassigned/u })).toBeInTheDocument();
   });
 
+  it("finds confirmed facilities by their original OSM names as well as operator names", () => {
+    renderExplorer();
+    const search = screen.getByRole("searchbox", { name: "Search pistes and lifts" });
+    fireEvent.change(search, { target: { value: "Frau-Hitt Warte" } });
+    expect(screen.getByRole("button", { name: "Sessellift Frau-Hitt-Warte" })).toBeInTheDocument();
+    fireEvent.change(search, { target: { value: "Seegrube" } });
+    expect(screen.getByRole("button", { name: "Sessellift 3er Stütze" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Seegrubenbahn" })).toBeInTheDocument();
+  });
+
   it("routes confirmed facilities to mapped geometry and missing or candidate facilities to facts", () => {
     const onSelect = vi.fn();
     const onSelectFacility = vi.fn();
