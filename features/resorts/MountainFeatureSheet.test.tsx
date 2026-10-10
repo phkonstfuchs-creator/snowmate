@@ -29,12 +29,12 @@ const lift: MountainFeature = {
 function renderSheet(feature: MountainFeature, locale: "en" | "de" = "en") {
   const onClose = vi.fn();
   const onBrowse = vi.fn();
-  render(
+  const { unmount } = render(
     <I18nProvider locale={locale}>
       <MountainFeatureSheet feature={feature} onClose={onClose} onBrowse={onBrowse} />
     </I18nProvider>,
   );
-  return { onClose, onBrowse };
+  return { onClose, onBrowse, unmount };
 }
 
 describe("MountainFeatureSheet", () => {

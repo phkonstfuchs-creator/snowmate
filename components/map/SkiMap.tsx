@@ -22,7 +22,6 @@ import {
   paperTint,
 } from "./map-style";
 import {
-  isInsideMountainSnapshot,
   MOUNTAIN_LIFT_HIT_LAYER,
   MOUNTAIN_PISTE_HIT_LAYER,
   MOUNTAIN_SOURCE,
@@ -241,9 +240,9 @@ export default function SkiMap({
     const updateRasterVisibility = () => {
       try {
         if (!map.getLayer("pistes")) return;
-        const center = map.getCenter();
-        const hideRaster = latestCity.current === "innsbruck" && map.getZoom() >= 14 && isInsideMountainSnapshot(center.lng, center.lat);
-        map.setLayoutProperty("pistes", "visibility", hideRaster ? "none" : "visible");
+        // A partial inventory cannot replace every line in the viewport,
+        // including when the optional selectable overlay fails to install.
+        map.setLayoutProperty("pistes", "visibility", "visible");
       } catch (error) {
         console.warn("Optional raster piste visibility could not be updated", error);
       }

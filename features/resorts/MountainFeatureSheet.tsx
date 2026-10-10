@@ -104,8 +104,10 @@ export default function MountainFeatureSheet({
 }
 
 function difficultyLabel(value: string, t: ReturnType<typeof useT>): string {
+  if (value === "novice") return t("mountain.difficulty.novice");
   if (value === "easy" || value === "beginner") return t("mountain.difficulty.easy");
   if (value === "intermediate") return t("mountain.difficulty.intermediate");
   if (value === "advanced" || value === "expert") return t("mountain.difficulty.advanced");
+  if (value === "freeride") return t("mountain.difficulty.freeride");
   return t("mountain.difficultyUnknown");
 }

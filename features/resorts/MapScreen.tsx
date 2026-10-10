@@ -117,7 +117,7 @@ function ResortDetailSheet({
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="absolute z-20 right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+        <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
           <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
         </button>
 
@@ -133,7 +133,7 @@ function ResortDetailSheet({
                 className="object-cover"
               />
             ) : (
-              <ResortScene name={resort.name} className="absolute z-20 inset-0 w-full h-full" />
+              <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
             )}
             {!isLive && (
               <span
