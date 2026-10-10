@@ -22,7 +22,8 @@ Browser ◄── feature screens (client components) ◄───────�
 - **Supabase** provides auth (email and password, SSR cookies via
   `@supabase/ssr`), Postgres and one edge function that sends push
   notices (ADR 0025). There is no other backend.
-- `/preview/mountain` is the explicitly labeled Phase A redesign experiment ([ADR 0041](adr/0041-isolated-mountain-design-preview.md)). Its German preview copy, memory-only drafts and simulated social/replay controls are isolated in `features/mountain-preview`; signed-in screens do not use them. Its bundled OSM geometry is real, imported outside runtime and attributed separately from fixtures.
+- `/preview/mountain` is the explicitly labeled Phase A redesign experiment ([ADR 0041](adr/0041-isolated-mountain-design-preview.md)). Its German preview copy, memory-only drafts and simulated social/replay controls are isolated in `features/mountain-preview`; signed-in screens do not use them. Its real OSM geometry is now shared with the production map through `features/mountain-data`, separately from fixtures.
+- `features/mountain-data` owns the single dated Nordkette OSM snapshot, import conversion and canonical feature catalog. The production map selects only known source IDs; its accessible inventory and details remain usable without map tiles. This partial geometry has no operating status, queue information or verified association with the separate lift-meetup IDs.
 - Identity always comes from the server session, never from a client-supplied id.
   The proxy and protected layout verify `auth.getUser()`; SQL uses `auth.uid()`
   and rejects missing/revoked session ids. `getClaims()` in a data boundary

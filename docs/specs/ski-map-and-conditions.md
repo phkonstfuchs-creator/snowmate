@@ -28,6 +28,33 @@ each other an exact meeting point.
 - Tracking ski days, gamification, swiping for new people, the new design
   (later phases).
 
+## Selectable Nordkette map — 2026-10-10
+
+The production map and demo now use the same bundled, source-backed
+Nordkette geometry as the design experiment. The map's **Pistes & lifts**
+action opens a searchable inventory: five mapped lift lines and 25 mapped
+piste sections. Repeated winter names keep their separate section identities.
+Selecting a line on the map or a list row opens its difficulty, source
+snapshot and OSM revision; closing the details keeps the selected line
+highlighted. The inventory remains usable if map tiles or WebGL are unavailable.
+
+This is partial coverage, as documented in the [pilot data audit](../qa/PILOT_MAP_DATA.md).
+It does not meet the full resort-inventory gate. Unknown operating status
+and queues stay unavailable. Numeric OSM lift durations are rounded and
+explicitly unverified; they are not arrival predictions. Official Nordkette
+operating-status and webcam links are available in the details, without
+loading or mirroring external media.
+
+The source data and conversion live in `features/mountain-data`. Existing
+preview imports use compatibility wrappers; there is only one raw snapshot.
+Public geometry selection never starts tracking, location sharing or a
+lift-meetup. No source-way ID is treated as a verified meetup lift ID.
+
+Evidence: shared catalog and converter tests, `components/map/SkiMap.test.tsx`,
+`features/resorts/MountainFeature*.test.tsx`, `MapScreen.test.tsx` and
+`tests/e2e/piste-map.spec.ts` cover source identity, selection, source failure,
+localized inventory/details, region boundaries, 320/390px and accessibility.
+
 ## Constraints
 
 - No user data goes to the weather provider; tiles are fetched by the

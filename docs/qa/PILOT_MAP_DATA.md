@@ -6,6 +6,8 @@
 
 **Bundled snapshot:** 30 OSM ways: 5 passenger aerialway ways and 25 piste ways, including multiple mapped sections with the same piste name. Snapshot-wide geometry bounds: `[11.3755319, 47.2861686, 11.3990069, 47.3121155]` (longitude, latitude).
 
+**Shared production location (2026-10-10):** `features/mountain-data/pilot.json` is the single snapshot used by both the normal map and the design preview. The importer targets this shared directory; preview TypeScript modules keep compatibility re-exports. Moving the snapshot does not refresh or expand its coverage.
+
 ## Coverage and provenance
 
 The query area is a compact Nordkette ski-area box. It does not include the full city-to-Hungerburg approach or prove full resort coverage. The 25 piste ways are source features and fragments, not 25 distinct complete runs. `disused:piste:type` and non-passenger aerialways are excluded. The import preserves every selected way's OSM id, version, timestamp and source tags; catalog ids link to `https://www.openstreetmap.org/way/<id>`. The app treats operational status as **unknown** because this extract does not establish current status.

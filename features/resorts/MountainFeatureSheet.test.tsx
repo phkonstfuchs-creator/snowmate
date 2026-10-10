@@ -49,6 +49,8 @@ describe("MountainFeatureSheet", () => {
       "href",
       "https://www.openstreetmap.org/way/24559397",
     );
+    expect(screen.getByRole("link", { name: "Live lift and piste status" })).toHaveAttribute("href", "https://nordkette.com/en/lifts-slopes/");
+    expect(screen.getByRole("link", { name: "Nordkette webcams" })).toHaveAttribute("href", "https://nordkette.com/en/cams/");
   });
 
   it("labels lift duration as unverified OSM data and leaves queue information unknown", () => {
@@ -70,7 +72,7 @@ describe("MountainFeatureSheet", () => {
   it("uses German copy while preserving localized duration formatting", () => {
     renderSheet(lift, "de");
 
-    expect(screen.getByText("5,2 Min.")).toBeInTheDocument();
+    expect(screen.getByText("5,2 min")).toBeInTheDocument();
     expect(screen.getByText("Wartezeit nicht verfügbar")).toBeInTheDocument();
   });
 

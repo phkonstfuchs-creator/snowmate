@@ -18,16 +18,16 @@ describe("MountainFeatureExplorer", () => {
     renderExplorer();
 
     expect(screen.getByRole("dialog", { name: "Pistes & lifts" })).toBeInTheDocument();
-    expect(screen.getByText(/25 mapped pistes/i)).toBeInTheDocument();
-    expect(screen.getByText(/5 lifts/i)).toBeInTheDocument();
-    expect(screen.getByText(/partial coverage/i)).toBeInTheDocument();
+    expect(screen.getByText(/25 mapped piste sections/i)).toBeInTheDocument();
+    expect(screen.getByText(/5 mapped lifts/i)).toBeInTheDocument();
+    expect(screen.getByText(/partial.*coverage/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Lifts" }));
     expect(screen.getByRole("button", { name: "Seegrubenbahn" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "2 - Zweier Skiroute" })).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: "2 - Zweier Skiroute" })).toHaveLength(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Pistes" }));
-    expect(screen.getByRole("button", { name: "2 - Zweier Skiroute" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /2 - Zweier Skiroute, Section \d+ of \d+/u }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: "Seegrubenbahn" })).not.toBeInTheDocument();
   });
 
@@ -45,19 +45,19 @@ describe("MountainFeatureExplorer", () => {
 
   it("selects the chosen catalog feature and localizes its controls", () => {
     const onSelect = renderExplorer("de");
-    const piste = screen.getByRole("button", { name: "2 - Zweier Skiroute" });
+    fireEvent.change(screen.getByRole("searchbox", { name: "Pisten und Lifte suchen" }), { target: { value: "24559397" } });
+    const piste = screen.getByRole("button", { name: /2 - Zweier Skiroute, Abschnitt \d+ von \d+/u });
     expect(screen.getByRole("button", { name: "Alle" })).toBeInTheDocument();
     fireEvent.click(piste);
 
     expect(onSelect).toHaveBeenCalledWith("way/24559397");
   });
 
-  it("keeps list controls large enough without horizontal scrolling", () => {
+  it("exposes every filter as a labeled pressed-state control", () => {
     renderExplorer();
-    for (const name of ["All", "Pistes", "Lifts"]) {
-      const button = screen.getByRole("button", { name });
-      expect(button).toHaveClass("mountainFilter");
-    }
+    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Pistes" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Lifts" })).toHaveAttribute("aria-pressed", "false");
     expect(within(screen.getByRole("dialog")).getByRole("list")).toBeInTheDocument();
   });
 });

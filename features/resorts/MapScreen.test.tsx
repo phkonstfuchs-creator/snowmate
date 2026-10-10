@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
@@ -49,7 +49,7 @@ describe("MapScreen", () => {
     fireEvent.click(within(inventory).getByRole("button", { name: /Seegrubenbahn/ }));
     expect(screen.getAllByRole("dialog")).toHaveLength(1);
     const details = screen.getByRole("dialog", { name: "Seegrubenbahn" });
-    expect(within(details).getByText(/status unknown/i)).toBeInTheDocument();
+    expect(within(details).getByText("Operational status unavailable")).toBeInTheDocument();
     expect(within(details).queryByRole("button", { name: "Tell my crew" })).not.toBeInTheDocument();
     expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
     expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ zoom: expect.any(Number) });
@@ -61,6 +61,14 @@ describe("MapScreen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
     expect(screen.getByRole("dialog", { name: "Seegrubenbahn" })).toBeInTheDocument();
+  });
+
+  it("keeps a selected geometry highlighted after its details are closed", async () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck" }} />);
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Seegrubenbahn" })).getByRole("button", { name: "Close" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
   });
 
   it("does not suggest Nordkette vector coverage in the Salzburg region", () => {

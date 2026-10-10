@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import pilotSource from "../mountain-preview/data/pilot.json";
+import pilotSource from "./pilot.json";
 import {
   MOUNTAIN_SNAPSHOT_DATE,
   mountainFeatureById,
