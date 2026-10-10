@@ -69,7 +69,7 @@ describe("MountainFeatureSheet", () => {
     renderSheet(mappedChair!);
 
     expect(screen.getByRole("dialog", { name: "Sessellift 3er Stütze" })).toBeInTheDocument();
-    expect(screen.getByText(mappedChair!.name, { exact: true })).toBeInTheDocument();
+    expect(screen.getByText(/OpenStreetMap feature name: Seegrube/u)).toBeInTheDocument();
   });
 
   it("omits malformed durations and invalid OSM IDs instead of creating unsupported links", () => {

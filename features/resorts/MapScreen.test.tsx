@@ -55,6 +55,8 @@ describe("MapScreen", () => {
     expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ zoom: expect.any(Number) });
     expect(within(details).getByText("Minimum 6.5 min")).toBeInTheDocument();
     expect(within(details).getByText(/departures every 15 min/i)).toBeInTheDocument();
+    expect(within(details).getByText(/Operator information checked.*10 Oct 2026/u)).toBeInTheDocument();
+    expect(within(details).getByText(/Inventory snapshot from 9 Oct 2026/u)).toBeInTheDocument();
   });
 
   it("shows an unsourced facility without highlighting or focusing candidate geometry", () => {

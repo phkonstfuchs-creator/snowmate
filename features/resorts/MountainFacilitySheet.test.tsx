@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "@/lib/i18n/client";
 import type { MountainFacility } from "@/features/mountain-data/facilities";
@@ -25,7 +25,7 @@ const hungerburg: MountainFacility = {
   sourceUrl: officialInventory,
   checkedAt: "2026-10-10T10:00:00+02:00",
   geometry: { status: "missing", featureId: null },
-  rideTime: { kind: "conflicting", minutes: [6, 8], sourceUrls: [operatorFacts, "https://nordkette.com/top-of-innsbruck/hungerburgbahn/"] },
+  rideTime: { kind: "conflicting", values: [6, 8], sourceUrls: [operatorFacts, "https://nordkette.com/top-of-innsbruck/hungerburgbahn/"] },
   departureInterval: { minutes: 15, sourceUrl: timetable },
 };
 
@@ -72,7 +72,7 @@ describe("MountainFacilitySheet", () => {
     expect(within(dialog).getByText("No mapped geometry" )).toBeInTheDocument();
     expect(within(dialog).getByText(/6 min.*8 min|8 min.*6 min/u)).toBeInTheDocument();
     expect(within(dialog).getByText(/sources disagree.*no verified ride time/u)).toBeInTheDocument();
-    expect(within(dialog).getByText(/inventory checked.*10 Oct 2026/u)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Inventory checked.*10 Oct 2026/u)).toBeInTheDocument();
     expect(within(dialog).getByRole("link", { name: "Nordkette lift and piste status" })).toHaveAttribute("href", officialInventory);
     expect(within(dialog).queryByText(/next departure|queue|open now|closed now/u)).not.toBeInTheDocument();
   });
@@ -81,7 +81,8 @@ describe("MountainFacilitySheet", () => {
     renderFacility(seegrube);
     const dialog = screen.getByRole("dialog", { name: "Seegrubenbahn" });
     expect(within(dialog).getByText("Minimum 6.5 min")).toBeInTheDocument();
-    expect(within(dialog).getByText(/departures every 15 min.*may run continuously when demand is high/u)).toBeInTheDocument();
+    expect(within(dialog).getByText(/departures every 15 min/iu)).toBeInTheDocument();
+    expect(within(dialog).getByText(/at high demand, lifts may run continuously/iu)).toBeInTheDocument();
     expect(within(dialog).getByRole("link", { name: "Ride-time source" })).toHaveAttribute("href", operatorFacts);
     expect(within(dialog).getByRole("link", { name: "Timetable source" })).toHaveAttribute("href", timetable);
     expect(within(dialog).queryByText(/queue|next departure/u)).not.toBeInTheDocument();
@@ -110,7 +111,8 @@ describe("MountainFacilitySheet", () => {
     renderFacility(seegrube, "de");
     const dialog = screen.getByRole("dialog", { name: "Seegrubenbahn" });
     expect(within(dialog).getByText("Mindestens 6,5 Min.")).toBeInTheDocument();
-    expect(within(dialog).getByText(/Abfahrten alle 15 Min.*bei hoher Nachfrage durchgehend/u)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Abfahrten alle 15 Min/iu)).toBeInTheDocument();
+    expect(within(dialog).getByText(/bei hoher Nachfrage können die Lifte durchgehend fahren/iu)).toBeInTheDocument();
     expect(within(dialog).getByText(/Inventar geprüft.*10. Okt. 2026/u)).toBeInTheDocument();
   });
 });
