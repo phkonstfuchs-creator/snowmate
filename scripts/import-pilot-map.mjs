@@ -1,11 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { convertOverpass } from "../features/mountain-preview/data/convert.ts";
+import { convertOverpass } from "../features/mountain-data/convert.ts";
 import { writePilotSnapshotAtomically } from "./pilot-map-import-utils.mjs";
 
 const bbox = "47.285,11.37,47.315,11.40";
 const query = `[out:json][timeout:30];(way["aerialway"](${bbox});way["piste:type"](${bbox}););out meta geom;`;
-const target = resolve(import.meta.dirname, "../features/mountain-preview/data/pilot.json");
+const target = resolve(import.meta.dirname, "../features/mountain-data/pilot.json");
 const inputIndex = process.argv.indexOf("--from");
 
 try {

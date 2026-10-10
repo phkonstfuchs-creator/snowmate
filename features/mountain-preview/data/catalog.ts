@@ -1,5 +1,5 @@
-import rawData from "./pilot.json";
-import type { PilotGeoCollection, PilotGeoFeature } from "./convert";
+import { mountainFeatures, mountainGeoJSON } from "../../mountain-data/catalog";
+import type { MountainGeoCollection } from "../../mountain-data/convert";
 
 export interface PilotFeature {
   id: string;
@@ -9,23 +9,16 @@ export interface PilotFeature {
   duration?: string;
 }
 
-export const pilotGeoJSON = rawData as unknown as PilotGeoCollection;
+export const pilotGeoJSON = mountainGeoJSON as MountainGeoCollection;
+export const pilotFeatures: readonly PilotFeature[] = mountainFeatures.map(({ id, name, kind, difficulty, duration }) => ({
+  id,
+  name,
+  kind,
+  ...(difficulty === undefined ? {} : { difficulty }),
+  ...(duration === undefined ? {} : { duration }),
+}));
 
-function toPilotFeature(feature: PilotGeoFeature): PilotFeature {
-  const { properties } = feature;
-  const difficulty = properties["piste:difficulty"];
-  const duration = properties["aerialway:duration"] ?? properties.duration;
-  return {
-    id: feature.id,
-    name: properties.name,
-    kind: properties.kind,
-    ...(typeof difficulty === "string" ? { difficulty } : {}),
-    ...(typeof duration === "string" ? { duration } : {}),
-  };
-}
-
-export const pilotFeatures: readonly PilotFeature[] = pilotGeoJSON.features.map(toPilotFeature);
-
+/** Kept solely for the preview's older picker tests and non-source use. */
 export function pilotFeatureFromProperties(properties: Record<string, unknown>): PilotFeature | null {
   const id = properties.osm_id;
   const kind = properties.kind;

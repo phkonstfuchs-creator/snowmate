@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import MapScreen from "./MapScreen";
 import { toIsoDay, toLiveRide } from "@/features/rides/live-ride";
@@ -39,6 +39,44 @@ const liveRide = toLiveRide(
 
 describe("MapScreen", () => {
   Element.prototype.scrollIntoView = vi.fn();
+  it("lets a rider inspect a sourced lift without sharing their location", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    const entry = screen.getByRole("button", { name: "Pistes & lifts" });
+    expect(entry.closest(".mountain-map-stage")).toContainElement(screen.getByTestId("map"));
+    fireEvent.click(entry);
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.change(within(inventory).getByRole("searchbox"), { target: { value: "Seegrubenbahn" } });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Seegrubenbahn/ }));
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    const details = screen.getByRole("dialog", { name: "Seegrubenbahn" });
+    expect(within(details).getByText("Operational status unavailable")).toBeInTheDocument();
+    expect(within(details).queryByRole("button", { name: "Tell my crew" })).not.toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
+    expect(mapMock.props.mock.lastCall![0].focus).toMatchObject({ zoom: expect.any(Number) });
+  });
+
+  it("resolves map selections from the known catalog and ignores unknown ids", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/999999999"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
+    expect(screen.getByRole("dialog", { name: "Seegrubenbahn" })).toBeInTheDocument();
+  });
+
+  it("keeps a selected geometry highlighted after its details are closed", async () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck" }} />);
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Seegrubenbahn" })).getByRole("button", { name: "Close" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBe("way/25170582");
+  });
+
+  it("does not suggest Nordkette vector coverage in the Salzburg region", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck" }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Salzburg" }));
+    expect(screen.queryByRole("button", { name: "Pistes & lifts" })).not.toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+  });
   it("opens the requested lift picker directly for eligible riders", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: true, initialAction: "lift" }} />);
     expect(screen.getByRole("dialog", { name: "Choose your lift" })).toBeInTheDocument();

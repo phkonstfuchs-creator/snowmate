@@ -6,6 +6,8 @@
 
 **Bundled snapshot:** 30 OSM ways: 5 passenger aerialway ways and 25 piste ways, including multiple mapped sections with the same piste name. Snapshot-wide geometry bounds: `[11.3755319, 47.2861686, 11.3990069, 47.3121155]` (longitude, latitude).
 
+**Shared production location (2026-10-10):** `features/mountain-data/pilot.json` is the single snapshot used by both the normal map and the design preview. The importer targets this shared directory; preview TypeScript modules keep compatibility re-exports. Moving the snapshot does not refresh or expand its coverage.
+
 ## Coverage and provenance
 
 The query area is a compact Nordkette ski-area box. It does not include the full city-to-Hungerburg approach or prove full resort coverage. The 25 piste ways are source features and fragments, not 25 distinct complete runs. `disused:piste:type` and non-passenger aerialways are excluded. The import preserves every selected way's OSM id, version, timestamp and source tags; catalog ids link to `https://www.openstreetmap.org/way/<id>`. The app treats operational status as **unknown** because this extract does not establish current status.
@@ -22,7 +24,7 @@ OpenStreetMap data is © OpenStreetMap contributors and available under the [ODb
 
 ## Re-import and review
 
-For recurring updates use regional extracts or the read-only Overpass service. The OSM editing API fallback was a one-time pilot read, not the recommended refresh pipeline under its usage policy. Convert a saved XML extract with `python3 scripts/import-pilot-map-osmapi.py --from /path/to/extract.osm`. Alternatively, save an Overpass response and run `node scripts/import-pilot-map.mjs --from /path/to/overpass-response.json`. Review way ids, tags, versions, timestamps, feature count and bounds against a dated operator inventory before expanding a coverage claim. Keep missing ways missing; do not replace their geometry with straight station connections.
+For recurring updates use regional extracts or the read-only Overpass service. The OSM editing API fallback was a one-time pilot read, not the recommended refresh pipeline under its usage policy. Convert a saved XML extract with `python3 scripts/import-pilot-map-osmapi.py --from /path/to/extract.osm`. Alternatively, save an Overpass response and run `node scripts/import-pilot-map.mjs --from /path/to/overpass-response.json`. Review way ids, tags, versions, timestamps, feature count and bounds against a dated operator inventory before expanding a coverage claim. On every refresh, update `MOUNTAIN_SNAPSHOT_DATE` in `features/mountain-data/catalog.ts`, its expected value in `features/mountain-data/catalog.test.ts`, and the dated snapshot/operator evidence in this document in the same commit as `pilot.json`. Preserve the snapshot date separately from each OSM edit timestamp; moving or rebuilding the file is not a refresh. Verify the displayed date in both the inventory and details before release. Keep missing ways missing; do not replace their geometry with straight station connections.
 
 ## Source, package and cost matrix — 2026-10-09
 

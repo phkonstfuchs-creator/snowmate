@@ -46,6 +46,9 @@ import { useLiftMeetups } from "@/features/lift-meetup/useLiftMeetups";
 import LiftMeetupPanel from "@/features/lift-meetup/LiftMeetupPanel";
 import { START_MESSAGES, type LiftMeetup, type StartResult } from "@/features/lift-meetup/meetup";
 import MapLoading from "@/components/map/MapLoading";
+import { mountainFeatureById, mountainFeatureFocus } from "@/features/mountain-data/catalog";
+import MountainFeatureExplorer from "./MountainFeatureExplorer";
+import MountainFeatureSheet from "./MountainFeatureSheet";
 
 const SkiMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
@@ -61,7 +64,7 @@ const CONDITIONS_LABELS: Record<ResortStatus["conditions"], MessageKey> = {
   fresh: "map.fresh", groomed: "map.groomed", icy: "map.icy", slushy: "map.slushy",
 };
 
-type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | null;
+type ActiveMapSheet = { type: "resort"; resort: ResortStatus } | { type: "lift" } | { type: "mountain-list" } | { type: "mountain-feature"; featureId: string } | null;
 
 function ResortDetailSheet({
   resort,
@@ -329,6 +332,7 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   /* Opening a resort also flies the map there, close enough to read its
      pistes once the sheet is closed. */
   const openResort = (resort: ResortStatus) => {
+    setSelectedFeatureId(null);
     const coordinates = resortCoordinates(resort.name);
     if (coordinates) setFocus((prev) => ({ lat: coordinates[0], lng: coordinates[1], zoom: RESORT_ZOOM, key: (prev?.key ?? 0) + 1 }));
     setActiveSheet({ type: "resort", resort });
@@ -342,6 +346,19 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
   const [locateRequest, setLocateRequest] = useState(0);
   const [city, setCity] = useState<City>(live?.defaultCity ?? "innsbruck");
   const [activeSheet, setActiveSheet] = useState<ActiveMapSheet>(() => live?.initialAction === "lift" && live.canShareLift === true ? { type: "lift" } : null);
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
+  const selectedFeature = activeSheet?.type === "mountain-feature" ? mountainFeatureById(activeSheet.featureId) : null;
+  const openMountainFeature = (id: string) => {
+    if (city !== "innsbruck") return;
+    const feature = mountainFeatureById(id);
+    const featureView = mountainFeatureFocus(id);
+    if (!feature || !featureView) return;
+    setSelectedFriendId(null);
+    setSelectedFeatureId(feature.id);
+    setFocus((previous) => ({ ...featureView, key: (previous?.key ?? 0) + 1 }));
+    setActiveSheet({ type: "mountain-feature", featureId: feature.id });
+    mapStage.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
+  };
   /* Keep both controls visible; active sharing also has a direct Stop. */
   const [panel, setPanel] = useState<"day" | "share" | null>(null);
   const mapStage = useRef<HTMLDivElement>(null);
@@ -378,16 +395,22 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onPersonSelect={(id) => {
             const friend = location?.friends?.find((item) => item.userId === id);
             if (friend) focusOn(friend.lat, friend.lng, friend.userId);
-          }} focus={focus} locateRequest={locateRequest} pin={pin} track={live ? tracking?.state?.track ?? null : null} />
-        <div className="absolute left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
+          }} focus={focus} locateRequest={locateRequest} pin={pin} track={live ? tracking?.state?.track ?? null : null}
+          selectedFeatureId={selectedFeatureId} onFeatureSelect={openMountainFeature} />
+        <div className="absolute z-20 left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
           <SegmentedControl options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]} value={city}
-            onChange={(next) => { setCity(next); setSelectedFriendId(null); setFocus(null); }} ariaLabel={t("common.region")} />
+            onChange={(next) => { setCity(next); setSelectedFriendId(null); setSelectedFeatureId(null); setFocus(null); setActiveSheet(null); }} ariaLabel={t("common.region")} />
         </div>
+        {city === "innsbruck" && <button type="button" onClick={() => setActiveSheet({ type: "mountain-list" })}
+          className="absolute z-20 left-3 top-[72px] flex min-h-12 max-w-[calc(100%-24px)] items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--paper-0)", color: INK, boxShadow: "var(--shadow-card)" }}>
+          <Icon name="route" size={18} />{t("mountain.explore")}
+        </button>}
         {location && <button type="button" onClick={() => { setLocateRequest(Date.now()); locateMe(); }} aria-label={t("loc.locateMe")}
-          className="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full"
+          className="absolute z-20 right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full"
           style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}><Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} /></button>}
-        {location?.locating && <p role="status" className="absolute left-3 top-[72px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
-        {location && live?.canShareLift === true && <div className="absolute bottom-10 left-3 right-3">
+        {location?.locating && <p role="status" className="absolute z-20 left-3 top-[188px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
+        {location && live?.canShareLift === true && <div className="absolute z-20 bottom-10 left-3 right-3">
           <p className="mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold" style={{ background: "var(--paper-0)", color: INK }}>{t("coord.liftTitle")}</p>
           <div className="flex gap-2">
             <button type="button" disabled={meetups?.busy} onClick={() => setActiveSheet({ type: "lift" })}
@@ -451,6 +474,8 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
           onClose={() => setActiveSheet(null)}
         />
       )}
+      {activeSheet?.type === "mountain-list" && <MountainFeatureExplorer onSelect={openMountainFeature} onClose={() => setActiveSheet(null)} />}
+      {selectedFeature && <MountainFeatureSheet feature={selectedFeature} onClose={() => setActiveSheet(null)} onBrowse={() => setActiveSheet({ type: "mountain-list" })} />}
     </>
   );
 }

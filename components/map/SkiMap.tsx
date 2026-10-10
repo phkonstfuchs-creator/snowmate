@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Map as MapLibreMap, Marker, setWorkerUrl, type GeoJSONSource, type StyleSpecification } from "maplibre-gl";
+import { Map as MapLibreMap, Marker, setWorkerUrl, type GeoJSONSource, type MapLayerMouseEvent, type StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import MapLoading from "./MapLoading";
 
@@ -9,6 +9,7 @@ import type { ResortStatus } from "@/lib/types";
 import { useT } from "@/lib/i18n/client";
 import { resortCoordinates } from "@/lib/resorts";
 import { createMarkerContent } from "@/features/resorts/marker-content";
+import { mountainFeatureFromProperties, mountainGeoJSON } from "@/features/mountain-data/catalog";
 import {
   PISTE_ATTRIBUTION,
   PISTE_TILES,
@@ -20,6 +21,12 @@ import {
   clampAccuracy,
   paperTint,
 } from "./map-style";
+import {
+  MOUNTAIN_LIFT_HIT_LAYER,
+  MOUNTAIN_PISTE_HIT_LAYER,
+  MOUNTAIN_SOURCE,
+  mountainLayers,
+} from "./mountain-layers";
 
 const CITY_VIEWS = {
   innsbruck: { center: [11.32, 47.22] as [number, number], zoom: 9.4 },
@@ -56,12 +63,16 @@ interface SkiMapProps {
   locateRequest?: number;
   /* A position sent in a chat. */
   pin?: { lat: number; lng: number; label: string } | null;
+  /* OSM way selected from the Innsbruck piste and lift overlay. */
+  selectedFeatureId?: string | null;
+  onFeatureSelect?: (id: string) => void;
   /* The ski day being recorded, [lng, lat] points; drawn as a line. */
   track?: readonly [number, number][] | null;
   ariaLabel?: string;
 }
 
 const TRACK_SOURCE = "ski-day-track";
+const EMPTY_MOUNTAIN_GEOJSON = { type: "FeatureCollection", features: [] } as const;
 
 function addTrackLayer(map: MapLibreMap) {
   if (map.getSource(TRACK_SOURCE)) return;
@@ -95,33 +106,44 @@ function addAccuracyLayer(map: MapLibreMap) {
 /* Hill shading under the labels, pistes and lifts on top. Both are
    extras: if their tiles fail, the base map still works. */
 function addSkiLayers(map: MapLibreMap) {
-  if (map.getSource("pistes")) return;
   const firstLabel = map.getStyle()?.layers?.find((layer) => layer.type === "symbol")?.id;
-  map.addSource("terrain", {
-    type: "raster-dem",
-    tiles: [TERRAIN_TILES],
-    encoding: "terrarium",
-    tileSize: 256,
-    maxzoom: 14,
-    attribution: TERRAIN_ATTRIBUTION,
-  });
-  map.addLayer(
-    {
-      id: "hillshade",
-      type: "hillshade",
-      source: "terrain",
-      paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#5b5446", "hillshade-highlight-color": "#ffffff" },
-    },
-    firstLabel,
-  );
-  map.addSource("pistes", {
-    type: "raster",
-    tiles: [PISTE_TILES],
-    tileSize: 256,
-    maxzoom: 18,
-    attribution: PISTE_ATTRIBUTION,
-  });
-  map.addLayer({ id: "pistes", type: "raster", source: "pistes", paint: { "raster-opacity": 0.95 } });
+  try {
+    if (!map.getSource("terrain")) {
+      map.addSource("terrain", {
+        type: "raster-dem",
+        tiles: [TERRAIN_TILES],
+        encoding: "terrarium",
+        tileSize: 256,
+        maxzoom: 14,
+        attribution: TERRAIN_ATTRIBUTION,
+      });
+      map.addLayer(
+        {
+          id: "hillshade",
+          type: "hillshade",
+          source: "terrain",
+          paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#5b5446", "hillshade-highlight-color": "#ffffff" },
+        },
+        firstLabel,
+      );
+    }
+  } catch (error) {
+    console.warn("Optional ski map terrain layer could not be added", error);
+  }
+  try {
+    if (!map.getSource("pistes")) {
+      map.addSource("pistes", {
+        type: "raster",
+        tiles: [PISTE_TILES],
+        tileSize: 256,
+        maxzoom: 18,
+        attribution: PISTE_ATTRIBUTION,
+      });
+      map.addLayer({ id: "pistes", type: "raster", source: "pistes", paint: { "raster-opacity": 0.95 } }, firstLabel);
+    }
+  } catch (error) {
+    console.warn("Optional raster piste layer could not be added", error);
+  }
 }
 
 function tintStyle(map: MapLibreMap) {
@@ -141,6 +163,8 @@ export default function SkiMap({
   focus = null,
   locateRequest = 0,
   pin = null,
+  selectedFeatureId = null,
+  onFeatureSelect,
   track = null,
   ariaLabel,
 }: SkiMapProps) {
@@ -153,11 +177,21 @@ export default function SkiMap({
   const handledLocate = useRef(0);
   const shownCity = useRef(city);
   const latestMe = useRef(me);
+  const latestCity = useRef(city);
+  const latestSelectedFeatureId = useRef(selectedFeatureId);
+  const latestFeatureSelect = useRef(onFeatureSelect);
   const [styleReady, setStyleReady] = useState(false);
   const [tilesReady, setTilesReady] = useState(false);
   const [slow, setSlow] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [mountainOverlayFailed, setMountainOverlayFailed] = useState(false);
   const t = useT();
+
+  useEffect(() => {
+    latestCity.current = city;
+    latestSelectedFeatureId.current = selectedFeatureId;
+    latestFeatureSelect.current = onFeatureSelect;
+  }, [city, selectedFeatureId, onFeatureSelect]);
 
   /* Create the map once. Markers are DOM elements and survive a style
      change; the accuracy layer is re-added on every style load. */
@@ -197,6 +231,62 @@ export default function SkiMap({
 
     let loaded = false;
     let fellBack = false;
+    const mountainClickListeners: { layers: string[]; handler: (event: MapLayerMouseEvent) => void }[] = [];
+    const removeMountainClickListeners = () => {
+      for (const { layers, handler } of mountainClickListeners.splice(0)) {
+        try { map.off("click", layers, handler); } catch { /* Style reload may already have removed the layer. */ }
+      }
+    };
+    const updateRasterVisibility = () => {
+      try {
+        if (!map.getLayer("pistes")) return;
+        // A partial inventory cannot replace every line in the viewport,
+        // including when the optional selectable overlay fails to install.
+        map.setLayoutProperty("pistes", "visibility", "visible");
+      } catch (error) {
+        console.warn("Optional raster piste visibility could not be updated", error);
+      }
+    };
+    const syncMountainOverlay = () => {
+      removeMountainClickListeners();
+      try {
+        if (!map.getSource(MOUNTAIN_SOURCE)) {
+          map.addSource(MOUNTAIN_SOURCE, {
+            type: "geojson",
+            attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>',
+            data: latestCity.current === "innsbruck" ? mountainGeoJSON : EMPTY_MOUNTAIN_GEOJSON,
+          });
+        }
+        const source = map.getSource(MOUNTAIN_SOURCE) as GeoJSONSource | undefined;
+        source?.setData(latestCity.current === "innsbruck" ? mountainGeoJSON : EMPTY_MOUNTAIN_GEOJSON);
+        const firstLabel = map.getStyle()?.layers?.find((layer) => layer.type === "symbol")?.id;
+        for (const layer of mountainLayers(latestSelectedFeatureId.current)) {
+          if (!map.getLayer(layer.id)) map.addLayer(layer, firstLabel);
+        }
+        const handleClick = (event: MapLayerMouseEvent) => {
+          if (latestCity.current !== "innsbruck") return;
+          const features = event.features ?? [];
+          // The lift hit layer is above the piste hit layer. Resolve overlap
+          // once in draw order instead of dispatching one callback per layer.
+          const feature = features.find(({ layer }) => layer.id === MOUNTAIN_LIFT_HIT_LAYER)
+            ?? features.find(({ layer }) => layer.id === MOUNTAIN_PISTE_HIT_LAYER);
+          if (!feature) return;
+          const expectedKind = feature.layer.id === MOUNTAIN_LIFT_HIT_LAYER ? "lift" : "piste";
+          const properties = feature.properties;
+          if (!properties || typeof properties !== "object") return;
+          const mountainFeature = mountainFeatureFromProperties(properties as Record<string, unknown>);
+          if (mountainFeature?.kind === expectedKind) latestFeatureSelect.current?.(mountainFeature.id);
+        };
+        const hitLayers = [MOUNTAIN_PISTE_HIT_LAYER, MOUNTAIN_LIFT_HIT_LAYER];
+        map.on("click", hitLayers, handleClick);
+        mountainClickListeners.push({ layers: hitLayers, handler: handleClick });
+        updateRasterVisibility();
+        setMountainOverlayFailed(false);
+      } catch (error) {
+        console.warn("Optional mountain feature overlay could not be added", error);
+        setMountainOverlayFailed(latestCity.current === "innsbruck");
+      }
+    };
     const fallBack = () => {
       if (loaded || fellBack) return;
       fellBack = true;
@@ -218,13 +308,16 @@ export default function SkiMap({
       loaded = true;
       window.clearTimeout(timer);
       // Optional piste/terrain requests must not hold a usable base map hostage.
-      baseSources = Object.keys(map.getStyle()?.sources ?? {}).filter((id) => !["pistes", "terrain", ACCURACY_SOURCE, TRACK_SOURCE].includes(id));
+      baseSources = Object.keys(map.getStyle()?.sources ?? {}).filter((id) => !["pistes", "terrain", ACCURACY_SOURCE, TRACK_SOURCE, MOUNTAIN_SOURCE].includes(id));
       if (!fellBack) tintStyle(map);
       addSkiLayers(map);
+      syncMountainOverlay();
       addAccuracyLayer(map);
       addTrackLayer(map);
+      updateRasterVisibility();
       setStyleReady(true);
     });
+    map.on("move", updateRasterVisibility);
     map.on("error", () => {
       if (!loaded) fallBack();
     });
@@ -238,6 +331,8 @@ export default function SkiMap({
       window.clearTimeout(timer);
       window.clearTimeout(readinessTimer);
       observer.disconnect();
+      removeMountainClickListeners();
+      map.off("move", updateRasterVisibility);
       map.remove();
       mapRef.current = null;
       resortMarkers.current = [];
@@ -254,7 +349,17 @@ export default function SkiMap({
     shownCity.current = city;
     const view = CITY_VIEWS[city];
     map.flyTo({ center: view.center, zoom: view.zoom, duration: 900, essential: true });
+    const source = map.getSource(MOUNTAIN_SOURCE) as GeoJSONSource | undefined;
+    source?.setData(city === "innsbruck" ? mountainGeoJSON : EMPTY_MOUNTAIN_GEOJSON);
   }, [city]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady) return;
+    for (const layer of mountainLayers(city === "innsbruck" ? selectedFeatureId : null)) {
+      if (map.getLayer(layer.id)) map.setFilter(layer.id, layer.filter ?? null);
+    }
+  }, [city, selectedFeatureId, styleReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -400,6 +505,15 @@ export default function SkiMap({
       style={{ width: "100%", height: "100%", minHeight: 260 }}
       />
       {!tilesReady && <MapLoading slow={slow} />}
+      {mountainOverlayFailed && city === "innsbruck" && (
+        <div
+          role="status"
+          className="pointer-events-none absolute left-3 right-3 top-[132px] z-10 rounded-xl px-3 py-2 text-xs shadow"
+          style={{ color: "var(--text-primary)", background: "var(--paper-0)" }}
+        >
+          {t("mountain.overlayUnavailable")}
+        </div>
+      )}
     </div>
   );
 }
