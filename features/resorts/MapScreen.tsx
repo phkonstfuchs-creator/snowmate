@@ -117,7 +117,7 @@ function ResortDetailSheet({
         <div className="flex justify-center pt-3">
           <div className="w-9 h-1 rounded-full" style={{ background: BORDER }} />
         </div>
-        <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="absolute right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
+        <button type="button" onClick={dismiss} aria-label={t("map.closeDetails")} className="absolute z-20 right-3 top-2 z-10 flex h-11 w-11 items-center justify-center">
           <Icon name="x" size={18} color={MUTED} strokeWidth={2} />
         </button>
 
@@ -133,7 +133,7 @@ function ResortDetailSheet({
                 className="object-cover"
               />
             ) : (
-              <ResortScene name={resort.name} className="absolute inset-0 w-full h-full" />
+              <ResortScene name={resort.name} className="absolute z-20 inset-0 w-full h-full" />
             )}
             {!isLive && (
               <span
@@ -397,20 +397,20 @@ function MapBody({ live, location, meetups }: { live?: LiveMap; location?: Locat
             if (friend) focusOn(friend.lat, friend.lng, friend.userId);
           }} focus={focus} locateRequest={locateRequest} pin={pin} track={live ? tracking?.state?.track ?? null : null}
           selectedFeatureId={selectedFeatureId} onFeatureSelect={openMountainFeature} />
-        <div className="absolute left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
+        <div className="absolute z-20 left-3 right-[72px] top-3 rounded-full p-1" style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}>
           <SegmentedControl options={[{ value: "innsbruck", label: "Innsbruck" }, { value: "salzburg", label: "Salzburg" }]} value={city}
             onChange={(next) => { setCity(next); setSelectedFriendId(null); setSelectedFeatureId(null); setFocus(null); setActiveSheet(null); }} ariaLabel={t("common.region")} />
         </div>
         {city === "innsbruck" && <button type="button" onClick={() => setActiveSheet({ type: "mountain-list" })}
-          className="absolute left-3 top-[72px] flex min-h-12 max-w-[calc(100%-24px)] items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+          className="absolute z-20 left-3 top-[72px] flex min-h-12 max-w-[calc(100%-24px)] items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
           style={{ background: "var(--paper-0)", color: INK, boxShadow: "var(--shadow-card)" }}>
           <Icon name="route" size={18} />{t("mountain.explore")}
         </button>}
         {location && <button type="button" onClick={() => { setLocateRequest(Date.now()); locateMe(); }} aria-label={t("loc.locateMe")}
-          className="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full"
+          className="absolute z-20 right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full"
           style={{ background: "var(--paper-0)", boxShadow: "var(--shadow-card)" }}><Icon name="locate" size={20} color={location.me ? "#2f6fb2" : INK} /></button>}
-        {location?.locating && <p role="status" className="absolute left-3 top-[188px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
-        {location && live?.canShareLift === true && <div className="absolute bottom-10 left-3 right-3">
+        {location?.locating && <p role="status" className="absolute z-20 left-3 top-[188px] rounded-full px-3 py-2 text-xs" style={{ background: "var(--paper-0)", color: INK }}>{t("loc.locating")}</p>}
+        {location && live?.canShareLift === true && <div className="absolute z-20 bottom-10 left-3 right-3">
           <p className="mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold" style={{ background: "var(--paper-0)", color: INK }}>{t("coord.liftTitle")}</p>
           <div className="flex gap-2">
             <button type="button" disabled={meetups?.busy} onClick={() => setActiveSheet({ type: "lift" })}
