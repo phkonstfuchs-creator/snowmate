@@ -54,3 +54,37 @@ test("the static inventory remains useful when map providers fail and stops at i
   await page.getByRole("button", { name: "Salzburg", exact: true }).click();
   await expect(page.getByRole("button", { name: "Pistes & lifts", exact: true })).toHaveCount(0);
 });
+
+test("tapping the rendered lift opens its canonical details", async ({ page }, testInfo) => {
+  await page.context().addCookies([{ name: "sm_locale", value: "en", domain: "127.0.0.1", path: "/" }]);
+  // Keep this renderer test independent of external tile services.
+  await page.route("https://tiles.openfreemap.org/styles/positron", (route) => route.fulfill({
+    json: { version: 8, sources: {}, layers: [{ id: "paper", type: "background", paint: { "background-color": "#edf1ec" } }] },
+  }));
+  await page.route("https://tiles.opensnowmap.org/**", (route) => route.abort());
+  await page.route("https://s3.amazonaws.com/elevation-tiles-prod/**", (route) => route.abort());
+  await page.goto("/demo/map");
+  const canvas = page.locator(".maplibregl-canvas");
+  await expect(canvas).toBeVisible();
+  await page.getByRole("button", { name: "Pistes & lifts", exact: true }).click();
+  const inventory = page.getByRole("dialog", { name: "Pistes & lifts", exact: true });
+  await inventory.getByRole("searchbox").fill("Seegrubenbahn");
+  await inventory.getByRole("button", { name: "Seegrubenbahn", exact: true }).click();
+  await page.getByRole("dialog", { name: "Seegrubenbahn", exact: true }).getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // The documented camera flight lasts 800 ms; project a source coordinate
+  // after it completes, without exposing MapLibre internals on the window.
+  await page.waitForTimeout(1000);
+  const box = await canvas.boundingBox();
+  expect(box).not.toBeNull();
+  if (!box) throw new Error("The rendered map must have a viewport");
+  const mercatorY = (lat: number) => (1 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / Math.PI) / 2;
+  const center = { lng: (11.3797446 + 11.3990069) / 2, lat: (47.2861686 + 47.3063876) / 2 };
+  const point = { lng: 11.3904186, lat: 47.2951844 };
+  const scale = 512 * 2 ** 10;
+  await page.screenshot({ path: testInfo.outputPath("rendered-lift.png") });
+  await page.mouse.click(box.x + box.width / 2 + (point.lng - center.lng) / 360 * scale,
+    box.y + box.height / 2 + (mercatorY(point.lat) - mercatorY(center.lat)) * scale);
+  await expect(page.getByRole("dialog", { name: "Seegrubenbahn", exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(1);
+});

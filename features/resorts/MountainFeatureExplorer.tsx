@@ -40,7 +40,7 @@ export default function MountainFeatureExplorer({
 
   return (
     <Sheet title={t("mountain.title")} subtitle={t("mountain.resort")} onClose={onClose} className={styles.sheet}>
-      <section className={styles.explorer} aria-label={t("mountain.inventory")}> 
+      <section className={styles.explorer} aria-label={t("mountain.inventory")}>
         <p className={styles.coverage}>{t("mountain.coverageSummary", { pistes: pisteCount, lifts: liftCount })}</p>
         <p className={styles.partialCoverage}>{t("mountain.partialCoverage")}</p>
 
