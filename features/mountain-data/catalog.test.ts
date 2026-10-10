@@ -49,7 +49,7 @@ describe("shared Nordkette mountain catalog", () => {
     expect(focus?.lat).toBeLessThan(47.5);
     expect(focus?.lng).toBeGreaterThan(11.2);
     expect(focus?.lng).toBeLessThan(11.5);
-    expect(focus?.zoom).toBeGreaterThan(0);
+    expect(focus?.zoom).toBeGreaterThanOrEqual(12);
     expect(focus?.zoom).toBeLessThanOrEqual(20);
     expect(mountainFeatureFocus("way/999999999")).toBeNull();
     expect(mountainFeatureFocus("25170582")).toBeNull();
