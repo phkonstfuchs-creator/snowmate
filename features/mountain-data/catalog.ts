@@ -60,6 +60,6 @@ export function mountainFeatureFocus(id: string): MountainFeatureFocus | null {
   if (!bounds) return null;
   const [west, south, east, north] = bounds;
   const span = Math.max(east - west, north - south);
-  const zoom = span <= 0.001 ? 16 : span <= 0.005 ? 14 : span <= 0.02 ? 12 : 10;
+  const zoom = span <= 0.001 ? 16 : span <= 0.005 ? 14 : span <= 0.03 ? 12 : 10;
   return { lat: (south + north) / 2, lng: (west + east) / 2, zoom };
 }

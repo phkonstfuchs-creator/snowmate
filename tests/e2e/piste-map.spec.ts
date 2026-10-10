@@ -82,7 +82,7 @@ test("tapping the rendered lift opens its canonical details", async ({ page }, t
   const mercatorY = (lat: number) => (1 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / Math.PI) / 2;
   const center = { lng: (11.3797446 + 11.3990069) / 2, lat: (47.2861686 + 47.3063876) / 2 };
   const point = { lng: 11.3904186, lat: 47.2951844 };
-  const scale = 512 * 2 ** 10;
+  const scale = 512 * 2 ** 12;
   const screenshot = await page.screenshot({ path: testInfo.outputPath("rendered-lift.png") });
   const pixels = await sharp(screenshot).removeAlpha().raw().toBuffer();
   let highlightedPixels = 0;
