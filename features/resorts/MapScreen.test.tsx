@@ -81,6 +81,19 @@ describe("MapScreen", () => {
     expect(mapMock.props.mock.lastCall![0].focus).toBeNull();
   });
 
+  it("clears an old mapped highlight before opening an unrelated facility without moving the camera", () => {
+    render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
+    act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/25170582"));
+    const priorFocus = mapMock.props.mock.lastCall![0].focus;
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Seegrubenbahn" })).getByRole("button", { name: "Browse all pistes and lifts" }));
+    const inventory = screen.getByRole("dialog", { name: "Pistes & lifts" });
+    fireEvent.click(within(inventory).getByRole("button", { name: /Hungerburgbahn/u }));
+
+    expect(screen.getByRole("dialog", { name: "Hungerburgbahn" })).toBeInTheDocument();
+    expect(mapMock.props.mock.lastCall![0].selectedFeatureId).toBeNull();
+    expect(mapMock.props.mock.lastCall![0].focus).toEqual(priorFocus);
+  });
+
   it("resolves map selections from the known catalog and ignores unknown ids", () => {
     render(<MapScreen live={{ rides: [], defaultCity: "innsbruck", canShareLift: false }} />);
     act(() => mapMock.props.mock.lastCall![0].onFeatureSelect("way/999999999"));
